@@ -1,13 +1,20 @@
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #1c1c1c;
+  --primary: #3d352e; /* dark beige/brown often found in fashion */
+  --secondary: #f4f4f4; /* light gray for backgrounds */
+  --accent: #d2b48c; /* subtle gold/beige */
+  
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 8rem;
+  
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --border-radius-full: 9999px;
 }
 
 html {
@@ -18,15 +25,15 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  font-family: var(--font-josefin-sans), sans-serif;
+  color: var(--foreground);
+  background: var(--background);
 }
 
 body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -42,8 +49,47 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* Typography Classes */
+.h1 { font-size: 3rem; font-weight: 300; letter-spacing: 0.1em; text-transform: uppercase; }
+.h2 { font-size: 2.25rem; font-weight: 300; letter-spacing: 0.05em; text-transform: uppercase; }
+.h3 { font-size: 1.5rem; font-weight: 400; letter-spacing: 0.05em; }
+.subtitle { font-size: 1.125rem; font-weight: 300; color: #666; letter-spacing: 0.1em; text-transform: uppercase; }
+.text-body { font-size: 1rem; line-height: 1.6; }
+.text-small { font-size: 0.875rem; color: #666; }
+
+/* Buttons */
+.btn-primary {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background-color: var(--primary);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--primary);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--primary);
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background-color: transparent;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: 1px solid var(--primary);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary);
+  color: #fff;
 }
