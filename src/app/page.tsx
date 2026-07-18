@@ -8,14 +8,21 @@ import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
 import HomepageSection from '@/models/HomepageSection';
+import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
 
 export const revalidate = 0;
 
 export default async function Home() {
   await dbConnect();
   
-  // Fetch up to 4 featured products
-  const featuredProducts = await Product.find({ isFeatured: true }).limit(4).lean();
+  // Fetch up to 4 featured products and serialize them for Client Components
+  const rawFeaturedProducts = await Product.find({ isFeatured: true }).limit(4).lean();
+  const featuredProducts = rawFeaturedProducts.map((p: any) => ({
+    ...p,
+    _id: p._id.toString(),
+    createdAt: p.createdAt ? p.createdAt.toString() : null,
+    updatedAt: p.updatedAt ? p.updatedAt.toString() : null,
+  }));
   
   // Fetch hero campaigns
   const campaigns = await HeroCampaign.find({}).sort({ order: 1 }).lean();
@@ -59,25 +66,15 @@ export default async function Home() {
         <DynamicCategoryShowcase categoryName="Beauty" campaigns={beautyMedia} />
         
         {/* Featured Products */}
-        <section style={{ padding: '8rem 2rem', textAlign: 'center', maxWidth: '1600px', margin: '0 auto' }}>
+        <section style={{ padding: '8rem 0', textAlign: 'center', width: '100%', overflow: 'hidden' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }}>
             Featured Arrivals
           </h2>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '4rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto 4rem auto', lineHeight: '1.6' }}>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>
             Curated collection for the season
           </p>
           
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '3rem 2rem',
-            marginTop: '3rem',
-            textAlign: 'left'
-          }}>
-            {featuredProducts.map((product: any) => (
-              <ProductCard key={product._id.toString()} product={product} />
-            ))}
-          </div>
+          <PremiumFeaturedCarousel products={featuredProducts} />
 
           <div style={{ marginTop: '4rem' }}>
             <a href="/products" style={{

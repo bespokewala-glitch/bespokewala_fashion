@@ -9,9 +9,10 @@ export interface ProductCardProps {
     images: string[];
     category: string;
   };
+  variant?: 'default' | 'slider';
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, variant = 'default' }: ProductCardProps) {
   const cardStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -26,6 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     aspectRatio: '2/3',
     overflow: 'hidden',
     backgroundColor: '#f9f9f9',
+    borderRadius: variant === 'slider' ? '24px' : '0px',
   };
 
   const imgStyle: React.CSSProperties = {
