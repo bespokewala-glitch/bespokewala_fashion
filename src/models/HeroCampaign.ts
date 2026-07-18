@@ -5,6 +5,8 @@ export interface IHeroCampaign extends Document {
   subtitle: string;
   videoUrl: string;
   linkUrl: string;
+  category: string;
+  mediaType: string;
   order: number;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +31,16 @@ const HeroCampaignSchema = new Schema<IHeroCampaign>(
     linkUrl: {
       type: String,
       required: false,
+    },
+    category: {
+      type: String,
+      enum: ['couture', 'jewellery', 'diffusion', 'beauty', 'general'],
+      default: 'general',
+    },
+    mediaType: {
+      type: String,
+      enum: ['video', 'image'],
+      default: 'image',
     },
     order: {
       type: Number,

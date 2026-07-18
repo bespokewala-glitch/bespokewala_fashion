@@ -14,7 +14,9 @@ export default function AdminCampaignsPage() {
     title: '',
     subtitle: '',
     linkUrl: '/products?category=couture',
-    videoUrl: ''
+    videoUrl: '',
+    category: 'couture',
+    mediaType: 'image'
   });
 
   const fetchCampaigns = async () => {
@@ -52,7 +54,12 @@ export default function AdminCampaignsPage() {
       });
       const result = await res.json();
       if (result.success) {
-        setFormData(prev => ({ ...prev, videoUrl: result.videoUrl }));
+        const isVideo = result.videoUrl.match(/\.(mp4|webm|ogg)$/i) != null;
+        setFormData(prev => ({ 
+          ...prev, 
+          videoUrl: result.videoUrl,
+          mediaType: isVideo ? 'video' : 'image'
+        }));
       } else {
         alert('Upload failed: ' + result.error);
       }
@@ -100,7 +107,7 @@ export default function AdminCampaignsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setFormData({ title: '', subtitle: '', linkUrl: '/products?category=couture', videoUrl: '' });
+        setFormData({ title: '', subtitle: '', linkUrl: '/products?category=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchCampaigns();
       } else {
@@ -178,6 +185,21 @@ export default function AdminCampaignsPage() {
               </select>
             </div>
 
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category</label>
+              <select 
+                value={formData.category}
+                onChange={e => setFormData({...formData, category: e.target.value})}
+                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+              >
+                <option value="couture">Couture</option>
+                <option value="jewellery">Jewellery</option>
+                <option value="diffusion">Diffusion</option>
+                <option value="beauty">Beauty</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+
             {/* DRAG AND DROP ZONE */}
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Media File (Video or Image)</label>
@@ -249,6 +271,7 @@ export default function AdminCampaignsPage() {
                   <div>
                     <h3 style={{ fontSize: '1.2rem', margin: '0 0 5px 0' }}>{camp.title}</h3>
                     <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem' }}>{camp.subtitle}</p>
+                    <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}><strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{camp.category || 'general'}</span> ({camp.mediaType || (isImage ? 'image' : 'video')})</p>
                     <p style={{ margin: '0 0 15px 0', fontSize: '0.8rem' }}><strong>Link:</strong> {camp.linkUrl}</p>
                     <button 
                       onClick={() => handleDelete(camp._id)}
