@@ -103,22 +103,22 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
 
             if (distance === 0) {
               // Center item
-              width = '400px';
-              height = '600px';
+              width = '320px';
+              height = '480px';
               scale = 1.05;
               opacity = 1;
               zIndex = 20;
             } else if (distance === 1) {
               // Immediate left/right
-              width = '280px';
-              height = '420px';
+              width = '240px';
+              height = '360px';
               scale = 0.95;
               opacity = 0.7;
               zIndex = 10;
             } else if (distance === 2) {
               // Outer left/right
-              width = '200px';
-              height = '300px';
+              width = '180px';
+              height = '270px';
               scale = 0.85;
               opacity = 0.3;
               zIndex = 5;
