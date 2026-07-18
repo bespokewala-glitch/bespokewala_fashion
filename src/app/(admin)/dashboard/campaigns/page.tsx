@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
 
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -138,12 +137,8 @@ export default function AdminCampaignsPage() {
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div style={{ marginBottom: '20px' }}>
         <h1 style={{ fontSize: '2rem', margin: 0 }}>Hero Campaigns Admin</h1>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <Link href="/dashboard/campaigns" style={{ padding: '8px 16px', backgroundColor: '#000', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>Campaigns</Link>
-          <Link href="/dashboard/products" style={{ padding: '8px 16px', backgroundColor: '#eee', color: '#000', textDecoration: 'none', borderRadius: '4px' }}>Products</Link>
-        </div>
       </div>
       
       <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>

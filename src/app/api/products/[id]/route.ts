@@ -4,11 +4,12 @@ import Product from '@/models/Product';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-    const id = params.id;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
     
     if (!id) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });

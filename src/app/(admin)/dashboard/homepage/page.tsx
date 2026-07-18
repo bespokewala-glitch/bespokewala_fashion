@@ -125,8 +125,10 @@ export default function HomepageCMS() {
   const carouselItems = sections.LookbookCarousel?.items || [{}, {}, {}, {}, {}];
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px' }}>
-      <h1 style={{ fontSize: '2rem', marginBottom: '30px' }}>Homepage Content Manager</h1>
+    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '30px' }}>
+        <h1 style={{ fontSize: '2rem', margin: 0 }}>Homepage Content Manager</h1>
+      </div>
       <p style={{ color: '#666', marginBottom: '20px' }}>Update the images and text for your advanced homepage sections here.</p>
 
       {/* Hidden File Input */}
