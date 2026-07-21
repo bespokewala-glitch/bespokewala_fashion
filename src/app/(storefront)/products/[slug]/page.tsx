@@ -4,6 +4,7 @@ import Product from '@/models/Product';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductGallery from '@/components/product/ProductGallery';
+import ProductActions from '@/components/product/ProductActions';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 0;
@@ -158,9 +159,13 @@ export default async function ProductDetailPage({
         
         <div style={{ position: 'relative' }}>
           <div style={detailsContainerStyle}>
-            {product.category && (
-              <div style={categoryStyle}>{product.category}</div>
-            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '-0.5rem' }}>
+              {product.category ? (
+                <div style={{ ...categoryStyle, marginBottom: 0 }}>{product.category}</div>
+              ) : <div />}
+              
+              <ProductActions productName={product.name} />
+            </div>
             
             <h1 style={titleStyle}>{product.name}</h1>
             

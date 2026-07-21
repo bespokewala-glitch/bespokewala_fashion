@@ -25,13 +25,18 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const res = await fetch(`${baseUrl}/api/products`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       const data = await res.json();
       if (Array.isArray(data)) {
         setProducts(data);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (e: any) {
+      console.error('Fetch products error:', e);
+      // Don't throw unhandled promise rejections
     } finally {
       setLoading(false);
     }
