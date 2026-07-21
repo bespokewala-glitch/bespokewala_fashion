@@ -17,6 +17,8 @@ export default function AdminProductsPage() {
     category: 'couture',
     subcategory: '',
     imageUrl: '',
+    referenceImages: { front: '', back: '', left: '', right: '' },
+    sizes: [] as string[],
     inventoryCount: '10',
     isFeatured: false,
   });
@@ -39,7 +41,7 @@ export default function AdminProductsPage() {
     fetchProducts();
   }, []);
 
-  const handleUploadFile = async (file: File) => {
+  const handleUploadFile = async (file: File, target: 'main' | 'front' | 'back' | 'left' | 'right') => {
     if (!file.type.startsWith('image/')) {
       alert('Please upload a valid image file');
       return;
@@ -56,10 +58,19 @@ export default function AdminProductsPage() {
       });
       const result = await res.json();
       if (result.success) {
-        setFormData(prev => ({ 
-          ...prev, 
-          imageUrl: result.videoUrl // The upload API returns 'videoUrl' for all files
-        }));
+        setFormData(prev => {
+          if (target === 'main') {
+            return { ...prev, imageUrl: result.videoUrl };
+          } else {
+            return {
+              ...prev,
+              referenceImages: {
+                ...prev.referenceImages,
+                [target]: result.videoUrl
+              }
+            };
+          }
+        });
       } else {
         alert('Upload failed: ' + result.error);
       }
@@ -70,9 +81,25 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, target: 'main' | 'front' | 'back' | 'left' | 'right') => {
     const file = e.target.files?.[0];
-    if (file) handleUploadFile(file);
+    if (file) handleUploadFile(file, target);
+  };
+
+  const handleRemoveImage = (target: 'main' | 'front' | 'back' | 'left' | 'right') => {
+    setFormData(prev => {
+      if (target === 'main') {
+        return { ...prev, imageUrl: '' };
+      } else {
+        return {
+          ...prev,
+          referenceImages: {
+            ...prev.referenceImages,
+            [target]: ''
+          }
+        };
+      }
+    });
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -85,11 +112,21 @@ export default function AdminProductsPage() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent, target: 'main' | 'front' | 'back' | 'left' | 'right') => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) handleUploadFile(file);
+    if (file) handleUploadFile(file, target);
+  };
+
+  const toggleSize = (size: string) => {
+    setFormData(prev => {
+      if (prev.sizes.includes(size)) {
+        return { ...prev, sizes: prev.sizes.filter(s => s !== size) };
+      } else {
+        return { ...prev, sizes: [...prev.sizes, size] };
+      }
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,6 +144,8 @@ export default function AdminProductsPage() {
       category: formData.category,
       subcategory: formData.subcategory,
       images: [formData.imageUrl],
+      referenceImages: formData.referenceImages,
+      sizes: formData.sizes,
       inventoryCount: Number(formData.inventoryCount),
       isFeatured: formData.isFeatured,
     };
@@ -121,7 +160,10 @@ export default function AdminProductsPage() {
       if (res.ok) {
         setFormData({ 
           name: '', description: '', price: '', originalPrice: '', 
-          category: 'couture', subcategory: '', imageUrl: '', inventoryCount: '10', isFeatured: false 
+          category: 'couture', subcategory: '', imageUrl: '', 
+          referenceImages: { front: '', back: '', left: '', right: '' },
+          sizes: [],
+          inventoryCount: '10', isFeatured: false 
         });
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchProducts();
@@ -241,6 +283,33 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Available Sizes</label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'].map(size => (
+                  <label key={size} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    cursor: 'pointer',
+                    padding: '5px 10px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    backgroundColor: formData.sizes.includes(size) ? '#000' : '#fff',
+                    color: formData.sizes.includes(size) ? '#fff' : '#000'
+                  }}>
+                    <input 
+                      type="checkbox"
+                      checked={formData.sizes.includes(size)}
+                      onChange={() => toggleSize(size)}
+                      style={{ display: 'none' }}
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
               <input 
                 type="checkbox" 
@@ -256,11 +325,11 @@ export default function AdminProductsPage() {
 
             {/* DRAG AND DROP ZONE */}
             <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Product Image</label>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Product Image (Main)</label>
               <div 
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
+                onDrop={(e) => handleDrop(e, 'main')}
                 onClick={() => fileInputRef.current?.click()}
                 style={{ 
                   border: isDragging ? '2px dashed #000' : '2px dashed #ccc', 
@@ -275,9 +344,10 @@ export default function AdminProductsPage() {
                 {uploading ? (
                   <p>Uploading... please wait.</p>
                 ) : formData.imageUrl ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
                     <img src={formData.imageUrl} alt="preview" style={{ maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }} />
-                    <p style={{ color: 'green', fontWeight: 'bold' }}>Image Uploaded Successfully</p>
+                    <p style={{ color: 'green', fontWeight: 'bold', margin: '0 0 10px 0' }}>Image Uploaded</p>
+                    <button type="button" onClick={() => handleRemoveImage('main')} style={{ padding: '5px 10px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Remove</button>
                   </div>
                 ) : (
                   <p>Drag & Drop an image file here, or click to select</p>
@@ -286,9 +356,60 @@ export default function AdminProductsPage() {
                   type="file" 
                   accept="image/*" 
                   ref={fileInputRef} 
-                  onChange={handleFileChange}
+                  onChange={(e) => handleFileChange(e, 'main')}
                   style={{ display: 'none' }} 
                 />
+              </div>
+            </div>
+
+            {/* REFERENCE IMAGES (OPTIONAL) */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Reference Images (Optional)</label>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '15px' }}>Upload additional angles for the outfit.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                {([
+                  { key: 'front', label: 'Front' },
+                  { key: 'back', label: 'Back' },
+                  { key: 'left', label: 'Left Side' },
+                  { key: 'right', label: 'Right Side' }
+                ] as const).map((angle) => {
+                  const currentImage = formData.referenceImages[angle.key];
+                  
+                  return (
+                    <div key={angle.key} style={{ border: '1px solid #ddd', borderRadius: '4px', padding: '15px', backgroundColor: '#fff', textAlign: 'center' }}>
+                      <p style={{ fontWeight: 'bold', margin: '0 0 10px 0', fontSize: '0.9rem' }}>{angle.label}</p>
+                      
+                      {currentImage ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <img src={currentImage} alt={angle.label} style={{ height: '80px', objectFit: 'contain', marginBottom: '10px' }} />
+                          <button type="button" onClick={() => handleRemoveImage(angle.key)} style={{ padding: '4px 8px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}>Remove</button>
+                        </div>
+                      ) : (
+                        <div>
+                          <label style={{ 
+                            display: 'inline-block', 
+                            padding: '8px 15px', 
+                            backgroundColor: '#f5f5f5', 
+                            border: '1px solid #ccc', 
+                            borderRadius: '4px', 
+                            cursor: 'pointer', 
+                            fontSize: '0.8rem' 
+                          }}>
+                            {uploading ? 'Uploading...' : 'Select Image'}
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={(e) => handleFileChange(e, angle.key)}
+                              disabled={uploading}
+                              style={{ display: 'none' }} 
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

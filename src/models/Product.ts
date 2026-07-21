@@ -15,6 +15,12 @@ const productSchema = new Schema<IProduct>(
     colors: { type: [String], default: [] },
     inventoryCount: { type: Number, default: 0, min: 0 },
     isFeatured: { type: Boolean, default: false },
+    referenceImages: {
+      front: { type: String },
+      back: { type: String },
+      left: { type: String },
+      right: { type: String },
+    },
   },
   {
     timestamps: true,

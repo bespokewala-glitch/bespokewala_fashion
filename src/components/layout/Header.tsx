@@ -9,13 +9,33 @@ export default function Header() {
   const pathname = usePathname();
   const isHomePage = pathname === '/';
 
+  const [user, setUser] = useState<{name: string, role: string} | null>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
+    
+    // Fetch user state
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(console.error);
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    window.location.href = '/login';
+  };
 
   const headerStyle: React.CSSProperties = {
     position: 'fixed',
@@ -51,6 +71,7 @@ export default function Header() {
     fontSize: '0.875rem',
     letterSpacing: '0.1em',
     textTransform: 'uppercase',
+    alignItems: 'center',
   };
 
   return (
@@ -91,14 +112,14 @@ export default function Header() {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              height: '45px', // Visible badge height
+              height: '45px',
               overflow: 'hidden'
             }}>
               <img 
                 src="/bespoken.png" 
                 alt="Bespoken Fashion" 
                 style={{ 
-                  height: '140px', // Scale up to crop out white space
+                  height: '140px',
                   width: 'auto', 
                   objectFit: 'contain',
                   flexShrink: 0,
@@ -111,9 +132,18 @@ export default function Header() {
           <nav>
             <ul style={menuStyle}>
               <li><Link href="/search">Search</Link></li>
-              <li><Link href="/account">Account</Link></li>
+              {user ? (
+                <>
+                  <li><Link href="/account">Account</Link></li>
+                  {user.role === 'admin' && (
+                    <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>
+                  )}
+                  <li><a href="#" onClick={handleLogout} className="text-gray-500 hover:text-current transition-colors">Logout</a></li>
+                </>
+              ) : (
+                <li><Link href="/login">Login</Link></li>
+              )}
               <li><Link href="/cart">Cart (0)</Link></li>
-              <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>
             </ul>
           </nav>
         </div>

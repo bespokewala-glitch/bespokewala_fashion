@@ -1,7 +1,9 @@
 import dbConnect from './mongoose';
 import Product from '../models/Product';
 import HeroCampaign from '../models/HeroCampaign';
+import User from '../models/User';
 import mongoose from 'mongoose';
+import { hashPassword } from './auth';
 
 const dummyProducts = [
   {
@@ -90,12 +92,32 @@ export async function seedDatabase() {
     // Clear existing products and campaigns
     await Product.deleteMany({});
     await HeroCampaign.deleteMany({});
+    await User.deleteMany({});
     console.log("Cleared existing data.");
 
     // Insert dummy data
     await Product.insertMany(dummyProducts);
     await HeroCampaign.insertMany(dummyCampaigns);
-    console.log("Successfully seeded database with products and campaigns!");
+    
+    // Insert dummy users
+    const adminPassword = await hashPassword('admin123');
+    const userPassword = await hashPassword('user123');
+    await User.insertMany([
+      {
+        name: 'Admin User',
+        email: 'admin@bespoken.com',
+        password: adminPassword,
+        role: 'admin'
+      },
+      {
+        name: 'Test Customer',
+        email: 'customer@bespoken.com',
+        password: userPassword,
+        role: 'customer'
+      }
+    ]);
+
+    console.log("Successfully seeded database with products, campaigns, and users!");
   } catch (error) {
     console.error("Error seeding database:", error);
   } finally {

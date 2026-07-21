@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
       inventoryCount: Number(body.inventoryCount) || 0,
       isFeatured: Boolean(body.isFeatured),
+      referenceImages: body.referenceImages || undefined,
     };
 
     const product = await Product.create(productData);

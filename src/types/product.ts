@@ -12,6 +12,12 @@ export interface IProduct {
   colors?: string[];
   inventoryCount: number;
   isFeatured: boolean;
+  referenceImages?: {
+    front?: string;
+    back?: string;
+    left?: string;
+    right?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
