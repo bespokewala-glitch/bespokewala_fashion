@@ -1,4 +1,5 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import { Suspense } from 'react';
 
 export default function AdminLayout({
   children,
@@ -7,7 +8,9 @@ export default function AdminLayout({
 }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <AdminSidebar />
+      <Suspense fallback={<div style={{ width: '250px', backgroundColor: '#111' }} />}>
+        <AdminSidebar />
+      </Suspense>
       <main style={{ flex: 1, overflowY: 'auto' }}>
         {children}
       </main>

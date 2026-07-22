@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package } from 'lucide-react';
 
@@ -23,7 +23,7 @@ const subcategoryOptions: Record<string, Record<string, string[]>> = {
   },
 };
 
-export default function AdminProductsPage() {
+function AdminProductsContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -675,5 +675,13 @@ export default function AdminProductsPage() {
       </div>
       )}
     </div>
+  );
+}
+
+export default function AdminProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading products...</div>}>
+      <AdminProductsContent />
+    </Suspense>
   );
 }

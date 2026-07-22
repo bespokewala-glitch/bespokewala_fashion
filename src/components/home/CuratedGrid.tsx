@@ -17,19 +17,24 @@ export default function CuratedGrid({ data }: { data?: any }) {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
       title: 'Signature Diffusion',
       link: '/products?productType=diffusion'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1583391733958-d698188172c9?auto=format&fit=crop&q=80',
+      title: 'Pret',
+      link: '/products?productType=pret'
     }
   ];
 
   const title = data?.title || 'Curated This Season';
   const subtitle = data?.subtitle || 'A blend of classic silhouettes and our signature shine, embodied by enigmatic sequins.';
-  const images = (data?.items && data.items.length === 3) ? data.items.map((i: any) => ({
+  const images = (data?.items && data.items.length > 0) ? data.items.map((i: any) => ({
     url: i.image || '',
     title: i.title || '',
     link: i.link || '#'
-  })) : defaultImages;
+  })).slice(0, 4) : defaultImages;
 
   return (
-    <section style={{ padding: '6rem 0 0 0', backgroundColor: '#fff', textAlign: 'center' }}>
+    <section style={{ padding: '6rem 2rem 4rem 2rem', backgroundColor: '#fff', textAlign: 'center' }}>
       <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }}>
         {title}
       </h2>
@@ -37,9 +42,9 @@ export default function CuratedGrid({ data }: { data?: any }) {
         {subtitle}
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }}>
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
-          <Link href={item.link} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px' }}>
+          <Link href={item.link} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }}>
             <img 
               src={item.url} 
               alt={item.title} 

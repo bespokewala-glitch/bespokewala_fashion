@@ -2,6 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
+const MediaPreview = ({ src, style, alt }: { src?: string, style?: any, alt?: string }) => {
+  if (!src) return null;
+  if (src.match(/\.(mp4|webm|ogg)$/i)) {
+    return <video src={src} style={style} autoPlay loop muted playsInline />;
+  }
+  return <img src={src} style={style} alt={alt || 'Preview'} />;
+};
+
 export default function HomepageCMS() {
   const [sections, setSections] = useState<any>({});
   const [loading, setLoading] = useState(true);
@@ -119,7 +127,7 @@ export default function HomepageCMS() {
 
   if (loading) return <div style={{ padding: '2rem' }}>Loading CMS...</div>;
 
-  const defaultGridItems = [{}, {}, {}];
+  const defaultGridItems = [{}, {}, {}, {}];
   const gridItems = sections.CuratedGrid?.items || defaultGridItems;
 
   const carouselItems = sections.LookbookCarousel?.items || [{}, {}, {}, {}, {}];
@@ -151,15 +159,15 @@ export default function HomepageCMS() {
             style={{ padding: '10px', width: '100%' }}
           />
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
-          {[0, 1, 2].map((i) => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+          {[0, 1, 2, 3].map((i) => (
             <div key={i} style={{ border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
               <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Grid Item {i + 1}</h3>
               <div 
                 onClick={() => handleFileUploadClick('CuratedGrid', 'items', i)}
                 style={{ height: '100px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
               >
-                {gridItems[i]?.image ? <img src={gridItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" /> : 'Click to Upload Image'}
+                {gridItems[i]?.image ? <MediaPreview src={gridItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Image'}
               </div>
               <input placeholder="Title" value={gridItems[i]?.title || ''} onChange={e => handleTextChange('CuratedGrid', 'items', e.target.value, i, 'title')} style={{ width: '100%', marginBottom: '5px', padding: '5px' }} />
               <input placeholder="Link URL" value={gridItems[i]?.link || ''} onChange={e => handleTextChange('CuratedGrid', 'items', e.target.value, i, 'link')} style={{ width: '100%', padding: '5px' }} />
@@ -176,7 +184,7 @@ export default function HomepageCMS() {
           onClick={() => handleFileUploadClick('FeatureBanner', 'image')}
           style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '20px', overflow: 'hidden' }}
         >
-          {sections.FeatureBanner?.image ? <img src={sections.FeatureBanner.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" /> : 'Click to Upload Background Image'}
+          {sections.FeatureBanner?.image ? <MediaPreview src={sections.FeatureBanner.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Background Image'}
         </div>
         <div style={{ display: 'grid', gap: '10px' }}>
           <input placeholder="Title" value={sections.FeatureBanner?.title || ''} onChange={e => handleTextChange('FeatureBanner', 'title', e.target.value)} style={{ padding: '10px', width: '100%' }} />
@@ -189,24 +197,35 @@ export default function HomepageCMS() {
       {/* 3. Split Showcase */}
       <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>3. Luminous (Split Showcase)</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Left Image (Model)</h3>
-            <div onClick={() => handleFileUploadClick('SplitShowcase', 'modelImage')} style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}>
-              {sections.SplitShowcase?.modelImage ? <img src={sections.SplitShowcase.modelImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" /> : 'Upload Model Image'}
-            </div>
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Right Image (Product)</h3>
-            <div onClick={() => handleFileUploadClick('SplitShowcase', 'productImage')} style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}>
-              {sections.SplitShowcase?.productImage ? <img src={sections.SplitShowcase.productImage} style={{ width: '100%', height: '100%', objectFit: 'contain' }} alt="Preview" /> : 'Upload Product Image'}
-            </div>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Left Image (Model / Lifestyle)</h3>
+          <div onClick={() => handleFileUploadClick('SplitShowcase', 'modelImage')} style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}>
+            {sections.SplitShowcase?.modelImage ? <MediaPreview src={sections.SplitShowcase.modelImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Model Image'}
           </div>
         </div>
-        <div style={{ display: 'grid', gap: '10px' }}>
-          <input placeholder="Title (e.g. Luminous)" value={sections.SplitShowcase?.title || ''} onChange={e => handleTextChange('SplitShowcase', 'title', e.target.value)} style={{ padding: '10px', width: '100%' }} />
-          <input placeholder="Link URL" value={sections.SplitShowcase?.link || ''} onChange={e => handleTextChange('SplitShowcase', 'link', e.target.value)} style={{ padding: '10px', width: '100%' }} />
+
+        <h3 style={{ fontSize: '1rem', marginBottom: '10px', marginTop: '30px' }}>Right Side (Product Slider)</h3>
+        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>Upload up to 5 jewelry products to feature in the auto-playing slider.</p>
+        
+        <div style={{ display: 'flex', overflowX: 'auto', gap: '15px', paddingBottom: '10px' }}>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const prod = sections.SplitShowcase?.products?.[i] || {};
+            return (
+              <div key={i} style={{ minWidth: '180px', border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
+                <div 
+                  onClick={() => handleFileUploadClick('SplitShowcase', 'products', i)}
+                  style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
+                >
+                  {prod.image ? <MediaPreview src={prod.image} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : `Product ${i + 1} Image`}
+                </div>
+                <input placeholder="Product Name" value={prod.name || ''} onChange={e => handleTextChange('SplitShowcase', 'products', e.target.value, i, 'name')} style={{ width: '100%', marginBottom: '5px', padding: '5px' }} />
+                <input placeholder="Price (e.g. $12,000)" value={prod.price || ''} onChange={e => handleTextChange('SplitShowcase', 'products', e.target.value, i, 'price')} style={{ width: '100%', padding: '5px' }} />
+              </div>
+            );
+          })}
         </div>
+        
         <button disabled={saving} onClick={() => saveSection('SplitShowcase', sections.SplitShowcase)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Split Showcase</button>
       </div>
 
@@ -222,7 +241,7 @@ export default function HomepageCMS() {
                 onClick={() => handleFileUploadClick('LookbookCarousel', 'items', i)}
                 style={{ height: '120px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
               >
-                {carouselItems[i]?.image ? <img src={carouselItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" /> : 'Upload Image'}
+                {carouselItems[i]?.image ? <MediaPreview src={carouselItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Image'}
               </div>
               <input placeholder="Muse Name" value={carouselItems[i]?.name || ''} onChange={e => handleTextChange('LookbookCarousel', 'items', e.target.value, i, 'name')} style={{ width: '100%', padding: '5px' }} />
             </div>

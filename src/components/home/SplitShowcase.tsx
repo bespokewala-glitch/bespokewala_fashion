@@ -1,11 +1,58 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function SplitShowcase({ data }: { data?: any }) {
   const modelImage = data?.modelImage || "https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80";
-  const productImage = data?.productImage || "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&q=80";
-  const title = data?.title || "Luminous";
-  const link = data?.link || "/products?productType=couture";
+  
+  // Hardcoded default products matching the luxury jewelry aesthetic
+  const defaultProducts = [
+    {
+      id: 1,
+      image: "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&q=80",
+      name: "Three Two Four Ring",
+      price: "$12,000"
+    },
+    {
+      id: 2,
+      image: "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80", 
+      name: "Drop Pendant",
+      price: "$5,200"
+    },
+    {
+      id: 3,
+      image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80", 
+      name: "Diamond Earrings",
+      price: "$4,800"
+    },
+    {
+      id: 4,
+      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80", 
+      name: "Diamond Bracelet",
+      price: "$7,500"
+    },
+    {
+      id: 5,
+      image: "https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?auto=format&fit=crop&q=80", 
+      name: "Ruby Ring",
+      price: "$6,200"
+    }
+  ];
+
+  const products = data?.products || defaultProducts;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % products.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [products.length]);
+
+  const handleNext = () => setCurrentIndex((prev) => (prev + 1) % products.length);
+  const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
 
   return (
     <section style={{ 
@@ -13,61 +60,78 @@ export default function SplitShowcase({ data }: { data?: any }) {
       width: '100%', 
       minHeight: '80vh',
       backgroundColor: '#fff',
-      flexWrap: 'wrap' // for responsiveness
+      flexWrap: 'wrap'
     }}>
-      {/* Left side - Model/Lifestyle Image */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes subtleFadeIn {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .slide-anim {
+          animation: subtleFadeIn 0.8s ease forwards;
+        }
+      `}} />
+      
+      {/* Left side - Fixed Model Image */}
       <div style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
         <img 
           src={modelImage} 
           alt="Model wearing jewellery"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
-        <div style={{ position: 'absolute', bottom: '2rem', left: '2rem', color: '#fff' }}>
-          <Link href={link} style={{ 
-            color: '#fff', 
-            textDecoration: 'none', 
-            fontSize: '0.9rem', 
-            letterSpacing: '0.1em',
-            borderBottom: '1px solid #fff',
-            paddingBottom: '2px'
-          }}>
-            explore &gt;
-          </Link>
-        </div>
       </div>
 
-      {/* Right side - Product Focus */}
+      {/* Right side - Auto-playing Slider */}
       <div style={{ 
         flex: '1 1 50%', 
         minWidth: '300px', 
         display: 'flex', 
         flexDirection: 'column', 
-        justifyContent: 'center', 
+        justifyContent: 'space-between', 
         alignItems: 'center',
-        padding: '4rem',
-        textAlign: 'center'
+        padding: '4rem 2rem 2rem 2rem',
+        textAlign: 'center',
+        backgroundColor: '#fff',
+        position: 'relative'
       }}>
-        <h2 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: 300, 
-          letterSpacing: '0.2em', 
-          textTransform: 'uppercase',
-          marginBottom: '3rem',
-          color: '#333'
-        }}>
-          {title}
-        </h2>
         
-        <img 
-          src={productImage} 
-          alt="Product detail"
-          style={{ 
-            width: '60%', 
-            maxWidth: '400px', 
-            height: 'auto',
-            objectFit: 'contain'
-          }}
-        />
+        {/* Top Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Our Collection</p>
+          <div style={{ width: '30px', height: '1px', backgroundColor: '#ccc', margin: '0 auto' }} />
+        </div>
+
+        {/* Main Slider Area */}
+        <div style={{ position: 'relative', width: '100%', maxWidth: '500px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          
+          <div key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem' }}>
+            <img 
+              src={products[currentIndex].image} 
+              alt={products[currentIndex].name}
+              style={{ width: '100%', maxWidth: '300px', height: '300px', objectFit: 'contain', marginBottom: '2rem' }}
+            />
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }}>{products[currentIndex].name}</h3>
+            <p style={{ fontSize: '1rem', color: '#888' }}>{products[currentIndex].price}</p>
+          </div>
+          
+          {/* Pagination Dots */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '2rem' }}>
+            {products.map((_: any, idx: number) => (
+              <div 
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                style={{ 
+                  width: '6px', height: '6px', borderRadius: '50%', 
+                  backgroundColor: idx === currentIndex ? '#333' : '#e0e0e0',
+                  cursor: 'pointer', transition: 'background-color 0.3s'
+                }} 
+              />
+            ))}
+          </div>
+        </div>
+
+
+        
       </div>
     </section>
   );

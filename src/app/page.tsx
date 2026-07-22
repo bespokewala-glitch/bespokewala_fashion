@@ -9,7 +9,10 @@ import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
 import HomepageSection from '@/models/HomepageSection';
 import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
-
+import CuratedGrid from '@/components/home/CuratedGrid';
+import FeatureBanner from '@/components/home/FeatureBanner';
+import SplitShowcase from '@/components/home/SplitShowcase';
+import LookbookCarousel from '@/components/home/LookbookCarousel';
 export const revalidate = 0;
 
 export default async function Home() {
@@ -59,6 +62,12 @@ export default async function Home() {
       <main style={{ backgroundColor: '#fff' }}>
         <HeroSection campaigns={heroCampaigns} />
         
+        {/* Curated Sections */}
+        <CuratedGrid data={sectionMap.CuratedGrid} />
+        <FeatureBanner data={sectionMap.FeatureBanner} />
+        <SplitShowcase data={sectionMap.SplitShowcase} />
+        <LookbookCarousel data={sectionMap.LookbookCarousel} />
+
         {/* New Advanced Layout Sections */}
         <DynamicCategoryShowcase categoryName="Couture" campaigns={coutureMedia} />
         <DynamicCategoryShowcase categoryName="Jewellery" campaigns={jewelleryMedia} />
