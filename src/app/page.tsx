@@ -68,12 +68,7 @@ export default async function Home() {
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <LookbookCarousel data={sectionMap.LookbookCarousel} />
 
-        {/* New Advanced Layout Sections */}
-        <DynamicCategoryShowcase categoryName="Couture" campaigns={coutureMedia} />
-        <DynamicCategoryShowcase categoryName="Jewellery" campaigns={jewelleryMedia} />
-        <DynamicCategoryShowcase categoryName="Diffusion" campaigns={diffusionMedia} />
-        <DynamicCategoryShowcase categoryName="Beauty" campaigns={beautyMedia} />
-        
+
         {/* Featured Products */}
         <section style={{ padding: '8rem 0', textAlign: 'center', width: '100%', overflow: 'hidden' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }}>
