@@ -5,7 +5,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
   const modelImage = data?.modelImage || "https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80";
   const productImage = data?.productImage || "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&q=80";
   const title = data?.title || "Luminous";
-  const link = data?.link || "/products?category=couture";
+  const link = data?.link || "/products?productType=couture";
 
   return (
     <section style={{ 

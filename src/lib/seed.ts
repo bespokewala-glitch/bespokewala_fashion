@@ -11,7 +11,8 @@ const dummyProducts = [
     slug: "embroidered-ivory-bridal-lehenga",
     description: "A stunning ivory lehenga with intricate silver and gold embroidery, perfect for the modern bride. Includes a matching blouse and dupatta.",
     price: 450000,
-    category: "couture",
+    productType: "couture",
+    category: "womens",
     subcategory: "bridal",
     images: [
       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=2883&auto=format&fit=crop",
@@ -27,8 +28,9 @@ const dummyProducts = [
     slug: "midnight-blue-velvet-sherwani",
     description: "Luxurious midnight blue velvet sherwani featuring zardosi handwork on the collar and buttons.",
     price: 180000,
-    category: "couture",
-    subcategory: "menswear",
+    productType: "couture",
+    category: "mens",
+    subcategory: "sherwani",
     images: [
       "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?q=80&w=2825&auto=format&fit=crop",
     ],
@@ -42,7 +44,8 @@ const dummyProducts = [
     slug: "emerald-cut-diamond-necklace",
     description: "A breathtaking emerald cut diamond necklace set in 18k white gold. A statement piece for any occasion.",
     price: 1250000,
-    category: "jewellery",
+    productType: "jewellery",
+    category: "womens",
     subcategory: "necklace",
     images: [
       "https://images.unsplash.com/photo-1599643478524-fb66f70d00f0?q=80&w=2728&auto=format&fit=crop",
@@ -55,7 +58,8 @@ const dummyProducts = [
     slug: "classic-red-matte-lipstick",
     description: "Highly pigmented, long-lasting matte lipstick in a classic red shade.",
     price: 2500,
-    category: "beauty",
+    productType: "diffusion",
+    category: "womens",
     subcategory: "makeup",
     images: [
       "https://images.unsplash.com/photo-1586495777744-4413f21062fa?q=80&w=2715&auto=format&fit=crop",
@@ -68,7 +72,8 @@ const dummyProducts = [
     slug: "floral-print-chiffon-saree",
     description: "Lightweight chiffon saree with a delicate floral print and embellished border.",
     price: 65000,
-    category: "pret",
+    productType: "pret",
+    category: "womens",
     subcategory: "saree",
     images: [
       "https://images.unsplash.com/photo-1610116306796-6fea9f4fae38?q=80&w=2940&auto=format&fit=crop",

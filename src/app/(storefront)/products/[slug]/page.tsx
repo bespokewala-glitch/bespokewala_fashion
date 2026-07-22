@@ -5,6 +5,8 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
+import VirtualTryOnButton from '@/components/product/VirtualTryOnButton';
+import SizeGuide from '@/components/product/SizeGuide';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 0;
@@ -186,7 +188,7 @@ export default async function ProductDetailPage({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={sectionLabelStyle}>Size</div>
-                  <a href="#" style={{ fontSize: '0.85rem', color: '#666', textDecoration: 'underline' }}>Size Guide</a>
+                  <SizeGuide />
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                   {product.sizes.map((size: string, idx: number) => (
@@ -218,6 +220,7 @@ export default async function ProductDetailPage({
               Made to order: 8-10 weeks
             </div>
 
+            <VirtualTryOnButton garmentImageUrl={product.images?.[0] || ''} />
             <button style={primaryBtnStyle}>Add to Cart</button>
             
           </div>

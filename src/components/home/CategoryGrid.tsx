@@ -25,7 +25,7 @@ export default function CategoryGrid() {
       </div>
       <div style={gridContainerStyle}>
         {categories.map((category) => (
-          <Link href={`/products?category=${category.slug}`} key={category.slug} style={{ position: 'relative', overflow: 'hidden', height: '600px', display: 'block' }}>
+          <Link href={`/products?productType=${category.slug}`} key={category.slug} style={{ position: 'relative', overflow: 'hidden', height: '600px', display: 'block' }}>
             <div style={{
               width: '100%',
               height: '100%',

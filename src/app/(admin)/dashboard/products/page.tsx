@@ -1,6 +1,27 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Package } from 'lucide-react';
+
+const subcategoryOptions: Record<string, Record<string, string[]>> = {
+  couture: {
+    womens: ['Lehenga', 'Indo Western', 'Light Lehenga', 'Sarees', 'Suits', 'Gowns'],
+    mens: ['Shervani', 'Tuxedo', 'Suits', 'Kurta', 'Bundi', 'Kurta Bundi Sets', 'Bandgala', 'Shirts', 'Indo Western', 'Casual Jackets']
+  },
+  jewellery: {
+    womens: ['Necklaces', 'Earrings', 'Rings', 'Bracelets', 'Sets'],
+    mens: ['Brooches', 'Cufflinks']
+  },
+  diffusion: {
+    womens: ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Makeup'],
+    mens: ['Shirts', 'Trousers', 'Outerwear']
+  },
+  pret: {
+    womens: ['Saree', 'Kurta', 'Tunic', 'Pants'],
+    mens: ['Shirts', 'Pants', 'Kurta']
+  },
+};
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -9,12 +30,28 @@ export default function AdminProductsPage() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const searchParams = useSearchParams();
+  const productTypeParam = searchParams.get('productType');
+  
+  const [activeProductType, setActiveProductType] = useState(productTypeParam || '');
+  const [menuImages, setMenuImages] = useState<string[]>(['', '', '']);
+  const [menuSettingsCategory, setMenuSettingsCategory] = useState<'womens' | 'mens'>('womens');
+  const [savingMenuImages, setSavingMenuImages] = useState(false);
+
+  useEffect(() => {
+    if (productTypeParam && ['couture', 'jewellery', 'diffusion', 'pret'].includes(productTypeParam)) {
+      setActiveProductType(productTypeParam);
+      setFormData(prev => ({ ...prev, productType: productTypeParam, category: 'womens' }));
+    }
+  }, [productTypeParam]);
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     originalPrice: '',
-    category: 'couture',
+    productType: 'couture',
+    category: 'womens',
     subcategory: '',
     imageUrl: '',
     referenceImages: { front: '', back: '', left: '', right: '' },
@@ -45,6 +82,32 @@ export default function AdminProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const fetchMenuImages = async () => {
+    if (!activeProductType) return;
+    try {
+      const res = await fetch(`/api/menu-images?productType=${activeProductType}&category=${menuSettingsCategory}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.length > 0 && data[0].images) {
+          const fetchedImages = data[0].images;
+          setMenuImages([
+            fetchedImages[0] || '',
+            fetchedImages[1] || '',
+            fetchedImages[2] || '',
+          ]);
+        } else {
+          setMenuImages(['', '', '']);
+        }
+      }
+    } catch (e) {
+      console.error('Fetch menu images error:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenuImages();
+  }, [activeProductType, menuSettingsCategory]);
 
   const handleUploadFile = async (file: File, target: 'main' | 'front' | 'back' | 'left' | 'right') => {
     if (!file.type.startsWith('image/')) {
@@ -146,6 +209,7 @@ export default function AdminProductsPage() {
       description: formData.description,
       price: Number(formData.price),
       originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
+      productType: formData.productType,
       category: formData.category,
       subcategory: formData.subcategory,
       images: [formData.imageUrl],
@@ -165,7 +229,7 @@ export default function AdminProductsPage() {
       if (res.ok) {
         setFormData({ 
           name: '', description: '', price: '', originalPrice: '', 
-          category: 'couture', subcategory: '', imageUrl: '', 
+          productType: activeProductType, category: 'womens', subcategory: '', imageUrl: '', 
           referenceImages: { front: '', back: '', left: '', right: '' },
           sizes: [],
           inventoryCount: '10', isFeatured: false 
@@ -198,16 +262,141 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleMenuImageUpload = async (file: File, index: number) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file');
+      return;
+    }
+    setUploading(true);
+    const data = new FormData();
+    data.append('file', file);
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: data,
+      });
+      const result = await res.json();
+      if (result.success) {
+        setMenuImages(prev => {
+          const newImages = [...prev];
+          newImages[index] = result.videoUrl; // Actually image URL
+          return newImages;
+        });
+      } else {
+        alert('Upload failed: ' + result.error);
+      }
+    } catch (err) {
+      alert('Upload error occurred');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveMenuImages = async () => {
+    setSavingMenuImages(true);
+    try {
+      const res = await fetch('/api/menu-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productType: activeProductType,
+          category: menuSettingsCategory,
+          images: menuImages
+        }),
+      });
+      if (res.ok) {
+        alert('Menu images saved successfully!');
+      } else {
+        alert('Failed to save menu images');
+      }
+    } catch (err) {
+      alert('Error saving menu images');
+    } finally {
+      setSavingMenuImages(false);
+    }
+  };
+
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }}>
       <div style={{ marginBottom: '20px' }}>
         <h1 style={{ fontSize: '2rem', margin: 0 }}>Products Admin</h1>
       </div>
-      
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
-        {/* ADD NEW PRODUCT FORM */}
-        <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Add New Product</h2>
+
+      {!activeProductType ? (
+        <div style={{ textAlign: 'center', padding: '100px 20px', color: '#666', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+          <Package size={48} style={{ margin: '0 auto 20px', opacity: 0.5, display: 'block' }} />
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: '#333' }}>Select a Product Type</h2>
+          <p>Please select a product type (e.g. Couture, Jewellery) from the sidebar to view and manage its products.</p>
+        </div>
+      ) : (
+      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', flexDirection: 'column' }}>
+        {/* MEGA MENU SETTINGS */}
+        <div style={{ width: '100%', backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', border: '1px solid #eee' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '1.5rem', margin: 0, textTransform: 'capitalize' }}>Mega Menu Images ({activeProductType})</h2>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => setMenuSettingsCategory('womens')}
+                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'womens' ? '#000' : '#fff', color: menuSettingsCategory === 'womens' ? '#fff' : '#000', cursor: 'pointer' }}
+              >
+                Womens
+              </button>
+              <button 
+                onClick={() => setMenuSettingsCategory('mens')}
+                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'mens' ? '#000' : '#fff', color: menuSettingsCategory === 'mens' ? '#fff' : '#000', cursor: 'pointer' }}
+              >
+                Mens
+              </button>
+            </div>
+          </div>
+          <p style={{ color: '#666', marginBottom: '20px' }}>Upload exactly 3 portrait images to display in the {activeProductType} {'->'} {menuSettingsCategory} mega menu dropdown.</p>
+          
+          <div style={{ display: 'flex', gap: '20px' }}>
+            {[0, 1, 2].map((index) => (
+              <div key={index} style={{ flex: 1, border: '2px dashed #ccc', padding: '20px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '4px' }}>
+                {menuImages[index] ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', objectFit: 'contain', marginBottom: '10px' }} />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} style={{ padding: '5px 10px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Remove</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p style={{ fontSize: '0.8rem', color: '#666' }}>Slot {index + 1}</p>
+                    <label style={{ display: 'inline-block', marginTop: '10px', padding: '8px 15px', backgroundColor: '#f5f5f5', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                      {uploading ? 'Uploading...' : 'Upload Image'}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleMenuImageUpload(file, index);
+                        }}
+                        disabled={uploading}
+                        style={{ display: 'none' }} 
+                      />
+                    </label>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '20px', textAlign: 'right' }}>
+            <button 
+              onClick={handleSaveMenuImages}
+              disabled={savingMenuImages}
+              style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingMenuImages ? 'not-allowed' : 'pointer', opacity: savingMenuImages ? 0.7 : 1 }}
+            >
+              {savingMenuImages ? 'Saving...' : 'Save Menu Images'}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', width: '100%' }}>
+          {/* ADD NEW PRODUCT FORM */}
+          <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>Add New {activeProductType} Product</h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             
             <div>
@@ -263,28 +452,30 @@ export default function AdminProductsPage() {
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Gender / Category</label>
                 <select 
+                  required
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value})}
                   style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                 >
-                  <option value="couture">Couture</option>
-                  <option value="jewellery">Jewellery</option>
-                  <option value="diffusion">Diffusion</option>
-                  <option value="beauty">Beauty</option>
+                  <option value="womens">Womens</option>
+                  <option value="mens">Mens</option>
                 </select>
               </div>
               <div style={{ flex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subcategory</label>
-                <input 
-                  type="text" 
+                <select 
                   required
                   value={formData.subcategory}
                   onChange={e => setFormData({...formData, subcategory: e.target.value})}
-                  placeholder="e.g. Menswear, Necklaces, Dresses"
                   style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-                />
+                >
+                  <option value="" disabled>Select a subcategory</option>
+                  {(subcategoryOptions[activeProductType]?.[formData.category] || []).map(sub => (
+                    <option key={sub} value={sub.toLowerCase()}>{sub}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -439,10 +630,10 @@ export default function AdminProductsPage() {
 
         {/* LIST EXISTING PRODUCTS */}
         <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Current Products</h2>
-          {loading ? <p>Loading...</p> : products.length === 0 ? <p>No products found.</p> : (
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>{activeProductType} Products</h2>
+          {loading ? <p>Loading...</p> : products.filter(p => p.productType === activeProductType).length === 0 ? <p>No products found in this category.</p> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {products.map((prod) => (
+              {products.filter(p => p.productType === activeProductType).map((prod) => (
                 <div key={prod._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px', position: 'relative' }}>
                   {prod.isFeatured && (
                     <span style={{ position: 'absolute', top: '-10px', right: '-10px', backgroundColor: 'gold', color: '#000', padding: '5px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold' }}>
@@ -480,7 +671,9 @@ export default function AdminProductsPage() {
             </div>
           )}
         </div>
+        </div>
       </div>
+      )}
     </div>
   );
 }

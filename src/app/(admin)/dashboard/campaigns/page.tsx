@@ -12,7 +12,7 @@ export default function AdminCampaignsPage() {
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
-    linkUrl: '/products?category=couture',
+    linkUrl: '/products?productType=couture',
     videoUrl: '',
     category: 'couture',
     mediaType: 'image'
@@ -106,7 +106,7 @@ export default function AdminCampaignsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setFormData({ title: '', subtitle: '', linkUrl: '/products?category=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
+        setFormData({ title: '', subtitle: '', linkUrl: '/products?productType=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchCampaigns();
       } else {
@@ -179,10 +179,10 @@ export default function AdminCampaignsPage() {
                 onChange={e => setFormData({...formData, linkUrl: e.target.value})}
                 style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               >
-                <option value="/products?category=couture">Couture</option>
-                <option value="/products?category=diffusion">Diffusion</option>
-                <option value="/products?category=jewellery">Jewellery</option>
-                <option value="/products?category=beauty">Beauty</option>
+                <option value="/products?productType=couture">Couture</option>
+                <option value="/products?productType=diffusion">Diffusion</option>
+                <option value="/products?productType=jewellery">Jewellery</option>
+                <option value="/products?productType=pret">Pret</option>
               </select>
             </div>
 
@@ -196,7 +196,7 @@ export default function AdminCampaignsPage() {
                 <option value="couture">Couture</option>
                 <option value="jewellery">Jewellery</option>
                 <option value="diffusion">Diffusion</option>
-                <option value="beauty">Beauty</option>
+                <option value="pret">Pret</option>
                 <option value="general">General</option>
               </select>
             </div>

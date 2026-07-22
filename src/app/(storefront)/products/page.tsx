@@ -10,23 +10,31 @@ export const revalidate = 0;
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>
+  searchParams: Promise<{ category?: string, productType?: string }>
 }) {
   await dbConnect();
   
-  let query = {};
+  let query: any = {};
   
   // Need to await searchParams in Next.js 15+ 
   const resolvedParams = await searchParams;
   const category = resolvedParams.category;
+  const productType = resolvedParams.productType;
 
   if (category) {
-    query = { category };
+    query.category = category;
+  }
+  if (productType) {
+    query.productType = productType;
   }
   
   const products = await Product.find(query).lean();
   
-  const pageTitle = category ? category.charAt(0).toUpperCase() + category.slice(1) : 'All Products';
+  const pageTitle = productType 
+    ? productType.charAt(0).toUpperCase() + productType.slice(1) 
+    : category 
+      ? category.charAt(0).toUpperCase() + category.slice(1)
+      : 'All Products';
 
   const containerStyle: React.CSSProperties = {
     padding: '8rem 2rem 4rem 2rem',

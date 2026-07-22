@@ -1,7 +1,8 @@
 "use client";
 
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { 
   LayoutDashboard, 
   ShoppingBag, 
@@ -14,11 +15,31 @@ import {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentProductType = searchParams.get('productType');
+  
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({
+    '/dashboard/products': pathname.startsWith('/dashboard/products')
+  });
+
+  const toggleExpand = (path: string) => {
+    setExpandedItems(prev => ({ ...prev, [path]: !prev[path] }));
+  };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Orders', path: '/dashboard/orders', icon: ShoppingBag },
-    { name: 'Products', path: '/dashboard/products', icon: Package },
+    { 
+      name: 'Products', 
+      path: '/dashboard/products', 
+      icon: Package,
+      subItems: [
+        { name: 'Couture', productType: 'couture' },
+        { name: 'Jewellery', productType: 'jewellery' },
+        { name: 'Diffusion', productType: 'diffusion' },
+        { name: 'Pret', productType: 'pret' },
+      ]
+    },
     { name: 'Users', path: '/dashboard/users', icon: Users },
     { name: 'Campaigns', path: '/dashboard/campaigns', icon: ImageIcon },
     { name: 'Homepage Sections', path: '/dashboard/homepage', icon: LayoutTemplate },
@@ -44,6 +65,66 @@ export default function AdminSidebar() {
         {navItems.map((item) => {
           const isActive = pathname === item.path;
           const Icon = item.icon;
+
+          if (item.subItems) {
+            return (
+              <div key={item.path}>
+                <button 
+                  onClick={() => toggleExpand(item.path)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '12px 15px',
+                    backgroundColor: 'transparent',
+                    color: '#aaa',
+                    border: 'none',
+                    width: '100%',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s ease',
+                    fontSize: '1rem',
+                    fontFamily: 'inherit',
+                    fontWeight: 400
+                  }}
+                >
+                  <Icon size={18} />
+                  <span style={{ flex: 1 }}>{item.name}</span>
+                  <span style={{ fontSize: '0.8rem' }}>{expandedItems[item.path] ? '▼' : '▶'}</span>
+                </button>
+                
+                {expandedItems[item.path] && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginLeft: '30px', marginTop: '5px' }}>
+                    {item.subItems?.map((subItem: any) => {
+                      const isSubActive = pathname === item.path && currentProductType === subItem.productType;
+                      return (
+                        <Link 
+                          key={subItem.productType} 
+                          href={`${item.path}?productType=${subItem.productType}`}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '8px 10px',
+                            color: isSubActive ? '#fff' : '#888',
+                            textDecoration: 'none',
+                            borderRadius: '6px',
+                            transition: 'all 0.2s ease',
+                            fontSize: '0.9rem',
+                            fontWeight: isSubActive ? 600 : 400,
+                            backgroundColor: isSubActive ? '#222' : 'transparent'
+                          }}
+                        >
+                          {subItem.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <Link 
               key={item.path} 
@@ -53,12 +134,12 @@ export default function AdminSidebar() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '12px 15px',
-                backgroundColor: isActive ? '#333' : 'transparent',
-                color: isActive ? '#fff' : '#aaa',
+                backgroundColor: isActive && !currentProductType ? '#333' : 'transparent',
+                color: isActive && !currentProductType ? '#fff' : '#aaa',
                 textDecoration: 'none',
                 borderRadius: '6px',
                 transition: 'all 0.2s ease',
-                fontWeight: isActive ? 600 : 400
+                fontWeight: isActive && !currentProductType ? 600 : 400
               }}
             >
               <Icon size={18} />

@@ -5,7 +5,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
   const image = data?.image || "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80";
   const title = data?.title || "High Jewellery";
   const subtitle = data?.subtitle || "Pair text with an image to focus on your chosen product.";
-  const link = data?.link || "/products?category=jewellery";
+  const link = data?.link || "/products?productType=jewellery";
 
   return (
     <section style={{ 

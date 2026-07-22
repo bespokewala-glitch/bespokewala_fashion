@@ -6,17 +6,17 @@ export default function CuratedGrid({ data }: { data?: any }) {
     {
       url: 'https://images.unsplash.com/photo-1579298245158-33e8f568f7d3?auto=format&fit=crop&q=80',
       title: 'Bridal Couture',
-      link: '/products?category=couture'
+      link: '/products?productType=couture'
     },
     {
       url: 'https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80',
       title: 'Fine Jewellery',
-      link: '/products?category=jewellery'
+      link: '/products?productType=jewellery'
     },
     {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
       title: 'Signature Diffusion',
-      link: '/products?category=diffusion'
+      link: '/products?productType=diffusion'
     }
   ];
 

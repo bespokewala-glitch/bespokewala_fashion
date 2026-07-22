@@ -20,9 +20,9 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const fallbackCampaigns: Campaign[] = [
-    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products?category=couture' },
-    { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?category=jewellery' },
-    { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?category=beauty' }
+    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products?productType=couture' },
+    { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?productType=jewellery' },
+    { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=pret' }
   ];
 
   const activeCampaigns = campaigns && campaigns.length > 0 ? campaigns : fallbackCampaigns;
