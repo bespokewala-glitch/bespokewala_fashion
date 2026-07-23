@@ -5,7 +5,7 @@ const HomepageSectionSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true, // Only one document per section type
-    enum: ['CuratedGrid', 'FeatureBanner', 'SplitShowcase', 'LookbookCarousel']
+    enum: ['CuratedGrid', 'FeatureBanner', 'SplitShowcase', 'LookbookCarousel', 'CoutureProcess']
   },
   content: {
     type: mongoose.Schema.Types.Mixed,

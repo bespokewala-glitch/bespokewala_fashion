@@ -109,7 +109,7 @@ export default function HomepageCMS() {
     }
   };
 
-  const handleTextChange = (section: string, field: string, value: string, index?: number, subfield?: string) => {
+  const handleTextChange = (section: string, field: string, value: any, index?: number, subfield?: string) => {
     setSections((prev: any) => {
       const updated = { ...prev };
       if (!updated[section]) updated[section] = {};
@@ -131,6 +131,46 @@ export default function HomepageCMS() {
   const gridItems = sections.CuratedGrid?.items || defaultGridItems;
 
   const carouselItems = sections.LookbookCarousel?.items || [{}, {}, {}, {}, {}];
+  const coutureSteps = sections.CoutureProcess?.steps || [];
+
+  const addCoutureStep = () => {
+    setSections((prev: any) => {
+      const updated = { ...prev };
+      if (!updated.CoutureProcess) updated.CoutureProcess = {};
+      if (!updated.CoutureProcess.steps) updated.CoutureProcess.steps = [];
+      updated.CoutureProcess.steps.push({ title: 'New Step', description: '', media: '', enabled: true });
+      return updated;
+    });
+  };
+
+  const removeCoutureStep = (index: number) => {
+    setSections((prev: any) => {
+      const updated = { ...prev };
+      if (updated.CoutureProcess?.steps) {
+        updated.CoutureProcess.steps.splice(index, 1);
+      }
+      return updated;
+    });
+  };
+
+  const moveCoutureStep = (index: number, direction: 'up' | 'down') => {
+    setSections((prev: any) => {
+      const updated = { ...prev };
+      if (updated.CoutureProcess?.steps) {
+        const steps = updated.CoutureProcess.steps;
+        if (direction === 'up' && index > 0) {
+          const temp = steps[index - 1];
+          steps[index - 1] = steps[index];
+          steps[index] = temp;
+        } else if (direction === 'down' && index < steps.length - 1) {
+          const temp = steps[index + 1];
+          steps[index + 1] = steps[index];
+          steps[index] = temp;
+        }
+      }
+      return updated;
+    });
+  };
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -248,6 +288,74 @@ export default function HomepageCMS() {
           ))}
         </div>
         <button disabled={saving} onClick={() => saveSection('LookbookCarousel', sections.LookbookCarousel)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Lookbook</button>
+      </div>
+
+      {/* 5. The Couture Process */}
+      <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>5. The Couture Process</h2>
+        
+        <div style={{ marginBottom: '20px' }}>
+          <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Main Background Media (Img/Vid)</h3>
+          <div 
+            onClick={() => handleFileUploadClick('CoutureProcess', 'mainMedia')}
+            style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}
+          >
+            {(sections.CoutureProcess?.mainMedia || sections.CoutureProcess?.image) ? <MediaPreview src={sections.CoutureProcess.mainMedia || sections.CoutureProcess.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Main Media'}
+          </div>
+          <input type="hidden" value={sections.CoutureProcess?.image || ''} onChange={() => {}} />
+          <input 
+            placeholder="Main Media URL" 
+            value={sections.CoutureProcess?.mainMedia || sections.CoutureProcess?.image || ''} 
+            onChange={e => handleTextChange('CoutureProcess', 'mainMedia', e.target.value)} 
+            style={{ padding: '8px', width: '300px', marginTop: '10px', display: 'block' }} 
+          />
+        </div>
+
+        <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', marginTop: '30px' }}>Process Steps</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {coutureSteps.map((step: any, i: number) => (
+            <div key={i} style={{ border: '1px solid #eee', padding: '15px', borderRadius: '4px', position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <h3 style={{ fontSize: '1.1rem', margin: 0 }}>Step {i + 1}</h3>
+                <div>
+                  <button onClick={() => moveCoutureStep(i, 'up')} disabled={i === 0} style={{ marginRight: '5px' }}>&uarr;</button>
+                  <button onClick={() => moveCoutureStep(i, 'down')} disabled={i === coutureSteps.length - 1} style={{ marginRight: '10px' }}>&darr;</button>
+                  <button onClick={() => removeCoutureStep(i)} style={{ color: 'red' }}>&times; Delete</button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <div style={{ flex: '1' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={step.enabled !== false} 
+                      onChange={e => handleTextChange('CoutureProcess', 'steps', e.target.checked, i, 'enabled')} 
+                    />
+                    Enabled
+                  </label>
+                  <input 
+                    placeholder="Step Title" 
+                    value={step.title || ''} 
+                    onChange={e => handleTextChange('CoutureProcess', 'steps', e.target.value, i, 'title')} 
+                    style={{ padding: '8px', width: '100%', marginBottom: '10px' }} 
+                  />
+                  <textarea 
+                    placeholder="Step Description" 
+                    value={step.description || ''} 
+                    onChange={e => handleTextChange('CoutureProcess', 'steps', e.target.value, i, 'description')} 
+                    style={{ padding: '8px', width: '100%', minHeight: '80px', marginBottom: '10px', resize: 'vertical' }} 
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>
+          <button onClick={addCoutureStep} style={{ padding: '10px 20px', backgroundColor: '#fff', border: '1px solid #ccc', cursor: 'pointer' }}>+ Add Step</button>
+          <button disabled={saving} onClick={() => saveSection('CoutureProcess', sections.CoutureProcess)} style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Couture Process</button>
+        </div>
       </div>
       
     </div>

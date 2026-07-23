@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,6 +17,7 @@ export default function Header() {
 
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{name: string, role: string} | null>(null);
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -271,7 +273,7 @@ export default function Header() {
               ) : (
                 <li><Link href="/login">Login</Link></li>
               )}
-              <li><Link href="/cart">Cart (0)</Link></li>
+              <li><Link href="/cart">Cart ({cartCount})</Link></li>
             </ul>
           </nav>
         </div>

@@ -12,7 +12,7 @@ import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
 import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
-import LookbookCarousel from '@/components/home/LookbookCarousel';
+import CoutureProcess from '@/components/home/CoutureProcess';
 export const revalidate = 0;
 
 export default async function Home() {
@@ -66,7 +66,8 @@ export default async function Home() {
         <CuratedGrid data={sectionMap.CuratedGrid} />
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
-        <LookbookCarousel data={sectionMap.LookbookCarousel} />
+        <CoutureProcess data={sectionMap.CoutureProcess} />
+
 
 
         {/* Featured Products */}

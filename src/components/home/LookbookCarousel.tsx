@@ -7,9 +7,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const defaultMuses = [
-    { name: 'Kareena Kapoor', img: 'https://images.unsplash.com/photo-1515347619362-67347171e54c?auto=format&fit=crop&q=80' },
     { name: 'Ranveer Singh', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80' },
-    { name: 'Deepika Padukone', img: 'https://images.unsplash.com/photo-1524504283526-9f888cecb609?auto=format&fit=crop&q=80' },
     { name: 'Alia Bhatt', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80' },
     { name: 'Shahrukh Khan', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80' },
   ];

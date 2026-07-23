@@ -5,8 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
-import VirtualTryOnButton from '@/components/product/VirtualTryOnButton';
-import SizeGuide from '@/components/product/SizeGuide';
+import ProductClientActions from '@/components/product/ProductClientActions';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 0;
@@ -106,51 +105,6 @@ export default async function ProductDetailPage({
     marginTop: '-1.25rem',
   };
 
-  const sectionLabelStyle: React.CSSProperties = {
-    fontSize: '0.85rem',
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-    color: '#333',
-  };
-
-  const optionBtnStyle: React.CSSProperties = {
-    padding: '0.75rem 1rem',
-    border: '1px solid #ddd',
-    background: 'transparent',
-    cursor: 'pointer',
-    fontSize: '0.85rem',
-    minWidth: '3rem',
-    textAlign: 'center',
-    transition: 'all 0.2s',
-  };
-
-  const primaryBtnStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '1rem',
-    backgroundColor: '#000',
-    color: '#fff',
-    border: 'none',
-    textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    fontSize: '0.9rem',
-    cursor: 'pointer',
-    marginTop: '1rem',
-  };
-
-  const quantitySelectorStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1.5rem',
-  };
-
-  const qtyBtnStyle: React.CSSProperties = {
-    background: 'none',
-    border: 'none',
-    fontSize: '1.2rem',
-    cursor: 'pointer',
-    color: '#666',
-  };
-
   return (
     <>
       <Header />
@@ -184,44 +138,16 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {product.sizes && product.sizes.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={sectionLabelStyle}>Size</div>
-                  <SizeGuide />
-                </div>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  {product.sizes.map((size: string, idx: number) => (
-                    <button 
-                      key={size} 
-                      style={{
-                        ...optionBtnStyle, 
-                        ...(idx === 0 ? { backgroundColor: '#000', color: '#fff', borderColor: '#000' } : {})
-                      }}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                  <button style={optionBtnStyle}>CUSTOM SIZE</button>
-                </div>
-              </div>
-            )}
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1rem' }}>
-              <div style={sectionLabelStyle}>Quantity</div>
-              <div style={quantitySelectorStyle}>
-                <button style={qtyBtnStyle}>-</button>
-                <span style={{ fontSize: '1rem' }}>1</span>
-                <button style={qtyBtnStyle}>+</button>
-              </div>
-            </div>
-
-            <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '1rem' }}>
-              Made to order: 8-10 weeks
-            </div>
-
-            <VirtualTryOnButton garmentImageUrl={product.images?.[0] || ''} />
-            <button style={primaryBtnStyle}>Add to Cart</button>
+            <ProductClientActions 
+              product={{
+                slug: product.slug,
+                name: product.name,
+                price: product.price,
+                images: product.images,
+                colors: product.colors,
+                sizes: product.sizes,
+              }} 
+            />
             
           </div>
         </div>
