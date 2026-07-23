@@ -11,6 +11,8 @@ const productSchema = new Schema<IProduct>(
     productType: { type: String, required: true, index: true },
     category: { type: String, required: true, index: true },
     subcategory: { type: String, required: true, index: true },
+    collectionName: { type: String, index: true },
+    occasion: { type: String, index: true },
     images: { type: [String], required: true },
     sizes: { type: [String], default: [] },
     colors: { type: [String], default: [] },

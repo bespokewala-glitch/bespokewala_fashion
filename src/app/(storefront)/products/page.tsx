@@ -10,7 +10,7 @@ export const revalidate = 0;
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string, productType?: string }>
+  searchParams: Promise<{ category?: string, productType?: string, subcategory?: string, collectionName?: string, occasion?: string }>
 }) {
   await dbConnect();
   
@@ -20,13 +20,15 @@ export default async function ProductsPage({
   const resolvedParams = await searchParams;
   const category = resolvedParams.category;
   const productType = resolvedParams.productType;
+  const subcategory = resolvedParams.subcategory;
+  const collectionName = resolvedParams.collectionName;
+  const occasion = resolvedParams.occasion;
 
-  if (category) {
-    query.category = category;
-  }
-  if (productType) {
-    query.productType = productType;
-  }
+  if (category) query.category = category;
+  if (productType) query.productType = productType;
+  if (subcategory) query.subcategory = subcategory;
+  if (collectionName) query.collectionName = collectionName;
+  if (occasion) query.occasion = occasion;
   
   const products = await Product.find(query).lean();
   

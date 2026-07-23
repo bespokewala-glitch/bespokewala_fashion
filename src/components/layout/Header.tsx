@@ -17,7 +17,23 @@ export default function Header() {
 
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{name: string, role: string} | null>(null);
+  const [taxonomies, setTaxonomies] = useState<any[]>([]);
   const { cartCount } = useCart();
+
+  useEffect(() => {
+    const fetchTaxonomies = async () => {
+      try {
+        const res = await fetch('/api/taxonomies?enabled=true');
+        if (res.ok) {
+          const data = await res.json();
+          setTaxonomies(data);
+        }
+      } catch (e) {
+        console.error('Failed to fetch taxonomies in header');
+      }
+    };
+    fetchTaxonomies();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -198,6 +214,10 @@ export default function Header() {
   const activeSecondaryNav = hoveredNav ? menuData[hoveredNav] : null;
   const activeTertiaryNav = activeSecondaryNav?.find(item => item.id === hoveredCategory);
 
+  const collections = taxonomies.filter(t => t.type === 'collection' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(hoveredNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(hoveredCategory as string)));
+  const occasions = taxonomies.filter(t => t.type === 'occasion' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(hoveredNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(hoveredCategory as string)));
+  const categories = taxonomies.filter(t => t.type === 'category' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(hoveredNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(hoveredCategory as string)));
+
   return (
     <>
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
@@ -315,37 +335,41 @@ export default function Header() {
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>COLLECTIONS</h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">THE INDIA STORY</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">INAYA SUMMER</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">AZTEC & FLORAL</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">LUX PRET</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">FESTIVE EDIT</Link></li>
+                      {collections.map(col => (
+                        <li key={col._id}>
+                          <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&collectionName=${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                            {col.name}
+                          </Link>
+                        </li>
+                      ))}
                     </ul>
                   </div>
 
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>OCCASION</h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">BRIDAL</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">RECEPTION</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">SANGEET</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">COCKTAIL</Link></li>
-                      <li><Link href="#" style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">HALDI & MEHENDI</Link></li>
+                      {occasions.map(occ => (
+                        <li key={occ._id}>
+                          <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&occasion=${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                            {occ.name}
+                          </Link>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                   
                   <div style={{ flex: 1 }}>
                     <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>CATEGORIES</h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {activeTertiaryNav.subcategories.map(sub => (
-                        <li key={sub.label}>
+                      {categories.map(cat => (
+                        <li key={cat._id}>
                           <Link 
-                            href={sub.href} 
+                            href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&subcategory=${cat.slug}`} 
                             onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                             style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                             className="sub-link-hover"
                           >
-                            {sub.label}
+                            {cat.name}
                           </Link>
                         </li>
                       ))}

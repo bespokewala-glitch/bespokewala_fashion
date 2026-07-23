@@ -8,6 +8,8 @@ export interface IProduct {
   productType: string;
   category: string;
   subcategory: string;
+  collectionName?: string;
+  occasion?: string;
   images: string[];
   sizes?: string[];
   colors?: string[];

@@ -10,7 +10,8 @@ import {
   Users, 
   Image as ImageIcon, 
   LayoutTemplate, 
-  LogOut 
+  LogOut,
+  ListTree
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -40,6 +41,7 @@ export default function AdminSidebar() {
         { name: 'Pret', productType: 'pret' },
       ]
     },
+    { name: 'Taxonomies', path: '/dashboard/taxonomies', icon: ListTree },
     { name: 'Users', path: '/dashboard/users', icon: Users },
     { name: 'Campaigns', path: '/dashboard/campaigns', icon: ImageIcon },
     { name: 'Homepage Sections', path: '/dashboard/homepage', icon: LayoutTemplate },

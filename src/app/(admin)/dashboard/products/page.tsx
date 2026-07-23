@@ -4,27 +4,11 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package } from 'lucide-react';
 
-const subcategoryOptions: Record<string, Record<string, string[]>> = {
-  couture: {
-    womens: ['Lehenga', 'Indo Western', 'Light Lehenga', 'Sarees', 'Suits', 'Gowns'],
-    mens: ['Shervani', 'Tuxedo', 'Suits', 'Kurta', 'Bundi', 'Kurta Bundi Sets', 'Bandgala', 'Shirts', 'Indo Western', 'Casual Jackets']
-  },
-  jewellery: {
-    womens: ['Necklaces', 'Earrings', 'Rings', 'Bracelets', 'Sets'],
-    mens: ['Brooches', 'Cufflinks']
-  },
-  diffusion: {
-    womens: ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Makeup'],
-    mens: ['Shirts', 'Trousers', 'Outerwear']
-  },
-  pret: {
-    womens: ['Saree', 'Kurta', 'Tunic', 'Pants'],
-    mens: ['Shirts', 'Pants', 'Kurta']
-  },
-};
+// We will fetch categories from the Taxonomy API dynamically now.
 
 function AdminProductsContent() {
   const [products, setProducts] = useState<any[]>([]);
+  const [taxonomies, setTaxonomies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -53,6 +37,8 @@ function AdminProductsContent() {
     productType: 'couture',
     category: 'womens',
     subcategory: '',
+    collectionName: '',
+    occasion: '',
     imageUrl: '',
     referenceImages: { front: '', back: '', left: '', right: '' },
     sizes: [] as string[],
@@ -60,27 +46,34 @@ function AdminProductsContent() {
     isFeatured: false,
   });
 
-  const fetchProducts = async () => {
+  const fetchProductsAndTaxonomies = async () => {
     try {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      const res = await fetch(`${baseUrl}/api/products`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      
+      const [productsRes, taxRes] = await Promise.all([
+        fetch(`${baseUrl}/api/products`),
+        fetch(`${baseUrl}/api/taxonomies`)
+      ]);
+
+      if (productsRes.ok) {
+        const pData = await productsRes.json();
+        if (Array.isArray(pData)) setProducts(pData);
       }
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setProducts(data);
+      
+      if (taxRes.ok) {
+        const tData = await taxRes.json();
+        if (Array.isArray(tData)) setTaxonomies(tData);
       }
+      
     } catch (e: any) {
-      console.error('Fetch products error:', e);
-      // Don't throw unhandled promise rejections
+      console.error('Fetch error:', e);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchProductsAndTaxonomies();
   }, []);
 
   const fetchMenuImages = async () => {
@@ -212,6 +205,8 @@ function AdminProductsContent() {
       productType: formData.productType,
       category: formData.category,
       subcategory: formData.subcategory,
+      collectionName: formData.collectionName,
+      occasion: formData.occasion,
       images: [formData.imageUrl],
       referenceImages: formData.referenceImages,
       sizes: formData.sizes,
@@ -229,13 +224,13 @@ function AdminProductsContent() {
       if (res.ok) {
         setFormData({ 
           name: '', description: '', price: '', originalPrice: '', 
-          productType: activeProductType, category: 'womens', subcategory: '', imageUrl: '', 
+          productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', 
           referenceImages: { front: '', back: '', left: '', right: '' },
           sizes: [],
           inventoryCount: '10', isFeatured: false 
         });
         if (fileInputRef.current) fileInputRef.current.value = '';
-        fetchProducts();
+        fetchProductsAndTaxonomies();
       } else {
         alert('Error saving product: ' + (data.error || 'Unknown error'));
       }
@@ -253,7 +248,7 @@ function AdminProductsContent() {
       });
       const data = await res.json();
       if (res.ok) {
-        fetchProducts();
+        fetchProductsAndTaxonomies();
       } else {
         alert('Error deleting product: ' + (data.error || 'Unknown error'));
       }
@@ -464,16 +459,45 @@ function AdminProductsContent() {
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subcategory</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Dynamic Category</label>
                 <select 
                   required
                   value={formData.subcategory}
                   onChange={e => setFormData({...formData, subcategory: e.target.value})}
                   style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
                 >
-                  <option value="" disabled>Select a subcategory</option>
-                  {(subcategoryOptions[activeProductType]?.[formData.category] || []).map(sub => (
-                    <option key={sub} value={sub.toLowerCase()}>{sub}</option>
+                  <option value="" disabled>Select a category</option>
+                  {taxonomies.filter(t => t.type === 'category' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
+                    <option key={tax._id} value={tax.slug}>{tax.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Collection (Optional)</label>
+                <select 
+                  value={formData.collectionName}
+                  onChange={e => setFormData({...formData, collectionName: e.target.value})}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                >
+                  <option value="">None</option>
+                  {taxonomies.filter(t => t.type === 'collection' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
+                    <option key={tax._id} value={tax.slug}>{tax.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Occasion (Optional)</label>
+                <select 
+                  value={formData.occasion}
+                  onChange={e => setFormData({...formData, occasion: e.target.value})}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                >
+                  <option value="">None</option>
+                  {taxonomies.filter(t => t.type === 'occasion' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
+                    <option key={tax._id} value={tax.slug}>{tax.name}</option>
                   ))}
                 </select>
               </div>
@@ -649,7 +673,11 @@ function AdminProductsContent() {
                       ${prod.price.toFixed(2)}
                       {prod.originalPrice && <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '10px', fontSize: '0.9rem' }}>${prod.originalPrice.toFixed(2)}</span>}
                     </p>
-                    <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}><strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{prod.category} / {prod.subcategory}</span></p>
+                    <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}>
+                      <strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{prod.category} / {prod.subcategory}</span>
+                      {prod.collectionName && <span> | <strong>Collection:</strong> {prod.collectionName}</span>}
+                      {prod.occasion && <span> | <strong>Occasion:</strong> {prod.occasion}</span>}
+                    </p>
                     <button 
                       onClick={() => handleDelete(prod._id)}
                       style={{ 
