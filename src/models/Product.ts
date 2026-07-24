@@ -24,6 +24,16 @@ const productSchema = new Schema<IProduct>(
       left: { type: String },
       right: { type: String },
     },
+    details: {
+      styleCode: { type: String },
+      commodityName: { type: String },
+      composition: { type: String },
+      componentsCount: { type: String },
+      includes: { type: String },
+      shipping: { type: String },
+      disclaimer: { type: String },
+      legal: { type: String },
+    },
   },
   {
     timestamps: true,

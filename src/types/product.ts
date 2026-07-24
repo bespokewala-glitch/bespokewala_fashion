@@ -21,6 +21,16 @@ export interface IProduct {
     left?: string;
     right?: string;
   };
+  details?: {
+    styleCode?: string;
+    commodityName?: string;
+    composition?: string;
+    componentsCount?: string;
+    includes?: string;
+    shipping?: string;
+    disclaimer?: string;
+    legal?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

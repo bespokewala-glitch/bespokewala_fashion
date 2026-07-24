@@ -41,6 +41,7 @@ function AdminProductsContent() {
     occasion: '',
     imageUrl: '',
     referenceImages: { front: '', back: '', left: '', right: '' },
+    details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
     sizes: [] as string[],
     inventoryCount: '10',
     isFeatured: false,
@@ -245,6 +246,7 @@ function AdminProductsContent() {
       occasion: formData.occasion,
       images: [formData.imageUrl],
       referenceImages: formData.referenceImages,
+      details: formData.details,
       sizes: formData.sizes,
       inventoryCount: Number(formData.inventoryCount),
       isFeatured: formData.isFeatured,
@@ -262,6 +264,7 @@ function AdminProductsContent() {
           name: '', description: '', price: '', originalPrice: '', 
           productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', 
           referenceImages: { front: '', back: '', left: '', right: '' },
+          details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
           sizes: [],
           inventoryCount: '10', isFeatured: false 
         });
@@ -695,6 +698,34 @@ function AdminProductsContent() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* PRODUCT DETAILS ACCORDION DATA */}
+            <div style={{ marginTop: '15px', padding: '15px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#fdfdfd' }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold' }}>Product Details (Accordion Data)</h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', fontWeight: 'bold' }}>Style Code</label>
+                  <input type="text" value={formData.details.styleCode} onChange={e => setFormData({...formData, details: {...formData.details, styleCode: e.target.value}})} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', fontWeight: 'bold' }}>Name of Commodity</label>
+                  <input type="text" value={formData.details.commodityName} onChange={e => setFormData({...formData, details: {...formData.details, commodityName: e.target.value}})} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', fontWeight: 'bold' }}>Composition</label>
+                  <input type="text" value={formData.details.composition} onChange={e => setFormData({...formData, details: {...formData.details, composition: e.target.value}})} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', fontWeight: 'bold' }}>No of Components</label>
+                  <input type="text" value={formData.details.componentsCount} onChange={e => setFormData({...formData, details: {...formData.details, componentsCount: e.target.value}})} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem', fontWeight: 'bold' }}>Includes</label>
+                  <input type="text" value={formData.details.includes} onChange={e => setFormData({...formData, details: {...formData.details, includes: e.target.value}})} placeholder="e.g. 1 Piece - Lehenga, 1 Piece - Blouse, 1 Piece - Dupatta" style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                </div>
               </div>
             </div>
 

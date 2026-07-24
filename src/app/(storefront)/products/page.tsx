@@ -37,7 +37,8 @@ export default async function ProductsPage({
   if (collectionName) query.collectionName = collectionName;
   if (occasion) query.occasion = occasion;
   
-  const products = await Product.find(query).lean();
+  const rawProducts = await Product.find(query).lean();
+  const products = JSON.parse(JSON.stringify(rawProducts));
   
   // Fetch campaigns for this product type
   let campaignQuery: any = {};

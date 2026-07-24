@@ -20,12 +20,7 @@ export default async function Home() {
   
   // Fetch up to 4 featured products and serialize them for Client Components
   const rawFeaturedProducts = await Product.find({ isFeatured: true }).limit(4).lean();
-  const featuredProducts = rawFeaturedProducts.map((p: any) => ({
-    ...p,
-    _id: p._id.toString(),
-    createdAt: p.createdAt ? p.createdAt.toString() : null,
-    updatedAt: p.updatedAt ? p.updatedAt.toString() : null,
-  }));
+  const featuredProducts = JSON.parse(JSON.stringify(rawFeaturedProducts));
   
   // Fetch hero campaigns
   const campaigns = await HeroCampaign.find({}).sort({ order: 1 }).lean();

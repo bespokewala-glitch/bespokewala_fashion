@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,6 +20,7 @@ export default function Header() {
   const [user, setUser] = useState<{name: string, role: string} | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
 
   useEffect(() => {
     const fetchTaxonomies = async () => {
@@ -259,6 +261,7 @@ export default function Header() {
               ) : (
                 <li><Link href="/login">Login</Link></li>
               )}
+              <li><Link href="/wishlist">Wishlist ({wishlistCount})</Link></li>
               <li><Link href="/cart">Cart ({cartCount})</Link></li>
             </ul>
           </nav>

@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
+import ProductDetailsAccordion from '@/components/product/ProductDetailsAccordion';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 0;
@@ -21,7 +22,8 @@ export default async function ProductDetailPage({
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
 
-  const product = await Product.findOne({ slug }).lean();
+  const rawProduct = await Product.findOne({ slug }).lean();
+  const product = JSON.parse(JSON.stringify(rawProduct));
 
   if (!product) {
     notFound();
@@ -120,7 +122,7 @@ export default async function ProductDetailPage({
                 <div style={{ ...categoryStyle, marginBottom: 0 }}>{product.category}</div>
               ) : <div />}
               
-              <ProductActions productName={product.name} />
+              <ProductActions product={product} />
             </div>
             
             <h1 style={titleStyle}>{product.name}</h1>
@@ -149,6 +151,7 @@ export default async function ProductDetailPage({
               }} 
             />
             
+            <ProductDetailsAccordion details={product.details} />
           </div>
         </div>
       </main>

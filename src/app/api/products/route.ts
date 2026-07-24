@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       inventoryCount: Number(body.inventoryCount) || 0,
       isFeatured: Boolean(body.isFeatured),
       referenceImages: body.referenceImages || undefined,
+      details: body.details || undefined,
     };
 
     const product = await Product.create(productData);
