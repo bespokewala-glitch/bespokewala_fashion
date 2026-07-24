@@ -22,7 +22,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const fallbackCampaigns: Campaign[] = [
     { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products?productType=couture' },
     { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?productType=jewellery' },
-    { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=pret' }
+    { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=accessories' }
   ];
 
   const activeCampaigns = campaigns && campaigns.length > 0 ? campaigns : fallbackCampaigns;
@@ -36,11 +36,17 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     let timer: NodeJS.Timeout;
     const isImg = activeCampaigns[currentIndex]?.videoUrl?.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
     
-    if (isImg) {
-      timer = setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % activeCampaigns.length);
-      }, 5000);
-    } else if (videoRef.current) {
+    // Only auto-slide if we have more than 1 campaign
+    if (activeCampaigns.length > 1) {
+      if (isImg) {
+        timer = setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % activeCampaigns.length);
+        }, 5000);
+      }
+    }
+    
+    // Always attempt to autoplay video when index changes
+    if (!isImg && videoRef.current) {
       videoRef.current.play().catch(e => console.log("Autoplay prevented:", e));
     }
     
@@ -129,28 +135,33 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
           src={currentCampaign?.videoUrl}
           autoPlay
           muted
+          loop={activeCampaigns.length <= 1}
           playsInline
-          onEnded={handleVideoEnd}
+          onEnded={activeCampaigns.length > 1 ? handleVideoEnd : undefined}
           style={videoStyle}
         />
       )}
       
-      <button 
-        onClick={() => setCurrentIndex((prev) => (prev - 1 + activeCampaigns.length) % activeCampaigns.length)}
-        style={{ ...arrowStyle, left: '1rem' }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
-      >
-        &#10094;
-      </button>
-      <button 
-        onClick={() => setCurrentIndex((prev) => (prev + 1) % activeCampaigns.length)}
-        style={{ ...arrowStyle, right: '1rem' }}
-        onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-        onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
-      >
-        &#10095;
-      </button>
+      {activeCampaigns.length > 1 && (
+        <>
+          <button 
+            onClick={() => setCurrentIndex((prev) => (prev - 1 + activeCampaigns.length) % activeCampaigns.length)}
+            style={{ ...arrowStyle, left: '1rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+          >
+            &#10094;
+          </button>
+          <button 
+            onClick={() => setCurrentIndex((prev) => (prev + 1) % activeCampaigns.length)}
+            style={{ ...arrowStyle, right: '1rem' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+          >
+            &#10095;
+          </button>
+        </>
+      )}
 
       <div style={overlayContentStyle}>
         <div style={subtitleStyle}>{currentCampaign?.subtitle}</div>

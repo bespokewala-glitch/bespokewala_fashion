@@ -180,9 +180,8 @@ export default function AdminCampaignsPage() {
                 style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               >
                 <option value="/products?productType=couture">Couture</option>
-                <option value="/products?productType=diffusion">Diffusion</option>
+                <option value="/products?productType=accessories">Accessories</option>
                 <option value="/products?productType=jewellery">Jewellery</option>
-                <option value="/products?productType=pret">Pret</option>
               </select>
             </div>
 
@@ -195,8 +194,7 @@ export default function AdminCampaignsPage() {
               >
                 <option value="couture">Couture</option>
                 <option value="jewellery">Jewellery</option>
-                <option value="diffusion">Diffusion</option>
-                <option value="pret">Pret</option>
+                <option value="accessories">Accessories</option>
                 <option value="general">General</option>
               </select>
             </div>

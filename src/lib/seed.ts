@@ -58,7 +58,7 @@ const dummyProducts = [
     slug: "classic-red-matte-lipstick",
     description: "Highly pigmented, long-lasting matte lipstick in a classic red shade.",
     price: 2500,
-    productType: "diffusion",
+    productType: "accessories",
     category: "womens",
     subcategory: "makeup",
     images: [
@@ -72,7 +72,7 @@ const dummyProducts = [
     slug: "floral-print-chiffon-saree",
     description: "Lightweight chiffon saree with a delicate floral print and embellished border.",
     price: 65000,
-    productType: "pret",
+    productType: "accessories",
     category: "womens",
     subcategory: "saree",
     images: [

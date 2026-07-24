@@ -4,8 +4,11 @@ const HomepageSectionSchema = new mongoose.Schema({
   sectionType: {
     type: String,
     required: true,
-    unique: true, // Only one document per section type
     enum: ['CuratedGrid', 'FeatureBanner', 'SplitShowcase', 'LookbookCarousel', 'CoutureProcess']
+  },
+  page: {
+    type: String,
+    default: 'home'
   },
   content: {
     type: mongoose.Schema.Types.Mixed,
@@ -13,4 +16,8 @@ const HomepageSectionSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-export default mongoose.models.HomepageSection || mongoose.model('HomepageSection', HomepageSectionSchema);
+HomepageSectionSchema.index({ sectionType: 1, page: 1 }, { unique: true });
+
+delete mongoose.models.HomepageSection;
+const HomepageSection = mongoose.model('HomepageSection', HomepageSectionSchema);
+export default HomepageSection;

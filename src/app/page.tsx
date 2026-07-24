@@ -50,7 +50,7 @@ export default async function Home() {
   const beautyMedia = plainCampaigns.filter(c => c.category === 'beauty');
 
   // Fetch Homepage Sections
-  const hpSections = await HomepageSection.find({}).lean();
+  const hpSections = await HomepageSection.find({ page: 'home' }).lean();
   const sectionMap: any = {};
   hpSections.forEach(s => {
     sectionMap[s.sectionType] = s.content;

@@ -15,13 +15,8 @@ export default function CuratedGrid({ data }: { data?: any }) {
     },
     {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
-      title: 'Signature Diffusion',
-      link: '/products?productType=diffusion'
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1583391733958-d698188172c9?auto=format&fit=crop&q=80',
-      title: 'Pret',
-      link: '/products?productType=pret'
+      title: 'Accessories',
+      link: '/products?productType=accessories'
     }
   ];
 

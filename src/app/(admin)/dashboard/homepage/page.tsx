@@ -11,6 +11,7 @@ const MediaPreview = ({ src, style, alt }: { src?: string, style?: any, alt?: st
 };
 
 export default function HomepageCMS() {
+  const [page, setPage] = useState('home');
   const [sections, setSections] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -20,12 +21,13 @@ export default function HomepageCMS() {
   const [uploadTarget, setUploadTarget] = useState<{ section: string, field: string, index?: number } | null>(null);
 
   useEffect(() => {
-    fetchSections();
-  }, []);
+    fetchSections(page);
+  }, [page]);
 
-  const fetchSections = async () => {
+  const fetchSections = async (currentPage: string) => {
+    setLoading(true);
     try {
-      const res = await fetch('/api/homepage-sections');
+      const res = await fetch(`/api/homepage-sections?page=${currentPage}`);
       const data = await res.json();
       if (data.success) {
         const sectionMap: any = {};
@@ -47,7 +49,7 @@ export default function HomepageCMS() {
       const res = await fetch('/api/homepage-sections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sectionType, content })
+        body: JSON.stringify({ sectionType, content, page })
       });
       const data = await res.json();
       if (data.success) {
@@ -174,10 +176,23 @@ export default function HomepageCMS() {
 
   return (
     <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '30px' }}>
-        <h1 style={{ fontSize: '2rem', margin: 0 }}>Homepage Content Manager</h1>
+      <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', margin: 0 }}>Page Sections Manager</h1>
+          <p style={{ color: '#666', margin: '5px 0 0 0' }}>Update the layout sections for different pages.</p>
+        </div>
+        <div>
+          <select 
+            value={page}
+            onChange={(e) => setPage(e.target.value)}
+            style={{ padding: '10px', fontSize: '1rem', border: '1px solid #ccc', borderRadius: '4px' }}
+          >
+            <option value="home">Home Page</option>
+            <option value="jewellery">Jewellery Page</option>
+            <option value="accessories">Accessories Page</option>
+          </select>
+        </div>
       </div>
-      <p style={{ color: '#666', marginBottom: '20px' }}>Update the images and text for your advanced homepage sections here.</p>
 
       {/* Hidden File Input */}
       <input type="file" accept="image/*,video/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />

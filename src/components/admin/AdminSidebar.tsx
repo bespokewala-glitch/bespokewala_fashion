@@ -11,7 +11,10 @@ import {
   Image as ImageIcon, 
   LayoutTemplate, 
   LogOut,
-  ListTree
+  ListTree,
+  Tags,
+  Calendar,
+  Layers
 } from 'lucide-react';
 
 export default function AdminSidebar() {
@@ -37,11 +40,9 @@ export default function AdminSidebar() {
       subItems: [
         { name: 'Couture', productType: 'couture' },
         { name: 'Jewellery', productType: 'jewellery' },
-        { name: 'Diffusion', productType: 'diffusion' },
-        { name: 'Pret', productType: 'pret' },
+        { name: 'Accessories', productType: 'accessories' },
       ]
     },
-    { name: 'Taxonomies', path: '/dashboard/taxonomies', icon: ListTree },
     { name: 'Users', path: '/dashboard/users', icon: Users },
     { name: 'Campaigns', path: '/dashboard/campaigns', icon: ImageIcon },
     { name: 'Homepage Sections', path: '/dashboard/homepage', icon: LayoutTemplate },

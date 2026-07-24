@@ -23,7 +23,7 @@ function AdminProductsContent() {
   const [savingMenuImages, setSavingMenuImages] = useState(false);
 
   useEffect(() => {
-    if (productTypeParam && ['couture', 'jewellery', 'diffusion', 'pret'].includes(productTypeParam)) {
+    if (productTypeParam && ['couture', 'jewellery', 'accessories'].includes(productTypeParam)) {
       setActiveProductType(productTypeParam);
       setFormData(prev => ({ ...prev, productType: productTypeParam, category: 'womens' }));
     }
@@ -62,13 +62,49 @@ function AdminProductsContent() {
       
       if (taxRes.ok) {
         const tData = await taxRes.json();
-        if (Array.isArray(tData)) setTaxonomies(tData);
+        setTaxonomies(tData);
       }
-      
-    } catch (e: any) {
-      console.error('Fetch error:', e);
+    } catch (e) {
+      console.error('Failed to fetch data', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickAddTaxonomy = async (type: 'category' | 'collection' | 'occasion', fieldName: 'subcategory' | 'collectionName' | 'occasion') => {
+    const name = prompt(`Enter new ${type} name:`);
+    if (!name) return;
+
+    try {
+      const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const payload = {
+        type,
+        name,
+        slug,
+        order: 0,
+        enabled: true,
+        productTypes: [activeProductType],
+        genders: [formData.category] // This is the department
+      };
+
+      const res = await fetch('/api/taxonomies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        const newTax = await res.json();
+        // Optimistically update taxonomies
+        setTaxonomies(prev => [...prev, newTax]);
+        // Auto-select the newly created taxonomy
+        setFormData(prev => ({ ...prev, [fieldName]: newTax.slug }));
+      } else {
+        const error = await res.json();
+        alert(`Failed to add ${type}: ${error.error || 'Unknown error'}`);
+      }
+    } catch (e) {
+      alert(`An error occurred while adding the ${type}.`);
     }
   };
 
@@ -445,21 +481,44 @@ function AdminProductsContent() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Gender / Category</label>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Department</label>
                 <select 
                   required
                   value={formData.category}
-                  onChange={e => setFormData({...formData, category: e.target.value})}
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  onChange={e => setFormData({...formData, category: e.target.value, subcategory: '', collectionName: '', occasion: ''})}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', textTransform: 'capitalize' }}
                 >
-                  <option value="womens">Womens</option>
-                  <option value="mens">Mens</option>
+                  <option value="">Select Department</option>
+                  {activeProductType === 'couture' && (
+                    <>
+                      <option value="womens">Womens</option>
+                      <option value="mens">Mens</option>
+                      <option value="new-arrivals">New Arrivals</option>
+                    </>
+                  )}
+                  {activeProductType === 'jewellery' && (
+                    <>
+                      <option value="signature-collection">Signature Collection</option>
+                      <option value="diamond-collection">Diamond Collection</option>
+                      <option value="menswear-collection">Menswear Collection</option>
+                      <option value="new-arrivals">New Arrivals</option>
+                    </>
+                  )}
+                  {activeProductType !== 'couture' && activeProductType !== 'jewellery' && (
+                    <>
+                      <option value="womens">Womens</option>
+                      <option value="mens">Mens</option>
+                    </>
+                  )}
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Dynamic Category</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                  <label style={{ fontWeight: 'bold' }}>Dynamic Category</label>
+                  <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                </div>
                 <select 
                   required
                   value={formData.subcategory}
@@ -476,7 +535,10 @@ function AdminProductsContent() {
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Collection (Optional)</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                  <label style={{ fontWeight: 'bold' }}>Collection (Optional)</label>
+                  <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                </div>
                 <select 
                   value={formData.collectionName}
                   onChange={e => setFormData({...formData, collectionName: e.target.value})}
@@ -489,7 +551,10 @@ function AdminProductsContent() {
                 </select>
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Occasion (Optional)</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                  <label style={{ fontWeight: 'bold' }}>Occasion (Optional)</label>
+                  <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                </div>
                 <select 
                   value={formData.occasion}
                   onChange={e => setFormData({...formData, occasion: e.target.value})}

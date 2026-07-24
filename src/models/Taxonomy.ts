@@ -17,7 +17,7 @@ const taxonomySchema = new Schema<ITaxonomy>(
   {
     type: { type: String, required: true, enum: ['collection', 'occasion', 'category'], index: true },
     name: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, trim: true },
+    slug: { type: String, required: true, trim: true },
     order: { type: Number, default: 0 },
     enabled: { type: Boolean, default: true },
     productTypes: { type: [String], default: [] },
@@ -27,6 +27,8 @@ const taxonomySchema = new Schema<ITaxonomy>(
     timestamps: true,
   }
 );
+
+taxonomySchema.index({ type: 1, slug: 1 }, { unique: true });
 
 if (mongoose.models.Taxonomy) {
   delete mongoose.models.Taxonomy;

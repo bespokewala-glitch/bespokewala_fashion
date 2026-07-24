@@ -161,58 +161,25 @@ export default function Header() {
     transition: 'all 0.3s ease',
   };
 
-  type Subcategory = { label: string, href: string };
-  type NavItem = { id: string, label: string, href: string, subcategories?: Subcategory[] };
-  
-  const menuData: Record<string, NavItem[]> = {
+  const menuData: Record<string, { id: string; label: string; href: string }[]> = {
     couture: [
-      { id: 'new', label: 'New Arrivals', href: '/products?productType=couture' },
-      { 
-        id: 'womens', label: 'Women', href: '/products?productType=couture&category=womens',
-        subcategories: [
-          { label: 'Lehengas', href: '/products?productType=couture&category=womens&subcategory=lehenga' },
-          { label: 'Indo Western', href: '/products?productType=couture&category=womens&subcategory=indo-western' },
-          { label: 'Light Lehenga', href: '/products?productType=couture&category=womens&subcategory=light-lehenga' },
-          { label: 'Sarees', href: '/products?productType=couture&category=womens&subcategory=sarees' },
-          { label: 'Suits', href: '/products?productType=couture&category=womens&subcategory=suits' },
-          { label: 'Gowns', href: '/products?productType=couture&category=womens&subcategory=gowns' },
-        ]
-      },
-      { 
-        id: 'mens', label: 'Men', href: '/products?productType=couture&category=mens',
-        subcategories: [
-          { label: 'Shervani', href: '/products?productType=couture&category=mens&subcategory=shervani' },
-          { label: 'Tuxedo', href: '/products?productType=couture&category=mens&subcategory=tuxedo' },
-          { label: 'Suits', href: '/products?productType=couture&category=mens&subcategory=suits' },
-          { label: 'Kurta', href: '/products?productType=couture&category=mens&subcategory=kurta' },
-          { label: 'Bundi', href: '/products?productType=couture&category=mens&subcategory=bundi' },
-          { label: 'Kurta Bundi Sets', href: '/products?productType=couture&category=mens&subcategory=kurta-bundi-sets' },
-          { label: 'Bandgala', href: '/products?productType=couture&category=mens&subcategory=bandgala' },
-          { label: 'Shirts', href: '/products?productType=couture&category=mens&subcategory=shirts' },
-          { label: 'Indo Western', href: '/products?productType=couture&category=mens&subcategory=indo-western' },
-          { label: 'Casual Jackets', href: '/products?productType=couture&category=mens&subcategory=casual-jackets' },
-        ]
-      },
-    ],
-    diffusion: [
-      { id: 'new', label: 'New Arrivals', href: '/products?productType=diffusion' },
-      { id: 'womens', label: 'Women', href: '/products?productType=diffusion&category=womens' },
-      { id: 'mens', label: 'Men', href: '/products?productType=diffusion&category=mens' },
+      { id: 'new-arrivals', label: 'New Arrivals', href: '/products?productType=couture&category=new-arrivals' },
+      { id: 'womens', label: 'Women', href: '/products?productType=couture&category=womens' },
+      { id: 'mens', label: 'Men', href: '/products?productType=couture&category=mens' },
     ],
     jewellery: [
-      { id: 'new', label: 'New Arrivals', href: '/products?productType=jewellery' },
-      { id: 'womens', label: 'Women', href: '/products?productType=jewellery&category=womens' },
-      { id: 'mens', label: 'Men', href: '/products?productType=jewellery&category=mens' },
+      { id: 'new-arrivals', label: 'New Arrivals', href: '/products?productType=jewellery&category=new-arrivals' },
+      { id: 'signature-collection', label: 'Signature Collection', href: '/products?productType=jewellery&category=signature-collection' },
+      { id: 'diamond-collection', label: 'Diamond Collection', href: '/products?productType=jewellery&category=diamond-collection' },
+      { id: 'menswear-collection', label: 'Menswear Collection', href: '/products?productType=jewellery&category=menswear-collection' },
     ],
-    pret: [
-      { id: 'new', label: 'New Arrivals', href: '/products?productType=pret' },
-      { id: 'womens', label: 'Women', href: '/products?productType=pret&category=womens' },
-      { id: 'mens', label: 'Men', href: '/products?productType=pret&category=mens' },
-    ]
+    accessories: [
+      { id: 'womens', label: 'Women', href: '/products?productType=accessories&category=womens' },
+      { id: 'mens', label: 'Men', href: '/products?productType=accessories&category=mens' },
+    ],
   };
 
-  const activeSecondaryNav = hoveredNav ? menuData[hoveredNav] : null;
-  const activeTertiaryNav = activeSecondaryNav?.find(item => item.id === hoveredCategory);
+  const activeSecondaryNav = hoveredNav ? menuData[hoveredNav as string] || [] : [];
 
   const collections = taxonomies.filter(t => t.type === 'collection' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(hoveredNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(hoveredCategory as string)));
   const occasions = taxonomies.filter(t => t.type === 'occasion' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(hoveredNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(hoveredCategory as string)));
@@ -251,9 +218,8 @@ export default function Header() {
           <nav>
             <ul style={menuStyle} onMouseLeave={handleMouseLeaveMenu}>
               <li onMouseEnter={() => handleMouseEnterMenu('couture')}><Link href="/products?productType=couture" style={{ padding: '1rem 0' }}>Couture</Link></li>
-              <li onMouseEnter={() => handleMouseEnterMenu('diffusion')}><Link href="/products?productType=diffusion" style={{ padding: '1rem 0' }}>Diffusion</Link></li>
+              <li onMouseEnter={() => handleMouseEnterMenu('accessories')}><Link href="/products?productType=accessories" style={{ padding: '1rem 0' }}>Accessories</Link></li>
               <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}><Link href="/products?productType=jewellery" style={{ padding: '1rem 0' }}>Jewellery</Link></li>
-              <li onMouseEnter={() => handleMouseEnterMenu('pret')}><Link href="/products?productType=pret" style={{ padding: '1rem 0' }}>Pret</Link></li>
             </ul>
           </nav>
           
@@ -298,7 +264,7 @@ export default function Header() {
           </nav>
         </div>
         
-        {/* Sub-navigation Menu */}
+        {/* Sub-navigation Menu (Departments) */}
         <div style={subNavContainer} onMouseEnter={handleMouseEnterSubMenu} onMouseLeave={handleMouseLeaveSubMenu}>
           <ul style={{ ...menuStyle, gap: '3rem', fontSize: '0.75rem', fontWeight: 500, color: '#333' }}>
             {activeSecondaryNav?.map((item) => (
@@ -315,7 +281,7 @@ export default function Header() {
           </ul>
 
           {/* Tertiary Mega Menu Panel */}
-          {activeTertiaryNav?.subcategories && (
+          {hoveredCategory && (
             <div style={{
               position: 'absolute',
               top: '100%',
@@ -332,57 +298,65 @@ export default function Header() {
             }}>
               <div style={{ display: 'flex', width: '100%', maxWidth: '1400px' }}>
                 <div style={{ flex: 1, display: 'flex', gap: '3rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>COLLECTIONS</h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {collections.map(col => (
-                        <li key={col._id}>
-                          <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&collectionName=${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
-                            {col.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {collections.length > 0 && (
+                    <div style={{ width: '220px' }}>
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>COLLECTIONS</h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {collections.map(col => (
+                          <li key={col._id}>
+                            <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&collectionName=${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                              {col.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>OCCASION</h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {occasions.map(occ => (
-                        <li key={occ._id}>
-                          <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&occasion=${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
-                            {occ.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {occasions.length > 0 && (
+                    <div style={{ width: '220px' }}>
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>OCCASION</h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {occasions.map(occ => (
+                          <li key={occ._id}>
+                            <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&occasion=${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                              {occ.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>CATEGORIES</h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {categories.map(cat => (
-                        <li key={cat._id}>
-                          <Link 
-                            href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&subcategory=${cat.slug}`} 
-                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
-                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                            className="sub-link-hover"
-                          >
-                            {cat.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {categories.length > 0 && (
+                    <div style={{ width: '220px' }}>
+                      <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>CATEGORIES</h4>
+                      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {categories.map(cat => (
+                          <li key={cat._id}>
+                            <Link 
+                              href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&subcategory=${cat.slug}`} 
+                              onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
+                              style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                              className="sub-link-hover"
+                            >
+                              {cat.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Image Grid matching the Manish Malhotra layout */}
-                <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
-                   <div style={{ flex: 1, backgroundColor: '#f0f0f0', backgroundImage: `url(${megaMenuImages[0] || 'https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80'})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div>
-                   <div style={{ flex: 1, backgroundColor: '#e5e5e5', backgroundImage: `url(${megaMenuImages[1] || 'https://images.unsplash.com/photo-1579298245158-33e8f568f7d3?auto=format&fit=crop&q=80'})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div>
-                   <div style={{ flex: 1, backgroundColor: '#d5d5d5', backgroundImage: `url(${megaMenuImages[2] || 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80'})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div>
-                </div>
+                {(megaMenuImages[0] || megaMenuImages[1] || megaMenuImages[2]) && (
+                  <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
+                     {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', backgroundImage: `url(${megaMenuImages[0]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                     {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', backgroundImage: `url(${megaMenuImages[1]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                     {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', backgroundImage: `url(${megaMenuImages[2]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                  </div>
+                )}
               </div>
             </div>
           )}

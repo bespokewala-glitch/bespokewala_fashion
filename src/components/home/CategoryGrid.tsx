@@ -13,7 +13,7 @@ export default function CategoryGrid() {
 
   const categories = [
     { name: 'Couture', slug: 'couture', image: 'https://images.unsplash.com/photo-1574044572237-7f938d821217?q=80&w=2687&auto=format&fit=crop' },
-    { name: 'Pret', slug: 'pret', image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2940&auto=format&fit=crop' },
+    { name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=2940&auto=format&fit=crop' },
     { name: 'Jewellery', slug: 'jewellery', image: 'https://images.unsplash.com/photo-1599643478524-fb66f70d00f0?q=80&w=2728&auto=format&fit=crop' },
     { name: 'Beauty', slug: 'beauty', image: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=2938&auto=format&fit=crop' },
   ];
