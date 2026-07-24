@@ -8,6 +8,12 @@ export interface ProductCardProps {
     price: number;
     images: string[];
     category: string;
+    referenceImages?: {
+      front?: string;
+      back?: string;
+      left?: string;
+      right?: string;
+    };
   };
   variant?: 'default' | 'slider';
 }
@@ -34,7 +40,10 @@ export default function ProductCard({ product, variant = 'default' }: ProductCar
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    transition: 'transform 0.5s ease',
+    transition: 'opacity 0.4s ease-in-out',
+    position: 'absolute',
+    top: 0,
+    left: 0,
   };
 
   const infoStyle: React.CSSProperties = {
@@ -63,13 +72,23 @@ export default function ProductCard({ product, variant = 'default' }: ProductCar
         <img 
           src={product.images[0]} 
           alt={product.name} 
-          style={imgStyle}
-          className="product-img"
+          style={{ ...imgStyle, position: 'relative' }}
+          className="product-img-primary"
         />
-        {/* Simple hover effect with CSS */}
+        {(product.images[1] || product.referenceImages?.front || product.referenceImages?.back || product.referenceImages?.left || product.referenceImages?.right) && (
+          <img 
+            src={product.images[1] || product.referenceImages?.front || product.referenceImages?.back || product.referenceImages?.left || product.referenceImages?.right} 
+            alt={`${product.name} alternate`} 
+            style={imgStyle}
+            className="product-img-secondary"
+          />
+        )}
         <style>{`
-          .product-card:hover .product-img {
-            transform: scale(1.05);
+          .product-card .product-img-secondary {
+            opacity: 0;
+          }
+          .product-card:hover .product-img-secondary {
+            opacity: 1;
           }
         `}</style>
       </div>

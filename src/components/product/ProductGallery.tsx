@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import Lightbox from './Lightbox';
 
 interface ProductGalleryProps {
   images: { url: string; alt: string }[];
@@ -8,6 +9,7 @@ interface ProductGalleryProps {
 
 export default function ProductGallery({ images }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   if (!images || images.length === 0) {
     return <div style={{ width: '100%', aspectRatio: '2/3', backgroundColor: '#f0f0f0', borderRadius: '12px' }} />;
@@ -16,12 +18,14 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   const selectedImage = images[selectedIndex];
 
   return (
-    <div style={{ display: 'flex', gap: '1.5rem', flexDirection: 'row' }}>
-      {/* Main Image (Left side) */}
+    <>
+      <div style={{ display: 'flex', gap: '1.5rem', flexDirection: 'row' }}>
+        {/* Main Image (Left side) */}
       <div style={{ flex: 1, position: 'relative' }}>
         <img
           src={selectedImage.url}
           alt={selectedImage.alt}
+          onClick={() => setIsLightboxOpen(true)}
           style={{
             width: '100%',
             height: '100%',
@@ -29,6 +33,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
             objectFit: 'cover',
             backgroundColor: '#fafafa',
             borderRadius: '12px',
+            cursor: 'zoom-in',
           }}
         />
       </div>
@@ -61,5 +66,13 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         ))}
       </div>
     </div>
+      
+      <Lightbox 
+        images={images} 
+        initialIndex={selectedIndex} 
+        isOpen={isLightboxOpen} 
+        onClose={() => setIsLightboxOpen(false)} 
+      />
+    </>
   );
 }
