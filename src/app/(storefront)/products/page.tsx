@@ -82,13 +82,6 @@ export default async function ProductsPage({
     minHeight: '80vh',
   };
 
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '3rem 2rem',
-    marginTop: '3rem',
-  };
-
   return (
     <>
       <Header />
@@ -116,7 +109,7 @@ export default async function ProductsPage({
             <p className="text-body">No products found in this category.</p>
           </div>
         ) : (
-          <div style={gridStyle}>
+          <div className="product-grid">
             {products.map((product: any) => (
               <ProductCard key={product._id.toString()} product={product} />
             ))}
