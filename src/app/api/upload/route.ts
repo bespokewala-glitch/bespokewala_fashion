@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { bucket } from '@/lib/gcs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,22 +13,20 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Save to public/uploads
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Directory might already exist, which is fine
-    }
-
     // Make filename unique
     const uniqueFilename = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-    const filepath = path.join(uploadDir, uniqueFilename);
     
-    await writeFile(filepath, buffer);
+    // Upload to Google Cloud Storage
+    const fileOptions = {
+      contentType: file.type || 'application/octet-stream',
+    };
 
-    const videoUrl = `/uploads/${uniqueFilename}`;
+    const gcsFile = bucket.file(`uploads/${uniqueFilename}`);
+    
+    await gcsFile.save(buffer, fileOptions);
+
+    // Return the proxy URL instead of the direct GCS URL to avoid public access requirements
+    const videoUrl = `/api/media/uploads/${uniqueFilename}`;
 
     return NextResponse.json({ success: true, videoUrl }, { status: 201 });
   } catch (error: any) {

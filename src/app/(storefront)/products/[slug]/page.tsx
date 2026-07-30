@@ -77,17 +77,21 @@ export default async function ProductsSlugPage({ params }: Props) {
   // Combine main images and reference images
   const allImages: { url: string; alt: string }[] = [];
 
+  // Normalize legacy ?file= URLs that may be stored in the database
+  const sanitizeUrl = (url: string) =>
+    url.replace(/^\/api\/media\?file=/, '/api/media/');
+
   if (product.images && Array.isArray(product.images)) {
     product.images.forEach((img: string, idx: number) => {
-      allImages.push({ url: img, alt: `${product.name} - View ${idx + 1}` });
+      allImages.push({ url: sanitizeUrl(img), alt: `${product.name} - View ${idx + 1}` });
     });
   }
 
   if (product.referenceImages) {
-    if (product.referenceImages.front) allImages.push({ url: product.referenceImages.front, alt: `${product.name} - Front View` });
-    if (product.referenceImages.back)  allImages.push({ url: product.referenceImages.back,  alt: `${product.name} - Back View` });
-    if (product.referenceImages.left)  allImages.push({ url: product.referenceImages.left,  alt: `${product.name} - Left View` });
-    if (product.referenceImages.right) allImages.push({ url: product.referenceImages.right, alt: `${product.name} - Right View` });
+    if (product.referenceImages.front) allImages.push({ url: sanitizeUrl(product.referenceImages.front), alt: `${product.name} - Front View` });
+    if (product.referenceImages.back)  allImages.push({ url: sanitizeUrl(product.referenceImages.back),  alt: `${product.name} - Back View` });
+    if (product.referenceImages.left)  allImages.push({ url: sanitizeUrl(product.referenceImages.left),  alt: `${product.name} - Left View` });
+    if (product.referenceImages.right) allImages.push({ url: sanitizeUrl(product.referenceImages.right), alt: `${product.name} - Right View` });
   }
 
   const containerStyle: React.CSSProperties = {

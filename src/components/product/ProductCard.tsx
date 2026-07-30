@@ -23,9 +23,15 @@ export interface ProductCardProps {
   priority?: boolean; // true for first ~4 above-the-fold cards
 }
 
-/** Returns true if the URL is a local path that can use next/image optimization */
+/** Returns true if the URL is a simple local path that next/image can optimize.
+ *  Excludes API proxy routes like /api/media/ since they are not whitelisted
+ *  in next.config localPatterns and don't benefit from image optimization.
+ */
 function isLocalImage(src: string): boolean {
-  return src.startsWith('/') && !src.startsWith('//');
+  if (!src) return false;
+  if (!src.startsWith('/') || src.startsWith('//')) return false;
+  if (src.startsWith('/api/')) return false; // proxy routes — use plain <img>
+  return true;
 }
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
@@ -33,14 +39,21 @@ export default function ProductCard({ product, variant = 'default', priority = f
   const isWishlisted = isInWishlist(product.slug);
   const [isHovered, setIsHovered] = useState(false);
 
-  const primaryImage = product.images[0];
-  const hoverImage =
+  /** Normalize legacy ?file= query-param URLs to clean path-based URLs */
+  const sanitizeUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    // Convert old format: /api/media?file=uploads/foo.png → /api/media/uploads/foo.png
+    return url.replace(/^\/api\/media\?file=/, '/api/media/');
+  };
+
+  const primaryImage = sanitizeUrl(product.images[0]) || '';
+  const hoverImage = sanitizeUrl(
     product.images[1] ||
     product.referenceImages?.front ||
     product.referenceImages?.back ||
     product.referenceImages?.left ||
-    product.referenceImages?.right ||
-    null;
+    product.referenceImages?.right
+  ) || null;
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();

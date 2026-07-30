@@ -7,12 +7,24 @@ const nextConfig: NextConfig = {
   // Enable Next.js Image Optimization for local uploads
   // This auto-converts images to WebP and serves them at the right size
   images: {
-    // Allow optimization for local /uploads path
+    // Allow optimization for Google Cloud Storage
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-webapp-prod'}/**`,
+      },
+    ],
+    // Allow local API routes with query parameters for next/image
     localPatterns: [
+      {
+        pathname: '/api/media',
+        search: '?file=**',
+      },
       {
         pathname: '/uploads/**',
         search: '',
-      },
+      }
     ],
     // Serve images at these breakpoints only (fewer variants = faster processing)
     deviceSizes: [640, 1080, 1920],
