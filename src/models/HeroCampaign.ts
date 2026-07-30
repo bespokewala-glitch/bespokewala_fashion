@@ -52,8 +52,7 @@ const HeroCampaignSchema = new Schema<IHeroCampaign>(
   }
 );
 
-// Prevent mongoose from compiling the model multiple times in development, but force update for now
-delete mongoose.models.HeroCampaign;
-const HeroCampaign: Model<IHeroCampaign> = mongoose.model<IHeroCampaign>('HeroCampaign', HeroCampaignSchema);
+// Use existing compiled model in development to avoid hot-reload re-compilation
+const HeroCampaign: Model<IHeroCampaign> = (mongoose.models.HeroCampaign as Model<IHeroCampaign>) || mongoose.model<IHeroCampaign>('HeroCampaign', HeroCampaignSchema);
 
 export default HeroCampaign;

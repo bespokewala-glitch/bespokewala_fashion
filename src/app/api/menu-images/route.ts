@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongoose';
 import MenuImage from '@/models/MenuImage';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
+import { getOrFetch, invalidateCachePrefix } from '@/lib/serverCache';
 
 // Helper to verify admin token
 async function verifyAdmin() {
@@ -29,8 +30,15 @@ export async function GET(request: Request) {
     if (productType) query.productType = productType;
     if (category) query.category = category;
     
-    const menuImages = await MenuImage.find(query).lean();
-    return NextResponse.json(menuImages);
+    const cacheKey = `menu-images:${productType || ''}:${category || ''}`;
+    const menuImages = await getOrFetch(cacheKey, 300, () =>
+      MenuImage.find(query).lean()
+    );
+    return NextResponse.json(menuImages, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
+      },
+    });
   } catch (error: unknown) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }

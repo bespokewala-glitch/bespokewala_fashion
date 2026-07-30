@@ -20,7 +20,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const fallbackCampaigns: Campaign[] = [
-    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products?productType=couture' },
+    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/' },
     { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?productType=jewellery' },
     { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=accessories' }
   ];
@@ -167,7 +167,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         <div style={subtitleStyle}>{currentCampaign?.subtitle}</div>
         <h1 style={titleStyle}>{currentCampaign?.title}</h1>
         {currentCampaign?.linkUrl && (
-          <Link href={currentCampaign.linkUrl} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }}>
+          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }}>
             Explore Now
           </Link>
         )}

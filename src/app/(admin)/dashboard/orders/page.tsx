@@ -73,25 +73,24 @@ export default function AdminOrdersPage() {
                     {order.user?.name || 'Guest'}<br/>
                     <small style={{ color: '#666' }}>{order.user?.email || ''}</small>
                   </td>
-                  <td style={{ padding: '15px' }}>${order.totalAmount.toFixed(2)}</td>
+                  <td style={{ padding: '15px' }}>${order.total?.toFixed(2) || '0.00'}</td>
                   <td style={{ padding: '15px' }}>
                     <select 
-                      value={order.status} 
+                      value={order.orderStatus || 'processing'} 
                       onChange={(e) => handleStatusChange(order._id, e.target.value)}
                       disabled={updating === order._id}
                       style={{ 
                         padding: '8px', 
                         borderRadius: '4px', 
                         border: '1px solid #ccc',
-                        backgroundColor: order.status === 'Delivered' ? '#e6fffa' : 
-                                       order.status === 'Cancelled' ? '#fff5f5' : '#fff'
+                        backgroundColor: order.orderStatus === 'delivered' ? '#e6fffa' : 
+                                       order.orderStatus === 'cancelled' ? '#fff5f5' : '#fff'
                       }}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Processing">Processing</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
+                      <option value="processing">Processing</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
                     </select>
                     {updating === order._id && <span style={{ marginLeft: '10px', fontSize: '12px', color: '#666' }}>Saving...</span>}
                   </td>

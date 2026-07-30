@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Taxonomy from '@/models/Taxonomy';
+import { getOrFetch, invalidateCachePrefix } from '@/lib/serverCache';
 
 export async function GET(request: Request) {
   try {
@@ -38,8 +39,15 @@ export async function GET(request: Request) {
       }
     }
 
-    const taxonomies = await Taxonomy.find(query).sort({ order: 1, name: 1 });
-    return NextResponse.json(taxonomies);
+    const cacheKey = `taxonomies:${type || ''}:${enabledOnly}:${productType || ''}:${gender || ''}`;
+    const taxonomies = await getOrFetch(cacheKey, 60, () =>
+      Taxonomy.find(query).sort({ order: 1, name: 1 }).lean()
+    );
+    return NextResponse.json(taxonomies, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+      },
+    });
   } catch (error: any) {
     console.error('Error fetching taxonomies:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -59,6 +67,7 @@ export async function POST(request: Request) {
 
     const taxonomy = new Taxonomy(data);
     await taxonomy.save();
+    invalidateCachePrefix('taxonomies:'); // clear cached taxonomy lists
     return NextResponse.json(taxonomy, { status: 201 });
   } catch (error: any) {
     if (error.code === 11000) {

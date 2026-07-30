@@ -39,7 +39,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }}>
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
-          <Link href={item.link} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }}>
+          <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }}>
             <img 
               src={item.url} 
               alt={item.title} 

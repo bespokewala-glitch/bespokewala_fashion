@@ -35,8 +35,9 @@ export default async function Home() {
   }));
 
   // Categorize campaigns
-  // General campaigns (both Images and Videos) go ONLY to the top HeroSection
-  const heroCampaigns = plainCampaigns.filter(c => c.category === 'general');
+  // General & Couture campaigns go to the top HeroSection (Homepage is the Couture page)
+  const heroCampaigns = plainCampaigns.filter(c => c.category === 'general' || c.category === 'couture');
+  const finalHeroCampaigns = heroCampaigns.length > 0 ? heroCampaigns : plainCampaigns;
   
   // Specific categories go ONLY to their respective DynamicCategoryShowcase
   const coutureMedia = plainCampaigns.filter(c => c.category === 'couture');
@@ -55,7 +56,7 @@ export default async function Home() {
     <>
       <Header />
       <main style={{ backgroundColor: '#fff' }}>
-        <HeroSection campaigns={heroCampaigns} />
+        <HeroSection campaigns={finalHeroCampaigns} />
         
         {/* Curated Sections */}
         <CuratedGrid data={sectionMap.CuratedGrid} />

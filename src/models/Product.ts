@@ -40,12 +40,8 @@ const productSchema = new Schema<IProduct>(
   }
 );
 
-// Prevent re-compilation of the model if it already exists (common issue in Next.js dev mode)
-// However, to ensure schema changes take effect in dev, we should delete the cached model
-if (mongoose.models.Product) {
-  delete mongoose.models.Product;
-}
+productSchema.index({ category: 1, subcategory: 1, productType: 1 });
 
-const Product: Model<IProduct> = mongoose.model<IProduct>('Product', productSchema, 'Products');
+const Product: Model<IProduct> = mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema, 'Products');
 
 export default Product;

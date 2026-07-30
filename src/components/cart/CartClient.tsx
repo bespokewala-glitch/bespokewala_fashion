@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 
 export default function CartClient() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -103,18 +105,21 @@ export default function CartClient() {
             <span>₹{cartTotal.toLocaleString('en-IN')}</span>
           </div>
 
-          <button style={{
-            width: '100%',
-            padding: '1.2rem',
-            backgroundColor: '#000',
-            color: '#fff',
-            border: 'none',
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s'
-          }}>
+          <button 
+            onClick={() => router.push('/checkout')}
+            style={{
+              width: '100%',
+              padding: '1.2rem',
+              backgroundColor: '#000',
+              color: '#fff',
+              border: 'none',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+          >
             Proceed to Checkout
           </button>
           

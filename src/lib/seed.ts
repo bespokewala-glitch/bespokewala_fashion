@@ -84,7 +84,7 @@ const dummyProducts = [
 ];
 
 const dummyCampaigns = [
-  { title: 'The Couture Edit', subtitle: 'New Arrivals', videoUrl: '/clothures_video.mp4', linkUrl: '/products?category=couture', order: 0 },
+  { title: 'The Couture Edit', subtitle: 'New Arrivals', videoUrl: '/clothures_video.mp4', linkUrl: '/', order: 0 },
   { title: 'High Jewellery', subtitle: 'Signature Collection', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?category=jewellery', order: 1 },
   { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?category=beauty', order: 2 }
 ];

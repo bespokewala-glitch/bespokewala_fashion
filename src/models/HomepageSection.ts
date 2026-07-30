@@ -18,6 +18,5 @@ const HomepageSectionSchema = new mongoose.Schema({
 
 HomepageSectionSchema.index({ sectionType: 1, page: 1 }, { unique: true });
 
-delete mongoose.models.HomepageSection;
-const HomepageSection = mongoose.model('HomepageSection', HomepageSectionSchema);
+const HomepageSection = mongoose.models.HomepageSection || mongoose.model('HomepageSection', HomepageSectionSchema);
 export default HomepageSection;

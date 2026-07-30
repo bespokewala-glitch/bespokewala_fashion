@@ -107,7 +107,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               {subtitle}
             </p>
           </div>
-          <Link href={link} style={{ 
+          <Link href={link} prefetch={false} style={{ 
             color: '#fff', 
             textDecoration: 'none', 
             fontSize: '0.85rem', 

@@ -25,10 +25,22 @@ export default function Header() {
   useEffect(() => {
     const fetchTaxonomies = async () => {
       try {
+        // Use sessionStorage cache to avoid re-fetching on every page navigation
+        const cached = sessionStorage.getItem('header_taxonomies');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (parsed.ts && Date.now() - parsed.ts < 60_000) {
+              setTaxonomies(parsed.data);
+              return;
+            }
+          } catch { /* ignore parse errors */ }
+        }
         const res = await fetch('/api/taxonomies?enabled=true');
         if (res.ok) {
           const data = await res.json();
           setTaxonomies(data);
+          sessionStorage.setItem('header_taxonomies', JSON.stringify({ ts: Date.now(), data }));
         }
       } catch (e) {
         console.error('Failed to fetch taxonomies in header');
@@ -55,17 +67,21 @@ export default function Header() {
 
   useEffect(() => {
     if (hoveredNav && hoveredCategory) {
-      fetch(`/api/menu-images?productType=${hoveredNav}&category=${hoveredCategory}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.length > 0 && data[0].images) {
-            const fetched = data[0].images;
-            setMegaMenuImages([fetched[0] || '', fetched[1] || '', fetched[2] || '']);
-          } else {
-            setMegaMenuImages(['', '', '']);
-          }
-        })
-        .catch(console.error);
+      // Debounce menu-image fetch to 200ms — avoids firing on accidental mouse-overs
+      const timer = setTimeout(() => {
+        fetch(`/api/menu-images?productType=${hoveredNav}&category=${hoveredCategory}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0 && data[0].images) {
+              const fetched = data[0].images;
+              setMegaMenuImages([fetched[0] || '', fetched[1] || '', fetched[2] || '']);
+            } else {
+              setMegaMenuImages(['', '', '']);
+            }
+          })
+          .catch(console.error);
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [hoveredNav, hoveredCategory]);
 
@@ -165,19 +181,19 @@ export default function Header() {
 
   const menuData: Record<string, { id: string; label: string; href: string }[]> = {
     couture: [
-      { id: 'new-arrivals', label: 'New Arrivals', href: '/products?productType=couture&category=new-arrivals' },
-      { id: 'womens', label: 'Women', href: '/products?productType=couture&category=womens' },
-      { id: 'mens', label: 'Men', href: '/products?productType=couture&category=mens' },
+      { id: 'new-arrivals', label: 'New Arrivals', href: '/products/couture/new-arrivals' },
+      { id: 'womens', label: 'Women', href: '/products/couture/womens' },
+      { id: 'mens', label: 'Men', href: '/products/couture/mens' },
     ],
     jewellery: [
-      { id: 'new-arrivals', label: 'New Arrivals', href: '/products?productType=jewellery&category=new-arrivals' },
-      { id: 'signature-collection', label: 'Signature Collection', href: '/products?productType=jewellery&category=signature-collection' },
-      { id: 'diamond-collection', label: 'Diamond Collection', href: '/products?productType=jewellery&category=diamond-collection' },
-      { id: 'menswear-collection', label: 'Menswear Collection', href: '/products?productType=jewellery&category=menswear-collection' },
+      { id: 'new-arrivals', label: 'New Arrivals', href: '/products/jewellery/new-arrivals' },
+      { id: 'signature-collection', label: 'Signature Collection', href: '/products/jewellery/signature-collection' },
+      { id: 'diamond-collection', label: 'Diamond Collection', href: '/products/jewellery/diamond-collection' },
+      { id: 'menswear-collection', label: 'Menswear Collection', href: '/products/jewellery/menswear-collection' },
     ],
     accessories: [
-      { id: 'womens', label: 'Women', href: '/products?productType=accessories&category=womens' },
-      { id: 'mens', label: 'Men', href: '/products?productType=accessories&category=mens' },
+      { id: 'womens', label: 'Women', href: '/products/accessories/womens' },
+      { id: 'mens', label: 'Men', href: '/products/accessories/mens' },
     ],
   };
 
@@ -219,9 +235,11 @@ export default function Header() {
         <div style={navContainer}>
           <nav>
             <ul style={menuStyle} onMouseLeave={handleMouseLeaveMenu}>
-              <li onMouseEnter={() => handleMouseEnterMenu('couture')}><Link href="/products?productType=couture" style={{ padding: '1rem 0' }}>Couture</Link></li>
-              <li onMouseEnter={() => handleMouseEnterMenu('accessories')}><Link href="/products?productType=accessories" style={{ padding: '1rem 0' }}>Accessories</Link></li>
-              <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}><Link href="/products?productType=jewellery" style={{ padding: '1rem 0' }}>Jewellery</Link></li>
+              <li onMouseEnter={() => handleMouseEnterMenu('couture')}>
+                <Link prefetch={false} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
+              </li>
+              <li onMouseEnter={() => handleMouseEnterMenu('accessories')}><Link prefetch={false} href="/products/accessories" style={{ padding: '1rem 0' }}>Accessories</Link></li>
+              <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}><Link prefetch={false} href="/products/jewellery" style={{ padding: '1rem 0' }}>Jewellery</Link></li>
             </ul>
           </nav>
           
@@ -274,17 +292,69 @@ export default function Header() {
               <li 
                 key={item.id} 
                 onMouseEnter={() => setHoveredCategory(item.id)}
-                style={{ padding: '1.5rem 0', cursor: 'pointer', borderBottom: hoveredCategory === item.id ? '2px solid #000' : '2px solid transparent' }}
+                style={{ 
+                  padding: '1.5rem 0', 
+                  cursor: 'pointer', 
+                  borderBottom: hoveredCategory === item.id ? '2px solid #000' : '2px solid transparent',
+                  position: 'relative'
+                }}
               >
-                <Link href={item.href} onClick={() => { setHoveredNav(null); setHoveredCategory(null); }} className="menu-link-hover">
+                <Link prefetch={false} href={item.href} onClick={() => { setHoveredNav(null); setHoveredCategory(null); }} className="menu-link-hover">
                   {item.label}
                 </Link>
+
+                {/* Simple Dropdown for Jewellery */}
+                {hoveredNav === 'jewellery' && hoveredCategory === item.id && (categories.length > 0 || collections.length > 0) && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: '0',
+                    backgroundColor: '#fff',
+                    padding: '1.5rem',
+                    minWidth: '200px',
+                    boxShadow: '4px 15px 30px rgba(0,0,0,0.03)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    zIndex: 100,
+                    textAlign: 'left'
+                  }}>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {categories.map(cat => (
+                        <li key={cat._id}>
+                          <Link 
+                            prefetch={true}
+                            href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`} 
+                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
+                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            className="sub-link-hover"
+                          >
+                            {cat.name}
+                          </Link>
+                        </li>
+                      ))}
+                      {collections.map(col => (
+                        <li key={col._id}>
+                          <Link 
+                            prefetch={false}
+                            href={`/products/${hoveredNav}/${hoveredCategory}/${col.slug}`} 
+                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
+                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            className="sub-link-hover"
+                          >
+                            {col.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
 
-          {/* Tertiary Mega Menu Panel */}
-          {hoveredCategory && (
+          {/* Tertiary Mega Menu Panel for Non-Jewellery Items */}
+          {hoveredCategory && hoveredNav !== 'jewellery' && (
             <div style={{
               position: 'absolute',
               top: '100%',
@@ -307,7 +377,7 @@ export default function Header() {
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {collections.map(col => (
                           <li key={col._id}>
-                            <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&collectionName=${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                            <Link prefetch={false} href={`/products/${hoveredNav}/${hoveredCategory}/${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
                               {col.name}
                             </Link>
                           </li>
@@ -322,7 +392,7 @@ export default function Header() {
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {occasions.map(occ => (
                           <li key={occ._id}>
-                            <Link href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&occasion=${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
+                            <Link prefetch={false} href={`/products/${hoveredNav}/${hoveredCategory}/${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
                               {occ.name}
                             </Link>
                           </li>
@@ -338,7 +408,8 @@ export default function Header() {
                         {categories.map(cat => (
                           <li key={cat._id}>
                             <Link 
-                              href={`/products?productType=${hoveredNav}&category=${hoveredCategory}&subcategory=${cat.slug}`} 
+                              prefetch={true}
+                              href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`} 
                               onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                               style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                               className="sub-link-hover"
