@@ -13,11 +13,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ success: false, error: 'Status is required' }, { status: 400 });
     }
 
+    const validStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json({ success: false, error: 'Invalid status value' }, { status: 400 });
+    }
+
     const order = await Order.findByIdAndUpdate(
       resolvedParams.id,
-      { status },
+      { orderStatus: status },
       { new: true }
-    );
+    ).populate('user', 'name email');
 
     if (!order) {
       return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
