@@ -18,7 +18,7 @@ function LoginContent() {
     setError('');
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/login', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,13 +34,13 @@ function LoginContent() {
 
       // Check if there is a redirect parameter in the URL
       const redirectPath = searchParams.get('redirect');
-      const destination = redirectPath 
-        ? redirectPath 
+      const destination = redirectPath
+        ? redirectPath
         : (data.user.role === 'admin' ? '/dashboard/campaigns' : '/account');
-        
+
       router.push(destination);
       router.refresh();
-      
+
     } catch (err: any) {
       setError(err.message);
     } finally {
