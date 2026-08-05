@@ -18,8 +18,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/auth';
 import dbConnect from '@/lib/mongoose';
 import Media from '@/models/Media';
 import AuditLog from '@/models/AuditLog';
@@ -75,21 +75,32 @@ function getClientIp(req: NextRequest): string | null {
 // ─── Handler ──────────────────────────────────────────────────────────────────
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const ip = getClientIp(req);
 
   // ── 1. Authentication ──────────────────────────────────────────────────────
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth-token')?.value;
+
+  if (!token) {
     return NextResponse.json(
       { success: false, error: { code: 'UNAUTHENTICATED', message: 'You must be logged in.' } },
       { status: 401 }
     );
   }
 
-  const userId = (session.user as any).id as string;
-  const { id: mediaId } = params;
+  const payload = await verifyToken(token);
+  if (!payload?.id) {
+    return NextResponse.json(
+      { success: false, error: { code: 'UNAUTHENTICATED', message: 'You must be logged in.' } },
+      { status: 401 }
+    );
+  }
+
+  const userId = payload.id as string;
+  const resolvedParams = await params;
+  const { id: mediaId } = resolvedParams;
 
   // MongoDB ObjectIds are exactly 24 hex chars — reject junk IDs before hitting the DB
   if (!/^[a-f\d]{24}$/i.test(mediaId)) {
@@ -120,7 +131,7 @@ export async function GET(
   await dbConnect();
   const media = await Media.findById(mediaId).lean();
 
-  const isAdmin = (session.user as any).role === 'admin';
+  const isAdmin = payload.role === 'admin';
   const isOwner = media?.uploader_id === userId;
 
   // IDOR-safe: non-owners and missing records both get 404, never 403

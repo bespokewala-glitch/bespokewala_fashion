@@ -25,8 +25,8 @@ export const storage = new Storage({
 
 // ── Public bucket — product images, banners, etc. (allUsers: Storage Object Viewer) ──
 export const bucketName = process.env.GOOGLE_CLOUD_BUCKET_NAME || '';
-export const bucket = storage.bucket(bucketName);
+export const bucket = storage.bucket(bucketName || 'dummy-bucket-name-for-build');
 
 // ── Private bucket — invoices, bills, documents (no public access) ──
 export const privateBucketName = process.env.GOOGLE_CLOUD_PRIVATE_BUCKET_NAME || '';
-export const privateBucket = storage.bucket(privateBucketName);
+export const privateBucket = storage.bucket(privateBucketName || 'dummy-private-bucket-name-for-build');
