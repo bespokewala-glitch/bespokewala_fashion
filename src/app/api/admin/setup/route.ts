@@ -16,6 +16,7 @@ export async function GET() {
       adminUser = await User.create({
         name: 'Admin User',
         email: 'admin@bespoken.com',
+        mobileNumber: '9999999999',
         password: 'password123', // In a real app, hash this!
         role: 'admin',
       });

@@ -8,40 +8,12 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  
-  const [step, setStep] = useState<'details' | 'otp'>('details');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/auth/register/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, mobileNumber }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send OTP');
-      }
-
-      setStep('otp');
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyAndRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -50,7 +22,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, mobileNumber, otp }),
+        body: JSON.stringify({ name, email, mobileNumber, password }),
       });
 
       const data = await res.json();
@@ -175,7 +147,7 @@ export default function RegisterPage() {
       <div style={cardStyle}>
         <div style={headerStyle}>
           <h1 style={titleStyle}>Register</h1>
-          <p style={subtitleStyle}>{step === 'details' ? 'Create your account' : 'Verify your mobile number'}</p>
+          <p style={subtitleStyle}>Create your account</p>
         </div>
 
         {error && (
@@ -184,93 +156,65 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {step === 'details' ? (
-          <form onSubmit={handleSendOtp} style={formStyle}>
-            <div>
-              <label style={labelStyle}>Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={inputStyle}
-                required
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={inputStyle}
-                required
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Mobile Number</label>
-              <input
-                type="tel"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                style={inputStyle}
-                required
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={buttonStyle}
-              onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
-              onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
-            >
-              {loading ? 'Sending OTP...' : 'Send OTP'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyAndRegister} style={formStyle}>
-            <div>
-              <label style={labelStyle}>Enter 6-Digit OTP</label>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                style={{ ...inputStyle, textAlign: 'center', letterSpacing: '0.25em', fontSize: '1.25rem' }}
-                required
-                maxLength={6}
-                pattern="\d{6}"
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-                placeholder="------"
-              />
-              <p style={{ ...subtitleStyle, marginTop: '1rem', textAlign: 'center', fontSize: '0.75rem' }}>
-                Please check the server terminal/console for the OTP code.
-              </p>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={buttonStyle}
-              onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
-              onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
-            >
-              {loading ? 'Verifying...' : 'Verify & Create Account'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep('details')}
-              disabled={loading}
-              style={{ ...linkStyle, background: 'none', border: 'none', cursor: 'pointer', width: '100%' }}
-            >
-              <span style={{ borderBottom: '1px solid #d1d5db' }}>Back to details</span>
-            </button>
-          </form>
-        )}
+        <form onSubmit={handleRegister} style={formStyle}>
+          <div>
+            <label style={labelStyle}>Full Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Mobile Number</label>
+            <input
+              type="tel"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={buttonStyle}
+            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
+            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
+          >
+            {loading ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
 
         <Link href="/login" style={linkStyle}>
           Already have an account? <span style={{ color: '#1c1c1c', borderBottom: '1px solid #1c1c1c' }}>Sign In</span>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
-import User from '@/models/User';
+import '@/models/User'; // Side-effect import to prevent tree-shaking
 
 export async function GET() {
   try {

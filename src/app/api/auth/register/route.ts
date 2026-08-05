@@ -2,30 +2,21 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
 import Otp from '@/models/Otp';
-import { hashPassword, signToken } from '@/lib/auth';
+import { signToken } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
     await dbConnect();
-    const { name, email, mobileNumber, otp } = await request.json();
+    const { name, email, mobileNumber, password } = await request.json();
 
-    if (!name || !email || !mobileNumber || !otp) {
+    if (!name || !email || !mobileNumber || !password) {
       return NextResponse.json(
-        { error: 'All fields including OTP are required' },
+        { error: 'All fields including password are required' },
         { status: 400 }
       );
     }
 
-    // Verify OTP
-    const otpRecord = await Otp.findOne({ mobileNumber, otp });
-    if (!otpRecord) {
-      return NextResponse.json(
-        { error: 'Invalid or expired OTP' },
-        { status: 400 }
-      );
-    }
-
-    // Check if user already exists (double check just in case)
+    // Check if user already exists
     const existingUser = await User.findOne({ 
       $or: [{ email }, { mobileNumber }] 
     });
@@ -36,16 +27,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create user
+    // Store password as plain text (as requested, though not recommended for production)
     const newUser = await User.create({
       name,
       email,
       mobileNumber,
+      password: password,
       role: 'customer', // Default role for new registrations
     });
-
-    // Delete the used OTP
-    await Otp.deleteOne({ _id: otpRecord._id });
 
     // Generate token
     const token = await signToken({

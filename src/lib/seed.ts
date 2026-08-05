@@ -111,12 +111,14 @@ export async function seedDatabase() {
       {
         name: 'Admin User',
         email: 'admin@bespoken.com',
+        mobileNumber: '9999999999',
         password: adminPassword,
         role: 'admin'
       },
       {
         name: 'Test Customer',
         email: 'customer@bespoken.com',
+        mobileNumber: '8888888888',
         password: userPassword,
         role: 'customer'
       }

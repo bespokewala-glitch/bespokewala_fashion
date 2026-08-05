@@ -57,7 +57,6 @@ export default function Footer() {
           <h4 style={headingStyle}>Company</h4>
           <ul style={listStyle}>
             <li><Link href="/about">About Us</Link></li>
-            <li><Link href="/careers">Careers</Link></li>
             <li><Link href="/press">Press</Link></li>
             <li><Link href="/contact">Contact</Link></li>
           </ul>

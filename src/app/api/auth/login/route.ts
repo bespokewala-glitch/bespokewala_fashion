@@ -7,25 +7,19 @@ import { signToken } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     await dbConnect();
-    const { mobileNumber, otp } = await request.json();
+    const { identifier, password } = await request.json();
 
-    if (!mobileNumber || !otp) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { error: 'Mobile number and OTP are required' },
+        { error: 'Email/Mobile Number and password are required' },
         { status: 400 }
       );
     }
 
-    // Verify OTP
-    const otpRecord = await Otp.findOne({ mobileNumber, otp });
-    if (!otpRecord) {
-      return NextResponse.json(
-        { error: 'Invalid or expired OTP' },
-        { status: 401 }
-      );
-    }
-
-    const user = await User.findOne({ mobileNumber });
+    const user = await User.findOne({ 
+      $or: [{ email: identifier }, { mobileNumber: identifier }]
+    });
+    
     if (!user) {
       return NextResponse.json(
         { error: 'Account not found' },
@@ -33,8 +27,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Delete the used OTP
-    await Otp.deleteOne({ _id: otpRecord._id });
+    if (!user.password) {
+      return NextResponse.json(
+        { error: 'Account uses OTP. Please reset your password or use old login.' },
+        { status: 401 }
+      );
+    }
+
+    // Plain text password comparison (as requested)
+    const isValid = password === user.password;
+
+    if (!isValid) {
+      return NextResponse.json(
+        { error: 'Invalid credentials' },
+        { status: 401 }
+      );
+    }
 
     // Generate token
     const token = await signToken({

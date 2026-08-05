@@ -23,6 +23,7 @@ export default function Header() {
   const { wishlistCount } = useWishlist();
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchTaxonomies = async () => {
       try {
         // Use sessionStorage cache to avoid re-fetching on every page navigation
@@ -36,40 +37,56 @@ export default function Header() {
             }
           } catch { /* ignore parse errors */ }
         }
-        const res = await fetch('/api/taxonomies?enabled=true');
+        const res = await fetch('/api/taxonomies?enabled=true', { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           setTaxonomies(data);
           sessionStorage.setItem('header_taxonomies', JSON.stringify({ ts: Date.now(), data }));
         }
-      } catch (e) {
-        console.error('Failed to fetch taxonomies in header');
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') {
+          console.error('Failed to fetch taxonomies in header');
+        }
       }
     };
     fetchTaxonomies();
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    
-    fetch('/api/auth/me')
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) setUser(data.user);
-      })
-      .catch(console.error);
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Retry once on transient failure (e.g. dev server still starting up)
+    const fetchMe = async (attempt = 0) => {
+      try {
+        const res = await fetch('/api/auth/me', { signal: controller.signal });
+        const data = await res.json();
+        if (data.user) setUser(data.user);
+      } catch (e: any) {
+        if (e?.name === 'AbortError') return;
+        if (attempt === 0) {
+          setTimeout(() => fetchMe(1), 1000);
+        }
+      }
+    };
+    fetchMe();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      controller.abort();
+    };
   }, []);
 
   useEffect(() => {
     if (hoveredNav && hoveredCategory) {
+      const controller = new AbortController();
       // Debounce menu-image fetch to 200ms — avoids firing on accidental mouse-overs
       const timer = setTimeout(() => {
-        fetch(`/api/menu-images?productType=${hoveredNav}&category=${hoveredCategory}`)
+        fetch(`/api/menu-images?productType=${hoveredNav}&category=${hoveredCategory}`, { signal: controller.signal })
           .then(res => res.json())
           .then(data => {
             if (data && data.length > 0 && data[0].images) {
@@ -79,9 +96,9 @@ export default function Header() {
               setMegaMenuImages(['', '', '']);
             }
           })
-          .catch(console.error);
+          .catch((e: any) => { if (e?.name !== 'AbortError') console.error(e); });
       }, 200);
-      return () => clearTimeout(timer);
+      return () => { clearTimeout(timer); controller.abort(); };
     }
   }, [hoveredNav, hoveredCategory]);
 

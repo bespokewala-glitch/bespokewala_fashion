@@ -176,21 +176,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           {sectionMap.CoutureProcess && <CoutureProcess data={sectionMap.CoutureProcess} />}
         </div>
 
-        {/* Breadcrumb */}
-        {breadcrumbs.length > 1 && (
-          <nav aria-label="Breadcrumb" style={{ marginBottom: '2rem', fontSize: '0.75rem', letterSpacing: '0.1em', color: '#999', textTransform: 'uppercase' }}>
-            {breadcrumbs.map((crumb, i) => (
-              <span key={crumb.href}>
-                {i > 0 && <span style={{ margin: '0 0.5rem' }}>›</span>}
-                {i < breadcrumbs.length - 1 ? (
-                  <a href={crumb.href} style={{ color: '#999', textDecoration: 'none' }}>{crumb.label}</a>
-                ) : (
-                  <span style={{ color: '#1c1c1c' }}>{crumb.label}</span>
-                )}
-              </span>
-            ))}
-          </nav>
-        )}
 
         {/* Page heading */}
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>

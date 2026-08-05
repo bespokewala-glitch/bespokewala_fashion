@@ -1,46 +1,18 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'details' | 'otp'>('details');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/auth/login/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobileNumber }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send OTP');
-      }
-
-      setStep('otp');
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyAndLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -51,7 +23,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mobileNumber, otp }),
+        body: JSON.stringify({ identifier, password }),
       });
 
       const data = await res.json();
@@ -60,7 +32,12 @@ export default function LoginPage() {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      const destination = data.user.role === 'admin' ? '/dashboard/campaigns' : '/account';
+      // Check if there is a redirect parameter in the URL
+      const redirectPath = searchParams.get('redirect');
+      const destination = redirectPath 
+        ? redirectPath 
+        : (data.user.role === 'admin' ? '/dashboard/campaigns' : '/account');
+        
       router.push(destination);
       router.refresh();
       
@@ -177,7 +154,7 @@ export default function LoginPage() {
       <div style={cardStyle}>
         <div style={headerStyle}>
           <h1 style={titleStyle}>Login</h1>
-          <p style={subtitleStyle}>{step === 'details' ? 'Access your account' : 'Verify your mobile number'}</p>
+          <p style={subtitleStyle}>Access your account</p>
         </div>
 
         {error && (
@@ -186,71 +163,45 @@ export default function LoginPage() {
           </div>
         )}
 
-        {step === 'details' ? (
-          <form onSubmit={handleSendOtp} style={formStyle}>
-            <div>
-              <label style={labelStyle}>
-                Mobile Number
-              </label>
-              <input
-                type="tel"
-                value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                style={inputStyle}
-                required
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={buttonStyle}
-              onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
-              onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
-            >
-              {loading ? 'Sending OTP...' : 'Send OTP'}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyAndLogin} style={formStyle}>
-            <div>
-              <label style={labelStyle}>Enter 6-Digit OTP</label>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                style={{ ...inputStyle, textAlign: 'center', letterSpacing: '0.25em', fontSize: '1.25rem' }}
-                required
-                maxLength={6}
-                pattern="\d{6}"
-                onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-                onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-                placeholder="------"
-              />
-              <p style={{ ...subtitleStyle, marginTop: '1rem', textAlign: 'center', fontSize: '0.75rem' }}>
-                Please check the server terminal/console for the OTP code.
-              </p>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={buttonStyle}
-              onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
-              onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
-            >
-              {loading ? 'Verifying...' : 'Sign In'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep('details')}
-              disabled={loading}
-              style={{ ...linkStyle, background: 'none', border: 'none', cursor: 'pointer', width: '100%' }}
-            >
-              <span style={{ borderBottom: '1px solid #d1d5db' }}>Back to details</span>
-            </button>
-          </form>
-        )}
+        <form onSubmit={handleLogin} style={formStyle}>
+          <div>
+            <label style={labelStyle}>
+              Email Address or Mobile Number
+            </label>
+            <input
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={inputStyle}
+              required
+              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
+              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            style={buttonStyle}
+            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
+            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
+          >
+            {loading ? 'Signing In...' : 'Sign In'}
+          </button>
+        </form>
 
         <Link href="/register" style={linkStyle}>
           Don't have an account? <span style={{ color: '#1c1c1c', borderBottom: '1px solid #1c1c1c' }}>Register</span>
