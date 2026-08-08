@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import styles from './homepage.module.css';
 
 const MediaPreview = ({ src, style, alt }: { src?: string, style?: any, alt?: string }) => {
   if (!src) return null;
@@ -175,23 +176,23 @@ export default function HomepageCMS() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h1 style={{ fontSize: '2rem', margin: 0 }}>Page Sections Manager</h1>
-          <p style={{ color: '#666', margin: '5px 0 0 0' }}>Update the layout sections for different pages.</p>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.headerTop}>
+          <h1 className={styles.title}>Page Sections Manager</h1>
+          <div className={styles.selectorWrapper}>
+            <select 
+              value={page}
+              onChange={(e) => setPage(e.target.value)}
+              className={styles.selector}
+            >
+              <option value="home">Home Page</option>
+              <option value="jewellery">Jewellery Page</option>
+              <option value="accessories">Accessories Page</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <select 
-            value={page}
-            onChange={(e) => setPage(e.target.value)}
-            style={{ padding: '10px', fontSize: '1rem', border: '1px solid #ccc', borderRadius: '4px' }}
-          >
-            <option value="home">Home Page</option>
-            <option value="jewellery">Jewellery Page</option>
-            <option value="accessories">Accessories Page</option>
-          </select>
-        </div>
+        <p className={styles.description}>Update the layout sections for different pages.</p>
       </div>
 
       {/* Hidden File Input */}
