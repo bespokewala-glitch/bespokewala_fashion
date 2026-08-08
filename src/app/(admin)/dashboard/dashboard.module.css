@@ -103,6 +103,7 @@
     padding: 20px 16px; 
   }
   .header {
+    padding-left: 56px; /* Clear the absolute hamburger */
     margin-bottom: 24px;
     flex-wrap: wrap;
     align-items: center;

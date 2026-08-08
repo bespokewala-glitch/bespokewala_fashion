@@ -21,7 +21,6 @@ import {
   Eye,
   AlertCircle,
 } from "lucide-react";
-import AdminHamburger from "@/components/admin/AdminHamburger";
 import styles from "./orders.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -432,7 +431,6 @@ export default function AdminOrdersPage() {
       {/* ── Header ── */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <AdminHamburger />
           <div>
             <h1>Orders</h1>
             <p>{allOrders.length} total orders · {fmt(stats.revenue)} revenue</p>

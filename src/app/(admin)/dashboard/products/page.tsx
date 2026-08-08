@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package } from 'lucide-react';
+import styles from './products.module.css';
 
 // We will fetch categories from the Taxonomy API dynamically now.
 
@@ -12,6 +13,7 @@ function AdminProductsContent() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const searchParams = useSearchParams();
@@ -25,7 +27,25 @@ function AdminProductsContent() {
   useEffect(() => {
     if (productTypeParam && ['couture', 'jewellery', 'accessories'].includes(productTypeParam)) {
       setActiveProductType(productTypeParam);
-      setFormData(prev => ({ ...prev, productType: productTypeParam, category: 'womens' }));
+      setEditingId(null);
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        originalPrice: '',
+        productType: productTypeParam,
+        category: 'womens',
+        subcategory: '',
+        collectionName: '',
+        occasion: '',
+        imageUrl: '',
+        referenceImages: { front: '', back: '', left: '', right: '' },
+        details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
+        sizes: [],
+        inventoryCount: '10',
+        isFeatured: false,
+      });
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [productTypeParam]);
 
@@ -253,8 +273,11 @@ function AdminProductsContent() {
     };
 
     try {
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const method = editingId ? 'PUT' : 'POST';
+      const url = editingId ? `/api/products/${editingId}` : '/api/products';
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
@@ -268,8 +291,10 @@ function AdminProductsContent() {
           sizes: [],
           inventoryCount: '10', isFeatured: false 
         });
+        setEditingId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchProductsAndTaxonomies();
+        alert(editingId ? 'Product updated successfully!' : 'Product created successfully!');
       } else {
         alert('Error saving product: ' + (data.error || 'Unknown error'));
       }
@@ -294,6 +319,28 @@ function AdminProductsContent() {
     } catch (err: any) {
       alert('Error deleting: ' + err.message);
     }
+  };
+
+  const handleEdit = (prod: any) => {
+    setEditingId(prod._id);
+    setFormData({
+      name: prod.name || '',
+      description: prod.description || '',
+      price: prod.price?.toString() || '',
+      originalPrice: prod.originalPrice?.toString() || '',
+      productType: prod.productType || activeProductType,
+      category: prod.category || 'womens',
+      subcategory: prod.subcategory || '',
+      collectionName: prod.collectionName || '',
+      occasion: prod.occasion || '',
+      imageUrl: (prod.images && prod.images[0]) ? prod.images[0] : '',
+      referenceImages: prod.referenceImages || { front: '', back: '', left: '', right: '' },
+      details: prod.details || { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
+      sizes: prod.sizes || [],
+      inventoryCount: prod.inventoryCount?.toString() || '10',
+      isFeatured: prod.isFeatured || false,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleMenuImageUpload = async (file: File, index: number) => {
@@ -351,54 +398,54 @@ function AdminProductsContent() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '2rem', margin: 0 }}>Products Admin</h1>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1>Products Admin</h1>
+        </div>
       </div>
 
       {!activeProductType ? (
-        <div style={{ textAlign: 'center', padding: '100px 20px', color: '#666', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+        <div className={styles.emptyState}>
           <Package size={48} style={{ margin: '0 auto 20px', opacity: 0.5, display: 'block' }} />
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '10px', color: '#333' }}>Select a Product Type</h2>
+          <h2>Select a Product Type</h2>
           <p>Please select a product type (e.g. Couture, Jewellery) from the sidebar to view and manage its products.</p>
         </div>
       ) : (
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', flexDirection: 'column' }}>
+      <div className={styles.mainLayout}>
         {/* MEGA MENU SETTINGS */}
-        <div style={{ width: '100%', backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', border: '1px solid #eee' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div className={styles.megaMenuSection}>
+          <div className={styles.megaMenuHeader}>
             <h2 style={{ fontSize: '1.5rem', margin: 0, textTransform: 'capitalize' }}>Mega Menu Images ({activeProductType})</h2>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={() => setMenuSettingsCategory('womens')}
-                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'womens' ? '#000' : '#fff', color: menuSettingsCategory === 'womens' ? '#fff' : '#000', cursor: 'pointer' }}
+                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'womens' ? '#000' : '#fff', color: menuSettingsCategory === 'womens' ? '#fff' : '#000', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
               >
                 Womens
               </button>
               <button 
                 onClick={() => setMenuSettingsCategory('mens')}
-                style={{ padding: '8px 16px', borderRadius: '4px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'mens' ? '#000' : '#fff', color: menuSettingsCategory === 'mens' ? '#fff' : '#000', cursor: 'pointer' }}
+                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'mens' ? '#000' : '#fff', color: menuSettingsCategory === 'mens' ? '#fff' : '#000', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
               >
                 Mens
               </button>
             </div>
           </div>
-          <p style={{ color: '#666', marginBottom: '20px' }}>Upload exactly 3 portrait images to display in the {activeProductType} {'->'} {menuSettingsCategory} mega menu dropdown.</p>
+          <p style={{ color: '#6b7280', marginBottom: '20px', fontSize: '0.9rem' }}>Upload exactly 3 portrait images to display in the {activeProductType} {'->'} {menuSettingsCategory} mega menu dropdown.</p>
           
-          <div style={{ display: 'flex', gap: '20px' }}>
+          <div className={styles.megaMenuGrid}>
             {[0, 1, 2].map((index) => (
-              <div key={index} style={{ flex: 1, border: '2px dashed #ccc', padding: '20px', textAlign: 'center', backgroundColor: '#fff', borderRadius: '4px' }}>
+              <div key={index} className={styles.megaMenuCard}>
                 {menuImages[index] ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', objectFit: 'contain', marginBottom: '10px' }} />
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                      <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} style={{ padding: '5px 10px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Remove</button>
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                    <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', width: '100%', objectFit: 'cover', marginBottom: '10px', borderRadius: '8px' }} />
+                    <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} className={styles.deleteBtn} style={{ width: '100%' }}>Remove</button>
                   </div>
                 ) : (
-                  <div>
-                    <p style={{ fontSize: '0.8rem', color: '#666' }}>Slot {index + 1}</p>
-                    <label style={{ display: 'inline-block', marginTop: '10px', padding: '8px 15px', backgroundColor: '#f5f5f5', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                    <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '12px' }}>Slot {index + 1}</p>
+                    <label style={{ display: 'block', width: '100%', padding: '10px', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>
                       {uploading ? 'Uploading...' : 'Upload Image'}
                       <input 
                         type="file" 
@@ -416,49 +463,64 @@ function AdminProductsContent() {
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '20px', textAlign: 'right' }}>
+          <div style={{ marginTop: '20px' }}>
             <button 
               onClick={handleSaveMenuImages}
               disabled={savingMenuImages}
-              style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingMenuImages ? 'not-allowed' : 'pointer', opacity: savingMenuImages ? 0.7 : 1 }}
+              className={styles.btnPrimary}
             >
               {savingMenuImages ? 'Saving...' : 'Save Menu Images'}
             </button>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start', width: '100%' }}>
+        <div className={styles.flexRow}>
           {/* ADD NEW PRODUCT FORM */}
-          <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>Add New {activeProductType} Product</h2>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div className={styles.formSection}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>
+            {editingId ? 'Edit' : 'Add New'} {activeProductType}
+            {editingId && (
+              <button 
+                type="button" 
+                onClick={() => {
+                  setEditingId(null);
+                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], inventoryCount: '10', isFeatured: false });
+                }}
+                style={{ fontSize: '0.8rem', marginLeft: '15px', padding: '4px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}
+              >
+                Cancel Edit
+              </button>
+            )}
+          </h2>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
             
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Product Name</label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Product Name</label>
               <input 
                 type="text" 
                 required 
                 value={formData.name}
                 onChange={e => setFormData({...formData, name: e.target.value})}
                 placeholder="e.g. Midnight Blue Velvet Sherwani"
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                className={styles.formInput}
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Description</label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Description</label>
               <textarea 
                 required 
                 value={formData.description}
                 onChange={e => setFormData({...formData, description: e.target.value})}
                 placeholder="Detailed product description..."
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', minHeight: '80px' }}
+                className={styles.formTextarea}
+                style={{ minHeight: '80px' }}
               />
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className={styles.formRow}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Price ($)</label>
+                <label className={styles.formLabel}>Price ($)</label>
                 <input 
                   type="number" 
                   required 
@@ -467,31 +529,32 @@ function AdminProductsContent() {
                   value={formData.price}
                   onChange={e => setFormData({...formData, price: e.target.value})}
                   placeholder="0.00"
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  className={styles.formInput}
                 />
               </div>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Original Price (Optional)</label>
+                <label className={styles.formLabel}>Original Price (Optional)</label>
                 <input 
                   type="number" 
                   min="0"
                   step="0.01"
                   value={formData.originalPrice}
                   onChange={e => setFormData({...formData, originalPrice: e.target.value})}
-                  placeholder="0.00 (shows strike-through)"
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  placeholder="0.00"
+                  className={styles.formInput}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <div className={styles.formRow}>
               <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Department</label>
+                <label className={styles.formLabel}>Department</label>
                 <select 
                   required
                   value={formData.category}
                   onChange={e => setFormData({...formData, category: e.target.value, subcategory: '', collectionName: '', occasion: ''})}
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', textTransform: 'capitalize' }}
+                  className={styles.formSelect}
+                  style={{ textTransform: 'capitalize' }}
                 >
                   <option value="">Select Department</option>
                   {activeProductType === 'couture' && (
@@ -519,14 +582,14 @@ function AdminProductsContent() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                  <label style={{ fontWeight: 'bold' }}>Dynamic Category</label>
+                  <label className={styles.formLabel} style={{ marginBottom: 0 }}>Dynamic Category</label>
                   <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
                 </div>
                 <select 
                   required
                   value={formData.subcategory}
                   onChange={e => setFormData({...formData, subcategory: e.target.value})}
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  className={styles.formSelect}
                 >
                   <option value="" disabled>Select a category</option>
                   {taxonomies.filter(t => t.type === 'category' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
@@ -536,16 +599,16 @@ function AdminProductsContent() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className={styles.formRow}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                  <label style={{ fontWeight: 'bold' }}>Collection (Optional)</label>
+                  <label className={styles.formLabel} style={{ marginBottom: 0 }}>Collection (Optional)</label>
                   <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
                 </div>
                 <select 
                   value={formData.collectionName}
                   onChange={e => setFormData({...formData, collectionName: e.target.value})}
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  className={styles.formSelect}
                 >
                   <option value="">None</option>
                   {taxonomies.filter(t => t.type === 'collection' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
@@ -555,13 +618,13 @@ function AdminProductsContent() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                  <label style={{ fontWeight: 'bold' }}>Occasion (Optional)</label>
+                  <label className={styles.formLabel} style={{ marginBottom: 0 }}>Occasion (Optional)</label>
                   <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
                 </div>
                 <select 
                   value={formData.occasion}
                   onChange={e => setFormData({...formData, occasion: e.target.value})}
-                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                  className={styles.formSelect}
                 >
                   <option value="">None</option>
                   {taxonomies.filter(t => t.type === 'occasion' && t.enabled && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(activeProductType)) && (!t.genders || t.genders.length === 0 || t.genders.includes(formData.category))).map(tax => (
@@ -571,8 +634,8 @@ function AdminProductsContent() {
               </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Available Sizes</label>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Available Sizes</label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'].map(size => (
                   <label key={size} style={{ 
@@ -580,11 +643,12 @@ function AdminProductsContent() {
                     alignItems: 'center', 
                     gap: '5px', 
                     cursor: 'pointer',
-                    padding: '5px 10px',
+                    padding: '8px 12px',
                     border: '1px solid #ccc',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     backgroundColor: formData.sizes.includes(size) ? '#000' : '#fff',
-                    color: formData.sizes.includes(size) ? '#fff' : '#000'
+                    color: formData.sizes.includes(size) ? '#fff' : '#000',
+                    fontSize: '0.875rem'
                   }}>
                     <input 
                       type="checkbox"
@@ -731,64 +795,55 @@ function AdminProductsContent() {
 
             <button 
               type="submit" 
-              disabled={uploading || !formData.imageUrl}
-              style={{ 
-                marginTop: '10px', 
-                padding: '12px', 
-                backgroundColor: '#000', 
-                color: '#fff', 
-                border: 'none', 
-                borderRadius: '4px', 
-                cursor: (uploading || !formData.imageUrl) ? 'not-allowed' : 'pointer',
-                opacity: (uploading || !formData.imageUrl) ? 0.5 : 1
-              }}
+              disabled={uploading || (!formData.imageUrl && !editingId)}
+              className={styles.btnPrimary}
+              style={{ marginTop: '20px' }}
             >
-              Save Product
+              {editingId ? 'Update Product' : 'Save Product'}
             </button>
           </form>
         </div>
 
         {/* LIST EXISTING PRODUCTS */}
-        <div style={{ flex: 1 }}>
+        <div className={styles.productListSection}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>{activeProductType} Products</h2>
           {loading ? <p>Loading...</p> : products.filter(p => p.productType === activeProductType).length === 0 ? <p>No products found in this category.</p> : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className={styles.productList}>
               {products.filter(p => p.productType === activeProductType).map((prod) => (
-                <div key={prod._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px', position: 'relative' }}>
+                <div key={prod._id} className={styles.productCard} style={{ position: 'relative' }}>
                   {prod.isFeatured && (
                     <span style={{ position: 'absolute', top: '-10px', right: '-10px', backgroundColor: 'gold', color: '#000', padding: '5px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold' }}>
                       FEATURED
                     </span>
                   )}
                   {prod.images && prod.images[0] && (
-                    <img src={prod.images[0]} style={{ width: '100px', height: '100px', objectFit: 'cover', backgroundColor: '#f5f5f5', borderRadius: '4px' }} alt={prod.name} />
+                    <img src={prod.images[0]} alt={prod.name} />
                   )}
-                  <div>
-                    <h3 style={{ fontSize: '1.2rem', margin: '0 0 5px 0' }}>{prod.name}</h3>
-                    <p style={{ margin: '0 0 10px 0', color: '#000', fontWeight: 'bold', fontSize: '1rem' }}>
+                  <div className={styles.productInfo}>
+                    <h3>{prod.name}</h3>
+                    <p className={styles.productPrice}>
                       ${prod.price.toFixed(2)}
-                      {prod.originalPrice && <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '10px', fontSize: '0.9rem' }}>${prod.originalPrice.toFixed(2)}</span>}
+                      {prod.originalPrice && <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '10px', fontSize: '0.9rem', fontWeight: 'normal' }}>${prod.originalPrice.toFixed(2)}</span>}
                     </p>
-                    <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}>
+                    <p className={styles.productCategory}>
                       <strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{prod.category} / {prod.subcategory}</span>
                       {prod.collectionName && <span> | <strong>Collection:</strong> {prod.collectionName}</span>}
                       {prod.occasion && <span> | <strong>Occasion:</strong> {prod.occasion}</span>}
                     </p>
-                    <button 
-                      onClick={() => handleDelete(prod._id)}
-                      style={{ 
-                        marginTop: '10px',
-                        padding: '6px 12px', 
-                        backgroundColor: '#ff4d4f', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem'
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                      <button 
+                        onClick={() => handleEdit(prod)}
+                        className={styles.editBtn}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(prod._id)}
+                        className={styles.deleteBtn}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

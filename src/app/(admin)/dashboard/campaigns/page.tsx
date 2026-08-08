@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-
-import AdminHamburger from "@/components/admin/AdminHamburger";
-
+import styles from './campaigns.module.css';
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,8 +137,7 @@ export default function AdminCampaignsPage() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }} className="admin-page-container">
-      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
-        <AdminHamburger />
+      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }} className={styles.header}>
         <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', margin: 0 }}>Hero Campaigns Admin</h1>
       </div>
       

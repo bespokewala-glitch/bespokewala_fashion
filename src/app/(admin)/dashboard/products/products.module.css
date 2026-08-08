@@ -1,0 +1,322 @@
+/* ─── Page & Header ────────────────────────────────────────────────────────── */
+.page {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #111;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.headerLeft h1 {
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Empty State ────────────────────────────────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 100px 20px;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+}
+
+.emptyState h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* ─── Main Layout (Form + List) ──────────────────────────────────────────── */
+.mainLayout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.flexSection {
+  flex: 1;
+  width: 100%;
+}
+
+/* ─── Mega Menu Grid ─────────────────────────────────────────────────────── */
+.megaMenuSection {
+  width: 100%;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.megaMenuHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.megaMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.megaMenuCard {
+  border: 2px dashed #e5e7eb;
+  padding: 20px;
+  text-align: center;
+  background-color: #fafafa;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Forms ──────────────────────────────────────────────────────────────── */
+.formSection {
+  flex: 1;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formRow {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+  transition: all 0.2s;
+  color: #111;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  border-color: #7c3aed;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #111;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btnPrimary:hover {
+  background-color: #333;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Product List ───────────────────────────────────────────────────────── */
+.productListSection {
+  flex: 1;
+  width: 100%;
+}
+
+.productList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.productCard {
+  border: 1px solid #f0f0f0;
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  gap: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  align-items: center;
+}
+
+.productCard img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 10px;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productInfo h3 {
+  font-size: 1.1rem;
+  margin: 0 0 4px 0;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productPrice {
+  margin: 0 0 6px 0;
+  color: #111;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.productCategory {
+  margin: 0 0 6px 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deleteBtn {
+  padding: 8px 14px;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.deleteBtn:hover {
+  background-color: #fca5a5;
+}
+
+.editBtn {
+  padding: 8px 14px;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn:hover {
+  background-color: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+/* ─── Mobile Overrides ───────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .flexRow {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px;
+  }
+
+  .header {
+    padding-left: 48px; /* Clear the global absolute hamburger */
+    margin-bottom: 20px;
+  }
+
+  .headerLeft h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Mega Menu images stack */
+  .megaMenuSection {
+    padding: 20px 16px;
+  }
+
+  .megaMenuGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .formSection {
+    padding: 20px 16px;
+  }
+
+  /* Product List */
+  .productCard {
+    padding: 12px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .megaMenuGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,11 @@
+.header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding-left: 48px; /* Clear global hamburger */
+  }
+}

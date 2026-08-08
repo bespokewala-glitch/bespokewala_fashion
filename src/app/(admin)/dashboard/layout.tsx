@@ -1,4 +1,5 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminHamburger from '@/components/admin/AdminHamburger';
 import { Suspense } from 'react';
 
 export default function AdminLayout({
@@ -11,7 +12,10 @@ export default function AdminLayout({
       <Suspense fallback={<div style={{ width: '250px', backgroundColor: '#111' }} />}>
         <AdminSidebar />
       </Suspense>
-      <main style={{ flex: 1, overflowY: 'auto' }}>
+      <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: '24px', left: '16px', zIndex: 999 }} className="mobile-hamburger-wrapper">
+          <AdminHamburger />
+        </div>
         {children}
       </main>
     </div>
