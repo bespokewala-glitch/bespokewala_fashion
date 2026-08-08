@@ -22,18 +22,18 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
   if (!campaigns || campaigns.length === 0) return null;
 
   return (
-    <section style={{ padding: '6rem 4rem', backgroundColor: '#fff' }}>
-      <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+    <section style={{ padding: '6rem 4rem', backgroundColor: '#fff' }} className="mobile-section-py mobile-px-container">
+      <div style={{ marginBottom: '3rem', textAlign: 'center' }} className="mobile-mb-2">
         <h2 style={{ 
           fontSize: '2.5rem', 
           fontWeight: 300, 
           letterSpacing: '0.2em', 
           color: '#000', 
           textTransform: 'uppercase' 
-        }}>
+        }} className="mobile-h2-clamp">
           {categoryName}
         </h2>
-        <div style={{ width: '60px', height: '2px', backgroundColor: '#000', margin: '1rem auto' }} />
+        <div style={{ width: '60px', height: '2px', backgroundColor: '#000', margin: '1rem auto' }} className="mobile-section-mb" />
       </div>
 
       <div style={{
@@ -41,7 +41,7 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '2rem',
         alignItems: 'stretch'
-      }}>
+      }} className="mobile-carousel">
         {campaigns.map((camp, index) => {
           // Make the first item span more columns if it's a prominent video, or just rely on auto-fit
           // We can use a dynamic style based on index
@@ -88,7 +88,7 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
               )}
 
               <div 
-                className="overlay-content"
+                className="overlay-content mobile-card-overlay"
                 style={{
                   position: 'absolute',
                   inset: 0,
@@ -101,10 +101,10 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
                   transition: 'background 0.3s ease'
                 }}
               >
-                <h3 style={{ fontSize: isLarge ? '2.5rem' : '1.5rem', fontWeight: 300, margin: '0 0 0.5rem 0', letterSpacing: '0.1em' }}>
+                <h3 style={{ fontSize: isLarge ? '2.5rem' : '1.5rem', fontWeight: 300, margin: '0 0 0.5rem 0', letterSpacing: '0.1em' }} className="mobile-card-title">
                   {camp.title}
                 </h3>
-                <p style={{ margin: '0 0 1rem 0', fontSize: '1rem', letterSpacing: '0.05em', color: '#eaeaea' }}>
+                <p style={{ margin: '0 0 1rem 0', fontSize: '1rem', letterSpacing: '0.05em', color: '#eaeaea' }} className="mobile-desc">
                   {camp.subtitle}
                 </p>
                 {camp.linkUrl && (
@@ -119,12 +119,12 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
                     letterSpacing: '0.1em',
                     fontSize: '0.8rem',
                     transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
+                  }} className="mobile-view-all"
+                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
                     e.currentTarget.style.backgroundColor = '#fff';
                     e.currentTarget.style.color = '#000';
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                     e.currentTarget.style.color = '#fff';
                   }}

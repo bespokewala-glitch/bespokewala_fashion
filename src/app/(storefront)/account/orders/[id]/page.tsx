@@ -135,13 +135,13 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '3rem', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '3rem', alignItems: 'start' }} className="mobile-flex-col">
         
         {/* Left Column: Items & Details */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
           
           {/* Order Items */}
-          <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }}>
+          <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }} className="mobile-p-4">
             <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.1em', textTransform: 'uppercase', borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '2rem' }}>
               Order Details
             </h2>
@@ -182,7 +182,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
           </div>
           
           {/* Shipping Address */}
-          <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }}>
+          <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }} className="mobile-p-4">
             <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.1em', textTransform: 'uppercase', borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '2rem' }}>
               Shipping Details
             </h2>
@@ -201,7 +201,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
           
           {/* Tracking Timeline */}
           {order.orderStatus.toLowerCase() !== 'cancelled' && (
-            <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }}>
+            <div style={{ backgroundColor: '#fff', border: '1px solid #eee', padding: '2.5rem' }} className="mobile-p-4">
               <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '2.5rem' }}>
                 Order Status
               </h2>

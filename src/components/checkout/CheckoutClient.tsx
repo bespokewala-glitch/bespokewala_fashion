@@ -123,14 +123,14 @@ export default function CheckoutClient() {
         </div>
       )}
 
-      <form onSubmit={handlePlaceOrder} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', alignItems: 'start' }}>
+      <form onSubmit={handlePlaceOrder} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '4rem', alignItems: 'start' }} className="mobile-flex-col">
         {/* Shipping Form */}
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 400, letterSpacing: '0.1em', marginBottom: '2rem', textTransform: 'uppercase', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
             Shipping Details
           </h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }} className="mobile-grid-1">
             <input required type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={inputStyle} />
             <input required type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={inputStyle} />
           </div>
@@ -139,12 +139,12 @@ export default function CheckoutClient() {
             <input required type="text" name="address" placeholder="Address (Street, Apartment, Suite)" value={shippingDetails.address} onChange={handleChange} style={inputStyle} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }} className="mobile-grid-1">
             <input required type="text" name="city" placeholder="City" value={shippingDetails.city} onChange={handleChange} style={inputStyle} />
             <input required type="text" name="state" placeholder="State / Province" value={shippingDetails.state} onChange={handleChange} style={inputStyle} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }} className="mobile-grid-1">
             <input required type="text" name="zipCode" placeholder="Postal Code / ZIP" value={shippingDetails.zipCode} onChange={handleChange} style={inputStyle} />
             <select name="country" value={shippingDetails.country} onChange={handleChange} style={inputStyle}>
               <option value="India">India</option>
@@ -183,7 +183,7 @@ export default function CheckoutClient() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div style={{ backgroundColor: '#f9f9f9', padding: '2.5rem', position: 'sticky', top: '100px' }}>
+        <div style={{ backgroundColor: '#f9f9f9', padding: '2.5rem', position: 'sticky', top: '100px', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0">
           <h2 style={{ fontSize: '1.25rem', fontWeight: 400, letterSpacing: '0.1em', marginBottom: '2rem', textTransform: 'uppercase' }}>
             Order Summary
           </h2>

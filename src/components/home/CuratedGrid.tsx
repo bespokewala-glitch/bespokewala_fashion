@@ -29,21 +29,21 @@ export default function CuratedGrid({ data }: { data?: any }) {
   })).slice(0, 4) : defaultImages;
 
   return (
-    <section style={{ padding: '6rem 2rem 4rem 2rem', backgroundColor: '#fff', textAlign: 'center' }}>
-      <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }}>
+    <section style={{ padding: '6rem 2rem 4rem 2rem', backgroundColor: '#fff', textAlign: 'center', overflow: 'hidden' }} className="mobile-section-py mobile-px-container">
+      <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }} className="mobile-h2-clamp mobile-mb-2">
         {title}
       </h2>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '4rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto 4rem auto', lineHeight: '1.6' }}>
+      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '4rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto 4rem auto', lineHeight: '1.6' }} className="mobile-body-clamp mobile-section-mb">
         {subtitle}
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }} className="mobile-carousel">
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
           <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }}>
             <img 
               src={item.url} 
               alt={item.title} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '400px' }}
             />
             <div style={{ 
               position: 'absolute', 
@@ -52,11 +52,27 @@ export default function CuratedGrid({ data }: { data?: any }) {
               background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%)',
               color: '#fff',
               textAlign: 'left'
-            }}>
-              <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>{item.title}</h3>
+            }} className="mobile-card-overlay">
+              <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }} className="mobile-card-title">{item.title}</h3>
             </div>
           </Link>
         ))}
+      </div>
+
+      <div style={{ marginTop: '3rem', textAlign: 'center' }} className="mobile-section-mt">
+        <Link href="/products" prefetch={false} style={{ 
+          display: 'inline-block',
+          padding: '0.8rem 2rem',
+          border: '1px solid #000',
+          color: '#000',
+          textDecoration: 'none',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          fontSize: '0.9rem',
+          transition: 'all 0.3s ease'
+        }} className="mobile-label-clamp">
+          View All
+        </Link>
       </div>
     </section>
   );

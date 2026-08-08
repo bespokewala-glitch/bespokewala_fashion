@@ -61,7 +61,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       minHeight: '80vh',
       backgroundColor: '#fff',
       flexWrap: 'wrap'
-    }}>
+    }} className="mobile-flex-col mobile-min-h-auto">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes subtleFadeIn {
           0% { opacity: 0; transform: translateY(10px); }
@@ -93,11 +93,11 @@ export default function SplitShowcase({ data }: { data?: any }) {
         textAlign: 'center',
         backgroundColor: '#fff',
         position: 'relative'
-      }}>
+      }} className="mobile-section-py mobile-px-container">
         
         {/* Top Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Our Collection</p>
+          <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }} className="mobile-label-clamp">Our Collection</p>
           <div style={{ width: '30px', height: '1px', backgroundColor: '#ccc', margin: '0 auto' }} />
         </div>
 
@@ -108,14 +108,15 @@ export default function SplitShowcase({ data }: { data?: any }) {
             <img 
               src={products[currentIndex].image} 
               alt={products[currentIndex].name}
-              style={{ width: '100%', maxWidth: '300px', height: '300px', objectFit: 'contain', marginBottom: '2rem' }}
+              style={{ width: '100%', maxWidth: '300px', height: '300px', objectFit: 'contain', marginBottom: '1.5rem' }}
+              className="mobile-slider-img"
             />
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }}>{products[currentIndex].name}</h3>
-            <p style={{ fontSize: '1rem', color: '#888' }}>{products[currentIndex].price}</p>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>
+            <p style={{ fontSize: '1rem', color: '#888' }} className="mobile-body-clamp">{products[currentIndex].price}</p>
           </div>
           
           {/* Pagination Dots */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '2rem' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem' }} className="mobile-section-mt">
             {products.map((_: any, idx: number) => (
               <div 
                 key={idx}

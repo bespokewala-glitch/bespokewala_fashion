@@ -67,17 +67,17 @@ export default async function Home() {
 
 
         {/* Featured Products */}
-        <section style={{ padding: '8rem 0', textAlign: 'center', width: '100%', overflow: 'hidden' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }}>
+        <section style={{ padding: '8rem 0', textAlign: 'center', width: '100%', overflow: 'hidden' }} className="mobile-section-py">
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }} className="mobile-h2-clamp">
             Featured Arrivals
           </h2>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }}>
+          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }} className="mobile-body-clamp">
             Curated collection for the season
           </p>
           
           <PremiumFeaturedCarousel products={featuredProducts} />
 
-          <div style={{ marginTop: '4rem' }}>
+          <div style={{ marginTop: '4rem' }} className="mobile-section-mt">
             <a href="/products" style={{
               display: 'inline-block',
               padding: '1rem 3rem',
@@ -87,7 +87,7 @@ export default async function Home() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               fontSize: '0.9rem'
-            }}>View All Products</a>
+            }} className="mobile-label-clamp">View All Products</a>
           </div>
         </section>
       </main>

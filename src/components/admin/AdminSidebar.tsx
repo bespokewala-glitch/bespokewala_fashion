@@ -13,9 +13,11 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
-  Gem,
   Sparkles,
+  Gem,
   Briefcase,
+  Menu,
+  X,
 } from "lucide-react";
 
 const navItems = [
@@ -44,14 +46,41 @@ export default function AdminSidebar() {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({
     "/dashboard/products": pathname.startsWith("/dashboard/products"),
   });
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleExpand = (path: string) => {
     setExpandedItems((prev) => ({ ...prev, [path]: !prev[path] }));
   };
 
   return (
-    <div
-      style={{
+    <>
+      <button 
+        className="desktop-hide"
+        onClick={() => setIsMobileOpen(true)}
+        style={{
+          position: "fixed",
+          top: "1rem",
+          left: "1rem",
+          zIndex: 90,
+          background: "#111",
+          color: "#fff",
+          border: "none",
+          borderRadius: "8px",
+          padding: "0.5rem",
+          cursor: "pointer"
+        }}
+      >
+        <Menu size={24} />
+      </button>
+
+      <div 
+        className={`admin-mobile-overlay desktop-hide ${isMobileOpen ? 'open' : ''}`}
+        onClick={() => setIsMobileOpen(false)}
+      />
+
+      <div
+        className={`admin-mobile-sidebar ${isMobileOpen ? 'open' : ''}`}
+        style={{
         width: "240px",
         minWidth: "240px",
         backgroundColor: "#0d0d0d",
@@ -301,5 +330,6 @@ export default function AdminSidebar() {
         </Link>
       </div>
     </div>
+    </>
   );
 }

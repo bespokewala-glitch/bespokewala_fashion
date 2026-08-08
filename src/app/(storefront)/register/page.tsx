@@ -143,7 +143,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className="mobile-p-4 mobile-pt-24">
       <div style={cardStyle}>
         <div style={headerStyle}>
           <h1 style={titleStyle}>Register</h1>

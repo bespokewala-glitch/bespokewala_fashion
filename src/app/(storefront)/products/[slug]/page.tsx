@@ -117,7 +117,7 @@ export default async function ProductsSlugPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main style={containerStyle}>
+      <main style={containerStyle} className="mobile-grid-1 mobile-p-4">
         <div>
           <ProductGallery images={allImages} />
         </div>

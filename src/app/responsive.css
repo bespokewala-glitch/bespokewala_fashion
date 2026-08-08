@@ -1,0 +1,1043 @@
+/* responsive.css */
+
+/* Hide mobile elements on desktop */
+@media (min-width: 1024px) {
+  .desktop-hide {
+    display: none !important;
+  }
+
+  .hero-overlay {
+    bottom: 4rem;
+    left: 4rem;
+  }
+} /* end @media (min-width: 1024px) */
+
+/* Mobile & Tablet Styles */
+@media (max-width: 1023px) {
+
+  html,
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .mobile-hide {
+    display: none !important;
+  }
+
+  .mobile-block {
+    display: block !important;
+  }
+
+  .mobile-flex {
+    display: flex !important;
+  }
+
+  .mobile-flex-col {
+    flex-direction: column !important;
+  }
+
+  .mobile-flex-col-reverse {
+    flex-direction: column-reverse !important;
+  }
+
+  .mobile-flex-row {
+    flex-direction: row !important;
+  }
+
+  .mobile-w-full {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .mobile-h-auto {
+    height: auto !important;
+  }
+
+  .mobile-min-h-auto {
+    min-height: 0 !important;
+  }
+
+  .mobile-slider-img {
+    height: 220px !important;
+  }
+
+  .mobile-footer-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .mobile-footer-full {
+    grid-column: 1 / -1 !important;
+  }
+
+  .mobile-h-full {
+    height: 100% !important;
+  }
+
+  .mobile-hero-height {
+    height: 65dvh !important;
+  }
+
+  .mobile-p-4 {
+    padding: 1rem !important;
+  }
+
+  .mobile-p-0 {
+    padding: 0 !important;
+  }
+
+  .mobile-px-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .mobile-py-4 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .mobile-pt-20 {
+    padding-top: 5rem !important;
+  }
+
+  .mobile-pb-20 {
+    padding-bottom: 5rem !important;
+  }
+
+  .mobile-m-0 {
+    margin: 0 !important;
+  }
+
+  .mobile-mt-4 {
+    margin-top: 1rem !important;
+  }
+
+  .mobile-mb-4 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mobile-my-8 {
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .mobile-mx-negative {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .mobile-m-0 {
+    margin: 0 !important;
+  }
+
+  .mobile-min-h-auto {
+    min-height: auto !important;
+  }
+
+  .mobile-text-center {
+    text-align: center !important;
+  }
+
+  .mobile-text-left {
+    text-align: left !important;
+  }
+
+  .mobile-font-sm {
+    font-size: 0.875rem !important;
+  }
+
+  .mobile-font-md {
+    font-size: 1rem !important;
+  }
+
+  .mobile-font-lg {
+    font-size: 1.5rem !important;
+  }
+
+  .mobile-font-xl {
+    font-size: 2rem !important;
+  }
+
+  .mobile-font-2xl {
+    font-size: 2.5rem !important;
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-overlay {
+    bottom: 2rem !important;
+    left: 1.5rem !important;
+    padding: 0 !important;
+  }
+
+  /* Specific mobile components */
+  .mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 85vw;
+    /* Leaves 15vw visible */
+    max-width: 400px;
+    /* Still restrict on large tablets */
+    height: 100%;
+    height: 100dvh;
+    background-color: var(--background);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .mobile-menu-drawer.open {
+    transform: translateX(0);
+  }
+
+  .mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .mobile-menu-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--background);
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .mobile-bottom-sheet.open {
+    transform: translateY(0);
+  }
+
+  /* Admin mobile specific */
+  .admin-mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .admin-mobile-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .admin-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    display: none;
+  }
+
+  .admin-mobile-overlay.open {
+    display: block;
+  }
+
+  .table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+} /* end @media (max-width: 1023px) */
+
+/* Smartphone specific */
+@media (max-width: 767px) {
+  .mobile-grid-2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .mobile-grid-1 {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Make sure images in grids don't overflow */
+  .mobile-grid-2 img {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+  }
+
+  .mobile-hero-title {
+    font-size: 2rem !important;
+  }
+
+  .mobile-overflow-x {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .mobile-snap-center {
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
+
+  /* Premium Horizontal Swipe Carousel */
+  .mobile-carousel {
+    display: flex !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+    gap: 6px !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    padding-bottom: 0.5rem;
+
+    /* Bleed out of the standard 16px container padding for edge-to-edge scrolling */
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .mobile-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-carousel>* {
+    /* Approx 80vw leaves 20vw for the next card peek + padding */
+    flex: 0 0 80vw !important;
+    max-width: 80vw !important;
+    scroll-snap-align: start;
+  }
+
+  .mobile-title-clamp {
+    font-size: clamp(26px, 7vw, 36px) !important;
+    line-height: 1.1 !important;
+  }
+
+  .mobile-h2-clamp {
+    font-size: clamp(24px, 6vw, 32px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .mobile-h3-clamp {
+    font-size: clamp(16px, 4.5vw, 20px) !important;
+    line-height: 1.3 !important;
+    font-weight: 400 !important;
+  }
+
+  .mobile-body-clamp {
+    font-size: clamp(13px, 3.5vw, 15px) !important;
+    line-height: 1.5 !important;
+  }
+
+  .mobile-label-clamp {
+    font-size: clamp(10px, 2.5vw, 12px) !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .mobile-section-py {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .mobile-section-mt {
+    margin-top: 1rem !important;
+  }
+
+  .mobile-section-mb {
+    margin-bottom: 1rem !important;
+  }
+
+  .mobile-gap-sm {
+    gap: 0.5rem !important;
+  }
+
+  .mobile-gap-md {
+    gap: 1rem !important;
+  }
+
+  .mobile-px-16 {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .mobile-px-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .mobile-py-2 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .mobile-pb-4 {
+    padding-bottom: 1rem !important;
+  }
+
+  .mobile-mb-2 {
+    margin-bottom: 1rem !important;
+  }
+
+  .mobile-desc {
+    font-size: 14px !important;
+    /* Update slightly to match body */
+    font-weight: 300 !important;
+    line-height: 1.6 !important;
+    max-width: 320px !important;
+    margin: 0 auto 1.5rem auto !important;
+    color: #666 !important;
+  }
+
+  .mobile-img-cover {
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+    margin-top: 0 !important;
+  }
+
+  .mobile-card-title {
+    font-size: 14px !important;
+    letter-spacing: 0.1em !important;
+    font-weight: 400 !important;
+  }
+
+  .mobile-card-overlay {
+    padding: 1.5rem !important;
+  }
+
+  .mobile-view-all {
+    font-size: 12px !important;
+    font-weight: 300 !important;
+    letter-spacing: 0.1em !important;
+    text-decoration: underline !important;
+    text-underline-offset: 4px !important;
+    margin-top: 1.5rem !important;
+  }
+
+  .mobile-header-sticky {
+    position: sticky !important;
+    top: 0 !important;
+    background-color: #fff !important;
+    border-bottom: 1px solid #eee !important;
+    color: #1c1c1c !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .mobile-top-nav {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 1.5rem !important;
+    align-items: center !important;
+    height: 38px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: #fff;
+    width: 100%;
+  }
+
+  .mobile-nav-link {
+    font-size: 11px !important;
+    letter-spacing: 0.1em !important;
+    color: #666 !important;
+    text-decoration: none !important;
+    text-transform: uppercase !important;
+  }
+
+  .mobile-nav-link.active {
+    color: #000 !important;
+    border-bottom: 1px solid #000 !important;
+    padding-bottom: 2px !important;
+  }
+
+  .mobile-main-header {
+    height: 75px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+
+  .mobile-logo-filter {
+    filter: url(#remove-white-make-black) !important;
+  }
+
+  .mobile-icon-right {
+    gap: 12px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JEWELLERY PAGE — COMPREHENSIVE MOBILE VISUAL REFINEMENT
+   Target: 320px · 360px · 375px · 390px · 414px · 480px · 768px
+   All rules use !important where inline styles would otherwise win.
+   Desktop (≥ 768px) is NEVER touched.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── GLOBAL BOX MODEL ──────────────────────────────────────────────────── */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* ── 1. MAIN CONTAINER ─────────────────────────────────────────────────── */
+  /* CollectionPageContent <main>: inline paddingLeft/Right '2rem' */
+  main.mobile-px-4 {
+    padding-top: 4rem !important;     /* keep header clearance */
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* ── 2. CURATED SECTIONS WRAPPER ──────────────────────────────────────── */
+  /* inline margin: '-4rem -2rem 4rem -2rem' — zero out horizontal */
+  .mobile-mx-negative {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 24px !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     FEATURE BANNER (CuratedGrid section)
+     Outer div: padding '6rem 2rem 6rem 2rem' inline
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Outer wrapper — reduce vertical padding, keep horizontal 16px */
+  .mobile-section-py.mobile-px-container {
+    padding-top: 28px !important;
+    padding-bottom: 24px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Eyebrow text "OUR CRAFT, YOUR FOREVER" */
+  .mobile-section-py.mobile-px-container > div > p:first-child,
+  .mobile-px-container > div > p[class*="label"] {
+    font-size: 11px !important;
+    letter-spacing: 0.15em !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Decorative thin line below eyebrow */
+  .mobile-px-container > div > div[style*="height: 1px"],
+  .mobile-px-container > div > div[style*="height:1px"] {
+    margin-bottom: 10px !important;
+  }
+
+  /* "CURATED GRID" main heading */
+  .mobile-section-py.mobile-px-container .mobile-h2-clamp {
+    font-size: clamp(22px, 6vw, 26px) !important;
+    margin-bottom: 8px !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  /* Italic description */
+  .mobile-section-py.mobile-px-container .mobile-body-clamp {
+    font-size: 12px !important;
+    margin-bottom: 16px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Heading+description wrapper: inline marginBottom '3rem' */
+  .mobile-mb-2 {
+    margin-bottom: 16px !important;
+  }
+
+  /* FeatureBanner hero image/video section: inline height '70vh', maxWidth '1200px' */
+  .mobile-px-container > section {
+    width: 100% !important;
+    max-width: 100% !important;
+    /* Responsive height: ~52vw gives good editorial proportion without full-screen */
+    height: clamp(180px, 52vw, 320px) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-px-container > section img,
+  .mobile-px-container > section video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+  }
+
+  /* Overlay text inside FeatureBanner hero */
+  .mobile-flex-col.mobile-p-4 {
+    padding: 14px !important;
+    gap: 4px !important;
+  }
+
+  .mobile-flex-col.mobile-p-4 h2 {
+    font-size: clamp(13px, 3.5vw, 16px) !important;
+    margin: 0 0 3px 0 !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  .mobile-flex-col.mobile-p-4 p {
+    font-size: clamp(10px, 2.8vw, 12px) !important;
+    margin: 0 !important;
+  }
+
+  /* ── Bottom divider: inline margin '4rem auto 0' ─────────────────────── */
+  /* The ──◇── decorative divider below the hero image */
+  .mobile-px-container > div[style*="margin: 4rem"],
+  .mobile-px-container > div[style*="margin:4rem"] {
+    margin: 16px auto 0 auto !important;
+    max-width: 100% !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     CURATED GRID CARDS (the horizontal carousel on mobile)
+     Each card: inline height '600px', img minHeight '400px'
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Card container: 80vw wide (from mobile-carousel), height corrected */
+  .mobile-carousel > a,
+  .mobile-carousel > div {
+    height: clamp(240px, 65vw, 320px) !important;
+    min-height: 0 !important;
+    border-radius: 10px !important;
+  }
+
+  .mobile-carousel > a img,
+  .mobile-carousel > div img {
+    min-height: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* Card overlay text */
+  .mobile-card-overlay {
+    padding: 12px !important;
+  }
+
+  .mobile-card-title {
+    font-size: 11px !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  /* View All button below carousel */
+  .mobile-section-mt {
+    margin-top: 16px !important;
+  }
+
+  .mobile-section-mb {
+    margin-bottom: 16px !important;
+  }
+
+  /* CuratedGrid subtitle: inline margin '0 auto 4rem auto' */
+  .mobile-carousel ~ p,
+  section > p.mobile-body-clamp {
+    margin-bottom: 16px !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     SPLIT SHOWCASE (OUR COLLECTION)
+     Section: inline minHeight '80vh'
+     Left model div: minWidth '300px', position relative
+     Right product div: padding '4rem 2rem 2rem 2rem'
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Section wrapper: kill 80vh minimum height */
+  section.mobile-flex-col.mobile-min-h-auto {
+    min-height: 0 !important;
+  }
+
+  /* Left model image panel */
+  .mobile-flex-col > div:first-child {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+    height: 240px !important;
+    min-height: 0 !important;
+    position: relative !important;
+  }
+
+  .mobile-flex-col > div:first-child > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center top !important;
+  }
+
+  /* Right product slider panel: inline padding '4rem 2rem 2rem 2rem' */
+  .mobile-flex-col > div:not(:first-child) {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+    padding: 20px 16px 16px 16px !important;
+  }
+
+  /* "OUR COLLECTION" label + divider top header area */
+  .mobile-flex-col > div:not(:first-child) > div:first-child {
+    margin-bottom: 12px !important;
+  }
+
+  .mobile-label-clamp {
+    font-size: 11px !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  /* Product slider image: inline height '300px' */
+  .mobile-slider-img {
+    height: clamp(160px, 44vw, 240px) !important;
+    max-width: 100% !important;
+    width: auto !important;
+    object-fit: contain !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Product name typography */
+  .mobile-flex-col .mobile-h3-clamp {
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Price text */
+  .mobile-flex-col .mobile-body-clamp {
+    font-size: 13px !important;
+  }
+
+  /* Pagination dots: inline marginTop '1.5rem' */
+  .mobile-section-mt[style*="gap: 10px"],
+  .mobile-section-mt[style*="gap:10px"] {
+    margin-top: 10px !important;
+    gap: 8px !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     COUTURE PROCESS
+     Section: inline marginTop '6rem', minHeight '80vh'
+     Left col: padding '6rem 4rem' inline
+     H2: marginBottom '4rem' inline
+     Right col: minHeight '400px' inline
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Section wrapper */
+  .mobile-flex-col.mobile-m-0 {
+    margin-top: 0 !important;
+    min-height: 0 !important;
+  }
+
+  /* Left accordion column: inline padding '6rem 4rem' */
+  .mobile-flex-col.mobile-m-0 > div:first-child {
+    padding: 24px 16px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+    height: auto !important;
+  }
+
+  /* "THE COUTURE PROCESS" heading: inline fontSize '2.5rem', marginBottom '4rem' */
+  .mobile-flex-col.mobile-m-0 .mobile-h2-clamp {
+    font-size: clamp(22px, 6vw, 28px) !important;
+    margin-bottom: 20px !important;
+    letter-spacing: 0.08em !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Accordion gap wrapper: inline gap '1rem' */
+  .mobile-gap-sm {
+    gap: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Each accordion item row header */
+  .mobile-py-2 {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* Accordion title h3: inline fontSize '1.2rem' */
+  .mobile-flex-col.mobile-m-0 .mobile-h3-clamp {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
+
+  /* Accordion body text: inline fontSize '0.95rem' */
+  .mobile-flex-col.mobile-m-0 .mobile-body-clamp {
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    color: #555 !important;
+  }
+
+  /* Accordion open content padding: inline padding '0 0 1.25rem 0' */
+  .mobile-pb-4 {
+    padding-bottom: 12px !important;
+  }
+
+  /* Right media column: inline minHeight '400px' */
+  .mobile-flex-col.mobile-m-0 > div:not(:first-child) {
+    min-height: 220px !important;
+    height: clamp(200px, 56vw, 320px) !important;
+    position: relative !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+    padding: 0 !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  section.mobile-hero-height {
+    height: clamp(260px, 70vw, 480px) !important;
+    max-height: 520px !important;
+    min-height: 220px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .mobile-hero-title {
+    font-size: clamp(18px, 5vw, 24px) !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .hero-overlay {
+    bottom: 1.5rem !important;
+    left: 1rem !important;
+  }
+
+  .hero-overlay > div:first-child {
+    font-size: clamp(10px, 2.6vw, 11px) !important;
+    letter-spacing: 0.18em !important;
+  }
+
+  .hero-overlay .btn-secondary {
+    padding: 0.55rem 1.2rem !important;
+    font-size: 0.7rem !important;
+    margin-top: 0.4rem !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     FOOTER & NEWSLETTER
+     Outer footer: inline padding '4rem 2rem'
+     Container: inline display flex + justify-content space-between
+     Newsletter form: inline display flex (side-by-side row)
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* Footer outer: reduce padding, ensure full width */
+  footer.mobile-section-py.mobile-px-container,
+  footer[class*="mobile"] {
+    padding: 28px 16px 20px 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Footer column grid: becomes a vertical stack on mobile */
+  .mobile-footer-grid {
+    flex-direction: column !important;
+    gap: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Each column: full width, no min-width */
+  .mobile-footer-grid > div {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Footer column headings */
+  .mobile-footer-grid h4 {
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  /* Footer link lists */
+  .mobile-footer-grid ul {
+    font-size: 12px !important;
+    line-height: 1.8 !important;
+  }
+
+  /* Newsletter full-width column */
+  .mobile-footer-full {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+  }
+
+  /* "NEWSLETTER" heading */
+  .mobile-footer-full h4 {
+    font-size: 14px !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Description text: must wrap, must not clip */
+  .mobile-footer-full p {
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 14px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: 100% !important;
+    color: #ccc !important;
+  }
+
+  /* ── NEWSLETTER FORM: STACK VERTICALLY ─────────────────────────────── */
+  /* The inline style `display: 'flex'` makes input + button side-by-side.
+     Override it to column so they stack on mobile. */
+  .mobile-footer-full form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Email input */
+  .mobile-footer-full form input[type="email"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+    flex: none !important;
+    border: 1px solid #444 !important;
+    background-color: transparent !important;
+    color: #fff !important;
+  }
+
+  /* Subscribe button */
+  .mobile-footer-full form button[type="submit"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 12px !important;
+    letter-spacing: 0.12em !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+  }
+
+  /* Footer bottom bar: inline marginTop '4rem', paddingTop '2rem' */
+  footer > div[style*="marginTop: 4rem"],
+  footer > div[style*="marginTop:4rem"] {
+    margin-top: 20px !important;
+    padding-top: 14px !important;
+    font-size: 11px !important;
+    letter-spacing: 0.04em !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     GENERAL OVERFLOW GUARD
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  section {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  footer {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* ── 480px and below: tighten further ─────────────────────────────────────── */
+@media (max-width: 480px) {
+
+  main.mobile-px-4 {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .mobile-section-py.mobile-px-container {
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* Hero even more compact on tiny screens */
+  section.mobile-hero-height {
+    height: clamp(220px, 62vw, 340px) !important;
+  }
+
+  /* FeatureBanner hero */
+  .mobile-px-container > section {
+    height: clamp(160px, 48vw, 260px) !important;
+  }
+
+  /* Curated grid cards */
+  .mobile-carousel > a,
+  .mobile-carousel > div {
+    height: clamp(200px, 60vw, 280px) !important;
+  }
+
+  /* SplitShowcase model image */
+  .mobile-flex-col > div:first-child {
+    height: 200px !important;
+  }
+
+  /* Product slider image */
+  .mobile-slider-img {
+    height: clamp(140px, 40vw, 200px) !important;
+  }
+
+  /* Couture process right media */
+  .mobile-flex-col.mobile-m-0 > div:not(:first-child) {
+    height: clamp(180px, 50vw, 260px) !important;
+  }
+
+  /* Footer tighter */
+  footer.mobile-section-py.mobile-px-container,
+  footer[class*="mobile"] {
+    padding: 20px 12px 16px 12px !important;
+  }
+}

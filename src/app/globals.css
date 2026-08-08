@@ -76,6 +76,14 @@ a {
   color: var(--primary);
 }
 
+.department-card-hover {
+  -webkit-user-drag: none;
+}
+.department-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
 .btn-secondary {
   display: inline-block;
   padding: 1rem 3rem;

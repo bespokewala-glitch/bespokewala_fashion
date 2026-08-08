@@ -17,6 +17,14 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
   };
 
   const [items, setItems] = useState<any[]>([]);
+  const [windowWidth, setWindowWidth] = useState(1200);
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -101,20 +109,23 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
             let zIndex = 10;
             let display = 'flex';
 
+            const isMobile = windowWidth < 768;
+
             if (distance === 0) {
               // Center item
-              width = '320px';
-              height = '480px';
+              width = isMobile ? '280px' : '320px';
+              height = isMobile ? '420px' : '480px';
               scale = 1.05;
               opacity = 1;
               zIndex = 20;
             } else if (distance === 1) {
               // Immediate left/right
-              width = '240px';
-              height = '360px';
+              width = isMobile ? '0px' : '240px';
+              height = isMobile ? '0px' : '360px';
               scale = 0.95;
-              opacity = 0.7;
+              opacity = isMobile ? 0 : 0.7;
               zIndex = 10;
+              if (isMobile) display = 'none';
             } else if (distance === 2) {
               // Outer left/right
               width = '180px';

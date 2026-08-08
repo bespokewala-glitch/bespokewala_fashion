@@ -51,8 +51,8 @@ export default function Footer() {
   };
 
   return (
-    <footer style={footerStyle}>
-      <div style={containerStyle}>
+    <footer style={footerStyle} className="mobile-section-py mobile-px-container">
+      <div style={containerStyle} className="mobile-footer-grid">
         <div style={columnStyle}>
           <h4 style={headingStyle}>Company</h4>
           <ul style={listStyle}>
@@ -80,7 +80,7 @@ export default function Footer() {
           </ul>
         </div>
 
-        <div style={columnStyle}>
+        <div style={columnStyle} className="mobile-footer-full">
           <h4 style={headingStyle}>Newsletter</h4>
           <p style={{ fontSize: '0.875rem', color: '#ccc', marginBottom: '1rem' }}>
             Subscribe to receive updates, access to exclusive deals, and more.
@@ -113,7 +113,7 @@ export default function Footer() {
       </div>
       
       <div style={bottomBar}>
-        &copy; {new Date().getFullYear()} Manish Malhotra Clone. All Rights Reserved.
+        &copy; {new Date().getFullYear()} Bespokewala. All Rights Reserved.
       </div>
     </footer>
   );

@@ -5,6 +5,7 @@ import { jwtVerify } from 'jose';
 const secretKey = process.env.JWT_SECRET || 'super-secret-key-for-development-only';
 const key = new TextEncoder().encode(secretKey);
 
+// Named export (required by Next.js 16+ proxy convention)
 export async function proxy(request: NextRequest) {
   const token = request.cookies.get('auth-token')?.value;
   const { pathname } = request.nextUrl;
@@ -46,6 +47,9 @@ export async function proxy(request: NextRequest) {
 
   return NextResponse.next();
 }
+
+// Default export alias (belt-and-suspenders for Turbopack recognition)
+export default proxy;
 
 export const config = {
   matcher: ['/dashboard/:path*', '/account/:path*', '/login'],

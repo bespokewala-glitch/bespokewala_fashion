@@ -38,12 +38,12 @@ export default async function AccountLayout({
           paddingRight: '4rem',
           maxWidth: '1400px',
           margin: '0 auto',
-        }}>
+        }} className="mobile-p-4 mobile-pt-24">
           <div style={{
             display: 'flex',
             gap: '5rem',
             flexDirection: 'row',
-          }}>
+          }} className="mobile-flex-col">
           <AccountSidebar />
           <div style={{ flex: 1, minWidth: 0 }}>
             {children}

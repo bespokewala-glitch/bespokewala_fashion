@@ -5,8 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { Menu, X, Search, ShoppingBag, User } from 'lucide-react';
 
 export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
+  const [expandedMobileSubMenu, setExpandedMobileSubMenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
@@ -248,9 +252,25 @@ export default function Header() {
         .sub-link-hover { transition: color 0.2s ease; }
         .sub-link-hover:hover { color: #000 !important; }
       `}</style>
-      <header style={headerStyle}>
-        <div style={navContainer}>
-          <nav>
+      <header style={headerStyle} className="mobile-header-sticky">
+        {/* Mobile Top Category Nav (Level 1) */}
+        <div className="desktop-hide mobile-top-nav">
+          <Link href="/" className={`mobile-nav-link ${pathname === '/' || pathname.includes('/couture') ? 'active' : ''}`}>COUTURE</Link>
+          <Link href="/products/jewellery" className={`mobile-nav-link ${pathname.includes('/jewellery') ? 'active' : ''}`}>JEWELLERY</Link>
+          <Link href="/products/accessories" className={`mobile-nav-link ${pathname.includes('/accessories') ? 'active' : ''}`}>ACCESSORIES</Link>
+        </div>
+
+        <div style={navContainer} className="mobile-main-header">
+          
+          {/* Mobile Hamburger Menu */}
+          <div className="desktop-hide" style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => setIsMobileMenuOpen(true)} className="touch-target" style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}>
+              <Menu size={24} />
+            </button>
+          </div>
+
+          {/* Desktop Left Nav */}
+          <nav className="mobile-hide" style={{ flex: 1 }}>
             <ul style={menuStyle} onMouseLeave={handleMouseLeaveMenu}>
               <li onMouseEnter={() => handleMouseEnterMenu('couture')}>
                 <Link prefetch={false} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
@@ -260,7 +280,8 @@ export default function Header() {
             </ul>
           </nav>
           
-          <div style={logoStyle}>
+          {/* Logo */}
+          <div style={{ ...logoStyle, flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
             <Link href="/" style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -271,6 +292,7 @@ export default function Header() {
               <img 
                 src="/bespoken.png" 
                 alt="Bespoken Fashion" 
+                className="mobile-logo-filter"
                 style={{ 
                   height: '140px',
                   width: 'auto', 
@@ -282,7 +304,22 @@ export default function Header() {
             </Link>
           </div>
           
-          <nav>
+          {/* Mobile Right Icons */}
+          <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Link href="/search" className="touch-target"><Search size={20} /></Link>
+            <Link href="/account" className="touch-target"><User size={20} /></Link>
+            <Link href="/cart" className="touch-target" style={{ position: 'relative' }}>
+              <ShoppingBag size={20} />
+              {cartCount > 0 && (
+                <span style={{ position: 'absolute', top: '2px', right: '2px', background: '#000', color: '#fff', fontSize: '10px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+
+          {/* Desktop Right Nav */}
+          <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
             <ul style={menuStyle}>
               <li><Link href="/search">Search</Link></li>
               {user ? (
@@ -451,6 +488,187 @@ export default function Header() {
               </div>
             </div>
           )}
+        </div>
+        
+        {/* Mobile Menu Drawer */}
+        <div className={`mobile-menu-overlay desktop-hide ${isMobileMenuOpen ? 'open' : ''}`} onClick={() => setIsMobileMenuOpen(false)}></div>
+        <div className={`mobile-menu-drawer desktop-hide ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
+            <span style={{ fontSize: '1.1rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#000' }}>Menu</span>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="touch-target" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#000' }}>
+              <X size={24} />
+            </button>
+          </div>
+          <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#333' }}>
+            
+            {/* Couture Accordion */}
+            <div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'couture' ? null : 'couture'); setExpandedMobileSubMenu(null); }}
+              >
+                <span>Couture</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'couture' ? '-' : '+'}</span>
+              </div>
+              {expandedMobileMenu === 'couture' && (
+                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                  {menuData.couture.map(item => {
+                    const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
+                    const subKey = `couture-${item.id}`;
+                    const isSubOpen = expandedMobileSubMenu === subKey;
+                    return (
+                      <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
+                          {hasTax && (
+                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
+                              {isSubOpen ? '−' : '›'}
+                            </button>
+                          )}
+                        </div>
+                        {isSubOpen && (
+                          <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
+                              .filter(g => g.items.length > 0)
+                              .map(group => (
+                                <div key={group.label}>
+                                  <div style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#aaa', marginBottom: '0.4rem', fontWeight: 600 }}>{group.label}</div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    {group.items.map((tx: any) => (
+                                      <Link key={tx._id} href={`/products/couture/${item.id}/${tx.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#555', fontSize: '0.75rem', letterSpacing: '0.04em' }}>{tx.name}</Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Couture</Link>
+                </div>
+              )}
+            </div>
+
+            {/* Accessories Accordion */}
+            <div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'accessories' ? null : 'accessories'); setExpandedMobileSubMenu(null); }}
+              >
+                <span>Accessories</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'accessories' ? '-' : '+'}</span>
+              </div>
+              {expandedMobileMenu === 'accessories' && (
+                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                  {menuData.accessories.map(item => {
+                    const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
+                    const subKey = `accessories-${item.id}`;
+                    const isSubOpen = expandedMobileSubMenu === subKey;
+                    return (
+                      <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
+                          {hasTax && (
+                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
+                              {isSubOpen ? '−' : '›'}
+                            </button>
+                          )}
+                        </div>
+                        {isSubOpen && (
+                          <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
+                              .filter(g => g.items.length > 0)
+                              .map(group => (
+                                <div key={group.label}>
+                                  <div style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#aaa', marginBottom: '0.4rem', fontWeight: 600 }}>{group.label}</div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    {group.items.map((tx: any) => (
+                                      <Link key={tx._id} href={`/products/accessories/${item.id}/${tx.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#555', fontSize: '0.75rem', letterSpacing: '0.04em' }}>{tx.name}</Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <Link href="/products/accessories" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Accessories</Link>
+                </div>
+              )}
+            </div>
+
+            {/* Jewellery Accordion */}
+            <div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'jewellery' ? null : 'jewellery'); setExpandedMobileSubMenu(null); }}
+              >
+                <span>Jewellery</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'jewellery' ? '-' : '+'}</span>
+              </div>
+              {expandedMobileMenu === 'jewellery' && (
+                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                  {menuData.jewellery.map(item => {
+                    const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
+                    const subKey = `jewellery-${item.id}`;
+                    const isSubOpen = expandedMobileSubMenu === subKey;
+                    return (
+                      <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
+                          {hasTax && (
+                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
+                              {isSubOpen ? '−' : '›'}
+                            </button>
+                          )}
+                        </div>
+                        {isSubOpen && (
+                          <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
+                              .filter(g => g.items.length > 0)
+                              .map(group => (
+                                <div key={group.label}>
+                                  <div style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#aaa', marginBottom: '0.4rem', fontWeight: 600 }}>{group.label}</div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    {group.items.map((tx: any) => (
+                                      <Link key={tx._id} href={`/products/jewellery/${item.id}/${tx.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#555', fontSize: '0.75rem', letterSpacing: '0.04em' }}>{tx.name}</Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <Link href="/products/jewellery" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Jewellery</Link>
+                </div>
+              )}
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid #eee' }} />
+            {user ? (
+              <>
+                <Link href="/account" onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>
+                {user.role === 'admin' && <Link href="/dashboard/campaigns" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>}
+                <a href="#" onClick={(e) => { setIsMobileMenuOpen(false); handleLogout(e); }}>Logout</a>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login / Register</Link>
+            )}
+            <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)}>Wishlist ({wishlistCount})</Link>
+          </div>
         </div>
       </header>
     </>

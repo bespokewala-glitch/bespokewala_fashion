@@ -42,7 +42,7 @@ export default function WishlistPage() {
   return (
     <>
       <Header />
-      <main style={containerStyle}>
+      <main style={containerStyle} className="mobile-p-4 mobile-pt-20">
         <h1 style={titleStyle}>Your Wishlist</h1>
 
         {wishlist.length === 0 ? (
@@ -65,7 +65,7 @@ export default function WishlistPage() {
             </Link>
           </div>
         ) : (
-          <div style={gridStyle}>
+          <div style={gridStyle} className="mobile-grid-1">
             {wishlist.map(item => (
               <div key={item.slug} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'relative' }}>
                 <Link href={`/products/${item.slug}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>

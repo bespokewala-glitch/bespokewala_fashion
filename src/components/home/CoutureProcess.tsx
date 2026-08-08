@@ -41,22 +41,22 @@ export default function CoutureProcess({ data }: { data?: any }) {
   };
 
   return (
-    <section style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }}>
+    <section style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }} className="mobile-flex-col mobile-m-0">
       {/* Left Column - Accordion */}
-      <div style={{ flex: '1 1 50%', padding: '6rem 4rem', boxSizing: 'border-box' }}>
-        <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '4rem', textTransform: 'uppercase', color: '#333' }}>
+      <div style={{ flex: '1 1 50%', padding: '6rem 4rem', boxSizing: 'border-box' }} className="mobile-section-py mobile-px-container">
+        <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '4rem', textTransform: 'uppercase', color: '#333' }} className="mobile-h2-clamp mobile-section-mb">
           The Couture<br/>Process
         </h2>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '600px' }} className="mobile-gap-sm">
           {steps.map((step: any, index: number) => {
             const isActive = index === activeIndex;
             return (
               <div 
                 key={index} 
                 style={{ 
-                  backgroundColor: isActive ? '#f0ede6' : 'transparent',
-                  borderRadius: '12px',
+                  backgroundColor: 'transparent',
+                  borderBottom: '1px solid #e0e0e0',
                   overflow: 'hidden',
                   transition: 'all 0.3s ease'
                 }}
@@ -64,22 +64,23 @@ export default function CoutureProcess({ data }: { data?: any }) {
                 <div 
                   onClick={() => setActiveIndex(index)}
                   style={{
-                    padding: '1.5rem',
+                    padding: '1.25rem 0',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     cursor: 'pointer',
                     userSelect: 'none'
                   }}
+                  className="mobile-py-2"
                 >
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 400, color: '#333' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: isActive ? 500 : 400, color: isActive ? '#000' : '#444' }} className="mobile-h3-clamp">
                     {step.title}
                   </h3>
                   <span style={{ 
                     transform: isActive ? 'rotate(180deg)' : 'rotate(0deg)', 
                     transition: 'transform 0.3s ease',
                     fontSize: '0.8rem',
-                    color: '#666'
+                    color: isActive ? '#000' : '#888'
                   }}>
                     &#9660;
                   </span>
@@ -90,10 +91,10 @@ export default function CoutureProcess({ data }: { data?: any }) {
                   opacity: isActive ? 1 : 0,
                   overflow: 'hidden',
                   transition: 'all 0.4s ease-in-out',
-                  padding: isActive ? '0 1.5rem 1.5rem 1.5rem' : '0 1.5rem',
-                  marginTop: isActive ? '1rem' : '0',
-                }}>
-                  <p style={{ margin: 0, color: '#555', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                  padding: isActive ? '0 0 1.25rem 0' : '0',
+                }}
+                className={isActive ? 'mobile-pb-4' : ''}>
+                  <p style={{ margin: 0, color: '#555', lineHeight: '1.6', fontSize: '0.95rem' }} className="mobile-body-clamp">
                     {step.description}
                   </p>
                 </div>

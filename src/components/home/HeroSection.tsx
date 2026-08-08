@@ -94,8 +94,6 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
   const overlayContentStyle: React.CSSProperties = {
     position: 'absolute',
-    bottom: '4rem',
-    left: '4rem',
     zIndex: 1,
     textAlign: 'left',
     color: '#fff',
@@ -122,7 +120,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const isImage = currentCampaign?.videoUrl?.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
 
   return (
-    <section style={heroStyle}>
+    <section style={heroStyle} className="mobile-hero-height">
       {isImage ? (
         <img 
           src={currentCampaign?.videoUrl}
@@ -163,9 +161,9 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         </>
       )}
 
-      <div style={overlayContentStyle}>
-        <div style={subtitleStyle}>{currentCampaign?.subtitle}</div>
-        <h1 style={titleStyle}>{currentCampaign?.title}</h1>
+      <div style={overlayContentStyle} className="hero-overlay mobile-p-4">
+        <div style={subtitleStyle} className="mobile-font-sm">{currentCampaign?.subtitle}</div>
+        <h1 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h1>
         {currentCampaign?.linkUrl && (
           <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }}>
             Explore Now

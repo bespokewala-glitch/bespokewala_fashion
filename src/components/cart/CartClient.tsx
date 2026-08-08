@@ -41,7 +41,7 @@ export default function CartClient() {
     <div style={{ padding: '4rem 4rem 8rem', maxWidth: '1400px', margin: '0 auto', fontFamily: '"Jost", "Inter", sans-serif' }}>
       <h1 style={{ fontSize: '2rem', fontWeight: 300, marginBottom: '4rem', letterSpacing: '0.1em', textAlign: 'center' }}>CART</h1>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '4rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '4rem' }} className="mobile-flex-col">
         {/* Left Side - Cart Items */}
         <div>
           {/* Header */}
@@ -87,7 +87,7 @@ export default function CartClient() {
         </div>
 
         {/* Right Side - Order Summary */}
-        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem' }}>
+        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0">
           <h2 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 2rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Order Summary</h2>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.95rem' }}>

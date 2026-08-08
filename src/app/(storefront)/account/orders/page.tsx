@@ -140,7 +140,7 @@ export default async function OrderHistoryPage() {
                 border: '1px solid #eee', 
                 backgroundColor: '#fff',
                 padding: '2rem'
-              }} className="order-history-card">
+              }} className="order-history-card mobile-p-4">
                 
                 {/* Order Header */}
                 <div style={{ 
@@ -184,7 +184,7 @@ export default async function OrderHistoryPage() {
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
                     {order.items.map((item: any, idx: number) => (
-                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', width: '340px' }}>
+                      <div key={idx} style={{ display: 'flex', gap: '1.5rem', width: '100%' }}>
                         <div style={{ width: '80px', height: '110px', backgroundColor: '#fafafa', flexShrink: 0 }}>
                           {item.image && <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                         </div>

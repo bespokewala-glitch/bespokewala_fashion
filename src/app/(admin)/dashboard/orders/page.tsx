@@ -399,7 +399,7 @@ export default function AdminOrdersPage() {
   const handleStatusUpdate = useCallback(async (orderId: string, newStatus: string) => {
     try {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });

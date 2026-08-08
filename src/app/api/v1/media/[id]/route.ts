@@ -139,8 +139,8 @@ export async function DELETE(
   }
 }
 
-// ─── PATCH /api/v1/media/[id] — Retry failed processing ──────────────────────
-export async function PATCH(
+// ─── PUT /api/v1/media/[id] — Retry failed processing ──────────────────────
+export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {

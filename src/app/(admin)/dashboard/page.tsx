@@ -409,7 +409,7 @@ export default function DashboardHome() {
       </div>
 
       {/* ── Charts Row ── */}
-      <div className={styles.chartsRow}>
+      <div className={`${styles.chartsRow} mobile-flex-col`}>
         {/* Revenue Bar Chart */}
         <div className={styles.card} style={{ flex: 2 }}>
           <div className={styles.cardHeader}>
@@ -446,7 +446,7 @@ export default function DashboardHome() {
       </div>
 
       {/* ── Bottom Row ── */}
-      <div className={styles.bottomRow}>
+      <div className={`${styles.bottomRow} mobile-flex-col`}>
         {/* Recent Orders */}
         <div className={styles.card} style={{ flex: 2 }}>
           <div className={styles.cardHeader}>
@@ -458,7 +458,7 @@ export default function DashboardHome() {
               View All <ArrowRight size={14} />
             </Link>
           </div>
-          <div className={styles.tableWrap}>
+          <div className={`${styles.tableWrap} table-responsive-wrapper`}>
             <table className={styles.table}>
               <thead>
                 <tr>

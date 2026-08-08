@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Josefin_Sans } from "next/font/google";
 import "./globals.css";
+import "./responsive.css";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 
@@ -10,10 +11,17 @@ const josefinSans = Josefin_Sans({
   weight: ["300", "400", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Manish Malhotra Clone",
-  description: "Luxury Fashion E-commerce Clone",
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
+
+export const metadata: Metadata = {
+  title: "Bespokewala",
+  description: "Luxury Indian Fashion",
+};
+
 
 export default function RootLayout({
   children,

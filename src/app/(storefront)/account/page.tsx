@@ -307,7 +307,7 @@ export default async function AccountDashboardPage() {
                     </div>
                   </div>
                   
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }} className="mobile-grid-1">
                     {/* Items Preview */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
                       {order.items.slice(0, 3).map((item: any, idx: number) => (
@@ -402,7 +402,7 @@ export default async function AccountDashboardPage() {
               Curated For You
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
+          <div className="product-grid" style={{ marginTop: 0 }}>
             {serializedRecommended.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
@@ -428,7 +428,7 @@ export default async function AccountDashboardPage() {
               Recently Viewed
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' }}>
+          <div className="product-grid" style={{ marginTop: 0 }}>
             {serializedRecentlyViewed.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}

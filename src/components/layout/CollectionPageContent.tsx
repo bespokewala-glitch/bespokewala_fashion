@@ -135,7 +135,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const containerStyle: React.CSSProperties = {
     // Subcategory pages have no hero above them, so they need header-clearance padding
-    padding: (showHero && campaigns.length > 0) ? '4rem 2rem' : '8rem 2rem 4rem 2rem',
+    // NOTE: horizontal padding is controlled by .mobile-px-4 on mobile (overrides via !important in responsive.css)
+    paddingTop: (showHero && campaigns.length > 0) ? '4rem' : '8rem',
+    paddingBottom: '4rem',
+    paddingLeft: '2rem',
+    paddingRight: '2rem',
     maxWidth: '1600px',
     margin: '0 auto',
     minHeight: '80vh',
@@ -167,9 +171,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <Header />
       {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
-      <main style={containerStyle}>
+      <main style={containerStyle} className="mobile-px-4">
         {/* Curated Sections */}
-        <div style={{ margin: '-4rem -2rem 4rem -2rem' }}>
+        {/* NOTE: On desktop the -2rem horizontal margins pull these sections edge-to-edge.
+             On mobile, .mobile-mx-negative resets to margin:0 (overrides inline via !important). */}
+        <div style={{ margin: '-4rem -2rem 4rem -2rem' }} className="mobile-mx-negative">
           {sectionMap.CuratedGrid && !isTopLevelDepartment && <CuratedGrid data={sectionMap.CuratedGrid} />}
           {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
           {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
@@ -193,12 +199,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
               gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '2rem',
               marginTop: '2rem',
-              marginBottom: '4rem'
-            }}>
+              marginBottom: '4rem',
+            }} className="mobile-carousel">
               {departmentCollections.map((col: any) => (
                 <a
                   key={col.href}
                   href={col.href}
+                  draggable={false}
                   style={{
                     position: 'relative',
                     display: 'flex',
@@ -217,6 +224,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                     transition: 'transform 0.4s ease, box-shadow 0.4s ease',
                     textAlign: 'center',
                     overflow: 'hidden',
+                    userSelect: 'none',
                   }}
                   className="department-card-hover"
                 >
