@@ -298,6 +298,8 @@ function DonutChart({
   );
 }
 
+import AdminHamburger from "@/components/admin/AdminHamburger";
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DashboardHome() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -339,16 +341,19 @@ export default function DashboardHome() {
     <div className={styles.page}>
       {/* ── Header ── */}
       <div className={styles.header}>
-        <div>
-          <h1 className={styles.pageTitle}>Dashboard</h1>
-          <p className={styles.pageSubtitle}>
-            Welcome back, Admin
-            {lastUpdated && (
-              <span className={styles.lastUpdated}>
-                · Last updated {lastUpdated.toLocaleTimeString()}
-              </span>
-            )}
-          </p>
+        <div style={{ display: "flex", alignItems: "flex-start" }}>
+          <AdminHamburger />
+          <div>
+            <h1 className={styles.pageTitle}>Dashboard</h1>
+            <p className={styles.pageSubtitle}>
+              Welcome back, Admin
+              {lastUpdated && (
+                <span className={styles.lastUpdated}>
+                  · Last updated {lastUpdated.toLocaleTimeString()}
+                </span>
+              )}
+            </p>
+          </div>
         </div>
         <button className={styles.refreshBtn} onClick={fetchStats}>
           <RefreshCw size={15} />

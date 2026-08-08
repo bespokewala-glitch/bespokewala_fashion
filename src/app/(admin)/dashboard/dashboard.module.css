@@ -99,8 +99,35 @@
 }
 
 @media (max-width: 600px) {
-  .kpiGrid { grid-template-columns: 1fr; }
-  .page { padding: 20px 16px; }
+  .page { 
+    padding: 20px 16px; 
+  }
+  .header {
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .pageTitle {
+    font-size: 1.5rem; /* 24px */
+  }
+  .pageSubtitle {
+    font-size: 0.75rem; /* 12px */
+  }
+  .refreshBtn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: 44px; /* Touch target */
+  }
+  .kpiGrid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Only drop to 1 col if absolutely necessary on tiny screens, but 2 col is preferred */
+  .kpiGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ─── KPI Card ───────────────────────────────────────────────────────────────── */
@@ -176,6 +203,43 @@
 .kpiSpark {
   margin-top: 8px;
   opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .kpiCard {
+    padding: 14px 12px;
+    gap: 4px;
+    border-radius: 12px;
+  }
+  .kpiTop {
+    margin-bottom: 4px;
+  }
+  .kpiIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .kpiIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .kpiBadge {
+    padding: 2px 6px;
+    font-size: 0.65rem;
+  }
+  .kpiValue {
+    font-size: 1.2rem;
+  }
+  .kpiTitle {
+    font-size: 0.65rem;
+    margin-top: 2px;
+  }
+  .kpiSubtitle {
+    font-size: 0.65rem;
+  }
+  .kpiSpark {
+    display: none; /* Hide sparkline on mobile to save space */
+  }
 }
 
 /* ─── Generic card ───────────────────────────────────────────────────────────── */

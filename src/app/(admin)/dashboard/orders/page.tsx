@@ -21,6 +21,7 @@ import {
   Eye,
   AlertCircle,
 } from "lucide-react";
+import AdminHamburger from "@/components/admin/AdminHamburger";
 import styles from "./orders.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -431,8 +432,11 @@ export default function AdminOrdersPage() {
       {/* ── Header ── */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1>Orders</h1>
-          <p>{allOrders.length} total orders · {fmt(stats.revenue)} revenue</p>
+          <AdminHamburger />
+          <div>
+            <h1>Orders</h1>
+            <p>{allOrders.length} total orders · {fmt(stats.revenue)} revenue</p>
+          </div>
         </div>
         <div className={styles.headerRight}>
           <button className={styles.refreshBtn} onClick={fetchOrders}>
@@ -629,7 +633,36 @@ export default function AdminOrdersPage() {
               </table>
             </div>
 
-            {/* Table footer / Pagination */}
+            {/* ── Mobile Order List ── */}
+            <div className={styles.mobileOrdersList}>
+              {paginated.map(order => {
+                const customerName =
+                  order.user?.name ||
+                  `${order.shippingDetails?.firstName ?? ""} ${order.shippingDetails?.lastName ?? ""}`.trim() ||
+                  "Guest";
+                const initials = customerName.charAt(0).toUpperCase();
+
+                return (
+                  <div key={order._id} className={styles.mobileOrderCard} onClick={() => setSelectedOrder(order)}>
+                    <div className={styles.moCardTop}>
+                      <span className={styles.moOrderId}>#{order._id.slice(-8).toUpperCase()}</span>
+                      <StatusPill status={order.orderStatus} />
+                    </div>
+                    <div className={styles.moCardMid}>
+                      <div className={styles.avatar}>{initials}</div>
+                      <div className={styles.moCustomer}>{customerName}</div>
+                    </div>
+                    <div className={styles.moCardBottom}>
+                      <span className={styles.moAmount}>{fmt(order.total)}</span>
+                      <span className={styles.moViewBtn}>View Order →</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* ── Pagination ── */}
+            {totalPages > 1 && (
             <div className={styles.tableFooter}>
               <span>
                 Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} orders
@@ -668,6 +701,7 @@ export default function AdminOrdersPage() {
                 </button>
               </div>
             </div>
+            )}
           </>
         )}
       </div>

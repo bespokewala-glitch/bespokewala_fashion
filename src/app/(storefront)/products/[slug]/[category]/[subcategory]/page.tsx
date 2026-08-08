@@ -27,5 +27,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function ProductSubcategoryPage({ params }: Props) {
   const { slug: productType, category, subcategory } = await params;
+  console.log("====== MATCHED SUBCATEGORY PAGE ======", { productType, category, subcategory });
   return <CollectionPageContent params={{ productType, category, subcategory }} />;
 }

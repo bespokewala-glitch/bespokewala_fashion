@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
@@ -48,30 +48,18 @@ export default function AdminSidebar() {
   });
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  useEffect(() => {
+    const handleOpen = () => setIsMobileOpen(true);
+    window.addEventListener("openAdminSidebar", handleOpen);
+    return () => window.removeEventListener("openAdminSidebar", handleOpen);
+  }, []);
+
   const toggleExpand = (path: string) => {
     setExpandedItems((prev) => ({ ...prev, [path]: !prev[path] }));
   };
 
   return (
     <>
-      <button 
-        className="desktop-hide"
-        onClick={() => setIsMobileOpen(true)}
-        style={{
-          position: "fixed",
-          top: "1rem",
-          left: "1rem",
-          zIndex: 90,
-          background: "#111",
-          color: "#fff",
-          border: "none",
-          borderRadius: "8px",
-          padding: "0.5rem",
-          cursor: "pointer"
-        }}
-      >
-        <Menu size={24} />
-      </button>
 
       <div 
         className={`admin-mobile-overlay desktop-hide ${isMobileOpen ? 'open' : ''}`}
@@ -79,10 +67,8 @@ export default function AdminSidebar() {
       />
 
       <div
-        className={`admin-mobile-sidebar ${isMobileOpen ? 'open' : ''}`}
+        className={`admin-mobile-sidebar admin-desktop-sidebar ${isMobileOpen ? 'open' : ''}`}
         style={{
-        width: "240px",
-        minWidth: "240px",
         backgroundColor: "#0d0d0d",
         color: "#fff",
         display: "flex",

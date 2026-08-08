@@ -1,4 +1,5 @@
 /* Pure server component — no useState/useEffect, no hydration risk */
+import Link from 'next/link';
 
 const LAST_UPDATED = "1 August 2026";
 

@@ -37,11 +37,16 @@
 /* ─── Header ───────────────────────────────────────────────────────────────── */
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 28px;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
 }
 
 .headerLeft h1 {
@@ -92,7 +97,8 @@
 }
 
 @media (max-width: 900px) { .statsRow { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 500px) { .statsRow { grid-template-columns: 1fr; } }
+/* Changed to repeat(2, 1fr) for mobile */
+@media (max-width: 500px) { .statsRow { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
 
 .statCard {
   background: #fff;
@@ -735,3 +741,134 @@
 
 .toastSuccess { background: #111; color: #fff; }
 .toastError   { background: #dc2626; color: #fff; }
+
+/* ─── Mobile Order Cards ─────────────────────────────────────────────────── */
+.mobileOrdersList {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px;
+  }
+  .header {
+    margin-bottom: 20px;
+  }
+  .headerLeft h1 {
+    font-size: 1.5rem; /* 24px */
+  }
+  .headerLeft p {
+    font-size: 0.75rem; /* 12px */
+  }
+  
+  /* Filter horizontal scroll */
+  .filterGroup {
+    overflow-x: auto;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    width: 100%;
+  }
+  .filterGroup::-webkit-scrollbar {
+    display: none;
+  }
+  .searchWrap {
+    width: 100%;
+    flex: none;
+  }
+  .sortSelect {
+    width: 100%;
+    min-height: 44px; /* touch target */
+  }
+
+  /* Compress stat cards */
+  .statCard {
+    padding: 12px 14px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+  .statIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+  .statIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .statValue {
+    font-size: 1.1rem;
+  }
+  .statLabel {
+    font-size: 0.65rem;
+  }
+
+  /* Swap table for cards */
+  .tableWrap {
+    display: none;
+  }
+  .tableCard {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  .mobileOrdersList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobileOrderCard {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+  }
+  .moCardTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .moOrderId {
+    font-family: 'Courier New', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #374151;
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .moCardMid {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .moCustomer {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #111;
+  }
+  .moCardBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+  }
+  .moAmount {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #111;
+  }
+  .moViewBtn {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #7c3aed;
+  }
+}

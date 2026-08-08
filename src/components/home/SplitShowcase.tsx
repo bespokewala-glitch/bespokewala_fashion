@@ -62,7 +62,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       minHeight: '80vh',
       backgroundColor: '#fff',
       flexWrap: 'wrap'
-    }} className="mobile-flex-col mobile-min-h-auto">
+    }} className="mobile-flex-col mobile-min-h-auto split-showcase-section">
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes subtleFadeIn {
           0% { opacity: 0; transform: translateY(10px); }
@@ -74,7 +74,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       `}} />
       
       {/* Left side - Fixed Model Image */}
-      <div style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
+      <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
         <Image 
           src={modelImage || ''} 
           alt="Model wearing jewellery"
@@ -85,7 +85,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       </div>
 
       {/* Right side - Auto-playing Slider */}
-      <div style={{ 
+      <div className="split-showcase-content mobile-section-py mobile-px-container" style={{ 
         flex: '1 1 50%', 
         minWidth: '300px', 
         display: 'flex', 
@@ -96,7 +96,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
         textAlign: 'center',
         backgroundColor: '#fff',
         position: 'relative'
-      }} className="mobile-section-py mobile-px-container">
+      }}>
         
         {/* Top Header */}
         <div style={{ marginBottom: '2rem' }}>

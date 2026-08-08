@@ -52,9 +52,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function ProductsSlugPage({ params }: Props) {
   const { slug } = await params;
+  console.log("====== MATCHED SLUG PAGE ======", { slug });
 
   // ── Case 1: Couture page is Homepage ─────────────────────────────────────
   if (slug === 'couture') {
+    console.log("====== Redirecting to / ======");
     redirect('/');
   }
 

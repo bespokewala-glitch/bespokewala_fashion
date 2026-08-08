@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 
+import AdminHamburger from "@/components/admin/AdminHamburger";
+
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,18 +138,19 @@ export default function AdminCampaignsPage() {
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '2rem', margin: 0 }}>Hero Campaigns Admin</h1>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }} className="admin-page-container">
+      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }}>
+        <AdminHamburger />
+        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', margin: 0 }}>Hero Campaigns Admin</h1>
       </div>
       
-      <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start' }} className="admin-flex-row">
         {/* ADD NEW CAMPAIGN FORM */}
-        <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px' }}>
+        <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', width: '100%', boxSizing: 'border-box' }} className="admin-page-container">
           <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Add New Campaign</h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             
-            <div>
+            <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Title</label>
               <input 
                 type="text" 
@@ -155,11 +158,11 @@ export default function AdminCampaignsPage() {
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
                 placeholder="e.g. INAYA SUMMER 2026"
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               />
             </div>
 
-            <div>
+            <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subtitle</label>
               <input 
                 type="text" 
@@ -167,17 +170,17 @@ export default function AdminCampaignsPage() {
                 value={formData.subtitle}
                 onChange={e => setFormData({...formData, subtitle: e.target.value})}
                 placeholder="e.g. NEW COLLECTION"
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               />
             </div>
 
-            <div>
+            <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Button Destination Link</label>
               <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#666' }}>Where should the "Explore Now" button take the user?</p>
               <select 
                 value={formData.linkUrl}
                 onChange={e => setFormData({...formData, linkUrl: e.target.value})}
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               >
                 <option value="/products?productType=couture">Couture</option>
                 <option value="/products?productType=accessories">Accessories</option>
@@ -185,12 +188,12 @@ export default function AdminCampaignsPage() {
               </select>
             </div>
 
-            <div>
+            <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category</label>
               <select 
                 value={formData.category}
                 onChange={e => setFormData({...formData, category: e.target.value})}
-                style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               >
                 <option value="couture">Couture</option>
                 <option value="jewellery">Jewellery</option>
@@ -200,7 +203,7 @@ export default function AdminCampaignsPage() {
             </div>
 
             {/* DRAG AND DROP ZONE */}
-            <div>
+            <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Media File (Video or Image)</label>
               <div 
                 onDragOver={handleDragOver}
@@ -210,17 +213,19 @@ export default function AdminCampaignsPage() {
                 style={{ 
                   border: isDragging ? '2px dashed #000' : '2px dashed #ccc', 
                   backgroundColor: isDragging ? '#e9e9e9' : '#fff',
-                  padding: '40px', 
+                  width: '100%',
+                  boxSizing: 'border-box',
                   textAlign: 'center',
                   borderRadius: '4px',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
+                className="admin-page-container"
               >
                 {uploading ? (
                   <p>Uploading... please wait.</p>
                 ) : formData.videoUrl ? (
-                  <p style={{ color: 'green', fontWeight: 'bold' }}>File Uploaded: {formData.videoUrl}</p>
+                  <p style={{ color: 'green', fontWeight: 'bold' }}>File Uploaded: {formData.videoUrl.split('/').pop()}</p>
                 ) : (
                   <p>Drag & Drop a video or image file here, or click to select</p>
                 )}
@@ -239,7 +244,9 @@ export default function AdminCampaignsPage() {
               disabled={uploading || !formData.videoUrl}
               style={{ 
                 marginTop: '10px', 
-                padding: '12px', 
+                minHeight: '44px',
+                width: '100%',
+                boxSizing: 'border-box',
                 backgroundColor: '#000', 
                 color: '#fff', 
                 border: 'none', 
@@ -254,14 +261,14 @@ export default function AdminCampaignsPage() {
         </div>
 
         {/* LIST EXISTING CAMPAIGNS */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Current Campaigns</h2>
           {loading ? <p>Loading...</p> : campaigns.length === 0 ? <p>No campaigns found.</p> : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {campaigns.map((camp) => {
                 const isImage = camp.videoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
                 return (
-                <div key={camp._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px' }}>
+                <div key={camp._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px' }} className="admin-card-stack">
                   {isImage ? (
                     <img src={camp.videoUrl} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} alt="campaign" />
                   ) : (

@@ -1,4 +1,5 @@
 /* Pure server component — no useState/useEffect, no hydration risk */
+import Link from 'next/link';
 
 const PRESS_COVERAGE = [
   {

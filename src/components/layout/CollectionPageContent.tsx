@@ -144,9 +144,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }
 
   const containerStyle: React.CSSProperties = {
-    // Subcategory pages have no hero above them, so they need header-clearance padding
-    // NOTE: horizontal padding is controlled by .mobile-px-4 on mobile (overrides via !important in responsive.css)
-    paddingTop: (showHero && campaigns.length > 0) ? '4rem' : '8rem',
+    // Only apply bottom padding and horizontal padding inline. 
+    // Top padding is moved to CSS so we can easily override it on mobile without specificity wars.
     paddingBottom: '4rem',
     paddingLeft: '2rem',
     paddingRight: '2rem',
@@ -155,13 +154,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     minHeight: '80vh',
   };
 
-  // Top-level department landing page (e.g. /products/jewellery or /products?productType=jewellery)
-  // when no specific category, subcategory, collection, or occasion filter is active.
+  // ... (keeping other variables unchanged)
   const isTopLevelDepartment = Boolean(productType && !category && !subcategory && !collectionName && !occasion);
 
-  // Department collection cards for Jewellery landing page.
-  // Dynamically uses images/titles configured in Admin -> Page Sections Manager (page: 'jewellery', section: 'CuratedGrid'),
-  // or falls back to default collection cards.
   const cmsGridItems = sectionMap.CuratedGrid?.items;
   const departmentCollections = (cmsGridItems && cmsGridItems.some((it: any) => it.image || it.title))
     ? cmsGridItems.map((item: any, idx: number) => ({
@@ -180,11 +175,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   return (
     <>
       {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
-      <main style={containerStyle} className="mobile-px-4">
+      <main style={containerStyle} className="mobile-px-4 desktop-pt-hero">
         {/* Curated Sections */}
-        {/* NOTE: On desktop the -2rem horizontal margins pull these sections edge-to-edge.
-             On mobile, .mobile-mx-negative resets to margin:0 (overrides inline via !important). */}
-        <div style={{ margin: '-4rem -2rem 4rem -2rem' }} className="mobile-mx-negative">
+        {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
+        <div className="desktop-mx-negative mobile-m-0">
           {sectionMap.CuratedGrid && !isTopLevelDepartment && <CuratedGrid data={sectionMap.CuratedGrid} />}
           {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
           {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}

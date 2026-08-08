@@ -1,6 +1,8 @@
 /* Pure server-compatible component — zero useState/useEffect, zero hydration risk.
    All animations via CSS @keyframes, all hover via CSS :hover.                     */
 
+import Link from 'next/link';
+
 export default function ShippingPageContent() {
   return (
     <>

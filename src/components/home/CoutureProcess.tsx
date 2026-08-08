@@ -41,9 +41,9 @@ export default function CoutureProcess({ data }: { data?: any }) {
   };
 
   return (
-    <section style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }} className="mobile-flex-col mobile-m-0">
+    <section style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }} className="mobile-flex-col mobile-m-0 couture-process-section">
       {/* Left Column - Accordion */}
-      <div style={{ flex: '1 1 50%', padding: '6rem 4rem', boxSizing: 'border-box' }} className="mobile-section-py mobile-px-container">
+      <div className="couture-process-accordion mobile-section-py mobile-px-container" style={{ flex: '1 1 50%', padding: '6rem 4rem', boxSizing: 'border-box' }}>
         <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '4rem', textTransform: 'uppercase', color: '#333' }} className="mobile-h2-clamp mobile-section-mb">
           The Couture<br/>Process
         </h2>
@@ -105,7 +105,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
       </div>
 
       {/* Right Column - Media */}
-      <div style={{ flex: '1 1 50%', position: 'relative', minHeight: '400px' }}>
+      <div className="couture-process-media" style={{ flex: '1 1 50%', position: 'relative', minHeight: '400px' }}>
         {(data?.mainMedia || data?.image || fallbackMedia) && (
           <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
             {isVideo(data?.mainMedia || data?.image || fallbackMedia) ? (

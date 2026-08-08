@@ -1,9 +1,26 @@
 /* responsive.css */
 
-/* Hide mobile elements on desktop */
+/* Desktop Specific Utilities */
 @media (min-width: 1024px) {
   .desktop-hide {
     display: none !important;
+  }
+
+  .desktop-pt-hero {
+    padding-top: 4rem; /* Standard desktop top padding when hero is present */
+  }
+
+  .desktop-pt-no-hero {
+    padding-top: 8rem; /* Padding when no hero */
+  }
+
+  .desktop-mx-negative {
+    margin: -4rem -2rem 4rem -2rem; /* Negative margins to push content to edges on desktop */
+  }
+
+  .admin-desktop-sidebar {
+    width: 240px !important;
+    min-width: 240px !important;
   }
 
   .hero-overlay {
@@ -106,6 +123,15 @@
     padding-bottom: 5rem !important;
   }
 
+  .mobile-section-py {
+    padding-top: 32px !important;
+    padding-bottom: 32px !important;
+  }
+
+  .mobile-pt-0 {
+    padding-top: 0 !important;
+  }
+
   .mobile-m-0 {
     margin: 0 !important;
   }
@@ -199,6 +225,64 @@
 
   .mobile-menu-drawer.open {
     transform: translateX(0);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Admin Mobile Sidebar Drawer */
+  .admin-mobile-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 95;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .admin-mobile-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .admin-mobile-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 85vw !important;
+    max-width: 320px !important;
+    min-width: unset !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    z-index: 100 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .admin-mobile-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Admin Dashboard Mobile Utilities */
+  .admin-page-container {
+    padding: 16px !important;
+  }
+  
+  .admin-flex-row {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  .admin-card-stack {
+    flex-direction: column !important;
+  }
+
+  .admin-card-stack img, .admin-card-stack video {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9;
+    border-radius: 6px;
   }
 
   .mobile-menu-overlay {
@@ -676,44 +760,51 @@
 
   /* ═══════════════════════════════════════════════════════════════════════
      SPLIT SHOWCASE (OUR COLLECTION)
-     Section: inline minHeight '80vh'
-     Left model div: minWidth '300px', position relative
-     Right product div: padding '4rem 2rem 2rem 2rem'
      ═══════════════════════════════════════════════════════════════════════ */
 
-  /* Section wrapper: kill 80vh minimum height */
-  section.mobile-flex-col.mobile-min-h-auto {
+  .split-showcase-section {
     min-height: 0 !important;
+    padding-bottom: 24px !important;
   }
 
   /* Left model image panel */
-  .mobile-flex-col > div:first-child {
+  .split-showcase-section .split-showcase-image {
     min-width: 0 !important;
     width: 100% !important;
     flex: none !important;
-    height: 240px !important;
+    height: clamp(260px, 60vw, 400px) !important;
     min-height: 0 !important;
     position: relative !important;
   }
 
-  .mobile-flex-col > div:first-child > img {
+  .split-showcase-section .split-showcase-image > img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center top !important;
+    object-position: center 25% !important;
   }
 
-  /* Right product slider panel: inline padding '4rem 2rem 2rem 2rem' */
-  .mobile-flex-col > div:not(:first-child) {
+  /* Right product slider panel */
+  .split-showcase-section .split-showcase-content {
     min-width: 0 !important;
     width: 100% !important;
     flex: none !important;
-    padding: 20px 16px 16px 16px !important;
+    padding: 16px 16px 8px 16px !important; /* Minimized padding to reduce white space */
+    justify-content: center !important;
   }
 
   /* "OUR COLLECTION" label + divider top header area */
-  .mobile-flex-col > div:not(:first-child) > div:first-child {
-    margin-bottom: 12px !important;
+  .split-showcase-section .split-showcase-content > div:first-child {
+    margin-bottom: 8px !important; /* Pulled extremely close */
+  }
+
+  .split-showcase-section .slide-anim {
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
   .mobile-label-clamp {
@@ -721,60 +812,62 @@
     letter-spacing: 0.15em !important;
   }
 
-  /* Product slider image: inline height '300px' */
-  .mobile-slider-img {
-    height: clamp(160px, 44vw, 240px) !important;
-    max-width: 100% !important;
-    width: auto !important;
+  /* Product slider image - PERFECT SQUARE TO ACCOMMODATE BOTH TALL AND WIDE IMAGES */
+  .split-showcase-section .mobile-slider-img {
+    width: clamp(220px, 75vw, 320px) !important; 
+    height: clamp(220px, 75vw, 320px) !important; /* 1:1 Aspect ratio fixes the massive vertical gap */
+    position: relative !important;
+    margin-bottom: 8px !important; 
+  }
+
+  .split-showcase-section .mobile-slider-img img {
     object-fit: contain !important;
-    margin-bottom: 10px !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   /* Product name typography */
-  .mobile-flex-col .mobile-h3-clamp {
+  .split-showcase-section .mobile-h3-clamp {
     font-size: 14px !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 2px !important;
+    letter-spacing: 0.05em !important;
   }
 
   /* Price text */
-  .mobile-flex-col .mobile-body-clamp {
+  .split-showcase-section .mobile-body-clamp {
     font-size: 13px !important;
   }
 
-  /* Pagination dots: inline marginTop '1.5rem' */
-  .mobile-section-mt[style*="gap: 10px"],
-  .mobile-section-mt[style*="gap:10px"] {
-    margin-top: 10px !important;
+  /* Pagination dots */
+  .split-showcase-section .mobile-section-mt[style*="gap: 10px"],
+  .split-showcase-section .mobile-section-mt[style*="gap:10px"] {
+    margin-top: 8px !important; /* Very tight below the image */
     gap: 8px !important;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
      COUTURE PROCESS
-     Section: inline marginTop '6rem', minHeight '80vh'
-     Left col: padding '6rem 4rem' inline
-     H2: marginBottom '4rem' inline
-     Right col: minHeight '400px' inline
      ═══════════════════════════════════════════════════════════════════════ */
 
   /* Section wrapper */
-  .mobile-flex-col.mobile-m-0 {
+  .couture-process-section {
     margin-top: 0 !important;
     min-height: 0 !important;
   }
 
-  /* Left accordion column: inline padding '6rem 4rem' */
-  .mobile-flex-col.mobile-m-0 > div:first-child {
-    padding: 24px 16px !important;
+  /* Left accordion column */
+  .couture-process-section .couture-process-accordion {
+    padding: 32px 16px 40px 16px !important;
     min-width: 0 !important;
     width: 100% !important;
     flex: none !important;
     height: auto !important;
   }
 
-  /* "THE COUTURE PROCESS" heading: inline fontSize '2.5rem', marginBottom '4rem' */
-  .mobile-flex-col.mobile-m-0 .mobile-h2-clamp {
-    font-size: clamp(22px, 6vw, 28px) !important;
-    margin-bottom: 20px !important;
+  /* "THE COUTURE PROCESS" heading */
+  .couture-process-section .mobile-h2-clamp {
+    font-size: clamp(24px, 7vw, 32px) !important;
+    margin-bottom: 24px !important;
     letter-spacing: 0.08em !important;
     line-height: 1.2 !important;
   }
@@ -787,14 +880,32 @@
 
   /* Each accordion item row header */
   .mobile-py-2 {
-    padding-top: 12px !important;
-    padding-bottom: 12px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
   }
 
   /* Accordion title h3: inline fontSize '1.2rem' */
-  .mobile-flex-col.mobile-m-0 .mobile-h3-clamp {
-    font-size: 14px !important;
+  .couture-process-section .mobile-h3-clamp {
+    font-size: 15px !important;
     font-weight: 500 !important;
+  }
+
+  /* Right media column */
+  .couture-process-section .couture-process-media {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+    height: clamp(320px, 85vw, 420px) !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+  }
+
+  .couture-process-section .couture-process-media video,
+  .couture-process-section .couture-process-media img {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   /* Accordion body text: inline fontSize '0.95rem' */
