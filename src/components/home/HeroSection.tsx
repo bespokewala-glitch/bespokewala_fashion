@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Campaign {
   _id?: string;
@@ -122,11 +123,15 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   return (
     <section style={heroStyle} className="mobile-hero-height">
       {isImage ? (
-        <img 
-          src={currentCampaign?.videoUrl}
-          style={videoStyle}
-          alt={currentCampaign?.title}
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Image 
+            src={currentCampaign?.videoUrl || ''}
+            alt={currentCampaign?.title || 'Hero Campaign'}
+            fill
+            style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
+            priority={true}
+          />
+        </div>
       ) : (
         <video 
           ref={videoRef}

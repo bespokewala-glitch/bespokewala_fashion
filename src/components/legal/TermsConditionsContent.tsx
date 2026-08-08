@@ -217,7 +217,7 @@ export default function TermsConditionsContent() {
                   <li>For international shipments, customs duties and import taxes are the buyer&apos;s sole responsibility.</li>
                   <li>We are not responsible for delays caused by customs clearance processes.</li>
                 </ul>
-                <p>Please refer to our <a href="/shipping" style={{ color: "#d2b48c" }}>Shipping &amp; Returns page</a> for full details on rates and timelines.</p>
+                <p>Please refer to our <Link href="/shipping" style={{ color: "#d2b48c" }}>Shipping &amp; Returns page</Link> for full details on rates and timelines.</p>
               </>
             ),
           },
@@ -374,12 +374,12 @@ export default function TermsConditionsContent() {
           </p>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
             <a href="mailto:bespokewala@gmail.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
-            <a href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</a>
+            <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</Link>
           </div>
         </div>
 
         <p style={{ fontSize: "0.75rem", color: "#bbb", marginTop: "2rem", textAlign: "center" }}>
-          Also see: <a href="/privacy-policy" style={{ color: "#d2b48c" }}>Privacy Policy</a>
+          Also see: <Link href="/privacy-policy" style={{ color: "#d2b48c" }}>Privacy Policy</Link>
         </p>
       </div>
     </>

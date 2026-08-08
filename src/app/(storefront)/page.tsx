@@ -1,5 +1,4 @@
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import Link from 'next/link';
 import HeroSection from '@/components/home/HeroSection';
 import HorizontalVideoScroll from '@/components/home/HorizontalVideoScroll';
 import DynamicCategoryShowcase from '@/components/home/DynamicCategoryShowcase';
@@ -54,7 +53,6 @@ export default async function Home() {
 
   return (
     <>
-      <Header />
       <main style={{ backgroundColor: '#fff' }}>
         <HeroSection campaigns={finalHeroCampaigns} />
         
@@ -78,7 +76,7 @@ export default async function Home() {
           <PremiumFeaturedCarousel products={featuredProducts} />
 
           <div style={{ marginTop: '4rem' }} className="mobile-section-mt">
-            <a href="/products" style={{
+            <Link href="/products" style={{
               display: 'inline-block',
               padding: '1rem 3rem',
               backgroundColor: '#000',
@@ -87,11 +85,10 @@ export default async function Home() {
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               fontSize: '0.9rem'
-            }} className="mobile-label-clamp">View All Products</a>
+            }} className="mobile-label-clamp">View All Products</Link>
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

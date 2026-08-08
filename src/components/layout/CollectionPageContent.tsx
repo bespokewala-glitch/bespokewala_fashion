@@ -1,9 +1,9 @@
 import React from 'react';
+import Link from 'next/link';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+
 import ProductCard from '@/components/product/ProductCard';
 import HeroSection from '@/components/home/HeroSection';
 import HomepageSection from '@/models/HomepageSection';
@@ -19,13 +19,17 @@ export interface CollectionPageParams {
   subcategory?: string;
   collectionName?: string;
   occasion?: string;
+  page?: string;
 }
 
 /** Shared data-fetching and rendering logic for all collection / category pages */
 export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
   await dbConnect();
 
-  const { productType, category, subcategory, collectionName, occasion } = params;
+  const { productType, category, subcategory, collectionName, occasion, page } = params;
+  const currentPage = parseInt(page || '1', 10) || 1;
+  const productsPerPage = 24;
+  const skip = (currentPage - 1) * productsPerPage;
 
   // Build MongoDB query from whatever filters are active
   const productQuery: Record<string, string> = {};
@@ -45,14 +49,20 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const pageId = subcategory || collectionName || category || productType || 'all-products';
 
-  const productCacheKey = `products:${JSON.stringify(productQuery)}`;
+  const productCacheKey = `products:${JSON.stringify(productQuery)}:p${currentPage}`;
+  const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, rawCampaigns, hpSections] = await Promise.all([
+  const [rawProducts, totalProducts, rawCampaigns, hpSections] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
+        .skip(skip)
+        .limit(productsPerPage)
         .lean()
+    ),
+    getOrFetch(totalProductsCacheKey, 60, () =>
+      Product.countDocuments(productQuery)
     ),
     // Only fetch campaigns for top-level pages
     showHero
@@ -169,7 +179,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   return (
     <>
-      <Header />
       {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
       <main style={containerStyle} className="mobile-px-4">
         {/* Curated Sections */}
@@ -202,7 +211,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
               marginBottom: '4rem',
             }} className="mobile-carousel">
               {departmentCollections.map((col: any) => (
-                <a
+                <Link
                   key={col.href}
                   href={col.href}
                   draggable={false}
@@ -256,7 +265,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                       {col.subtitle}
                     </span>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           )
@@ -267,15 +276,38 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
               <p className="text-body">No products found in this category.</p>
             </div>
           ) : (
-            <div className="product-grid">
-              {products.map((product: any, index: number) => (
-                <ProductCard key={product._id} product={product} priority={index < 4} />
-              ))}
-            </div>
+            <>
+              <div className="product-grid">
+                {products.map((product: any, index: number) => (
+                  <ProductCard key={product._id} product={product} priority={index < 4} />
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              {totalProducts > productsPerPage && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '4rem' }}>
+                  {currentPage > 1 && (
+                    <Link 
+                      href={`?${new URLSearchParams({ ...params as Record<string, string>, page: (currentPage - 1).toString() }).toString()}`}
+                      className="btn-secondary"
+                    >
+                      Previous
+                    </Link>
+                  )}
+                  {currentPage * productsPerPage < totalProducts && (
+                    <Link 
+                      href={`?${new URLSearchParams({ ...params as Record<string, string>, page: (currentPage + 1).toString() }).toString()}`}
+                      className="btn-secondary"
+                    >
+                      Next Page
+                    </Link>
+                  )}
+                </div>
+              )}
+            </>
           )
         )}
       </main>
-      <Footer />
     </>
   );
 }

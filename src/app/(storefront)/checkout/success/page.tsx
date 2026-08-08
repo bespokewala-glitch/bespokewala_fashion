@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
@@ -58,13 +56,11 @@ function SuccessClient() {
 export default function CheckoutSuccessPage() {
   return (
     <>
-      <Header />
-      <main style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <main style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center' }}>Loading...</div>}>
           <SuccessClient />
         </Suspense>
       </main>
-      <Footer />
-    </>
+          </>
   );
 }

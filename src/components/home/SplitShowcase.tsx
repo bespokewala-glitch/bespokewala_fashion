@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SplitShowcase({ data }: { data?: any }) {
   const modelImage = data?.modelImage || "https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80";
@@ -74,10 +75,12 @@ export default function SplitShowcase({ data }: { data?: any }) {
       
       {/* Left side - Fixed Model Image */}
       <div style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
-        <img 
-          src={modelImage} 
+        <Image 
+          src={modelImage || ''} 
           alt="Model wearing jewellery"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: 'cover' }}
         />
       </div>
 
@@ -105,12 +108,15 @@ export default function SplitShowcase({ data }: { data?: any }) {
         <div style={{ position: 'relative', width: '100%', maxWidth: '500px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           
           <div key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem' }}>
-            <img 
-              src={products[currentIndex].image} 
-              alt={products[currentIndex].name}
-              style={{ width: '100%', maxWidth: '300px', height: '300px', objectFit: 'contain', marginBottom: '1.5rem' }}
-              className="mobile-slider-img"
-            />
+            <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
+              <Image 
+                src={products[currentIndex].image || ''} 
+                alt={products[currentIndex].name || 'Product Image'}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                style={{ objectFit: 'contain' }}
+              />
+            </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>
             <p style={{ fontSize: '1rem', color: '#888' }} className="mobile-body-clamp">{products[currentIndex].price}</p>
           </div>

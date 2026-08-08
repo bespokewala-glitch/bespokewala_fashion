@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function CuratedGrid({ data }: { data?: any }) {
   const defaultImages = [
@@ -40,10 +41,12 @@ export default function CuratedGrid({ data }: { data?: any }) {
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }} className="mobile-carousel">
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
           <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }}>
-            <img 
-              src={item.url} 
-              alt={item.title} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '400px' }}
+            <Image 
+              src={item.url || ''} 
+              alt={item.title || 'Curated item'} 
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
             />
             <div style={{ 
               position: 'absolute', 

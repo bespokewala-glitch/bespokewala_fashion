@@ -449,9 +449,9 @@ export default function PressPageContent() {
           <a href="https://www.instagram.com/bespokewala?igsh=Y3Zud3V3OHd6OTIz" target="_blank" rel="noopener noreferrer" className="btn-primary">
             Follow on Instagram
           </a>
-          <a href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
-            Contact Us →
-          </a>
+          <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
+            Contact PR Team
+          </Link>
         </div>
       </section>
     </>

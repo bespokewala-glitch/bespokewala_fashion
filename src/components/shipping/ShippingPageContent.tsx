@@ -536,7 +536,7 @@ export default function ShippingPageContent() {
           Reach our team on WhatsApp, email, or visit our Mumbai studio for any shipping or returns query.
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
-          <a href="/contact" className="btn-primary">Contact Us</a>
+          <Link href="/contact" className="btn-primary">Contact Us</Link>
           <a
             href="https://wa.me/917506767452?text=Hello%20Bespokewala%2C%20I%20have%20a%20shipping%20query."
             target="_blank"

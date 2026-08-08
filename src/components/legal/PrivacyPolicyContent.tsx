@@ -1,5 +1,8 @@
 /* Pure server component — no useState/useEffect, no hydration risk */
 
+import React from 'react';
+import Link from 'next/link';
+
 const LAST_UPDATED = "1 August 2026";
 
 export default function PrivacyPolicyContent() {
@@ -311,12 +314,12 @@ export default function PrivacyPolicyContent() {
           </p>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
             <a href="mailto:bespokewala@gmail.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
-            <a href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</a>
+            <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</Link>
           </div>
         </div>
 
         <p style={{ fontSize: "0.75rem", color: "#bbb", marginTop: "2rem", textAlign: "center" }}>
-          Also see: <a href="/terms-conditions" style={{ color: "#d2b48c" }}>Terms &amp; Conditions</a>
+          Also see: <Link href="/terms-conditions" style={{ color: "#d2b48c" }}>Terms &amp; Conditions</Link>
         </p>
       </div>
     </>

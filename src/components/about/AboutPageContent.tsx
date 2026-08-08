@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 function useInView(threshold = 0.15) {
@@ -440,12 +441,12 @@ export default function AboutPageContent() {
       <p style={{ fontSize: "0.975rem", color: "#aaa", maxWidth: "480px", margin: "0 auto 2.5rem", lineHeight: 1.8 }}>
         Explore our latest collections or book a personal styling consultation at your nearest atelier.
       </p>
-      <a href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
-        Shop Couture
-      </a>
-      <a href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
-        Contact Us
-      </a>
+      <Link href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
+        Discover Couture
+      </Link>
+      <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
+        Book an Appointment
+      </Link>
     </section>
   );
 

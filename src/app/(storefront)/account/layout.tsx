@@ -1,6 +1,4 @@
 import React from 'react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import AccountSidebar from '@/components/account/AccountSidebar';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
@@ -26,8 +24,7 @@ export default async function AccountLayout({
 
   return (
     <>
-      <Header />
-      <div style={{
+            <div style={{
         backgroundColor: '#FAF9F6',
         minHeight: '100vh'
       }}>
@@ -51,7 +48,6 @@ export default async function AccountLayout({
           </div>
         </div>
       </div>
-      <Footer />
-    </>
+          </>
   );
 }

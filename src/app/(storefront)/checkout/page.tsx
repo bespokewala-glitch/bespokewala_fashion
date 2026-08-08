@@ -2,8 +2,6 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import CheckoutClient from '@/components/checkout/CheckoutClient';
 
 export default async function CheckoutPage() {
@@ -22,11 +20,9 @@ export default async function CheckoutPage() {
 
   return (
     <>
-      <Header />
-      <main style={{ minHeight: '80vh', paddingTop: '6rem', paddingBottom: '6rem' }}>
+            <main style={{ minHeight: '80vh', paddingTop: '6rem', paddingBottom: '6rem' }}>
         <CheckoutClient />
       </main>
-      <Footer />
-    </>
+          </>
   );
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function FeatureBanner({ data }: { data?: any }) {
   const image = data?.image || "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80";
@@ -47,12 +48,12 @@ export default function FeatureBanner({ data }: { data?: any }) {
             autoPlay loop muted playsInline
           />
         ) : (
-          <img
-            src={image}
-            alt={title}
+          <Image
+            src={image || ''}
+            alt={title || 'Feature Banner'}
+            fill
+            sizes="100vw"
             style={{
-              width: '100%',
-              height: '100%',
               objectFit: 'cover',
               opacity: 0.7,
             }}

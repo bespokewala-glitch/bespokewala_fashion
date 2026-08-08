@@ -1,6 +1,9 @@
 /* Pure server component — zero useState/useEffect, zero hydration risk.
    Tab switching uses the native <details> pattern + CSS :target for no-JS tabs. */
 
+import React from 'react';
+import Link from 'next/link';
+
 export default function SizeGuideContent() {
   return (
     <>
@@ -675,7 +678,7 @@ export default function SizeGuideContent() {
           <a href="https://wa.me/917506767452?text=Hi%2C%20I%20need%20help%20with%20sizing." target="_blank" rel="noopener noreferrer" className="btn-primary">
             💬 WhatsApp for Sizing Help
           </a>
-          <a href="/contact" className="btn-secondary">Contact Our Atelier →</a>
+          <Link href="/contact" className="btn-secondary">Contact Our Atelier →</Link>
         </div>
       </section>
     </>

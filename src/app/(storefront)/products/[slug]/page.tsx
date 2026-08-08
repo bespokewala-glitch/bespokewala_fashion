@@ -1,8 +1,6 @@
 import React from 'react';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
@@ -116,8 +114,7 @@ export default async function ProductsSlugPage({ params }: Props) {
 
   return (
     <>
-      <Header />
-      <main style={containerStyle} className="mobile-grid-1 mobile-p-4">
+            <main style={containerStyle} className="mobile-grid-1 mobile-p-4">
         <div>
           <ProductGallery images={allImages} />
         </div>
@@ -170,7 +167,6 @@ export default async function ProductsSlugPage({ params }: Props) {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+          </>
   );
 }

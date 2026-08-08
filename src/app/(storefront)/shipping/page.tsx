@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import ShippingPageContent from "@/components/shipping/ShippingPageContent";
 
 export const metadata: Metadata = {
@@ -12,11 +10,9 @@ export const metadata: Metadata = {
 export default function ShippingPage() {
   return (
     <>
-      <Header />
-      <main style={{ minHeight: "80vh" }}>
+            <main style={{ minHeight: "80vh" }}>
         <ShippingPageContent />
       </main>
-      <Footer />
-    </>
+          </>
   );
 }

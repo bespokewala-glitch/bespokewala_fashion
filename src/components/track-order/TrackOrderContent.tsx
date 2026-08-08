@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 
 /* ── Order status steps ── */
 const STEPS = [
@@ -465,7 +466,7 @@ export default function TrackOrderContent() {
           Our support team is available Mon–Sat, 10am–8pm IST. We typically respond to emails within 24 hours.
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
-          <a href="/contact"                className="btn-primary">Contact Us</a>
+          <Link href="/contact"                className="btn-primary">Contact Us</Link>
           <a href="https://wa.me/917506767452?text=Hi%2C%20I%20need%20help%20with%20my%20order." target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
             WhatsApp →
           </a>

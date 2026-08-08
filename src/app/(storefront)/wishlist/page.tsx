@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -41,8 +39,7 @@ export default function WishlistPage() {
 
   return (
     <>
-      <Header />
-      <main style={containerStyle} className="mobile-p-4 mobile-pt-20">
+            <main style={containerStyle} className="mobile-p-4 mobile-pt-20">
         <h1 style={titleStyle}>Your Wishlist</h1>
 
         {wishlist.length === 0 ? (
@@ -116,7 +113,6 @@ export default function WishlistPage() {
           </div>
         )}
       </main>
-      <Footer />
-    </>
+          </>
   );
 }

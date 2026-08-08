@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import TrackOrderContent from "@/components/track-order/TrackOrderContent";
 
 export const metadata: Metadata = {
@@ -12,11 +10,9 @@ export const metadata: Metadata = {
 export default function TrackOrderPage() {
   return (
     <>
-      <Header />
-      <main style={{ minHeight: "80vh" }}>
+            <main style={{ minHeight: "80vh" }}>
         <TrackOrderContent />
       </main>
-      <Footer />
-    </>
+          </>
   );
 }
