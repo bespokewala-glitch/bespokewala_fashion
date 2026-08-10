@@ -125,7 +125,7 @@ export default async function AccountDashboardPage() {
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: '2rem'
-      }} className="luxury-card">
+      }} className="luxury-card mobile-p-4">
         <div>
           <h1 style={{ 
             fontSize: '2.5rem', 
@@ -170,7 +170,7 @@ export default async function AccountDashboardPage() {
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: '2rem'
-      }}>
+      }} className="mobile-p-4">
         <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
           <div>
             <h4 style={{ color: '#D4AF37', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Complimentary</h4>
@@ -274,7 +274,7 @@ export default async function AccountDashboardPage() {
                   border: '1px solid #eee', 
                   padding: '2.5rem', 
                   backgroundColor: '#fff'
-                }} className="luxury-card">
+                }} className="luxury-card mobile-p-4">
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '2rem', marginBottom: '2rem', flexWrap: 'wrap', gap: '2rem' }}>
                     <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
                       <div>

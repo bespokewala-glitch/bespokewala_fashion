@@ -51,10 +51,12 @@
   }
 
   .mobile-flex-col {
+    display: flex !important;
     flex-direction: column !important;
   }
 
   .mobile-flex-col-reverse {
+    display: flex !important;
     flex-direction: column-reverse !important;
   }
 

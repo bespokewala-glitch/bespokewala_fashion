@@ -38,14 +38,14 @@ export default function CartClient() {
   }
 
   return (
-    <div style={{ padding: '4rem 4rem 8rem', maxWidth: '1400px', margin: '0 auto', fontFamily: '"Jost", "Inter", sans-serif' }}>
+    <div style={{ padding: '4rem 4rem 8rem', maxWidth: '1400px', margin: '0 auto', fontFamily: '"Jost", "Inter", sans-serif' }} className="mobile-px-4 mobile-py-4">
       <h1 style={{ fontSize: '2rem', fontWeight: 300, marginBottom: '4rem', letterSpacing: '0.1em', textAlign: 'center' }}>CART</h1>
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '4rem' }} className="mobile-flex-col">
         {/* Left Side - Cart Items */}
         <div>
           {/* Header */}
-          <div style={{ display: 'flex', borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '2rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#666' }}>
+          <div style={{ display: 'flex', borderBottom: '1px solid #eee', paddingBottom: '1rem', marginBottom: '2rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#666' }} className="mobile-hide">
             <div style={{ flex: '3' }}>Product</div>
             <div style={{ flex: '1', textAlign: 'center' }}>Quantity</div>
             <div style={{ flex: '1', textAlign: 'right' }}>Total</div>
@@ -54,8 +54,8 @@ export default function CartClient() {
           {/* Items */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {cart.map((item) => (
-              <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '2rem' }}>
-                <div style={{ flex: '3', display: 'flex', gap: '2rem', alignItems: 'center' }}>
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '2rem' }} className="mobile-flex-col mobile-gap-md">
+                <div style={{ flex: '3', display: 'flex', gap: '2rem', alignItems: 'center' }} className="mobile-w-full">
                   <img src={item.image} alt={item.name} style={{ width: '120px', height: '160px', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 0.5rem', color: '#111' }}>{item.name}</h3>
@@ -70,7 +70,7 @@ export default function CartClient() {
                   </div>
                 </div>
 
-                <div style={{ flex: '1', display: 'flex', justifyContent: 'center' }}>
+                <div style={{ flex: '1', display: 'flex', justifyContent: 'center' }} className="mobile-w-full mobile-text-left">
                   <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', padding: '0.5rem' }}>
                     <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#666', padding: '0 0.5rem' }}>-</button>
                     <span style={{ fontSize: '1rem', width: '2rem', textAlign: 'center' }}>{item.quantity}</span>
@@ -78,7 +78,7 @@ export default function CartClient() {
                   </div>
                 </div>
 
-                <div style={{ flex: '1', textAlign: 'right', fontSize: '1.1rem', fontWeight: 500 }}>
+                <div style={{ flex: '1', textAlign: 'right', fontSize: '1.1rem', fontWeight: 500 }} className="mobile-w-full mobile-text-left">
                   ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                 </div>
               </div>
@@ -87,7 +87,7 @@ export default function CartClient() {
         </div>
 
         {/* Right Side - Order Summary */}
-        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0">
+        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0 mobile-p-4">
           <h2 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 2rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Order Summary</h2>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.95rem' }}>

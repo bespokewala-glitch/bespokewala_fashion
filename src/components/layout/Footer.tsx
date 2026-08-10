@@ -85,7 +85,7 @@ export default function Footer() {
           <p style={{ fontSize: '0.875rem', color: '#ccc', marginBottom: '1rem' }}>
             Subscribe to receive updates, access to exclusive deals, and more.
           </p>
-          <form style={{ display: 'flex' }}>
+          <form style={{ display: 'flex' }} className="mobile-flex-col mobile-gap-sm">
             <input 
               type="email" 
               placeholder="Enter your email address" 

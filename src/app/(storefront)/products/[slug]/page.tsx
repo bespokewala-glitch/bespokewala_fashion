@@ -116,7 +116,7 @@ export default async function ProductsSlugPage({ params }: Props) {
 
   return (
     <>
-            <main style={containerStyle} className="mobile-grid-1 mobile-p-4">
+            <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
         <div>
           <ProductGallery images={allImages} />
         </div>
