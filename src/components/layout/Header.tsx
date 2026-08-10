@@ -21,7 +21,7 @@ export default function Header() {
   const enterTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
-  const [user, setUser] = useState<{name: string, role: string} | null>(null);
+  const [user, setUser] = useState<{ name: string, role: string } | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
@@ -116,7 +116,7 @@ export default function Header() {
   const handleMouseEnterMenu = (navId: string) => {
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
-    
+
     // If a menu is already open, add a delay before switching to prevent 
     // the "diagonal hover problem" when moving mouse towards the sub-menu.
     if (hoveredNav && hoveredNav !== navId) {
@@ -251,6 +251,9 @@ export default function Header() {
         .menu-link-hover:hover { color: #888 !important; }
         .sub-link-hover { transition: color 0.2s ease; }
         .sub-link-hover:hover { color: #000 !important; }
+        @media (max-width: 1023px) {
+          .mobile-logo-img { filter: none !important; }
+        }
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
         {/* Mobile Top Category Nav (Level 1) */}
@@ -261,7 +264,7 @@ export default function Header() {
         </div>
 
         <div style={navContainer} className="mobile-main-header">
-          
+
           {/* Mobile Hamburger Menu */}
           <div className="desktop-hide" style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
             <button onClick={() => setIsMobileMenuOpen(true)} className="touch-target" style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}>
@@ -279,31 +282,30 @@ export default function Header() {
               <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}><Link prefetch={false} href="/products/jewellery" style={{ padding: '1rem 0' }}>Jewellery</Link></li>
             </ul>
           </nav>
-          
+
           {/* Logo */}
-          <div style={{ ...logoStyle, flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
-            <Link href="/" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+          <div style={{ flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Link href="/" style={{
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
-              height: '45px',
-              overflow: 'hidden'
             }}>
-              <img 
-                src="/bespoken.png" 
-                alt="Bespoken Fashion" 
-                className="mobile-logo-filter"
-                style={{ 
-                  height: '140px',
-                  width: 'auto', 
+              <img
+                src="/bespoken-transparent.png"
+                alt="Bespokewala"
+                className="mobile-logo-img"
+                style={{
+                  height: '64px',
+                  width: 'auto',
                   objectFit: 'contain',
-                  flexShrink: 0,
-                  filter: isLightHeader ? 'url(#remove-white-make-black)' : 'url(#remove-white-make-white)'
-                }} 
+                  display: 'block',
+                  background: 'transparent',
+                  filter: isLightHeader ? 'none' : 'brightness(0) invert(1)'
+                }}
               />
             </Link>
           </div>
-          
+
           {/* Mobile Right Icons */}
           <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
             <Link href="/search" className="touch-target"><Search size={20} /></Link>
@@ -338,17 +340,17 @@ export default function Header() {
             </ul>
           </nav>
         </div>
-        
+
         {/* Sub-navigation Menu (Departments) */}
         <div style={subNavContainer} onMouseEnter={handleMouseEnterSubMenu} onMouseLeave={handleMouseLeaveSubMenu}>
           <ul style={{ ...menuStyle, gap: '3rem', fontSize: '0.75rem', fontWeight: 500, color: '#333' }}>
             {activeSecondaryNav?.map((item) => (
-              <li 
-                key={item.id} 
+              <li
+                key={item.id}
                 onMouseEnter={() => setHoveredCategory(item.id)}
-                style={{ 
-                  padding: '1.5rem 0', 
-                  cursor: 'pointer', 
+                style={{
+                  padding: '1.5rem 0',
+                  cursor: 'pointer',
                   borderBottom: hoveredCategory === item.id ? '2px solid #000' : '2px solid transparent',
                   position: 'relative'
                 }}
@@ -376,9 +378,9 @@ export default function Header() {
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       {categories.map(cat => (
                         <li key={cat._id}>
-                          <Link 
+                          <Link
                             prefetch={true}
-                            href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`} 
+                            href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`}
                             onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                             style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                             className="sub-link-hover"
@@ -389,9 +391,9 @@ export default function Header() {
                       ))}
                       {collections.map(col => (
                         <li key={col._id}>
-                          <Link 
+                          <Link
                             prefetch={false}
-                            href={`/products/${hoveredNav}/${hoveredCategory}/${col.slug}`} 
+                            href={`/products/${hoveredNav}/${hoveredCategory}/${col.slug}`}
                             onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                             style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                             className="sub-link-hover"
@@ -454,16 +456,16 @@ export default function Header() {
                       </ul>
                     </div>
                   )}
-                  
+
                   {categories.length > 0 && (
                     <div style={{ width: '220px' }}>
                       <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>CATEGORIES</h4>
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {categories.map(cat => (
                           <li key={cat._id}>
-                            <Link 
+                            <Link
                               prefetch={true}
-                              href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`} 
+                              href={`/products/${hoveredNav}/${hoveredCategory}/${cat.slug}`}
                               onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                               style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                               className="sub-link-hover"
@@ -476,20 +478,20 @@ export default function Header() {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Image Grid matching the Manish Malhotra layout */}
                 {(megaMenuImages[0] || megaMenuImages[1] || megaMenuImages[2]) && (
                   <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
-                     {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', backgroundImage: `url(${megaMenuImages[0]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
-                     {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', backgroundImage: `url(${megaMenuImages[1]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
-                     {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', backgroundImage: `url(${megaMenuImages[2]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', backgroundImage: `url(${megaMenuImages[0]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', backgroundImage: `url(${megaMenuImages[1]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', backgroundImage: `url(${megaMenuImages[2]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
                   </div>
                 )}
               </div>
             </div>
           )}
         </div>
-        
+
         {/* Mobile Menu Drawer */}
         <div className={`mobile-menu-overlay desktop-hide ${isMobileMenuOpen ? 'open' : ''}`} onClick={() => setIsMobileMenuOpen(false)}></div>
         <div className={`mobile-menu-drawer desktop-hide ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -500,7 +502,7 @@ export default function Header() {
             </button>
           </div>
           <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#333' }}>
-            
+
             {/* Couture Accordion */}
             <div>
               <div
@@ -514,8 +516,8 @@ export default function Header() {
                 <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
                   {menuData.couture.map(item => {
                     const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs = taxonomies.filter((t: any) => t.type === 'occasion' && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats = taxonomies.filter((t: any) => t.type === 'category' && (!t.productTypes?.length || t.productTypes.includes('couture')) && (!t.genders?.length || t.genders.includes(item.id)));
                     const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
                     const subKey = `couture-${item.id}`;
                     const isSubOpen = expandedMobileSubMenu === subKey;
@@ -566,8 +568,8 @@ export default function Header() {
                 <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
                   {menuData.accessories.map(item => {
                     const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs = taxonomies.filter((t: any) => t.type === 'occasion' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats = taxonomies.filter((t: any) => t.type === 'category' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
                     const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
                     const subKey = `accessories-${item.id}`;
                     const isSubOpen = expandedMobileSubMenu === subKey;
@@ -618,8 +620,8 @@ export default function Header() {
                 <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
                   {menuData.jewellery.map(item => {
                     const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const occs  = taxonomies.filter((t: any) => t.type === 'occasion'   && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const cats  = taxonomies.filter((t: any) => t.type === 'category'   && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs = taxonomies.filter((t: any) => t.type === 'occasion' && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats = taxonomies.filter((t: any) => t.type === 'category' && (!t.productTypes?.length || t.productTypes.includes('jewellery')) && (!t.genders?.length || t.genders.includes(item.id)));
                     const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
                     const subKey = `jewellery-${item.id}`;
                     const isSubOpen = expandedMobileSubMenu === subKey;
