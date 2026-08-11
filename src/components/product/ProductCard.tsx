@@ -31,25 +31,15 @@ export default function ProductCard({ product, variant = 'default', priority = f
   const [isHovered, setIsHovered] = useState(false);
 
   /**
-   * Normalize image URLs from MongoDB to valid public CDN URLs.
-   *
-   * Handles two legacy formats:
-   *   1. /api/media?file=uploads/foo.png  (old query-param proxy)
-   *   2. /api/media/uploads/foo.png       (new path-based proxy)
-   * Both are rewritten to: https://storage.googleapis.com/<bucket>/uploads/foo.png
-   *
-   * This fixes INVALID_IMAGE_OPTIMIZE_REQUEST in production:
-   * Vercel's image optimizer cannot recursively call back into the same
-   * deployment's /api/media proxy. Direct GCS CDN URLs work correctly.
+   * Normalize legacy ?file= query-param URLs to clean path-based URLs.
+   * /api/media URLs are kept as-is — they are served via the authenticated
+   * GCS proxy (/api/media/[...path]) which does not require public bucket access.
+   * next/image uses unoptimized={true} for these to bypass the optimizer.
    */
-  const GCS_CDN = 'https://storage.googleapis.com/bespokewala-storage';
   const sanitizeUrl = (url: string | null | undefined): string | null => {
     if (!url) return null;
-    // Format 1: /api/media?file=uploads/foo.png
-    let normalized = url.replace(/^\/api\/media\?file=/, '/api/media/');
-    // Format 2: /api/media/uploads/foo.png  →  https://storage.googleapis.com/.../uploads/foo.png
-    normalized = normalized.replace(/^\/api\/media\//, `${GCS_CDN}/`);
-    return normalized;
+    // Convert old format: /api/media?file=uploads/foo.png → /api/media/uploads/foo.png
+    return url.replace(/^\/api\/media\?file=/, '/api/media/');
   };
 
   const primaryImage = sanitizeUrl(product.images[0]) || '';
@@ -117,6 +107,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, objectPosition: 'top' }}
             priority={priority}
+            unoptimized={primaryImage.startsWith('/api/')}
           />
         )}
 
@@ -129,6 +120,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top', opacity: isHovered ? 1 : 0 }}
             priority={false}
+            unoptimized={hoverImage.startsWith('/api/')}
           />
         )}
 

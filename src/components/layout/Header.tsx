@@ -24,16 +24,6 @@ export default function Header() {
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{ name: string, role: string } | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
-
-  // Normalize /api/media proxy URLs to direct GCS CDN URLs so next/image can
-  // optimize them without making a recursive call back into the deployment.
-  const GCS_CDN = 'https://storage.googleapis.com/bespokewala-storage';
-  const normalizeImageUrl = (url: string): string => {
-    if (!url) return url;
-    let u = url.replace(/^\/api\/media\?file=/, '/api/media/');
-    u = u.replace(/^\/api\/media\//, `${GCS_CDN}/`);
-    return u;
-  };
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
 
@@ -106,12 +96,7 @@ export default function Header() {
           .then(data => {
             if (data && data.length > 0 && data[0].images) {
               const fetched = data[0].images;
-              // Normalize proxy URLs → GCS CDN URLs before storing in state
-              setMegaMenuImages([
-                normalizeImageUrl(fetched[0] || ''),
-                normalizeImageUrl(fetched[1] || ''),
-                normalizeImageUrl(fetched[2] || ''),
-              ]);
+              setMegaMenuImages([fetched[0] || '', fetched[1] || '', fetched[2] || '']);
             } else {
               setMegaMenuImages(['', '', '']);
             }
@@ -496,9 +481,9 @@ export default function Header() {
                 {/* Image Grid matching the Manish Malhotra layout */}
                 {(megaMenuImages[0] || megaMenuImages[1] || megaMenuImages[2]) && (
                   <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
-                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[0]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[1]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[2]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[0]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[0].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[1]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[1].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[2]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[2].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
                   </div>
                 )}
               </div>

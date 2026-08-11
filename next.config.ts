@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    // Allow /api/media/ proxy paths as valid next/image sources.
+    // Images using this path get unoptimized={true} so the browser fetches the proxy directly.
+    localPatterns: [
+      {
+        pathname: '/api/media/**',
+        search: '',
+      },
+    ],
     // Serve images at these breakpoints only (fewer variants = faster processing)
     deviceSizes: [640, 1080, 1920],
     imageSizes: [320, 480, 640],
