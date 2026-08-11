@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useWishlist } from '@/context/WishlistContext';
+import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export interface ProductCardProps {
   product: {
@@ -30,26 +31,14 @@ export default function ProductCard({ product, variant = 'default', priority = f
   const isWishlisted = isInWishlist(product.slug);
   const [isHovered, setIsHovered] = useState(false);
 
-  /**
-   * Normalize legacy ?file= query-param URLs to clean path-based URLs.
-   * /api/media URLs are kept as-is — they are served via the authenticated
-   * GCS proxy (/api/media/[...path]) which does not require public bucket access.
-   * next/image uses unoptimized={true} for these to bypass the optimizer.
-   */
-  const sanitizeUrl = (url: string | null | undefined): string | null => {
-    if (!url) return null;
-    // Convert old format: /api/media?file=uploads/foo.png → /api/media/uploads/foo.png
-    return url.replace(/^\/api\/media\?file=/, '/api/media/');
-  };
-
-  const primaryImage = sanitizeUrl(product.images[0]) || '';
-  const hoverImage = sanitizeUrl(
+  const primaryImage = normalizeImageUrl(product.images[0]);
+  const hoverImage = normalizeImageUrl(
     product.images[1] ||
     product.referenceImages?.front ||
     product.referenceImages?.back ||
     product.referenceImages?.left ||
     product.referenceImages?.right
-  ) || null;
+  );
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -107,7 +96,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, objectPosition: 'top' }}
             priority={priority}
-            unoptimized={primaryImage.startsWith('/api/')}
+            unoptimized={shouldBypassOptimizer(primaryImage)}
           />
         )}
 
@@ -120,7 +109,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top', opacity: isHovered ? 1 : 0 }}
             priority={false}
-            unoptimized={hoverImage.startsWith('/api/')}
+            unoptimized={shouldBypassOptimizer(hoverImage)}
           />
         )}
 

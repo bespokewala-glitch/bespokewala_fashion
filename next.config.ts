@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses
   compress: true,
 
-  // Enable Next.js Image Optimization for all GCS objects
-  // Images are always served directly from the public GCS bucket CDN.
-  // The /api/media proxy is only used for streaming (videos, private files)
-  // and is NOT used as an image source for next/image anymore.
+  // Enable Next.js Image Optimization for external URLs (like Unsplash).
+  // Private GCS images are served via the authenticated /api/media/ proxy.
+  // We bypass Vercel's image optimizer for these proxy URLs using unoptimized={true}
+  // to avoid recursive INVALID_IMAGE_OPTIMIZE_REQUEST errors.
   images: {
     remotePatterns: [
       {

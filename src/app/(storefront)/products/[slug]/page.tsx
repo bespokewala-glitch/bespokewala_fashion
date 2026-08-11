@@ -8,6 +8,7 @@ import ProductDetailsAccordion from '@/components/product/ProductDetailsAccordio
 import { notFound, redirect } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 export const revalidate = 60;
 
@@ -77,24 +78,26 @@ export default async function ProductsSlugPage({ params }: Props) {
   // Combine main images and reference images
   const allImages: { url: string; alt: string }[] = [];
 
-  // Normalize legacy ?file= query-param URLs that may be stored in the database.
-  // /api/media/ proxy URLs are kept as-is — the proxy authenticates with GCS server-side.
-  // GCS objects uploaded via /api/upload were not made publicly accessible, so
-  // CDN URLs (https://storage.googleapis.com/...) would return 403 in the browser.
-  const sanitizeUrl = (url: string) =>
-    url.replace(/^\/api\/media\?file=/, '/api/media/');
+  // Normalize all image URLs from MongoDB to browser-safe proxy URLs.
+  // Handles: legacy ?file= format, stale GCS CDN URLs, correct proxy URLs.
+  // See src/lib/imageUrl.ts for full normalization logic.
 
   if (product.images && Array.isArray(product.images)) {
     product.images.forEach((img: string, idx: number) => {
-      allImages.push({ url: sanitizeUrl(img), alt: `${product.name} - View ${idx + 1}` });
+      const url = normalizeImageUrl(img);
+      if (url) allImages.push({ url, alt: `${product.name} - View ${idx + 1}` });
     });
   }
 
   if (product.referenceImages) {
-    if (product.referenceImages.front) allImages.push({ url: sanitizeUrl(product.referenceImages.front), alt: `${product.name} - Front View` });
-    if (product.referenceImages.back)  allImages.push({ url: sanitizeUrl(product.referenceImages.back),  alt: `${product.name} - Back View` });
-    if (product.referenceImages.left)  allImages.push({ url: sanitizeUrl(product.referenceImages.left),  alt: `${product.name} - Left View` });
-    if (product.referenceImages.right) allImages.push({ url: sanitizeUrl(product.referenceImages.right), alt: `${product.name} - Right View` });
+    const addRef = (img: string | undefined, label: string) => {
+      const url = normalizeImageUrl(img);
+      if (url) allImages.push({ url, alt: `${product.name} - ${label}` });
+    };
+    addRef(product.referenceImages.front, 'Front View');
+    addRef(product.referenceImages.back,  'Back View');
+    addRef(product.referenceImages.left,  'Left View');
+    addRef(product.referenceImages.right, 'Right View');
   }
 
   const containerStyle: React.CSSProperties = {

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export default function CuratedGrid({ data }: { data?: any }) {
   const defaultImages = [
@@ -47,6 +48,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
+              unoptimized={shouldBypassOptimizer(item.url)}
             />
             <div style={{ 
               position: 'absolute', 

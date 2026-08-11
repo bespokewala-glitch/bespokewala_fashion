@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export default function LookbookCarousel({ data }: { data?: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
                 fill
                 sizes="(max-width: 768px) 100vw, 300px"
                 style={{ objectFit: 'cover' }}
+                unoptimized={shouldBypassOptimizer(muse.img)}
               />
             </div>
             <h3 style={{ fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#333', margin: 0 }}>

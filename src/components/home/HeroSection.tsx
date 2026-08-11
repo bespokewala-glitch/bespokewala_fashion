@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { shouldBypassOptimizer } from '@/lib/imageUrl';
 
 interface Campaign {
   _id?: string;
@@ -130,6 +131,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
             fill
             style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
             priority={true}
+            unoptimized={shouldBypassOptimizer(currentCampaign?.videoUrl)}
           />
         </div>
       ) : (

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 import { Menu, X, ShoppingBag, User } from 'lucide-react';
 
 export default function Header() {
@@ -96,7 +97,11 @@ export default function Header() {
           .then(data => {
             if (data && data.length > 0 && data[0].images) {
               const fetched = data[0].images;
-              setMegaMenuImages([fetched[0] || '', fetched[1] || '', fetched[2] || '']);
+              setMegaMenuImages([
+                normalizeImageUrl(fetched[0] || ''),
+                normalizeImageUrl(fetched[1] || ''),
+                normalizeImageUrl(fetched[2] || ''),
+              ]);
             } else {
               setMegaMenuImages(['', '', '']);
             }
@@ -481,9 +486,9 @@ export default function Header() {
                 {/* Image Grid matching the Manish Malhotra layout */}
                 {(megaMenuImages[0] || megaMenuImages[1] || megaMenuImages[2]) && (
                   <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
-                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[0]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[0].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[1]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[1].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[2]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={megaMenuImages[2].startsWith('/api/')} /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[0]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={shouldBypassOptimizer(megaMenuImages[0])} /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[1]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={shouldBypassOptimizer(megaMenuImages[1])} /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[2]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" unoptimized={shouldBypassOptimizer(megaMenuImages[2])} /></div> : <div style={{ flex: 1 }}></div>}
                   </div>
                 )}
               </div>
