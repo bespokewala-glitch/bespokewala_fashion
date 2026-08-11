@@ -204,30 +204,30 @@ export default function CheckoutClient() {
         </div>
       )}
 
-      <form onSubmit={handlePayWithRazorpay} style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "4rem", alignItems: "start" }} className="mobile-flex-col">
+      <form onSubmit={handlePayWithRazorpay} style={{ display: "flex", flexWrap: "wrap", gap: "4rem", alignItems: "flex-start" }}>
         {/* Shipping Form */}
-        <div>
+        <div style={{ flex: "1 1 400px", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 400, letterSpacing: "0.1em", marginBottom: "2rem", textTransform: "uppercase", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
             Shipping Details
           </h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }} className="mobile-grid-1">
-            <input required type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={inputStyle} />
-            <input required type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={inputStyle} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <input required type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+            <input required type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
           </div>
 
           <div style={{ marginBottom: "1.5rem" }}>
             <input required type="text" name="address" placeholder="Address (Street, Apartment, Suite)" value={shippingDetails.address} onChange={handleChange} style={inputStyle} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }} className="mobile-grid-1">
-            <input required type="text" name="city" placeholder="City" value={shippingDetails.city} onChange={handleChange} style={inputStyle} />
-            <input required type="text" name="state" placeholder="State / Province" value={shippingDetails.state} onChange={handleChange} style={inputStyle} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <input required type="text" name="city" placeholder="City" value={shippingDetails.city} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+            <input required type="text" name="state" placeholder="State / Province" value={shippingDetails.state} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }} className="mobile-grid-1">
-            <input required type="text" name="zipCode" placeholder="Postal Code / ZIP" value={shippingDetails.zipCode} onChange={handleChange} style={inputStyle} />
-            <select name="country" value={shippingDetails.country} onChange={handleChange} style={inputStyle}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <input required type="text" name="zipCode" placeholder="Postal Code / ZIP" value={shippingDetails.zipCode} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+            <select name="country" value={shippingDetails.country} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }}>
               <option value="India">India</option>
               <option value="United States">United States</option>
               <option value="United Kingdom">United Kingdom</option>
@@ -260,7 +260,7 @@ export default function CheckoutClient() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div style={{ backgroundColor: "#f9f9f9", padding: "2.5rem", position: "sticky", top: "100px", width: "100%", boxSizing: "border-box" }} className="mobile-m-0 mobile-p-4">
+        <div style={{ backgroundColor: "#f9f9f9", padding: "2.5rem", width: "100%", boxSizing: "border-box", flex: "1 1 300px", minWidth: 0 }} className="mobile-m-0 mobile-p-4 desktop-sticky">
           <h2 style={{ fontSize: "1.25rem", fontWeight: 400, letterSpacing: "0.1em", marginBottom: "2rem", textTransform: "uppercase" }}>
             Order Summary
           </h2>

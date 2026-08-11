@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { Menu, X, Search, ShoppingBag, User } from 'lucide-react';
+import { Menu, X, ShoppingBag, User } from 'lucide-react';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -308,7 +308,6 @@ export default function Header() {
 
           {/* Mobile Right Icons */}
           <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Link href="/search" className="touch-target"><Search size={20} /></Link>
             <Link href="/account" className="touch-target"><User size={20} /></Link>
             <Link href="/cart" className="touch-target" style={{ position: 'relative' }}>
               <ShoppingBag size={20} />
@@ -323,7 +322,6 @@ export default function Header() {
           {/* Desktop Right Nav */}
           <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
             <ul style={menuStyle}>
-              <li><Link href="/search">Search</Link></li>
               {user ? (
                 <>
                   <li><Link href="/account">Account</Link></li>

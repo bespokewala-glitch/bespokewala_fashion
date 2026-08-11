@@ -373,7 +373,21 @@
     gap: 1.5rem !important;
   }
 
-  /* Make sure images in grids don't overflow */
+  .mobile-static {
+    position: static !important;
+  }
+
+  .mobile-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  .desktop-sticky {
+    position: static !important;
+  }
+
+/* Make sure images in grids don't overflow */
   .mobile-grid-2 img {
     width: 100% !important;
     height: auto !important;
@@ -1152,5 +1166,12 @@
   footer.mobile-section-py.mobile-px-container,
   footer[class*="mobile"] {
     padding: 20px 12px 16px 12px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .desktop-sticky {
+    position: sticky !important;
+    top: 100px !important;
   }
 }
