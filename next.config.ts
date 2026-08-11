@@ -14,12 +14,17 @@ const nextConfig: NextConfig = {
         hostname: 'storage.googleapis.com',
         pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-webapp-prod'}/**`,
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      }
     ],
     // Allow local API routes with query parameters for next/image
     localPatterns: [
       {
-        pathname: '/api/media',
-        search: '?file=**',
+        pathname: '/api/media/**',
+        search: '',
       },
       {
         pathname: '/uploads/**',

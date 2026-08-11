@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -480,9 +481,9 @@ export default function Header() {
                 {/* Image Grid matching the Manish Malhotra layout */}
                 {(megaMenuImages[0] || megaMenuImages[1] || megaMenuImages[2]) && (
                   <div style={{ flex: 1.2, display: 'flex', gap: '1rem', paddingLeft: '3rem' }}>
-                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', backgroundImage: `url(${megaMenuImages[0]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', backgroundImage: `url(${megaMenuImages[1]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
-                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', backgroundImage: `url(${megaMenuImages[2]})`, backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '400px' }}></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[0] ? <div style={{ flex: 1, backgroundColor: '#f0f0f0', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[0]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[1] ? <div style={{ flex: 1, backgroundColor: '#e5e5e5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[1]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
+                    {megaMenuImages[2] ? <div style={{ flex: 1, backgroundColor: '#d5d5d5', position: 'relative', minHeight: '400px' }}><Image src={megaMenuImages[2]} fill style={{ objectFit: 'cover' }} alt="Category" sizes="33vw" /></div> : <div style={{ flex: 1 }}></div>}
                   </div>
                 )}
               </div>

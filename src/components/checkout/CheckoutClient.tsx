@@ -33,6 +33,7 @@ export default function CheckoutClient() {
   const [shippingDetails, setShippingDetails] = useState({
     firstName: "",
     lastName: "",
+    email: "",
     address: "",
     city: "",
     state: "",
@@ -92,6 +93,7 @@ export default function CheckoutClient() {
           order_id: razorpayOrderId,
           prefill: {
             name: `${shippingDetails.firstName} ${shippingDetails.lastName}`.trim(),
+            email: shippingDetails.email,
             contact: shippingDetails.phone,
           },
           notes: {
@@ -214,6 +216,10 @@ export default function CheckoutClient() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
             <input required type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
             <input required type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+          </div>
+
+          <div style={{ marginBottom: "1.5rem" }}>
+            <input required type="email" name="email" placeholder="Email Address" value={shippingDetails.email} onChange={handleChange} style={inputStyle} />
           </div>
 
           <div style={{ marginBottom: "1.5rem" }}>

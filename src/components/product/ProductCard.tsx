@@ -23,16 +23,7 @@ export interface ProductCardProps {
   priority?: boolean; // true for first ~4 above-the-fold cards
 }
 
-/** Returns true if the URL is a simple local path that next/image can optimize.
- *  Excludes API proxy routes like /api/media/ since they are not whitelisted
- *  in next.config localPatterns and don't benefit from image optimization.
- */
-function isLocalImage(src: string): boolean {
-  if (!src) return false;
-  if (!src.startsWith('/') || src.startsWith('//')) return false;
-  if (src.startsWith('/api/')) return false; // proxy routes — use plain <img>
-  return true;
-}
+
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -103,7 +94,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
         }}
       >
         {/* Primary image */}
-        {isLocalImage(primaryImage) ? (
+        {primaryImage && (
           <Image
             src={primaryImage}
             alt={product.name}
@@ -112,38 +103,18 @@ export default function ProductCard({ product, variant = 'default', priority = f
             style={{ ...sharedImgStyle, objectPosition: 'top' }}
             priority={priority}
           />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={primaryImage}
-            alt={product.name}
-            loading={priority ? 'eager' : 'lazy'}
-            decoding="async"
-            style={{ ...sharedImgStyle, width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
-          />
         )}
 
         {/* Hover image — always mounted but faded in on hover for smooth transition */}
         {hoverImage && (
-          isLocalImage(hoverImage) ? (
-            <Image
-              src={hoverImage}
-              alt={`${product.name} alternate`}
-              fill
-              sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top', opacity: isHovered ? 1 : 0 }}
-              priority={false}
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={hoverImage}
-              alt={`${product.name} alternate`}
-              loading="lazy"
-              decoding="async"
-              style={{ ...sharedImgStyle, width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 2, opacity: isHovered ? 1 : 0 }}
-            />
-          )
+          <Image
+            src={hoverImage}
+            alt={`${product.name} alternate`}
+            fill
+            sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top', opacity: isHovered ? 1 : 0 }}
+            priority={false}
+          />
         )}
 
         {/* Wishlist button */}

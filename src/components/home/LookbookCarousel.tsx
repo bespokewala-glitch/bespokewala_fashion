@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LookbookCarousel({ data }: { data?: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -85,12 +86,15 @@ export default function LookbookCarousel({ data }: { data?: any }) {
               borderRadius: '20px', 
               overflow: 'hidden',
               marginBottom: '1.5rem',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+              boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+              position: 'relative'
             }}>
-              <img 
+              <Image 
                 src={muse.img} 
                 alt={muse.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                fill
+                sizes="(max-width: 768px) 100vw, 300px"
+                style={{ objectFit: 'cover' }}
               />
             </div>
             <h3 style={{ fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#333', margin: 0 }}>
