@@ -8,15 +8,44 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <Suspense fallback={<div style={{ width: '250px', backgroundColor: '#111' }} />}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
+      <Suspense fallback={<div className="admin-desktop-sidebar" style={{ backgroundColor: '#0d0d0d' }} />}>
         <AdminSidebar />
       </Suspense>
-      <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: '24px', left: '16px', zIndex: 999 }} className="mobile-hamburger-wrapper">
-          <AdminHamburger />
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {/* LUXURY MOBILE HEADER */}
+        <div 
+          className="desktop-hide"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            padding: '0 16px',
+            backgroundColor: '#fff',
+            borderBottom: '1px solid #eaeaea',
+            position: 'sticky',
+            top: 0,
+            zIndex: 90,
+            height: '64px',
+            flexShrink: 0
+          }}
+        >
+          <div style={{ width: '44px' }}>
+            <AdminHamburger />
+          </div>
+          <div style={{ fontWeight: 600, letterSpacing: '0.15em', fontSize: '0.95rem', color: '#111' }}>
+            BESPOKEWALA
+          </div>
+          <div style={{ width: '44px', display: 'flex', justifyContent: 'flex-end' }}>
+             <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#333' }}>
+               A
+             </div>
+          </div>
         </div>
-        {children}
+        
+        <div style={{ flex: 1 }}>
+          {children}
+        </div>
       </main>
     </div>
   );

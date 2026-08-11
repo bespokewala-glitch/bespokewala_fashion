@@ -86,20 +86,20 @@ export default function AdminSidebar() {
           borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div
             style={{
               width: "34px",
               height: "34px",
-              background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
-              borderRadius: "10px",
+              background: "#fff",
+              borderRadius: "4px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "0.9rem",
+              fontSize: "1.2rem",
               fontWeight: 800,
-              color: "#fff",
-              letterSpacing: "-0.02em",
+              color: "#000",
+              fontFamily: "serif"
             }}
           >
             B
@@ -107,24 +107,24 @@ export default function AdminSidebar() {
           <div>
             <div
               style={{
-                fontSize: "1.05rem",
-                fontWeight: 700,
-                letterSpacing: "0.12em",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                letterSpacing: "0.15em",
                 color: "#fff",
               }}
             >
-              BESPOKEN
+              BESPOKEWALA
             </div>
             <div
               style={{
-                fontSize: "0.7rem",
-                color: "#666",
-                letterSpacing: "0.06em",
+                fontSize: "0.6rem",
+                color: "#999",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
-                marginTop: "1px",
+                marginTop: "2px",
               }}
             >
-              Admin Portal
+              Luxury Fashion Studio
             </div>
           </div>
         </div>
@@ -172,17 +172,17 @@ export default function AdminSidebar() {
                     padding: "10px 12px",
                     backgroundColor:
                       isProductsActive
-                        ? "rgba(124,58,237,0.12)"
+                        ? "rgba(255,255,255,0.06)"
                         : "transparent",
-                    color: isProductsActive ? "#a78bfa" : "#888",
+                    color: isProductsActive ? "#fff" : "#888",
                     border: "none",
                     width: "100%",
                     textAlign: "left",
                     cursor: "pointer",
-                    borderRadius: "10px",
-                    fontSize: "0.875rem",
+                    borderRadius: "6px",
+                    fontSize: "0.85rem",
                     fontFamily: "inherit",
-                    fontWeight: isProductsActive ? 600 : 400,
+                    fontWeight: isProductsActive ? 500 : 400,
                     transition: "all 0.2s",
                   }}
                 >
@@ -227,7 +227,7 @@ export default function AdminSidebar() {
                             fontSize: "0.83rem",
                             fontWeight: isSubActive ? 600 : 400,
                             backgroundColor: isSubActive
-                              ? "rgba(124,58,237,0.2)"
+                              ? "rgba(255,255,255,0.08)"
                               : "transparent",
                             transition: "all 0.15s",
                           }}
@@ -254,14 +254,14 @@ export default function AdminSidebar() {
                 padding: "10px 12px",
                 backgroundColor:
                   isActive && !currentProductType
-                    ? "rgba(124,58,237,0.12)"
+                    ? "rgba(255,255,255,0.06)"
                     : "transparent",
                 color:
-                  isActive && !currentProductType ? "#a78bfa" : "#888",
+                  isActive && !currentProductType ? "#fff" : "#888",
                 textDecoration: "none",
-                borderRadius: "10px",
-                fontSize: "0.875rem",
-                fontWeight: isActive && !currentProductType ? 600 : 400,
+                borderRadius: "6px",
+                fontSize: "0.85rem",
+                fontWeight: isActive && !currentProductType ? 500 : 400,
                 transition: "all 0.2s",
                 position: "relative",
               }}
@@ -275,8 +275,8 @@ export default function AdminSidebar() {
                     transform: "translateY(-50%)",
                     width: "3px",
                     height: "20px",
-                    background: "#7c3aed",
-                    borderRadius: "0 3px 3px 0",
+                    background: "#fff",
+                    borderRadius: "0 2px 2px 0",
                   }}
                 />
               )}
@@ -302,12 +302,13 @@ export default function AdminSidebar() {
             justifyContent: "center",
             gap: "8px",
             padding: "11px",
-            background: "linear-gradient(135deg, #dc2626, #ef4444)",
+            background: "#111",
+            border: "1px solid rgba(255,255,255,0.1)",
             color: "#fff",
             textDecoration: "none",
-            borderRadius: "10px",
+            borderRadius: "6px",
             fontSize: "0.85rem",
-            fontWeight: 600,
+            fontWeight: 500,
             transition: "opacity 0.2s",
           }}
         >

@@ -15,6 +15,12 @@ function AdminProductsContent() {
   const [isDragging, setIsDragging] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isMegaMenuExpanded, setIsMegaMenuExpanded] = useState(false);
+  const ITEMS_PER_PAGE = 20;
 
   const searchParams = useSearchParams();
   const productTypeParam = searchParams.get('productType');
@@ -28,6 +34,8 @@ function AdminProductsContent() {
     if (productTypeParam && ['couture', 'jewellery', 'accessories'].includes(productTypeParam)) {
       setActiveProductType(productTypeParam);
       setEditingId(null);
+      setCurrentPage(1);
+      setSearchQuery('');
       setFormData({
         name: '',
         description: '',
@@ -294,6 +302,9 @@ function AdminProductsContent() {
         setEditingId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchProductsAndTaxonomies();
+        setCurrentPage(1);
+        setSearchQuery('');
+        listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
         alert(editingId ? 'Product updated successfully!' : 'Product created successfully!');
       } else {
         alert('Error saving product: ' + (data.error || 'Unknown error'));
@@ -415,63 +426,78 @@ function AdminProductsContent() {
       <div className={styles.mainLayout}>
         {/* MEGA MENU SETTINGS */}
         <div className={styles.megaMenuSection}>
-          <div className={styles.megaMenuHeader}>
-            <h2 style={{ fontSize: '1.5rem', margin: 0, textTransform: 'capitalize' }}>Mega Menu Images ({activeProductType})</h2>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => setMenuSettingsCategory('womens')}
-                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'womens' ? '#000' : '#fff', color: menuSettingsCategory === 'womens' ? '#fff' : '#000', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
-              >
-                Womens
-              </button>
-              <button 
-                onClick={() => setMenuSettingsCategory('mens')}
-                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #000', backgroundColor: menuSettingsCategory === 'mens' ? '#000' : '#fff', color: menuSettingsCategory === 'mens' ? '#fff' : '#000', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
-              >
-                Mens
-              </button>
+          <div 
+            className={styles.megaMenuHeader} 
+            onClick={() => setIsMegaMenuExpanded(!isMegaMenuExpanded)}
+            style={{ cursor: 'pointer', marginBottom: isMegaMenuExpanded ? '20px' : '0' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 style={{ fontSize: '1.2rem', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mega Menu ({activeProductType})</h2>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <span style={{ fontSize: '1.5rem', fontWeight: 300 }}>{isMegaMenuExpanded ? '−' : '+'}</span>
             </div>
           </div>
-          <p style={{ color: '#6b7280', marginBottom: '20px', fontSize: '0.9rem' }}>Upload exactly 3 portrait images to display in the {activeProductType} {'->'} {menuSettingsCategory} mega menu dropdown.</p>
           
-          <div className={styles.megaMenuGrid}>
-            {[0, 1, 2].map((index) => (
-              <div key={index} className={styles.megaMenuCard}>
-                {menuImages[index] ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', width: '100%', objectFit: 'cover', marginBottom: '10px', borderRadius: '8px' }} />
-                    <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} className={styles.deleteBtn} style={{ width: '100%' }}>Remove</button>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '12px' }}>Slot {index + 1}</p>
-                    <label style={{ display: 'block', width: '100%', padding: '10px', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>
-                      {uploading ? 'Uploading...' : 'Upload Image'}
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleMenuImageUpload(file, index);
-                        }}
-                        disabled={uploading}
-                        style={{ display: 'none' }} 
-                      />
-                    </label>
-                  </div>
-                )}
+          {isMegaMenuExpanded && (
+            <div style={{ borderTop: '1px solid #eaeaea', paddingTop: '20px' }}>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setMenuSettingsCategory('womens'); }}
+                  style={{ padding: '8px 24px', borderRadius: '4px', border: '1px solid #111', backgroundColor: menuSettingsCategory === 'womens' ? '#111' : '#fff', color: menuSettingsCategory === 'womens' ? '#fff' : '#111', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+                >
+                  Womens
+                </button>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setMenuSettingsCategory('mens'); }}
+                  style={{ padding: '8px 24px', borderRadius: '4px', border: '1px solid #111', backgroundColor: menuSettingsCategory === 'mens' ? '#111' : '#fff', color: menuSettingsCategory === 'mens' ? '#fff' : '#111', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}
+                >
+                  Mens
+                </button>
               </div>
-            ))}
-          </div>
-          <div style={{ marginTop: '20px' }}>
-            <button 
-              onClick={handleSaveMenuImages}
-              disabled={savingMenuImages}
-              className={styles.btnPrimary}
-            >
-              {savingMenuImages ? 'Saving...' : 'Save Menu Images'}
-            </button>
-          </div>
+              <p style={{ color: '#666', marginBottom: '20px', fontSize: '0.85rem' }}>Upload exactly 3 portrait images to display in the {activeProductType} {'->'} {menuSettingsCategory} mega menu dropdown.</p>
+              
+              <div className={styles.megaMenuCarousel}>
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className={styles.megaMenuCard}>
+                    {menuImages[index] ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                        <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', width: '100%', objectFit: 'cover', marginBottom: '10px', borderRadius: '8px' }} />
+                        <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} className={styles.deleteBtn} style={{ width: '100%' }}>Remove</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                        <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '12px' }}>Slot {index + 1}</p>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', minHeight: '44px', padding: '10px', backgroundColor: '#f9f9f9', border: '1px solid #e5e7eb', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, color: '#333' }}>
+                          {uploading ? 'Uploading...' : 'Upload Image'}
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleMenuImageUpload(file, index);
+                            }}
+                            disabled={uploading}
+                            style={{ display: 'none' }} 
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '20px' }}>
+                <button 
+                  onClick={handleSaveMenuImages}
+                  disabled={savingMenuImages}
+                  className={styles.btnPrimary}
+                  style={{ width: 'auto', padding: '14px 30px' }}
+                >
+                  {savingMenuImages ? 'Saving...' : 'Save Menu Images'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className={styles.flexRow}>
@@ -494,6 +520,10 @@ function AdminProductsContent() {
           </h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
             
+            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', borderLeft: '4px solid #111' }}>
+              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>1. Product Information</h3>
+            </div>
+
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Product Name</label>
               <input 
@@ -544,6 +574,10 @@ function AdminProductsContent() {
                   className={styles.formInput}
                 />
               </div>
+            </div>
+
+            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
+              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>2. Category & Collection</h3>
             </div>
 
             <div className={styles.formRow}>
@@ -634,6 +668,10 @@ function AdminProductsContent() {
               </div>
             </div>
 
+            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
+              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>3. Sizes</h3>
+            </div>
+
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Available Sizes</label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -675,6 +713,10 @@ function AdminProductsContent() {
               </label>
             </div>
 
+            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
+              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>4. Images</h3>
+            </div>
+
             {/* DRAG AND DROP ZONE */}
             <div>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Product Image (Main)</label>
@@ -686,11 +728,16 @@ function AdminProductsContent() {
                 style={{ 
                   border: isDragging ? '2px dashed #000' : '2px dashed #ccc', 
                   backgroundColor: isDragging ? '#e9e9e9' : '#fff',
-                  padding: '40px', 
+                  padding: '20px', 
                   textAlign: 'center',
-                  borderRadius: '4px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  minHeight: '120px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
               >
                 {uploading ? (
@@ -740,13 +787,17 @@ function AdminProductsContent() {
                       ) : (
                         <div>
                           <label style={{ 
-                            display: 'inline-block', 
+                            display: 'inline-flex', 
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             padding: '8px 15px', 
+                            minHeight: '44px',
                             backgroundColor: '#f5f5f5', 
                             border: '1px solid #ccc', 
-                            borderRadius: '4px', 
+                            borderRadius: '8px', 
                             cursor: 'pointer', 
-                            fontSize: '0.8rem' 
+                            fontSize: '0.8rem',
+                            fontWeight: 500
                           }}>
                             {uploading ? 'Uploading...' : 'Select Image'}
                             <input 
@@ -805,50 +856,104 @@ function AdminProductsContent() {
         </div>
 
         {/* LIST EXISTING PRODUCTS */}
-        <div className={styles.productListSection}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px', textTransform: 'capitalize' }}>{activeProductType} Products</h2>
-          {loading ? <p>Loading...</p> : products.filter(p => p.productType === activeProductType).length === 0 ? <p>No products found in this category.</p> : (
-            <div className={styles.productList}>
-              {products.filter(p => p.productType === activeProductType).map((prod) => (
-                <div key={prod._id} className={styles.productCard} style={{ position: 'relative' }}>
-                  {prod.isFeatured && (
-                    <span style={{ position: 'absolute', top: '-10px', right: '-10px', backgroundColor: 'gold', color: '#000', padding: '5px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                      FEATURED
-                    </span>
-                  )}
-                  {prod.images && prod.images[0] && (
-                    <img src={prod.images[0]} alt={prod.name} />
-                  )}
-                  <div className={styles.productInfo}>
-                    <h3>{prod.name}</h3>
-                    <p className={styles.productPrice}>
-                      ${prod.price.toFixed(2)}
-                      {prod.originalPrice && <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '10px', fontSize: '0.9rem', fontWeight: 'normal' }}>${prod.originalPrice.toFixed(2)}</span>}
-                    </p>
-                    <p className={styles.productCategory}>
-                      <strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{prod.category} / {prod.subcategory}</span>
-                      {prod.collectionName && <span> | <strong>Collection:</strong> {prod.collectionName}</span>}
-                      {prod.occasion && <span> | <strong>Occasion:</strong> {prod.occasion}</span>}
-                    </p>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                      <button 
-                        onClick={() => handleEdit(prod)}
-                        className={styles.editBtn}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(prod._id)}
-                        className={styles.deleteBtn}
-                      >
-                        Delete
-                      </button>
+        <div className={styles.productListSection} ref={listRef}>
+          <div className={styles.listHeader}>
+            <h2>{activeProductType} Products (Total: {products.filter(p => p.productType === activeProductType).length})</h2>
+            <input 
+              type="text" 
+              placeholder="Search by name, category..." 
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              className={styles.searchBar}
+            />
+          </div>
+          
+          {loading ? <p>Loading...</p> : (() => {
+            const typeProducts = products.filter(p => p.productType === activeProductType);
+            const filteredProducts = typeProducts.filter(p => {
+              if (!searchQuery) return true;
+              const q = searchQuery.toLowerCase();
+              return (
+                p.name?.toLowerCase().includes(q) ||
+                p.category?.toLowerCase().includes(q) ||
+                p.subcategory?.toLowerCase().includes(q) ||
+                p.collectionName?.toLowerCase().includes(q) ||
+                p.occasion?.toLowerCase().includes(q)
+              );
+            });
+            const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+            const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+            if (typeProducts.length === 0) return <p>No products found in this category.</p>;
+            if (filteredProducts.length === 0) return <p>No products match your search.</p>;
+
+            return (
+              <>
+                <div className={styles.productList}>
+                  {paginatedProducts.map((prod) => (
+                    <div key={prod._id} className={styles.productCard} style={{ position: 'relative' }}>
+                      {prod.isFeatured && (
+                        <span style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: 'gold', color: '#000', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>
+                          FEATURED
+                        </span>
+                      )}
+                      {prod.images && prod.images[0] ? (
+                        <img src={prod.images[0]} alt={prod.name} />
+                      ) : (
+                        <div style={{ width: '90px', height: '96px', backgroundColor: '#f0f0f0', borderRadius: '8px', flexShrink: 0 }} />
+                      )}
+                      <div className={styles.productInfo}>
+                        <h3>{prod.name}</h3>
+                        <p className={styles.productPrice}>
+                          ${prod.price.toFixed(2)}
+                          {prod.originalPrice && <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '10px', fontSize: '0.8rem', fontWeight: 'normal' }}>${prod.originalPrice.toFixed(2)}</span>}
+                        </p>
+                        <p className={styles.productCategory}>
+                          <strong>Cat:</strong> <span style={{ textTransform: 'capitalize' }}>{prod.category} / {prod.subcategory}</span>
+                          {prod.collectionName && <span> | <strong>Col:</strong> {prod.collectionName}</span>}
+                          {prod.occasion && <span> | <strong>Occ:</strong> {prod.occasion}</span>}
+                        </p>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                          <button 
+                            onClick={() => handleEdit(prod)}
+                            className={styles.editBtn}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(prod._id)}
+                            className={styles.deleteBtn}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+                
+                {totalPages > 1 && (
+                  <div className={styles.pagination}>
+                    <button 
+                      onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); listRef.current?.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={currentPage === 1}
+                      className={styles.pageBtn}
+                    >
+                      Previous
+                    </button>
+                    <span style={{ fontSize: '0.85rem', color: '#666' }}>Page {currentPage} of {totalPages}</span>
+                    <button 
+                      onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); listRef.current?.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={currentPage === totalPages}
+                      className={styles.pageBtn}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
         </div>
       </div>

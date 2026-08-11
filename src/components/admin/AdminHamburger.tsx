@@ -19,24 +19,20 @@ export default function AdminHamburger() {
         alignItems: "center",
         width: "40px",
         height: "40px",
-        padding: "13px 10px", // Maintains ~14px total icon height inside the 40px box
-        backgroundColor: "#ffffff",
-        border: "1px solid #f0f0f0",
-        borderRadius: "8px",
+        padding: "13px 10px", 
+        backgroundColor: "transparent",
+        border: "none",
         cursor: "pointer",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-        transition: "all 0.2s ease",
-        marginRight: "16px",
+        transition: "opacity 0.2s ease",
+        margin: 0,
         flexShrink: 0,
         WebkitTapHighlightColor: "transparent",
       }}
       onMouseOver={(e) => {
-        e.currentTarget.style.backgroundColor = "#fafafa";
-        e.currentTarget.style.borderColor = "#e5e7eb";
+        e.currentTarget.style.opacity = "0.7";
       }}
       onMouseOut={(e) => {
-        e.currentTarget.style.backgroundColor = "#ffffff";
-        e.currentTarget.style.borderColor = "#f0f0f0";
+        e.currentTarget.style.opacity = "1";
       }}
       onMouseDown={(e) => {
         e.currentTarget.style.transform = "scale(0.96)";
