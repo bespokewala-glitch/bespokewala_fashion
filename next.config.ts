@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/**',
         search: '',
       },
+      {
+        pathname: '/uploads/**',
+        search: '',
+      },
     ],
     // Serve images at these breakpoints only (fewer variants = faster processing)
     deviceSizes: [640, 1080, 1920],
