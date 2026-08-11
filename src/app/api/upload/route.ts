@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { bucket } from '@/lib/gcs';
+import { bucket, bucketName } from '@/lib/gcs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,18 +15,22 @@ export async function POST(request: NextRequest) {
 
     // Make filename unique
     const uniqueFilename = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-    
-    // Upload to Google Cloud Storage
-    const fileOptions = {
+    const gcsKey = `uploads/${uniqueFilename}`;
+
+    // Upload to Google Cloud Storage (public read)
+    const gcsFile = bucket.file(gcsKey);
+    await gcsFile.save(buffer, {
       contentType: file.type || 'application/octet-stream',
-    };
+      // Ensure the object is publicly readable so next/image can fetch it directly
+      metadata: { cacheControl: 'public, max-age=86400' },
+    });
 
-    const gcsFile = bucket.file(`uploads/${uniqueFilename}`);
-    
-    await gcsFile.save(buffer, fileOptions);
-
-    // Return the proxy URL instead of the direct GCS URL to avoid public access requirements
-    const videoUrl = `/api/media/uploads/${uniqueFilename}`;
+    // Return the direct public GCS CDN URL.
+    // This avoids the /api/media proxy, which causes Vercel's image optimizer to
+    // make a recursive call back into the deployment (→ INVALID_IMAGE_OPTIMIZE_REQUEST).
+    const cdnBase = process.env.CDN_BASE_URL?.replace(/\/$/, '')
+      || `https://storage.googleapis.com/${bucketName}`;
+    const videoUrl = `${cdnBase}/${gcsKey}`;
 
     return NextResponse.json({ success: true, videoUrl }, { status: 201 });
   } catch (error: any) {

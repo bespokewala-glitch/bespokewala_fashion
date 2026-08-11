@@ -77,9 +77,18 @@ export default async function ProductsSlugPage({ params }: Props) {
   // Combine main images and reference images
   const allImages: { url: string; alt: string }[] = [];
 
-  // Normalize legacy ?file= URLs that may be stored in the database
-  const sanitizeUrl = (url: string) =>
-    url.replace(/^\/api\/media\?file=/, '/api/media/');
+  // Normalize image URLs from MongoDB to valid public CDN URLs.
+  // Handles two legacy formats:
+  //   1. /api/media?file=uploads/foo.png  (old query-param proxy)
+  //   2. /api/media/uploads/foo.png       (new path-based proxy)
+  // Both are rewritten to the public GCS CDN URL so next/image can optimize them
+  // directly from GCS without making a recursive call back into the deployment.
+  const GCS_CDN = 'https://storage.googleapis.com/bespokewala-storage';
+  const sanitizeUrl = (url: string) => {
+    let normalized = url.replace(/^\/api\/media\?file=/, '/api/media/');
+    normalized = normalized.replace(/^\/api\/media\//, `${GCS_CDN}/`);
+    return normalized;
+  };
 
   if (product.images && Array.isArray(product.images)) {
     product.images.forEach((img: string, idx: number) => {

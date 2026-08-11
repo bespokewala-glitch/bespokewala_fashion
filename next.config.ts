@@ -4,39 +4,30 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses
   compress: true,
 
-  // Enable Next.js Image Optimization for local uploads
-  // This auto-converts images to WebP and serves them at the right size
+  // Enable Next.js Image Optimization for all GCS objects
+  // Images are always served directly from the public GCS bucket CDN.
+  // The /api/media proxy is only used for streaming (videos, private files)
+  // and is NOT used as an image source for next/image anymore.
   images: {
-    // Allow optimization for Google Cloud Storage
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'storage.googleapis.com',
-        pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-webapp-prod'}/**`,
+        // Match ALL objects in ALL subfolders inside the bucket
+        pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-storage'}/**`,
       },
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/**',
-      }
-    ],
-    // Allow local API routes with query parameters for next/image
-    localPatterns: [
-      {
-        pathname: '/api/media/**',
-        search: '',
       },
-      {
-        pathname: '/uploads/**',
-        search: '',
-      }
     ],
     // Serve images at these breakpoints only (fewer variants = faster processing)
     deviceSizes: [640, 1080, 1920],
     imageSizes: [320, 480, 640],
     // WebP has ~30% better compression than JPEG/PNG
     formats: ['image/webp'],
-    // Cache optimized images for 60 seconds (dev) — use longer in prod
+    // Cache optimized images for 60 seconds minimum
     minimumCacheTTL: 60,
   },
 

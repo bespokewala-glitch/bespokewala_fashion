@@ -24,6 +24,16 @@ export default function Header() {
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{ name: string, role: string } | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
+
+  // Normalize /api/media proxy URLs to direct GCS CDN URLs so next/image can
+  // optimize them without making a recursive call back into the deployment.
+  const GCS_CDN = 'https://storage.googleapis.com/bespokewala-storage';
+  const normalizeImageUrl = (url: string): string => {
+    if (!url) return url;
+    let u = url.replace(/^\/api\/media\?file=/, '/api/media/');
+    u = u.replace(/^\/api\/media\//, `${GCS_CDN}/`);
+    return u;
+  };
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
 
@@ -96,7 +106,12 @@ export default function Header() {
           .then(data => {
             if (data && data.length > 0 && data[0].images) {
               const fetched = data[0].images;
-              setMegaMenuImages([fetched[0] || '', fetched[1] || '', fetched[2] || '']);
+              // Normalize proxy URLs → GCS CDN URLs before storing in state
+              setMegaMenuImages([
+                normalizeImageUrl(fetched[0] || ''),
+                normalizeImageUrl(fetched[1] || ''),
+                normalizeImageUrl(fetched[2] || ''),
+              ]);
             } else {
               setMegaMenuImages(['', '', '']);
             }

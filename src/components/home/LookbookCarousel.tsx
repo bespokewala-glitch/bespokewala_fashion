@@ -34,7 +34,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
       </p>
 
       {/* Navigation Arrows */}
-      <button 
+      <button
         onClick={() => scroll('left')}
         style={{
           position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)',
@@ -46,7 +46,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
         &#10094;
       </button>
 
-      <button 
+      <button
         onClick={() => scroll('right')}
         style={{
           position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)',
@@ -59,11 +59,11 @@ export default function LookbookCarousel({ data }: { data?: any }) {
       </button>
 
       {/* Carousel Container */}
-      <div 
+      <div
         ref={scrollRef}
-        style={{ 
-          display: 'flex', 
-          overflowX: 'auto', 
+        style={{
+          display: 'flex',
+          overflowX: 'auto',
           scrollSnapType: 'x mandatory',
           gap: '2rem',
           paddingBottom: '2rem',
@@ -72,25 +72,25 @@ export default function LookbookCarousel({ data }: { data?: any }) {
         }}
       >
         {muses.map((muse: { name: string; img: string }, index: number) => (
-          <div key={index} style={{ 
-            flex: '0 0 auto', 
-            width: '300px', 
+          <div key={index} style={{
+            flex: '0 0 auto',
+            width: '300px',
             scrollSnapAlign: 'start',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
           }}>
-            <div style={{ 
-              width: '100%', 
-              height: '400px', 
-              borderRadius: '20px', 
+            <div style={{
+              width: '100%',
+              height: '400px',
+              borderRadius: '20px',
               overflow: 'hidden',
               marginBottom: '1.5rem',
               boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
               position: 'relative'
             }}>
-              <Image 
-                src={muse.img} 
+              <Image
+                src={muse.img}
                 alt={muse.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 300px"

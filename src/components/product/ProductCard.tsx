@@ -30,11 +30,26 @@ export default function ProductCard({ product, variant = 'default', priority = f
   const isWishlisted = isInWishlist(product.slug);
   const [isHovered, setIsHovered] = useState(false);
 
-  /** Normalize legacy ?file= query-param URLs to clean path-based URLs */
+  /**
+   * Normalize image URLs from MongoDB to valid public CDN URLs.
+   *
+   * Handles two legacy formats:
+   *   1. /api/media?file=uploads/foo.png  (old query-param proxy)
+   *   2. /api/media/uploads/foo.png       (new path-based proxy)
+   * Both are rewritten to: https://storage.googleapis.com/<bucket>/uploads/foo.png
+   *
+   * This fixes INVALID_IMAGE_OPTIMIZE_REQUEST in production:
+   * Vercel's image optimizer cannot recursively call back into the same
+   * deployment's /api/media proxy. Direct GCS CDN URLs work correctly.
+   */
+  const GCS_CDN = 'https://storage.googleapis.com/bespokewala-storage';
   const sanitizeUrl = (url: string | null | undefined): string | null => {
     if (!url) return null;
-    // Convert old format: /api/media?file=uploads/foo.png → /api/media/uploads/foo.png
-    return url.replace(/^\/api\/media\?file=/, '/api/media/');
+    // Format 1: /api/media?file=uploads/foo.png
+    let normalized = url.replace(/^\/api\/media\?file=/, '/api/media/');
+    // Format 2: /api/media/uploads/foo.png  →  https://storage.googleapis.com/.../uploads/foo.png
+    normalized = normalized.replace(/^\/api\/media\//, `${GCS_CDN}/`);
+    return normalized;
   };
 
   const primaryImage = sanitizeUrl(product.images[0]) || '';
