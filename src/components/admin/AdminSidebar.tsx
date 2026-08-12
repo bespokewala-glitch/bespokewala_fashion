@@ -30,7 +30,7 @@ const navItems = [
     subItems: [
       { name: "Couture", productType: "couture", icon: Sparkles },
       { name: "Jewellery", productType: "jewellery", icon: Gem },
-      { name: "Accessories", productType: "accessories", icon: Briefcase },
+      { name: "Footwear", productType: "footwear", icon: Briefcase },
     ],
   },
   { name: "Users", path: "/dashboard/users", icon: Users },

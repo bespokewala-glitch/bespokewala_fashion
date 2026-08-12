@@ -181,7 +181,7 @@ export default function AdminCampaignsPage() {
                 style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
               >
                 <option value="/products?productType=couture">Couture</option>
-                <option value="/products?productType=accessories">Accessories</option>
+                <option value="/products?productType=footwear">Footwear</option>
                 <option value="/products?productType=jewellery">Jewellery</option>
               </select>
             </div>
@@ -195,7 +195,7 @@ export default function AdminCampaignsPage() {
               >
                 <option value="couture">Couture</option>
                 <option value="jewellery">Jewellery</option>
-                <option value="accessories">Accessories</option>
+                <option value="footwear">Footwear</option>
                 <option value="general">General</option>
               </select>
             </div>

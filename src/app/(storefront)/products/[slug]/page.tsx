@@ -14,7 +14,7 @@ export const revalidate = 60;
 
 // Known product types — used to distinguish /products/jewellery (listing)
 // from /products/the-pink-diamond-ring (product detail)
-const PRODUCT_TYPES = ['jewellery', 'couture', 'accessories', 'beauty', 'diffusion'];
+const PRODUCT_TYPES = ['jewellery', 'couture', 'accessories', 'footwear', 'beauty', 'diffusion'];
 
 interface Props {
   params: Promise<{ slug: string }>;

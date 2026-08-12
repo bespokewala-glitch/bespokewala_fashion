@@ -24,7 +24,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const fallbackCampaigns: Campaign[] = [
     { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/' },
     { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?productType=jewellery' },
-    { title: 'Accessories', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=accessories' }
+    { title: 'Footwear', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=footwear' }
   ];
 
   const activeCampaigns = campaigns && campaigns.length > 0 ? campaigns : fallbackCampaigns;

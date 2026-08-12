@@ -5,7 +5,7 @@ const MenuImageSchema = new mongoose.Schema(
     productType: {
       type: String,
       required: true,
-      enum: ['couture', 'jewellery', 'accessories'],
+      enum: ['couture', 'jewellery', 'footwear'],
     },
     category: {
       type: String,

@@ -218,9 +218,9 @@ export default function Header() {
       { id: 'diamond-collection', label: 'Diamond Collection', href: '/products/jewellery/diamond-collection' },
       { id: 'menswear-collection', label: 'Menswear Collection', href: '/products/jewellery/menswear-collection' },
     ],
-    accessories: [
-      { id: 'womens', label: 'Women', href: '/products/accessories/womens' },
-      { id: 'mens', label: 'Men', href: '/products/accessories/mens' },
+    footwear: [
+      { id: 'womens', label: 'Women', href: '/products/footwear/womens' },
+      { id: 'mens', label: 'Men', href: '/products/footwear/mens' },
     ],
   };
 
@@ -266,7 +266,7 @@ export default function Header() {
         <div className="desktop-hide mobile-top-nav">
           <Link href="/" className={`mobile-nav-link ${pathname === '/' || pathname.includes('/couture') ? 'active' : ''}`}>COUTURE</Link>
           <Link href="/products/jewellery" className={`mobile-nav-link ${pathname.includes('/jewellery') ? 'active' : ''}`}>JEWELLERY</Link>
-          <Link href="/products/accessories" className={`mobile-nav-link ${pathname.includes('/accessories') ? 'active' : ''}`}>ACCESSORIES</Link>
+          <Link href="/products/footwear" className={`mobile-nav-link ${pathname.includes('/footwear') ? 'active' : ''}`}>FOOTWEAR</Link>
         </div>
 
         <div style={navContainer} className="mobile-main-header">
@@ -284,7 +284,7 @@ export default function Header() {
               <li onMouseEnter={() => handleMouseEnterMenu('couture')}>
                 <Link prefetch={false} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
-              <li onMouseEnter={() => handleMouseEnterMenu('accessories')}><Link prefetch={false} href="/products/accessories" style={{ padding: '1rem 0' }}>Accessories</Link></li>
+              <li onMouseEnter={() => handleMouseEnterMenu('footwear')}><Link prefetch={false} href="/products/footwear" style={{ padding: '1rem 0' }}>Footwear</Link></li>
               <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}><Link prefetch={false} href="/products/jewellery" style={{ padding: '1rem 0' }}>Jewellery</Link></li>
             </ul>
           </nav>
@@ -559,54 +559,25 @@ export default function Header() {
               )}
             </div>
 
-            {/* Accessories Accordion */}
+            {/* Footwear Accordion */}
             <div>
               <div
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
-                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'accessories' ? null : 'accessories'); setExpandedMobileSubMenu(null); }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'footwear' ? null : 'footwear'); setExpandedMobileSubMenu(null); }}
               >
-                <span>Accessories</span>
-                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'accessories' ? '-' : '+'}</span>
+                <span>Footwear</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'footwear' ? '-' : '+'}</span>
               </div>
-              {expandedMobileMenu === 'accessories' && (
+              {expandedMobileMenu === 'footwear' && (
                 <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
-                  {menuData.accessories.map(item => {
-                    const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const occs = taxonomies.filter((t: any) => t.type === 'occasion' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const cats = taxonomies.filter((t: any) => t.type === 'category' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
-                    const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
-                    const subKey = `accessories-${item.id}`;
-                    const isSubOpen = expandedMobileSubMenu === subKey;
-                    return (
-                      <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
-                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
-                          {hasTax && (
-                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
-                              {isSubOpen ? '−' : '›'}
-                            </button>
-                          )}
-                        </div>
-                        {isSubOpen && (
-                          <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
-                              .filter(g => g.items.length > 0)
-                              .map(group => (
-                                <div key={group.label}>
-                                  <div style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#aaa', marginBottom: '0.4rem', fontWeight: 600 }}>{group.label}</div>
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                    {group.items.map((tx: any) => (
-                                      <Link key={tx._id} href={`/products/accessories/${item.id}/${tx.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#555', fontSize: '0.75rem', letterSpacing: '0.04em' }}>{tx.name}</Link>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        )}
+                  {menuData.footwear.map(item => (
+                    <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                        <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
                       </div>
-                    );
-                  })}
-                  <Link href="/products/accessories" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Accessories</Link>
+                    </div>
+                  ))}
+                  <Link href="/products/footwear" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Footwear</Link>
                 </div>
               )}
             </div>

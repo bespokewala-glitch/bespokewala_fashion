@@ -190,7 +190,7 @@ export default function HomepageCMS() {
             >
               <option value="home">Home Page</option>
               <option value="jewellery">Jewellery Page</option>
-              <option value="accessories">Accessories Page</option>
+              <option value="footwear">Footwear Page</option>
             </select>
           </div>
         </div>

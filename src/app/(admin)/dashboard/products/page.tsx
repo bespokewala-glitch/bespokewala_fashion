@@ -32,7 +32,7 @@ function AdminProductsContent() {
   const [savingMenuImages, setSavingMenuImages] = useState(false);
 
   useEffect(() => {
-    if (productTypeParam && ['couture', 'jewellery', 'accessories'].includes(productTypeParam)) {
+    if (productTypeParam && ['couture', 'jewellery', 'footwear'].includes(productTypeParam)) {
       setActiveProductType(productTypeParam);
       setEditingId(null);
       setCurrentPage(1);
@@ -676,7 +676,10 @@ function AdminProductsContent() {
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Available Sizes</label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'].map(size => (
+                {(activeProductType === 'footwear'
+                  ? ['EU 36', 'EU 37', 'EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45']
+                  : ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom']
+                ).map(size => (
                   <label key={size} style={{ 
                     display: 'flex', 
                     alignItems: 'center', 

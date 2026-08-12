@@ -17,8 +17,8 @@ export default function CuratedGrid({ data }: { data?: any }) {
     },
     {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
-      title: 'Accessories',
-      link: '/products?productType=accessories'
+      title: 'Footwear',
+      link: '/products?productType=footwear'
     }
   ];
 
