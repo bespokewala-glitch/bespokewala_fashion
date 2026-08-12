@@ -2,6 +2,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
@@ -313,7 +314,7 @@ export default async function AccountDashboardPage() {
                       {order.items.slice(0, 3).map((item: any, idx: number) => (
                         <div key={idx} style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                           <div style={{ width: '70px', height: '95px', backgroundColor: '#fafafa', flexShrink: 0 }}>
-                            {item.image && <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                            {item.image && <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                           </div>
                           <div>
                             <h4 style={{ fontSize: '0.85rem', fontWeight: 400, margin: '0 0 0.25rem 0', color: '#000', lineHeight: 1.4, maxWidth: '120px' }}>{item.name}</h4>

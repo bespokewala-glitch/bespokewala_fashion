@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import VirtualTryOnButton from '@/components/product/VirtualTryOnButton';
 import SizeGuide from '@/components/product/SizeGuide';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 interface ProductClientActionsProps {
   product: {
@@ -29,7 +30,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       productSlug: product.slug,
       name: product.name,
       price: product.price,
-      image: product.images?.[0] || '',
+      image: normalizeImageUrl(product.images?.[0] || ''),
       quantity,
       size: selectedSize || undefined,
     });
@@ -129,7 +130,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         Made to order: 8-10 weeks
       </div>
 
-      <VirtualTryOnButton garmentImageUrl={product.images?.[0] || ''} />
+      <VirtualTryOnButton garmentImageUrl={normalizeImageUrl(product.images?.[0] || '')} />
       <button style={primaryBtnStyle} onClick={handleAddToCart}>
         {isAdding ? 'Adding...' : 'Add to Cart'}
       </button>

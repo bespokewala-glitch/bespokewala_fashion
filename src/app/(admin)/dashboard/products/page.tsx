@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Package } from 'lucide-react';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import styles from './products.module.css';
 
 // We will fetch categories from the Taxonomy API dynamically now.
@@ -462,7 +463,7 @@ function AdminProductsContent() {
                   <div key={index} className={styles.megaMenuCard}>
                     {menuImages[index] ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                        <img src={menuImages[index]} alt={`Menu Image ${index + 1}`} style={{ height: '150px', width: '100%', objectFit: 'cover', marginBottom: '10px', borderRadius: '8px' }} />
+                        <img src={normalizeImageUrl(menuImages[index])} alt={`Menu Image ${index + 1}`} style={{ height: '150px', width: '100%', objectFit: 'cover', marginBottom: '10px', borderRadius: '8px' }} />
                         <button onClick={() => { const newArr = [...menuImages]; newArr[index] = ''; setMenuImages(newArr); }} className={styles.deleteBtn} style={{ width: '100%' }}>Remove</button>
                       </div>
                     ) : (
@@ -744,7 +745,7 @@ function AdminProductsContent() {
                   <p>Uploading... please wait.</p>
                 ) : formData.imageUrl ? (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={(e) => e.stopPropagation()}>
-                    <img src={formData.imageUrl} alt="preview" style={{ maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }} />
+                    <img src={normalizeImageUrl(formData.imageUrl)} alt="preview" style={{ maxHeight: '100px', objectFit: 'contain', marginBottom: '10px' }} />
                     <p style={{ color: 'green', fontWeight: 'bold', margin: '0 0 10px 0' }}>Image Uploaded</p>
                     <button type="button" onClick={() => handleRemoveImage('main')} style={{ padding: '5px 10px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Remove</button>
                   </div>
@@ -781,7 +782,7 @@ function AdminProductsContent() {
                       
                       {currentImage ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                          <img src={currentImage} alt={angle.label} style={{ height: '80px', objectFit: 'contain', marginBottom: '10px' }} />
+                          <img src={normalizeImageUrl(currentImage)} alt={angle.label} style={{ height: '80px', objectFit: 'contain', marginBottom: '10px' }} />
                           <button type="button" onClick={() => handleRemoveImage(angle.key)} style={{ padding: '4px 8px', backgroundColor: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}>Remove</button>
                         </div>
                       ) : (
@@ -898,7 +899,7 @@ function AdminProductsContent() {
                         </span>
                       )}
                       {prod.images && prod.images[0] ? (
-                        <img src={prod.images[0]} alt={prod.name} />
+                        <img src={normalizeImageUrl(prod.images[0])} alt={prod.name} />
                       ) : (
                         <div style={{ width: '90px', height: '96px', backgroundColor: '#f0f0f0', borderRadius: '8px', flexShrink: 0 }} />
                       )}

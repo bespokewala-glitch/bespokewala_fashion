@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useCart, CartItem } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import { normalizeImageUrl } from "@/lib/imageUrl";
 
 declare global {
   interface Window {
@@ -275,7 +276,7 @@ export default function CheckoutClient() {
             {cart.map((item: CartItem, idx: number) => (
               <div key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
                 <div style={{ width: "60px", height: "80px", flexShrink: 0, backgroundColor: "#eee" }}>
-                  <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontSize: "0.875rem", fontWeight: 400, margin: 0 }}>{item.name}</h4>

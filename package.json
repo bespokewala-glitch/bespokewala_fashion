@@ -16,7 +16,6 @@
     "framer-motion": "^12.42.2",
     "jose": "^6.2.3",
     "lucide-react": "^1.25.0",
-    "mongodb": "^7.5.0",
     "mongoose": "^9.7.4",
     "next": "16.2.10",
     "razorpay": "^2.9.8",
@@ -29,8 +28,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "mongodb": "^7.5.0",
     "typescript": "^5"
   }
 }

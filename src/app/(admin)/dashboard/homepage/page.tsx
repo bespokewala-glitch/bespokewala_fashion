@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import styles from './homepage.module.css';
 
 const MediaPreview = ({ src, style, alt }: { src?: string, style?: any, alt?: string }) => {
   if (!src) return null;
+  const normalSrc = normalizeImageUrl(src);
   if (src.match(/\.(mp4|webm|ogg)$/i)) {
-    return <video src={src} style={style} autoPlay loop muted playsInline />;
+    return <video src={normalSrc} style={style} autoPlay loop muted playsInline />;
   }
-  return <img src={src} style={style} alt={alt || 'Preview'} />;
+  return <img src={normalSrc} style={style} alt={alt || 'Preview'} />;
 };
 
 export default function HomepageCMS() {

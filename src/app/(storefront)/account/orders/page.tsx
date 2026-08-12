@@ -3,6 +3,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Link from 'next/link';
@@ -186,7 +187,7 @@ export default async function OrderHistoryPage() {
                     {order.items.map((item: any, idx: number) => (
                       <div key={idx} style={{ display: 'flex', gap: '1.5rem', width: '100%' }}>
                         <div style={{ width: '80px', height: '110px', backgroundColor: '#fafafa', flexShrink: 0 }}>
-                          {item.image && <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                          {item.image && <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                         </div>
                         <div style={{ paddingTop: '0.5rem' }}>
                           <h4 style={{ fontSize: '0.85rem', fontWeight: 500, margin: '0 0 0.5rem 0', color: '#000', lineHeight: 1.4 }}>{item.name}</h4>

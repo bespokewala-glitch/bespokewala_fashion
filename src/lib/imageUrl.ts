@@ -55,6 +55,11 @@ export function normalizeImageUrl(url: string | null | undefined): string {
     }
   }
 
+  // Bare /uploads/ path (missing /api/media prefix) — old jewellery products
+  if (trimmed.startsWith('/uploads/')) {
+    return `/api/media${trimmed}`;
+  }
+
   // Public external URL (Unsplash, CDN, etc.) — keep as-is
   if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
     return trimmed;

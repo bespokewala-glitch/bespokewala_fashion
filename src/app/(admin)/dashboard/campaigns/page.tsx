@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import styles from './campaigns.module.css';
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -267,9 +268,9 @@ export default function AdminCampaignsPage() {
                 return (
                 <div key={camp._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px' }} className="admin-card-stack">
                   {isImage ? (
-                    <img src={camp.videoUrl} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} alt="campaign" />
+                    <img src={normalizeImageUrl(camp.videoUrl)} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} alt="campaign" />
                   ) : (
-                    <video src={camp.videoUrl} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} muted playsInline />
+                    <video src={normalizeImageUrl(camp.videoUrl)} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} muted playsInline />
                   )}
                   <div>
                     <h3 style={{ fontSize: '1.2rem', margin: '0 0 5px 0' }}>{camp.title}</h3>

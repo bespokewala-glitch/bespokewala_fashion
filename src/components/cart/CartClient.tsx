@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 export default function CartClient() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -56,7 +57,7 @@ export default function CartClient() {
             {cart.map((item) => (
               <div key={item.id} style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #f5f5f5', paddingBottom: '2rem' }} className="mobile-flex-col mobile-gap-md">
                 <div style={{ flex: '3', display: 'flex', gap: '2rem', alignItems: 'center' }} className="mobile-w-full">
-                  <img src={item.image} alt={item.name} style={{ width: '120px', height: '160px', objectFit: 'cover' }} />
+                  <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '120px', height: '160px', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 0.5rem', color: '#111' }}>{item.name}</h3>
                     <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>₹{item.price.toLocaleString('en-IN')}</div>

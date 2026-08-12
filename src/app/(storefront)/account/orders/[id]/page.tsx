@@ -2,6 +2,7 @@ import React from 'react';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Link from 'next/link';
@@ -150,7 +151,7 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
               {order.items.map((item: any, idx: number) => (
                 <div key={idx} style={{ display: 'flex', gap: '2rem' }}>
                   <div style={{ width: '100px', height: '140px', backgroundColor: '#fafafa', flexShrink: 0 }}>
-                    {item.image && <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                    {item.image && <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <h4 style={{ fontSize: '1rem', fontWeight: 400, margin: '0 0 0.5rem 0', color: '#000', lineHeight: 1.4 }}>{item.name}</h4>
