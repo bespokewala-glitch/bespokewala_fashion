@@ -91,7 +91,8 @@ export default function ProductDetailsAccordion({ details }: ProductDetailsAccor
       <AccordionItem title="Shipping, Packaging & Returns">
         <div style={{ whiteSpace: 'pre-line' }}>
           Standard shipping typically takes 3-5 business days. 
-          Bespoke and Couture items may take 8-12 weeks for production and delivery.
+          Footwear shipping typically takes 15-20 days.
+          Bespoke and Couture items typically take 40-50 days for production and delivery.
           Returns are accepted within 14 days of delivery for standard items. 
           Custom-made items are non-refundable.
         </div>
