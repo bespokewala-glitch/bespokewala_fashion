@@ -221,11 +221,22 @@ export default function HomepageCMS() {
           {[0, 1, 2, 3].map((i) => (
             <div key={i} style={{ border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
               <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Grid Item {i + 1}</h3>
-              <div 
-                onClick={() => handleFileUploadClick('CuratedGrid', 'items', i)}
-                style={{ height: '100px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
-              >
-                {gridItems[i]?.image ? <MediaPreview src={gridItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Image'}
+              <div style={{ position: 'relative', height: '100px', marginBottom: '10px' }}>
+                <div 
+                  onClick={() => handleFileUploadClick('CuratedGrid', 'items', i)}
+                  style={{ height: '100px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
+                >
+                  {gridItems[i]?.image ? <MediaPreview src={gridItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Image'}
+                </div>
+                {gridItems[i]?.image && (
+                  <button 
+                    onClick={() => handleTextChange('CuratedGrid', 'items', '', i, 'image')}
+                    className={styles.removeButton}
+                    title="Remove Image"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
               <input placeholder="Title" value={gridItems[i]?.title || ''} onChange={e => handleTextChange('CuratedGrid', 'items', e.target.value, i, 'title')} style={{ width: '100%', marginBottom: '5px', padding: '5px' }} />
               <input placeholder="Link URL" value={gridItems[i]?.link || ''} onChange={e => handleTextChange('CuratedGrid', 'items', e.target.value, i, 'link')} style={{ width: '100%', padding: '5px' }} />
@@ -238,11 +249,22 @@ export default function HomepageCMS() {
       {/* 2. Feature Banner */}
       <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>2. High Jewellery (Feature Banner)</h2>
-        <div 
-          onClick={() => handleFileUploadClick('FeatureBanner', 'image')}
-          style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '20px', overflow: 'hidden' }}
-        >
-          {sections.FeatureBanner?.image ? <MediaPreview src={sections.FeatureBanner.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Background Image'}
+        <div style={{ position: 'relative', height: '150px', marginBottom: '20px' }}>
+          <div 
+            onClick={() => handleFileUploadClick('FeatureBanner', 'image')}
+            style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
+          >
+            {sections.FeatureBanner?.image ? <MediaPreview src={sections.FeatureBanner.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Background Image'}
+          </div>
+          {sections.FeatureBanner?.image && (
+            <button 
+              onClick={() => handleTextChange('FeatureBanner', 'image', '')}
+              className={styles.removeButton}
+              title="Remove Image"
+            >
+              ✕
+            </button>
+          )}
         </div>
         <div style={{ display: 'grid', gap: '10px' }}>
           <input placeholder="Title" value={sections.FeatureBanner?.title || ''} onChange={e => handleTextChange('FeatureBanner', 'title', e.target.value)} style={{ padding: '10px', width: '100%' }} />
@@ -258,8 +280,19 @@ export default function HomepageCMS() {
         
         <div style={{ marginBottom: '20px' }}>
           <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Left Image (Model / Lifestyle)</h3>
-          <div onClick={() => handleFileUploadClick('SplitShowcase', 'modelImage')} style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}>
-            {sections.SplitShowcase?.modelImage ? <MediaPreview src={sections.SplitShowcase.modelImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Model Image'}
+          <div style={{ position: 'relative', height: '200px', maxWidth: '300px' }}>
+            <div onClick={() => handleFileUploadClick('SplitShowcase', 'modelImage')} style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}>
+              {sections.SplitShowcase?.modelImage ? <MediaPreview src={sections.SplitShowcase.modelImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Model Image'}
+            </div>
+            {sections.SplitShowcase?.modelImage && (
+              <button 
+                onClick={() => handleTextChange('SplitShowcase', 'modelImage', '')}
+                className={styles.removeButton}
+                title="Remove Image"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </div>
 
@@ -271,11 +304,22 @@ export default function HomepageCMS() {
             const prod = sections.SplitShowcase?.products?.[i] || {};
             return (
               <div key={i} style={{ minWidth: '180px', border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
-                <div 
-                  onClick={() => handleFileUploadClick('SplitShowcase', 'products', i)}
-                  style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
-                >
-                  {prod.image ? <MediaPreview src={prod.image} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : `Product ${i + 1} Image`}
+                <div style={{ position: 'relative', height: '150px', marginBottom: '10px' }}>
+                  <div 
+                    onClick={() => handleFileUploadClick('SplitShowcase', 'products', i)}
+                    style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
+                  >
+                    {prod.image ? <MediaPreview src={prod.image} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : `Product ${i + 1} Image`}
+                  </div>
+                  {prod.image && (
+                    <button 
+                      onClick={() => handleTextChange('SplitShowcase', 'products', '', i, 'image')}
+                      className={styles.removeButton}
+                      title="Remove Image"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
                 <input placeholder="Product Name" value={prod.name || ''} onChange={e => handleTextChange('SplitShowcase', 'products', e.target.value, i, 'name')} style={{ width: '100%', marginBottom: '5px', padding: '5px' }} />
                 <input placeholder="Price (e.g. $12,000)" value={prod.price || ''} onChange={e => handleTextChange('SplitShowcase', 'products', e.target.value, i, 'price')} style={{ width: '100%', padding: '5px' }} />
@@ -295,11 +339,22 @@ export default function HomepageCMS() {
         <div style={{ display: 'flex', overflowX: 'auto', gap: '15px', paddingBottom: '10px' }}>
           {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} style={{ minWidth: '150px', border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
-              <div 
-                onClick={() => handleFileUploadClick('LookbookCarousel', 'items', i)}
-                style={{ height: '120px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginBottom: '10px', overflow: 'hidden' }}
-              >
-                {carouselItems[i]?.image ? <MediaPreview src={carouselItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Image'}
+              <div style={{ position: 'relative', height: '120px', marginBottom: '10px' }}>
+                <div 
+                  onClick={() => handleFileUploadClick('LookbookCarousel', 'items', i)}
+                  style={{ height: '120px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
+                >
+                  {carouselItems[i]?.image ? <MediaPreview src={carouselItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Image'}
+                </div>
+                {carouselItems[i]?.image && (
+                  <button 
+                    onClick={() => handleTextChange('LookbookCarousel', 'items', '', i, 'image')}
+                    className={styles.removeButton}
+                    title="Remove Image"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
               <input placeholder="Muse Name" value={carouselItems[i]?.name || ''} onChange={e => handleTextChange('LookbookCarousel', 'items', e.target.value, i, 'name')} style={{ width: '100%', padding: '5px' }} />
             </div>
@@ -314,11 +369,25 @@ export default function HomepageCMS() {
         
         <div style={{ marginBottom: '20px' }}>
           <h3 style={{ fontSize: '1rem', marginBottom: '10px' }}>Main Background Media (Img/Vid)</h3>
-          <div 
-            onClick={() => handleFileUploadClick('CoutureProcess', 'mainMedia')}
-            style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}
-          >
-            {(sections.CoutureProcess?.mainMedia || sections.CoutureProcess?.image) ? <MediaPreview src={sections.CoutureProcess.mainMedia || sections.CoutureProcess.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Main Media'}
+          <div style={{ position: 'relative', height: '200px', maxWidth: '300px' }}>
+            <div 
+              onClick={() => handleFileUploadClick('CoutureProcess', 'mainMedia')}
+              style={{ height: '200px', maxWidth: '300px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}
+            >
+              {(sections.CoutureProcess?.mainMedia || sections.CoutureProcess?.image) ? <MediaPreview src={sections.CoutureProcess.mainMedia || sections.CoutureProcess.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Main Media'}
+            </div>
+            {(sections.CoutureProcess?.mainMedia || sections.CoutureProcess?.image) && (
+              <button 
+                onClick={() => {
+                  handleTextChange('CoutureProcess', 'mainMedia', '');
+                  handleTextChange('CoutureProcess', 'image', ''); // just in case
+                }}
+                className={styles.removeButton}
+                title="Remove Image"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <input type="hidden" value={sections.CoutureProcess?.image || ''} onChange={() => {}} />
           <input 
