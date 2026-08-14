@@ -1167,6 +1167,50 @@
   footer[class*="mobile"] {
     padding: 20px 12px 16px 12px !important;
   }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     MY ACCOUNT & ORDER HISTORY — MOBILE RESPONSIVENESS (320px–1023px)
+     ═══════════════════════════════════════════════════════════════════════════ */
+  .account-container-padding {
+    padding-top: 6.5rem !important;
+    padding-bottom: 4rem !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100% !important;
+  }
+
+  .account-layout-flex {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  .account-profile-banner {
+    padding: 1.5rem 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  .account-profile-title {
+    font-size: clamp(1.4rem, 5vw, 2rem) !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .account-benefits-banner {
+    padding: 1.25rem 1rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .account-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+    margin-bottom: 3rem !important;
+  }
+
+  .account-stat-card {
+    padding: 1.25rem 1rem !important;
+  }
 }
 
 @media (min-width: 768px) {

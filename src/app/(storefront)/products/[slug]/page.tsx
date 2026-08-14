@@ -5,6 +5,7 @@ import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordion from '@/components/product/ProductDetailsAccordion';
+import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
 import { notFound, redirect } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
@@ -149,12 +150,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               {product.description}
             </div>
 
-            <div style={{ fontSize: '1.1rem', fontWeight: 500, color: '#000', marginTop: '0.5rem' }}>
-              MRP: ₹{product.price.toLocaleString('en-IN')}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '-1.25rem' }}>
-              Price included of all taxes
-            </div>
+            <ProductPriceDisplay price={product.price} />
 
             {product.colors && product.colors.length > 0 && (
               <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '0.5rem' }}>

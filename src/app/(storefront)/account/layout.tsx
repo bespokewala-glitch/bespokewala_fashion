@@ -23,31 +23,35 @@ export default async function AccountLayout({
   }
 
   return (
-    <>
-            <div style={{
-        backgroundColor: '#FAF9F6',
-        minHeight: '100vh'
-      }}>
-        <div style={{
-          paddingTop: '13rem',
+    <div style={{
+      backgroundColor: '#FAF9F6',
+      minHeight: '100vh'
+    }}>
+      <div 
+        style={{
+          paddingTop: '11rem',
           paddingBottom: '8rem',
           paddingLeft: '4rem',
           paddingRight: '4rem',
           maxWidth: '1400px',
           margin: '0 auto',
-        }} className="mobile-p-4 mobile-pt-24">
-          <div style={{
+        }} 
+        className="account-container-padding"
+      >
+        <div 
+          style={{
             display: 'flex',
-            gap: '5rem',
+            gap: '3.5rem',
             flexDirection: 'row',
-          }} className="mobile-flex-col">
+          }} 
+          className="account-layout-flex"
+        >
           <AccountSidebar />
-          <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
             {children}
-          </div>
           </div>
         </div>
       </div>
-          </>
+    </div>
   );
 }

@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -78,7 +80,7 @@ export default function WishlistPage() {
                       {item.name}
                     </h3>
                     <div style={{ fontSize: '0.875rem', color: '#666' }}>
-                      INR {item.price.toLocaleString('en-IN')}
+                      {formatPrice(item.price)}
                     </div>
                   </div>
                 </Link>

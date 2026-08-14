@@ -118,42 +118,42 @@ export default async function AccountDashboardPage() {
       {/* Premium Profile Banner */}
       <div style={{ 
         backgroundColor: '#fff', 
-        padding: '3rem', 
+        padding: '2.5rem', 
         border: '1px solid #eaeaea',
-        marginBottom: '3rem',
+        marginBottom: '2.5rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '2rem'
-      }} className="luxury-card mobile-p-4">
+        gap: '1.5rem'
+      }} className="luxury-card account-profile-banner">
         <div>
           <h1 style={{ 
-            fontSize: '2.5rem', 
+            fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
             fontWeight: 300, 
-            letterSpacing: '0.15em', 
+            letterSpacing: '0.12em', 
             textTransform: 'uppercase', 
             color: '#000',
-            marginBottom: '0.5rem'
-          }}>
-            Bonjour, {user.name}
+            marginBottom: '0.35rem'
+          }} className="account-profile-title">
+            Welcome, {user.name}
           </h1>
-          <p style={{ color: '#888', letterSpacing: '0.1em', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-            Welcome to your Bespoke Dashboard
+          <p style={{ color: '#888', letterSpacing: '0.08em', fontSize: '0.85rem', textTransform: 'uppercase', margin: 0 }}>
+            Welcome to your Account Dashboard
           </p>
         </div>
         <div style={{
-          padding: '1rem 2rem',
+          padding: '0.75rem 1.5rem',
           backgroundColor: '#FAF9F6',
           border: '1px solid #D4AF37',
           color: '#D4AF37',
           textTransform: 'uppercase',
-          letterSpacing: '0.15em',
-          fontSize: '0.8rem',
+          letterSpacing: '0.12em',
+          fontSize: '0.75rem',
           fontWeight: 500,
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem'
+          gap: '0.75rem'
         }}>
           <span style={{ width: '8px', height: '8px', backgroundColor: '#D4AF37', borderRadius: '50%' }}></span>
           Maison Member
@@ -164,26 +164,26 @@ export default async function AccountDashboardPage() {
       <div style={{ 
         backgroundColor: '#000', 
         color: '#fff',
-        padding: '2rem 3rem', 
-        marginBottom: '4rem',
+        padding: '1.75rem 2.5rem', 
+        marginBottom: '3rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '2rem'
-      }} className="mobile-p-4">
-        <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
+        gap: '1.5rem'
+      }} className="account-benefits-banner">
+        <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap' }}>
           <div>
-            <h4 style={{ color: '#D4AF37', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Complimentary</h4>
-            <p style={{ fontSize: '0.95rem', fontWeight: 300, letterSpacing: '0.05em' }}>Express Global Shipping</p>
+            <h4 style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.35rem' }}>Complimentary</h4>
+            <p style={{ fontSize: '0.85rem', fontWeight: 300, letterSpacing: '0.05em', margin: 0 }}>Express Global Shipping</p>
           </div>
           <div>
-            <h4 style={{ color: '#D4AF37', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Priority Access</h4>
-            <p style={{ fontSize: '0.95rem', fontWeight: 300, letterSpacing: '0.05em' }}>24/7 Private Concierge</p>
+            <h4 style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.35rem' }}>Priority Access</h4>
+            <p style={{ fontSize: '0.85rem', fontWeight: 300, letterSpacing: '0.05em', margin: 0 }}>24/7 Private Concierge</p>
           </div>
           <div>
-            <h4 style={{ color: '#D4AF37', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Early Access</h4>
-            <p style={{ fontSize: '0.95rem', fontWeight: 300, letterSpacing: '0.05em' }}>Next Season Couture</p>
+            <h4 style={{ color: '#D4AF37', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.35rem' }}>Early Access</h4>
+            <p style={{ fontSize: '0.85rem', fontWeight: 300, letterSpacing: '0.05em', margin: 0 }}>Next Season Couture</p>
           </div>
         </div>
       </div>
@@ -191,28 +191,28 @@ export default async function AccountDashboardPage() {
       {/* Stats Grid */}
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-        gap: '2rem',
-        marginBottom: '5rem'
-      }}>
-        <div style={statCardStyle} className="luxury-card">
-          <Package size={24} color="#D4AF37" strokeWidth={1.5} />
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+        gap: '1.5rem',
+        marginBottom: '4rem'
+      }} className="account-stats-grid">
+        <div style={statCardStyle} className="luxury-card account-stat-card">
+          <Package size={22} color="#D4AF37" strokeWidth={1.5} />
           <div style={statValueStyle}>{totalOrders}</div>
           <div style={statLabelStyle}>Total Orders</div>
         </div>
-        <div style={statCardStyle} className="luxury-card">
-          <Heart size={24} color="#D4AF37" strokeWidth={1.5} />
+        <div style={statCardStyle} className="luxury-card account-stat-card">
+          <Heart size={22} color="#D4AF37" strokeWidth={1.5} />
           <div style={statValueStyle}>3</div>
           <div style={statLabelStyle}>Wishlist Items</div>
         </div>
-        <div style={statCardStyle} className="luxury-card">
-          <MapPin size={24} color="#D4AF37" strokeWidth={1.5} />
+        <div style={statCardStyle} className="luxury-card account-stat-card">
+          <MapPin size={22} color="#D4AF37" strokeWidth={1.5} />
           <div style={statValueStyle}>2</div>
           <div style={statLabelStyle}>Saved Addresses</div>
         </div>
-        <div style={statCardStyle} className="luxury-card">
-          <CalendarDays size={24} color="#D4AF37" strokeWidth={1.5} />
-          <div style={{ ...statValueStyle, fontSize: '1.25rem', marginTop: 'auto', paddingBottom: '4px' }}>
+        <div style={statCardStyle} className="luxury-card account-stat-card">
+          <CalendarDays size={22} color="#D4AF37" strokeWidth={1.5} />
+          <div style={{ ...statValueStyle, fontSize: '1.1rem', marginTop: 'auto', paddingBottom: '4px' }}>
             {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
           </div>
           <div style={statLabelStyle}>Member Since</div>

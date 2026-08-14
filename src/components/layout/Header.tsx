@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 import { Menu, X, ShoppingBag, User } from 'lucide-react';
+import CurrencySelector from '@/components/layout/CurrencySelector';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -167,7 +168,7 @@ export default function Header() {
     color: (isScrolled || !isHomePage || hoveredNav) ? '#1c1c1c' : '#ffffff',
   };
 
-  const isLightHeader = isScrolled || !isHomePage || hoveredNav;
+  const isLightHeader = Boolean(isScrolled || !isHomePage || hoveredNav);
 
   const navContainer: React.CSSProperties = {
     display: 'flex',
@@ -313,7 +314,8 @@ export default function Header() {
           </div>
 
           {/* Mobile Right Icons */}
-          <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>
+            <CurrencySelector isDarkHeader={isLightHeader} />
             <Link href="/account" className="touch-target"><User size={20} /></Link>
             <Link href="/cart" className="touch-target" style={{ position: 'relative' }}>
               <ShoppingBag size={20} />
@@ -326,8 +328,11 @@ export default function Header() {
           </div>
 
           {/* Desktop Right Nav */}
-          <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            <ul style={menuStyle}>
+          <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <ul style={{ ...menuStyle, alignItems: 'center' }}>
+              <li style={{ display: 'flex', alignItems: 'center' }}>
+                <CurrencySelector isDarkHeader={isLightHeader} />
+              </li>
               {user ? (
                 <>
                   <li><Link href="/account">Account</Link></li>
@@ -645,6 +650,10 @@ export default function Header() {
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login / Register</Link>
             )}
             <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)}>Wishlist ({wishlistCount})</Link>
+            <div style={{ paddingTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Currency:</span>
+              <CurrencySelector isDarkHeader={true} />
+            </div>
           </div>
         </div>
       </header>

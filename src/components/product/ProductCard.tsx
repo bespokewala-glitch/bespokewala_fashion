@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export interface ProductCardProps {
@@ -28,6 +29,7 @@ export interface ProductCardProps {
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const isWishlisted = isInWishlist(product.slug);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -152,7 +154,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
           {product.name}
         </h3>
         <span style={{ fontSize: '0.875rem', color: '#666' }}>
-          INR {product.price.toLocaleString('en-IN')}
+          {formatPrice(product.price)}
         </span>
       </div>
     </Link>
