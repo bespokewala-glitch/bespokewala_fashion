@@ -7,6 +7,7 @@ const MIME_TYPES: Record<string, string> = {
   jpeg: 'image/jpeg',
   png:  'image/png',
   webp: 'image/webp',
+  avif: 'image/avif',
   gif:  'image/gif',
   svg:  'image/svg+xml',
   mp4:  'video/mp4',

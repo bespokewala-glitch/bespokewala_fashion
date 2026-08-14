@@ -18,7 +18,7 @@ require('dotenv').config({ path: '.env' });
 const { MongoClient } = require('mongodb');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB  = process.env.MONGODB_DB || 'bespoken_fashion';
+const MONGODB_DB  = process.env.MONGODB_DB || 'bespokewala_fashion';
 const GCS_BASE    = 'https://storage.googleapis.com/bespokewala-storage/';
 
 if (!MONGODB_URI) {

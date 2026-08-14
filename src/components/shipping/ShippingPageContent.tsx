@@ -150,7 +150,7 @@ export default function ShippingPageContent() {
         </h1>
         <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "0 auto 1.5rem" }} />
         <p style={{ fontSize: "clamp(0.85rem,2vw,0.975rem)", fontWeight: 300, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8, color: "rgba(255,255,255,0.72)" }}>
-          Every Bespoken order is handled with the same care that goes into crafting each piece — 
+          Every Bespokewala order is handled with the same care that goes into crafting each piece — 
           packed, insured, and delivered safely to your door.
         </p>
       </section>
@@ -312,7 +312,7 @@ export default function ShippingPageContent() {
             {[
               { step: "01", icon: "🛍️", title: "Order Placed",    desc: "Your order is confirmed and payment verified" },
               { step: "02", icon: "🔍", title: "Quality Check",   desc: "Every item inspected by our QC team" },
-              { step: "03", icon: "📦", title: "Packed & Sealed", desc: "Gift-wrapped in signature Bespoken packaging" },
+              { step: "03", icon: "📦", title: "Packed & Sealed", desc: "Gift-wrapped in signature Bespokewala packaging" },
               { step: "04", icon: "🚚", title: "Dispatched",      desc: "Shipped with tracking via Blue Dart / Delhivery / FedEx" },
               { step: "05", icon: "🏠", title: "Delivered",       desc: "Safely delivered to your address" },
             ].map(({ step, icon, title, desc }) => (
@@ -505,11 +505,11 @@ export default function ShippingPageContent() {
             },
             {
               q: "Is my order insured during transit?",
-              a: "Yes. All Bespoken orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a full refund.",
+              a: "Yes. All Bespokewala orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a full refund.",
             },
             {
               q: "How are the orders packaged?",
-              a: "Every order is packaged in our signature Bespoken gift box, wrapped in tissue paper with a wax seal, and placed in a protective outer shipping box. Gift messaging is available free of charge — just add a note at checkout.",
+              a: "Every order is packaged in our signature Bespokewala gift box, wrapped in tissue paper with a wax seal, and placed in a protective outer shipping box. Gift messaging is available free of charge — just add a note at checkout.",
             },
             {
               q: "Do I have to pay customs duties on international orders?",

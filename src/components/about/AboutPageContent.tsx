@@ -98,7 +98,7 @@ export default function AboutPageContent() {
     <section style={{ position: "relative", height: "85vh", overflow: "hidden" }}>
       <img
         src="/about-hero.png"
-        alt="Bespoken atelier interior"
+        alt="Bespokewala atelier interior"
         style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
       />
       {/* overlay */}
@@ -113,7 +113,7 @@ export default function AboutPageContent() {
           Est. 2002 · Mumbai, India
         </p>
         <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 300, letterSpacing: "0.12em", textTransform: "uppercase", lineHeight: 1.1, marginBottom: "1.5rem" }}>
-          The Art of<br />Bespoken Fashion
+          The Art of<br />Bespokewala Fashion
         </h1>
         <p style={{ fontSize: "1rem", fontWeight: 300, maxWidth: "560px", lineHeight: 1.8, color: "rgba(255,255,255,0.85)", letterSpacing: "0.04em" }}>
           Where timeless Indian heritage meets contemporary luxury — crafted for those who refuse to be ordinary.
@@ -170,7 +170,7 @@ export default function AboutPageContent() {
           </h2>
           <Divider />
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#555", marginBottom: "1.25rem" }}>
-            We envision Bespoken as the world's most celebrated Indian luxury fashion house — a name synonymous with impeccable craft, enduring elegance, and cultural pride on every global stage.
+            We envision Bespokewala as the world's most celebrated Indian luxury fashion house — a name synonymous with impeccable craft, enduring elegance, and cultural pride on every global stage.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#555" }}>
             From bridal couture to everyday luxury, our vision is a wardrobe where every piece tells a story worth passing down through generations.
@@ -205,10 +205,10 @@ export default function AboutPageContent() {
             It began in 2002 with a 400 sq ft studio in Bandra, Mumbai — a dream, a sewing machine, and an unshakeable belief that Indian couture deserved a global pedestal. The founder, armed with a degree in textile arts and a passion for handcraft, stitched the very first lehenga by hand.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
-            Word spread quietly at first — a bride here, a celebrity there. By 2008, Bespoken had dressed its first Bollywood star for a major awards ceremony, and the fashion world took notice. What began as a solo endeavour grew into a collective of over 200 master craftsmen, weavers, and embroiderers.
+            Word spread quietly at first — a bride here, a celebrity there. By 2008, Bespokewala had dressed its first Bollywood star for a major awards ceremony, and the fashion world took notice. What began as a solo endeavour grew into a collective of over 200 master craftsmen, weavers, and embroiderers.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc" }}>
-            Today, with flagship studios in Mumbai, Delhi, and Dubai, and clients across five continents, Bespoken remains anchored by the same belief that launched it — that every person deserves to be dressed in a masterpiece.
+            Today, with flagship studios in Mumbai, Delhi, and Dubai, and clients across five continents, Bespokewala remains anchored by the same belief that launched it — that every person deserves to be dressed in a masterpiece.
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export default function AboutPageContent() {
             { year: "2002", event: "Founded in Bandra, Mumbai with a single studio and a team of three." },
             { year: "2006", event: "Opened our first flagship atelier and launched the signature bridal collection." },
             { year: "2010", event: "International debut at London Fashion Week; global recognition begins." },
-            { year: "2016", event: "Expanded to Delhi & Dubai; launched Bespoken Jewellery." },
+            { year: "2016", event: "Expanded to Delhi & Dubai; launched Bespokewala Jewellery." },
             { year: "2022", event: "Celebrating 20 years — 500+ craftsmen, 5 studios, clients in 40+ countries." },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>
@@ -246,7 +246,7 @@ export default function AboutPageContent() {
         <div style={{ position: "relative" }}>
           <img
             src="/founder-portrait.png"
-            alt="Founder of Bespoken Fashion"
+            alt="Founder of Bespokewala Fashion"
             style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
           />
           {/* decorative frame */}
@@ -273,7 +273,7 @@ export default function AboutPageContent() {
 
           <blockquote style={{ borderLeft: "3px solid #d2b48c", paddingLeft: "1.5rem", margin: "1.5rem 0 2rem" }}>
             <p style={{ fontSize: "1.1rem", fontStyle: "italic", lineHeight: 1.9, color: "#555", fontWeight: 300 }}>
-              "I started Bespoken not to sell clothes, but to give people an emotion they could wear — pride, beauty, confidence, and a deep connection to the traditions that make India extraordinary."
+              "I started Bespokewala not to sell clothes, but to give people an emotion they could wear — pride, beauty, confidence, and a deep connection to the traditions that make India extraordinary."
             </p>
           </blockquote>
 
@@ -305,9 +305,9 @@ export default function AboutPageContent() {
 
         {/* heading */}
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-          <SectionLabel>Why Bespoken</SectionLabel>
+          <SectionLabel>Why Bespokewala</SectionLabel>
           <h2 style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 300, letterSpacing: "0.07em", textTransform: "uppercase" }}>
-            The Bespoken Difference
+            The Bespokewala Difference
           </h2>
           <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "1.5rem auto 0" }} />
         </div>
@@ -433,7 +433,7 @@ export default function AboutPageContent() {
   const ctaStrip = (
     <section style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "5rem 2rem", textAlign: "center" }}>
       <p style={{ fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "1.25rem" }}>
-        Experience Bespoken
+        Experience Bespokewala
       </p>
       <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 300, letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: "1.5rem" }}>
         Ready to Wear a Masterpiece?

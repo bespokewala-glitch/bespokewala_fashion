@@ -89,7 +89,7 @@ export default function PrivacyPolicyContent() {
 
         {/* Intro */}
         <p style={{ fontSize: "0.95rem", color: "#555", lineHeight: 1.9, marginBottom: "2rem" }}>
-          Bespoken Fashion (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) is committed to protecting your privacy.
+          Bespokewala Fashion (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) is committed to protecting your privacy.
           This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website{" "}
           <strong>www.bespokewala.com</strong> and make purchases from us. Please read it carefully.
           By using our website, you consent to the practices described in this policy.

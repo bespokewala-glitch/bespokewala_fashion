@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const sub = subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   return {
-    title: `${sub} – ${cat} | Bespoken`,
-    description: `Shop ${sub.toLowerCase()} from the ${cat} ${pt.toLowerCase()} collection at Bespoken. Luxury jewellery crafted to perfection.`,
+    title: `${sub} – ${cat} | Bespokewala`,
+    description: `Shop ${sub.toLowerCase()} from the ${cat} ${pt.toLowerCase()} collection at Bespokewala. Luxury jewellery crafted to perfection.`,
   };
 }
 

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import TermsConditionsContent from "@/components/legal/TermsConditionsContent";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | Bespoken Fashion",
+  title: "Terms & Conditions | Bespokewala Fashion",
   description:
-    "Read Bespoken Fashion's Terms & Conditions governing the use of our website and the purchase of our products.",
+    "Read Bespokewala Fashion's Terms & Conditions governing the use of our website and the purchase of our products.",
 };
 
 export default function TermsConditionsPage() {

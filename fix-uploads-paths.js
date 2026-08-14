@@ -8,7 +8,7 @@ const { MongoClient } = require('mongodb');
 async function run() {
   const client = new MongoClient(process.env.MONGODB_URI);
   await client.connect();
-  const db = client.db(process.env.MONGODB_DB || 'bespoken_fashion');
+  const db = client.db(process.env.MONGODB_DB || 'bespokewala_fashion');
   const products = db.collection('Products');
   const all = await products.find({}).toArray();
   let fixed = 0;

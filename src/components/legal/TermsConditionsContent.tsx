@@ -98,14 +98,14 @@ export default function TermsConditionsContent() {
 
         {/* Intro */}
         <p style={{ fontSize: "0.95rem", color: "#555", lineHeight: 1.9, marginBottom: "1rem" }}>
-          Welcome to <strong>Bespoken Fashion</strong> (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;).
+          Welcome to <strong>Bespokewala Fashion</strong> (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;).
           These Terms &amp; Conditions govern your use of our website and the purchase of products from us.
           By accessing our website or placing an order, you agree to be bound by these terms.
           If you do not agree, please do not use our website.
         </p>
 
         <div className="legal-highlight">
-          ℹ️ These Terms constitute a legally binding agreement between you and Bespoken Fashion, a business
+          ℹ️ These Terms constitute a legally binding agreement between you and Bespokewala Fashion, a business
           registered in Mumbai, Maharashtra, India. All disputes are subject to the jurisdiction of courts in Mumbai.
         </div>
 
@@ -270,7 +270,7 @@ export default function TermsConditionsContent() {
             title: "Intellectual Property",
             content: (
               <>
-                <p>All content on our website — including designs, photographs, text, graphics, logos, the Bespokewala brand name, and the overall website design — is the exclusive property of Bespoken Fashion and is protected under applicable Indian and international intellectual property laws.</p>
+                <p>All content on our website — including designs, photographs, text, graphics, logos, the Bespokewala brand name, and the overall website design — is the exclusive property of Bespokewala Fashion and is protected under applicable Indian and international intellectual property laws.</p>
                 <ul>
                   <li>You may not reproduce, distribute, modify, display, or use our content for commercial purposes without our express written consent.</li>
                   <li>You may not copy or imitate our designs, garments, or embroidery patterns.</li>

@@ -19,7 +19,7 @@ async function dbConnect() {
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      dbName: process.env.MONGODB_DB || 'bespoken_fashion',
+      dbName: process.env.MONGODB_DB || 'bespokewala_fashion',
     };
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;

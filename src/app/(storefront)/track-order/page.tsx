@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import TrackOrderContent from "@/components/track-order/TrackOrderContent";
 
 export const metadata: Metadata = {
-  title: "Track Your Order | Bespoken Fashion",
+  title: "Track Your Order | Bespokewala Fashion",
   description:
-    "Track your Bespoken Fashion order in real-time. Enter your order number and email address to get the latest status and delivery updates.",
+    "Track your Bespokewala Fashion order in real-time. Enter your order number and email address to get the latest status and delivery updates.",
 };
 
 export default function TrackOrderPage() {

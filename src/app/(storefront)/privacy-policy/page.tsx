@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PrivacyPolicyContent from "@/components/legal/PrivacyPolicyContent";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Bespoken Fashion",
+  title: "Privacy Policy | Bespokewala Fashion",
   description:
-    "Read Bespoken Fashion's Privacy Policy to understand how we collect, use, and protect your personal information when you shop with us.",
+    "Read Bespokewala Fashion's Privacy Policy to understand how we collect, use, and protect your personal information when you shop with us.",
 };
 
 export default function PrivacyPolicyPage() {

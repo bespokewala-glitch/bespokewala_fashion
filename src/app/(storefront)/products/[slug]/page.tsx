@@ -27,17 +27,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (PRODUCT_TYPES.includes(slug)) {
     const title = slug.charAt(0).toUpperCase() + slug.slice(1);
     return {
-      title: `${title} | Bespoken`,
-      description: `Shop our luxury ${title.toLowerCase()} collection at Bespoken.`,
+      title: `${title} | Bespokewala`,
+      description: `Shop our luxury ${title.toLowerCase()} collection at Bespokewala.`,
     };
   }
 
   // Otherwise treat as product slug
   await dbConnect();
   const product = await Product.findOne({ slug }).select('name description').lean() as any;
-  if (!product) return { title: 'Product Not Found | Bespoken' };
+  if (!product) return { title: 'Product Not Found | Bespokewala' };
   return {
-    title: `${product.name} | Bespoken`,
+    title: `${product.name} | Bespokewala`,
     description: product.description?.slice(0, 160),
   };
 }

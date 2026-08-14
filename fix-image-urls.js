@@ -5,7 +5,7 @@
 
 // async function fixImageUrls() {
 //   const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-//   const db = process.env.MONGODB_DB || 'bespoken_fashion';
+//   const db = process.env.MONGODB_DB || 'bespokewala_fashion';
 
 //   await mongoose.connect(`${uri}/${db}`);
 //   console.log('Connected to MongoDB');

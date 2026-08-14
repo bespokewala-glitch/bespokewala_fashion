@@ -33,5 +33,10 @@
     "eslint-config-next": "16.2.10",
     "mongodb": "^7.5.0",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "protobufjs@7.6.5": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }

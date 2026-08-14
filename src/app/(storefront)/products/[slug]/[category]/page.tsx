@@ -12,8 +12,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const pt = productType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   const cat = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   return {
-    title: `${cat} – ${pt} | Bespoken`,
-    description: `Explore the ${cat} collection from our ${pt.toLowerCase()} range at Bespoken.`,
+    title: `${cat} – ${pt} | Bespokewala`,
+    description: `Explore the ${cat} collection from our ${pt.toLowerCase()} range at Bespokewala.`,
   };
 }
 

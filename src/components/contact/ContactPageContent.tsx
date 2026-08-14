@@ -321,7 +321,7 @@ export default function ContactPageContent() {
             {/* Map */}
             <div style={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", border: "1px solid #e8e0d6" }}>
               <iframe
-                title="Bespoken Studio Location"
+                title="Bespokewala Studio Location"
                 src="https://maps.google.com/maps?q=Lotus+Arc+One+Andheri+West+Mumbai&output=embed"
                 width="100%"
                 height="100%"

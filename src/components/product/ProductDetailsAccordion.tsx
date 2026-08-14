@@ -106,7 +106,7 @@ export default function ProductDetailsAccordion({ details }: ProductDetailsAccor
 
       <AccordionItem title="Legal">
         <div style={{ whiteSpace: 'pre-line' }}>
-          All designs, images, and content are intellectual property of Bespoke.
+          All designs, images, and content are intellectual property of Bespokewala.
           Unauthorized use or reproduction is strictly prohibited.
         </div>
       </AccordionItem>
