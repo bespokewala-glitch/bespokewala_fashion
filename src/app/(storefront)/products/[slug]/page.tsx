@@ -10,6 +10,7 @@ import { notFound, redirect } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
 import { normalizeImageUrl } from '@/lib/imageUrl';
+import ProductReviews from '@/components/product/reviews/ProductReviews';
 
 export const revalidate = 60;
 
@@ -104,13 +105,12 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
   }
 
   const containerStyle: React.CSSProperties = {
-    padding: '8rem 4rem 4rem 4rem',
+    padding: '8rem 4rem 0 4rem',
     maxWidth: '1600px',
     margin: '0 auto',
     display: 'grid',
     gridTemplateColumns: '1.2fr 1fr',
     gap: '6rem',
-    minHeight: '80vh',
     fontFamily: '"Jost", "Inter", sans-serif',
   };
 
@@ -173,6 +173,9 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           </div>
         </div>
       </main>
+      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+        <ProductReviews productId={product._id.toString()} />
+      </div>
     </>
   );
 }

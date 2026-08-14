@@ -263,13 +263,6 @@ export default function Header() {
         }
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
-        {/* Mobile Top Category Nav (Level 1) */}
-        <div className="desktop-hide mobile-top-nav">
-          <Link href="/" className={`mobile-nav-link ${pathname === '/' || pathname.includes('/couture') ? 'active' : ''}`}>COUTURE</Link>
-          <Link href="/products/jewellery" className={`mobile-nav-link ${pathname.includes('/jewellery') ? 'active' : ''}`}>JEWELLERY</Link>
-          <Link href="/products/footwear" className={`mobile-nav-link ${pathname.includes('/footwear') ? 'active' : ''}`}>FOOTWEAR</Link>
-        </div>
-
         <div style={navContainer} className="mobile-main-header">
 
           {/* Mobile Hamburger — left */}
@@ -310,13 +303,12 @@ export default function Header() {
           </div>
 
           {/* Mobile Right Icons — right */}
-          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '2px' }}>
-            <CurrencySelector isDarkHeader={isLightHeader} />
-            <Link href="/account" className="touch-target" style={{ display: 'flex', alignItems: 'center', padding: '0 4px' }}><User size={20} /></Link>
-            <Link href="/cart" className="touch-target" style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0 4px' }}>
+          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+            <Link href="/account" className="touch-target" style={{ display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}><User size={20} /></Link>
+            <Link href="/cart" className="touch-target" style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
               <ShoppingBag size={20} />
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: '0px', right: '2px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {cartCount}
                 </span>
               )}

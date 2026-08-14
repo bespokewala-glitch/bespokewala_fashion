@@ -142,11 +142,21 @@ export default function CurrencySelector({ isDarkHeader = false }: { isDarkHeade
             minWidth: '0',
           }}
         >
-          <Globe
-            size={13}
-            strokeWidth={1.75}
-            style={{ flexShrink: 0, opacity: 0.75 }}
-          />
+          <div
+            style={{ 
+              width: '12px', 
+              height: '12px', 
+              borderRadius: '50%', 
+              border: `1px solid ${fgColor}`, 
+              opacity: 0.6,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: fgColor }} />
+          </div>
           {/* Symbol + Code — always visible on both mobile and desktop */}
           <span style={{ color: fgColor, letterSpacing: '0.04em' }}>
             {selectedCurrency.symbol} {selectedCurrency.code}

@@ -52,7 +52,7 @@ export default function Footer() {
 
   return (
     <footer style={footerStyle} className="mobile-section-py mobile-px-container">
-      <div style={containerStyle} className="mobile-footer-grid">
+      <div style={containerStyle} className="mobile-stack">
         <div style={columnStyle}>
           <h4 style={headingStyle}>Company</h4>
           <ul style={listStyle}>
