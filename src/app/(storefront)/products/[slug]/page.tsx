@@ -97,8 +97,8 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
       if (url) allImages.push({ url, alt: `${product.name} - ${label}` });
     };
     addRef(product.referenceImages.front, 'Front View');
-    addRef(product.referenceImages.back,  'Back View');
-    addRef(product.referenceImages.left,  'Left View');
+    addRef(product.referenceImages.back, 'Back View');
+    addRef(product.referenceImages.left, 'Left View');
     addRef(product.referenceImages.right, 'Right View');
   }
 
@@ -124,7 +124,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
 
   return (
     <>
-            <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
+      <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
         <div>
           <ProductGallery images={allImages} />
         </div>
@@ -177,6 +177,6 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           </div>
         </div>
       </main>
-          </>
+    </>
   );
 }

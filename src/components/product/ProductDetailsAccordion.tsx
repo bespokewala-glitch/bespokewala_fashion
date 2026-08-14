@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 
 interface ProductDetailsAccordionProps {
+  productType?: string;
+  category?: string;
   details?: {
     styleCode?: string;
     commodityName?: string;
@@ -22,7 +24,7 @@ const AccordionItem = ({ title, children, defaultOpen = false }: { title: string
 
   return (
     <div style={{ borderBottom: '1px solid #e0e0e0', padding: '1.25rem 0' }}>
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
           width: '100%',
@@ -69,31 +71,45 @@ const AccordionItem = ({ title, children, defaultOpen = false }: { title: string
   );
 };
 
-export default function ProductDetailsAccordion({ details }: ProductDetailsAccordionProps) {
-  if (!details) return null;
+export default function ProductDetailsAccordion({ productType, category, details }: ProductDetailsAccordionProps) {
+  const d = details || {};
+  const hasProductDetails = d.styleCode || d.commodityName || d.composition || d.componentsCount || d.includes;
 
-  const hasProductDetails = details.styleCode || details.commodityName || details.composition || details.componentsCount || details.includes;
+  const isFootwear = productType?.toLowerCase() === 'footwear' || category?.toLowerCase() === 'footwear';
+  const isCouture = productType?.toLowerCase() === 'couture' || category?.toLowerCase() === 'couture';
 
   return (
     <div style={{ width: '100%', marginTop: '2rem' }}>
       {hasProductDetails && (
         <AccordionItem title="Product Details" defaultOpen={true}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {details.styleCode && <div><strong>Style Code:</strong> {details.styleCode}</div>}
-            {details.commodityName && <div><strong>Name of Commodity:</strong> {details.commodityName}</div>}
-            {details.composition && <div><strong>Composition:</strong> {details.composition}</div>}
-            {details.componentsCount && <div><strong>No of Components:</strong> {details.componentsCount}</div>}
-            {details.includes && <div><strong>Includes:</strong> {details.includes}</div>}
+            {d.styleCode && <div><strong>Style Code:</strong> {d.styleCode}</div>}
+            {d.commodityName && <div><strong>Name of Commodity:</strong> {d.commodityName}</div>}
+            {d.composition && <div><strong>Composition:</strong> {d.composition}</div>}
+            {d.componentsCount && <div><strong>No of Components:</strong> {d.componentsCount}</div>}
+            {d.includes && <div><strong>Includes:</strong> {d.includes}</div>}
           </div>
         </AccordionItem>
       )}
 
       <AccordionItem title="Shipping, Packaging & Returns">
-        <div style={{ whiteSpace: 'pre-line' }}>
-          Standard shipping typically takes 3-5 business days. 
-          Bespoke and Couture items may take 8-12 weeks for production and delivery.
-          Returns are accepted within 14 days of delivery for standard items. 
-          Custom-made items are non-refundable.
+        <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8' }}>
+          {isFootwear ? (
+            <>
+              • <strong>Footwear Delivery:</strong> 15 to 20 days for custom crafting & delivery.{"\n"}
+            </>
+          ) : isCouture ? (
+            <>
+              • <strong>Couture Delivery:</strong> 40 to 45 days for handcrafted creation & delivery.{"\n"}
+            </>
+          ) : (
+            <>
+              • <strong>Footwear Delivery:</strong> 15 to 20 days.{"\n"}
+              • <strong>Couture & Bespoke:</strong> 40 to 45 days for handcrafted creation & delivery.{"\n"}
+              • <strong>Standard Shipping:</strong> 5 to 7 business days.{"\n"}
+            </>
+          )}
+          • <strong>Returns:</strong> Accepted within 7 days of delivery for standard ready-to-wear items. Custom-made, footwear & couture garments are non-refundable.
         </div>
       </AccordionItem>
 
