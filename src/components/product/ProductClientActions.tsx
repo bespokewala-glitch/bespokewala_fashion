@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
-import VirtualTryOnButton from '@/components/product/VirtualTryOnButton';
 import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 
@@ -126,11 +125,6 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
       </div>
 
-      <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '1rem' }}>
-        Made to order: 8-10 weeks
-      </div>
-
-      <VirtualTryOnButton garmentImageUrl={normalizeImageUrl(product.images?.[0] || '')} />
       <button style={primaryBtnStyle} onClick={handleAddToCart}>
         {isAdding ? 'Adding...' : 'Add to Cart'}
       </button>
