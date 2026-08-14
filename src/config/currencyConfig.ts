@@ -68,33 +68,41 @@ export const SUPPORTED_CURRENCIES: Record<string, CurrencyDetail> = {
 };
 
 /**
- * Mapping of Country ISO codes to Currency codes
+ * Mapping of Country ISO codes to Currency codes.
+ * Used by both the backend /api/geolocation route and the CurrencyContext client.
+ * Add any country here to automatically detect its preferred currency.
  */
 export const COUNTRY_TO_CURRENCY: Record<string, string> = {
-  IN: 'INR',
-  GB: 'GBP',
-  UK: 'GBP',
-  US: 'USD',
-  // Eurozone countries
-  DE: 'EUR',
-  FR: 'EUR',
-  IT: 'EUR',
-  ES: 'EUR',
-  NL: 'EUR',
-  BE: 'EUR',
-  AT: 'EUR',
-  IE: 'EUR',
-  PT: 'EUR',
-  FI: 'EUR',
-  GR: 'EUR',
-  // Others
+  // South Asia
+  IN: 'INR', // India
+  // UK
+  GB: 'GBP', UK: 'GBP',
+  // United States & territories
+  US: 'USD', PR: 'USD', GU: 'USD', VI: 'USD',
+  // Eurozone
+  DE: 'EUR', FR: 'EUR', IT: 'EUR', ES: 'EUR',
+  NL: 'EUR', BE: 'EUR', AT: 'EUR', IE: 'EUR',
+  PT: 'EUR', FI: 'EUR', GR: 'EUR', LU: 'EUR',
+  SK: 'EUR', SI: 'EUR', EE: 'EUR', LV: 'EUR',
+  LT: 'EUR', MT: 'EUR', CY: 'EUR',
+  // Canada
   CA: 'CAD',
-  AU: 'AUD',
-  AE: 'AED',
+  // Australia & Oceania
+  AU: 'AUD', NZ: 'AUD',
+  // Middle East
+  AE: 'AED', // UAE
+  SA: 'AED', QA: 'AED', BH: 'AED', KW: 'AED', OM: 'AED',
+  // Singapore
   SG: 'SGD',
+  // Other Asia (map to USD for now — no SGD/HKD/JPY/etc. supported)
+  HK: 'USD', MO: 'USD',
+  JP: 'USD', CN: 'USD', KR: 'USD',
+  MY: 'USD', TH: 'USD', PH: 'USD', ID: 'USD', VN: 'USD',
+  BD: 'USD', PK: 'USD', LK: 'USD', NP: 'USD',
+  // Rest of World → USD fallback
 };
 
 /**
- * Fallback currency code when country is unsupported or IP detection fails
+ * Fallback currency code when country is unsupported or IP detection fails.
  */
 export const DEFAULT_FALLBACK_CURRENCY = 'USD';

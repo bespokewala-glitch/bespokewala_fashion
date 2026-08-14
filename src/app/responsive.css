@@ -561,20 +561,22 @@
     flex-direction: column !important;
   }
 
+  /* ── Mobile Top Category Row ──────────────────────────────────────────────── */
   .mobile-top-nav {
     display: flex !important;
     justify-content: center !important;
-    gap: 1.5rem !important;
+    gap: 1.25rem !important;
     align-items: center !important;
-    height: 38px !important;
+    height: 36px !important;
     border-bottom: 1px solid #f0f0f0 !important;
     background: #fff;
     width: 100%;
+    flex-shrink: 0;
   }
 
   .mobile-nav-link {
-    font-size: 11px !important;
-    letter-spacing: 0.1em !important;
+    font-size: 10px !important;
+    letter-spacing: 0.12em !important;
     color: #666 !important;
     text-decoration: none !important;
     text-transform: uppercase !important;
@@ -586,21 +588,99 @@
     padding-bottom: 2px !important;
   }
 
+  /* ── Mobile Main Header Row ─────────────────────────────────────────────── */
+  /* Layout: [hamburger flex:0 44px] [logo flex:1 centered] [icons flex:0 auto] */
   .mobile-main-header {
-    height: 75px !important;
-    padding: 0 16px !important;
+    height: 64px !important;
+    padding: 0 10px !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Logo img — reinforce inline width so it's always sized correctly */
+  .header-logo-img {
+    width: 60px !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Right side icons group */
+  .mobile-icon-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Touch targets — 44px minimum */
+  .mobile-icon-right .touch-target {
+    min-height: 44px !important;
+    min-width: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .mobile-logo-filter {
     filter: url(#remove-white-make-black) !important;
   }
 
-  .mobile-icon-right {
-    gap: 12px !important;
+  /* ── 320px–360px: small screen adjustments ────────────────────────────── */
+  @media (max-width: 360px) {
+    .mobile-main-header {
+      padding: 0 6px !important;
+      height: 58px !important;
+    }
+    .header-logo-img {
+      width: 50px !important;
+    }
+    .mobile-top-nav {
+      gap: 0.85rem !important;
+    }
+    .mobile-nav-link {
+      font-size: 9px !important;
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   LOGO — Responsive sizing across all breakpoints
+   Logo natural size: 522 × 481 px (near-square, ratio 1.085:1)
+   Always width + height:auto to preserve correct aspect ratio.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Desktop: 1440px+ */
+@media (min-width: 1440px) {
+  .header-logo-img { width: 100px; height: auto; object-fit: contain; }
+}
+/* Desktop: 1024px–1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .header-logo-img { width: 88px; height: auto; object-fit: contain; }
+}
+/* Tablet: 768px–1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .header-logo-img { width: 72px; height: auto; object-fit: contain; }
+}
+/* Desktop logo wrapper — centered in flex row */
+@media (min-width: 1024px) {
+  .header-logo-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .header-logo-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* When the desktop header is transparent (top of homepage), invert logo to white */
+  .header-logo-inverted {
+    filter: brightness(0) invert(1);
   }
 }
 

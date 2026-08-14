@@ -259,7 +259,7 @@ export default function Header() {
         .sub-link-hover { transition: color 0.2s ease; }
         .sub-link-hover:hover { color: #000 !important; }
         @media (max-width: 1023px) {
-          .mobile-logo-img { filter: none !important; }
+          .header-logo-img { filter: none !important; }
         }
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
@@ -272,10 +272,10 @@ export default function Header() {
 
         <div style={navContainer} className="mobile-main-header">
 
-          {/* Mobile Hamburger Menu */}
-          <div className="desktop-hide" style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+          {/* Mobile Hamburger — left */}
+          <div className="desktop-hide" style={{ flex: '0 0 44px', display: 'flex', alignItems: 'center' }}>
             <button onClick={() => setIsMobileMenuOpen(true)} className="touch-target" style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}>
-              <Menu size={24} />
+              <Menu size={22} />
             </button>
           </div>
 
@@ -290,42 +290,39 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Logo */}
-          <div style={{ flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Link href="/" style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
+          {/* Logo — center, always explicitly sized */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <img
                 src="/bespoken-transparent.png"
                 alt="Bespokewala"
-                className="mobile-logo-img"
+                className={`header-logo-img${isLightHeader ? '' : ' header-logo-inverted'}`}
                 style={{
-                  height: '64px',
-                  width: 'auto',
+                  width: '60px',
+                  height: 'auto',
                   objectFit: 'contain',
                   display: 'block',
+                  flexShrink: 0,
                   background: 'transparent',
-                  filter: isLightHeader ? 'none' : 'brightness(0) invert(1)'
                 }}
               />
             </Link>
           </div>
 
-          {/* Mobile Right Icons */}
-          <div className="desktop-hide mobile-icon-right" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          {/* Mobile Right Icons — right */}
+          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '2px' }}>
             <CurrencySelector isDarkHeader={isLightHeader} />
-            <Link href="/account" className="touch-target"><User size={20} /></Link>
-            <Link href="/cart" className="touch-target" style={{ position: 'relative' }}>
+            <Link href="/account" className="touch-target" style={{ display: 'flex', alignItems: 'center', padding: '0 4px' }}><User size={20} /></Link>
+            <Link href="/cart" className="touch-target" style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0 4px' }}>
               <ShoppingBag size={20} />
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: '2px', right: '2px', background: '#000', color: '#fff', fontSize: '10px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ position: 'absolute', top: '0px', right: '2px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {cartCount}
                 </span>
               )}
             </Link>
           </div>
+
 
           {/* Desktop Right Nav */}
           <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
