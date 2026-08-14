@@ -5,6 +5,7 @@ export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string; category: string; subcategory: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -25,8 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *   /products/jewellery/diamond-collection/necklace
  *   /products/jewellery/menswear-collection/bracelet
  */
-export default async function ProductSubcategoryPage({ params }: Props) {
+export default async function ProductSubcategoryPage({ params, searchParams }: Props) {
   const { slug: productType, category, subcategory } = await params;
-  console.log("====== MATCHED SUBCATEGORY PAGE ======", { productType, category, subcategory });
-  return <CollectionPageContent params={{ productType, category, subcategory }} />;
+  const { page } = await searchParams;
+  console.log("====== MATCHED SUBCATEGORY PAGE ======", { productType, category, subcategory, page });
+  return <CollectionPageContent params={{ productType, category, subcategory, page }} />;
 }

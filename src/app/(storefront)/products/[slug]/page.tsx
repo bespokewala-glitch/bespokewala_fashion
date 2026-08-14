@@ -18,6 +18,7 @@ const PRODUCT_TYPES = ['jewellery', 'couture', 'accessories', 'footwear', 'beaut
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -51,9 +52,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *   2. Product slug        → renders the individual product detail page
  *      e.g. /products/the-pink-diamond-ring
  */
-export default async function ProductsSlugPage({ params }: Props) {
+export default async function ProductsSlugPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  console.log("====== MATCHED SLUG PAGE ======", { slug });
+  const { page } = await searchParams;
+  console.log("====== MATCHED SLUG PAGE ======", { slug, page });
 
   // ── Case 1: Couture page is Homepage ─────────────────────────────────────
   if (slug === 'couture') {
@@ -63,7 +65,7 @@ export default async function ProductsSlugPage({ params }: Props) {
 
   // ── Case 2: Product-type listing ─────────────────────────────────────────
   if (PRODUCT_TYPES.includes(slug)) {
-    return <CollectionPageContent params={{ productType: slug }} />;
+    return <CollectionPageContent params={{ productType: slug, page }} />;
   }
 
   // ── Case 2: Individual product detail ────────────────────────────────────

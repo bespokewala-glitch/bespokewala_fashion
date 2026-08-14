@@ -5,6 +5,7 @@ export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string; category: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,7 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *   /products/jewellery/diamond-collection
  *   /products/couture/womens
  */
-export default async function ProductCategoryPage({ params }: Props) {
+export default async function ProductCategoryPage({ params, searchParams }: Props) {
   const { slug: productType, category } = await params;
-  return <CollectionPageContent params={{ productType, category }} />;
+  const { page } = await searchParams;
+  return <CollectionPageContent params={{ productType, category, page }} />;
 }
