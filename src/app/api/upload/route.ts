@@ -1,5 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bucket } from '@/lib/gcs';
+import sharp from 'sharp';
+
+// ─── Thumbnail sizes generated eagerly at upload time ─────────────────────────
+// These match the variants checked by /api/media/[...path]/route.ts.
+// Pre-generating them here means the storefront NEVER has to generate them
+// on-demand inside a cold Vercel function — which was the root cause of the
+// recurring broken-image problem every time new products were uploaded.
+const THUMBNAIL_VARIANTS = [
+  { name: 'thumbnail', width: 600,  quality: 80  },
+  { name: 'medium',    width: 1000, quality: 85  },
+] as const;
+
+/**
+ * Generate a single webp variant from an image buffer and save it to GCS.
+ * Errors are caught and logged — they must NOT fail the upload response.
+ */
+async function generateAndSaveVariant(
+  originalBuffer: Buffer,
+  gcsKey: string,
+  variantName: string,
+  width: number,
+  quality: number,
+): Promise<void> {
+  const variantPath = `_variants/${variantName}/${gcsKey}.webp`;
+  try {
+    const optimized = await sharp(originalBuffer)
+      .resize(width, null, { withoutEnlargement: true })
+      .webp({ quality })
+      .toBuffer();
+
+    await bucket.file(variantPath).save(optimized, {
+      contentType: 'image/webp',
+      metadata: { cacheControl: 'public, max-age=31536000, immutable' },
+    });
+
+    console.log(`[upload] ✅ Pre-generated variant: ${variantPath} (${optimized.length} bytes)`);
+  } catch (err) {
+    // Non-fatal: log only. The /api/media route will serve the original as fallback.
+    console.error(`[upload] ⚠️  Failed to pre-generate variant "${variantPath}":`, err instanceof Error ? err.message : err);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,33 +51,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No file uploaded' }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
+    const bytes  = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Sanitize filename: replace spaces and special chars
-    const safeName = file.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
+    const safeName       = file.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
     const uniqueFilename = `${Date.now()}-${safeName}`;
-    const gcsKey = `uploads/${uniqueFilename}`;
+    const gcsKey         = `uploads/${uniqueFilename}`;
 
-    // Upload to private GCS bucket using server-side credentials
+    // ── Step 1: Upload original to GCS ────────────────────────────────────────
     const gcsFile = bucket.file(gcsKey);
     await gcsFile.save(buffer, {
       contentType: file.type || 'application/octet-stream',
-      // Content is immutable once uploaded — safe to cache for a long time
       metadata: { cacheControl: 'public, max-age=31536000, immutable' },
     });
+    console.log(`[upload] ✅ Uploaded original: ${gcsKey} (${buffer.length} bytes)`);
 
+    // ── Step 2: Pre-generate webp variants for image files ────────────────────
+    // This runs BEFORE returning the response, so by the time the product is
+    // published and appears in the storefront, thumbnails ALREADY exist in GCS.
+    // The /api/media route can then serve them instantly with zero on-demand work.
+    const isImage = /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name);
+    if (isImage) {
+      // Generate thumbnail and medium in parallel — both are small operations.
+      // We await both so we know they succeeded before returning a 201.
+      await Promise.allSettled(
+        THUMBNAIL_VARIANTS.map(v =>
+          generateAndSaveVariant(buffer, gcsKey, v.name, v.width, v.quality)
+        )
+      );
+    }
+
+    // ── Step 3: Return the proxy URL ──────────────────────────────────────────
     // IMPORTANT: Return the internal proxy URL, NOT a direct GCS CDN URL.
     // The GCS bucket is PRIVATE. Direct GCS URLs return 403 in the browser.
     // The /api/media/[...path] route authenticates with GCS server-side and
     // streams the file bytes back to the browser securely.
-    //
-    // next/image must use unoptimized={shouldBypassOptimizer(url)} for these
-    // proxy URLs — see src/lib/imageUrl.ts. Vercel's image optimizer cannot
-    // make a recursive call back into the same serverless deployment.
-    const videoUrl = `/api/media/${gcsKey}`;
+    const mediaUrl = `/api/media/${gcsKey}`;
+    return NextResponse.json({ success: true, videoUrl: mediaUrl, mediaUrl }, { status: 201 });
 
-    return NextResponse.json({ success: true, videoUrl }, { status: 201 });
   } catch (error: any) {
     console.error('[upload] Error uploading file to GCS:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
