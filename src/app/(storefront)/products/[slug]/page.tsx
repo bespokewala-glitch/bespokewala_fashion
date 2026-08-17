@@ -12,9 +12,9 @@ import dynamic from 'next/dynamic';
 import FootwearGallery from '@/components/product/FootwearGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
+import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
 
 const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
-const ProductDetailsAccordion = dynamic(() => import('@/components/product/ProductDetailsAccordion'));
 
 export const revalidate = 60;
 
@@ -274,7 +274,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               }}
             />
 
-            <ProductDetailsAccordion details={product.details} />
+            <ProductDetailsAccordionWrapper details={product.details} productType={product.productType} category={product.category} />
           </div>
         </div>
       </main>
