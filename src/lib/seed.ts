@@ -110,14 +110,14 @@ export async function seedDatabase() {
     await User.insertMany([
       {
         name: 'Admin User',
-        email: 'admin@bespoken.com',
+        email: 'admin@bespokewala.com',
         mobileNumber: '9999999999',
         password: adminPassword,
         role: 'admin'
       },
       {
         name: 'Test Customer',
-        email: 'customer@bespoken.com',
+        email: 'customer@bespokewala.com',
         mobileNumber: '8888888888',
         password: userPassword,
         role: 'customer'

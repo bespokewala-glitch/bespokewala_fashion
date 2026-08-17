@@ -6,7 +6,7 @@ async function dropIndex() {
 
   try {
     await client.connect();
-    const database = client.db('bespoken_fashion');
+    const database = client.db('bespokewala_fashion');
     const collection = database.collection('Taxonomies');
     
     // Drop the old index

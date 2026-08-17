@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function PremiumFeaturedCarousel({ products }: { products: any[] }) {
+  const { formatPrice } = useCurrency();
   // We need enough items to create a smooth loop. 
   // If the user only has 2-4 featured products, we duplicate them to ensure the carousel never runs empty.
   const getExtendedProducts = () => {
@@ -204,7 +206,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                       {product.name}
                     </h3>
                     <p style={{ color: '#eee', margin: 0, fontSize: '0.9rem' }}>
-                      INR {product.price.toLocaleString('en-IN')}
+                      {formatPrice(product.price)}
                     </p>
                   </div>
                 </div>

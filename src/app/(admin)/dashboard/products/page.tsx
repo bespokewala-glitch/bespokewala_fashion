@@ -583,7 +583,7 @@ function AdminProductsContent() {
 
             <div className={styles.formRow}>
               <div style={{ flex: 1 }}>
-                <label className={styles.formLabel}>Department</label>
+                <label className={styles.formLabel}>{activeProductType === 'footwear' ? 'Footwear Type' : 'Department'}</label>
                 <select 
                   required
                   value={formData.category}
@@ -591,7 +591,7 @@ function AdminProductsContent() {
                   className={styles.formSelect}
                   style={{ textTransform: 'capitalize' }}
                 >
-                  <option value="">Select Department</option>
+                  <option value="">Select {activeProductType === 'footwear' ? 'Type' : 'Department'}</option>
                   {activeProductType === 'couture' && (
                     <>
                       <option value="womens">Womens</option>
@@ -677,7 +677,9 @@ function AdminProductsContent() {
               <label className={styles.formLabel}>Available Sizes</label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {(activeProductType === 'footwear'
-                  ? ['EU 36', 'EU 37', 'EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45']
+                  ? (formData.category === 'womens'
+                      ? ['EU 35', 'EU 35½', 'EU 36', 'EU 37', 'EU 37½', 'EU 38', 'EU 39', 'EU 39½', 'EU 40', 'EU 41', 'EU 41½', 'EU 42']
+                      : ['EU 36', 'EU 37', 'EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'])
                   : ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom']
                 ).map(size => (
                   <label key={size} style={{ 

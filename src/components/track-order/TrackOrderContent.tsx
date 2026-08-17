@@ -224,7 +224,7 @@ export default function TrackOrderContent() {
         </h1>
         <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "0 auto 1.5rem" }} />
         <p style={{ fontSize: "clamp(0.85rem,2vw,0.95rem)", fontWeight: 300, maxWidth: "480px", margin: "0 auto", lineHeight: 1.8, color: "rgba(255,255,255,0.72)" }}>
-          Enter your order ID and the email address used at checkout to see the latest status of your Bespoken order.
+          Enter your order ID and the email address used at checkout to see the latest status of your Bespokewala order.
         </p>
       </section>
 
@@ -298,7 +298,7 @@ export default function TrackOrderContent() {
                 </p>
                 <p style={{ fontSize: "0.85rem", color: "#555", lineHeight: 1.75 }}>
                   Can&apos;t find your order ID? Check your inbox for an email from{" "}
-                  <strong>bespokewala@gmail.com</strong> with the subject &ldquo;Your Bespoken Order Confirmation&rdquo;.
+                  <strong>bespokewala@gmail.com</strong> with the subject &ldquo;Your Bespokewala Order Confirmation&rdquo;.
                 </p>
                 <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginTop: "1rem" }}>
                   <a href="mailto:bespokewala@gmail.com" style={{ fontSize: "0.78rem", color: "#d2b48c", textDecoration: "none", letterSpacing: "0.05em" }}>

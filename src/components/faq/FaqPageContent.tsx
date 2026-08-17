@@ -9,7 +9,7 @@ const CATEGORIES = [
     title: "Orders & Payments",
     faqs: [
       {
-        q: "How do I place an order on Bespoken?",
+        q: "How do I place an order on Bespokewala?",
         a: "Browse our collections, select your size and quantity, and click 'Add to Cart'. Once you're ready, proceed to checkout, fill in your shipping details, and complete payment. You'll receive an order confirmation email within minutes.",
       },
       {
@@ -45,10 +45,10 @@ const CATEGORIES = [
       },
       {
         q: "Are your products made in India?",
-        a: "Yes, every Bespoken piece is crafted entirely in India by skilled artisans. Our fabrics are sourced from renowned textile hubs — Banaras for silks, Jaipur for block-prints, Surat for chiffons — and all embroidery is done by hand in our Mumbai atelier.",
+        a: "Yes, every Bespokewala piece is crafted entirely in India by skilled artisans. Our fabrics are sourced from renowned textile hubs — Banaras for silks, Jaipur for block-prints, Surat for chiffons — and all embroidery is done by hand in our Mumbai atelier.",
       },
       {
-        q: "How should I care for my Bespoken garment?",
+        q: "How should I care for my Bespokewala garment?",
         a: "All garments come with a care label. As a general rule: handwash or dry-clean only for embroidered pieces; use cold water and a gentle detergent; never tumble-dry or wring delicate fabrics; store in a breathable muslin bag away from direct sunlight.",
       },
       {
@@ -165,7 +165,7 @@ const CATEGORIES = [
       },
       {
         q: "Is there a loyalty programme?",
-        a: "Yes — Bespoken Insiders! Every purchase earns you reward points redeemable on future orders. Members also get early access to new collections, exclusive discounts, and invitations to private preview events. Points are automatically credited to your account after every order.",
+        a: "Yes — Bespokewala Insiders! Every purchase earns you reward points redeemable on future orders. Members also get early access to new collections, exclusive discounts, and invitations to private preview events. Points are automatically credited to your account after every order.",
       },
       {
         q: "Can I save items to a wishlist?",

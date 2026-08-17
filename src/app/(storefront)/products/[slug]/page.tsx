@@ -5,10 +5,12 @@ import ProductGallery from '@/components/product/ProductGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordion from '@/components/product/ProductDetailsAccordion';
+import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
 import { notFound, redirect } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
 import { normalizeImageUrl } from '@/lib/imageUrl';
+import ProductReviews from '@/components/product/reviews/ProductReviews';
 
 export const revalidate = 60;
 
@@ -18,6 +20,7 @@ const PRODUCT_TYPES = ['jewellery', 'couture', 'accessories', 'footwear', 'beaut
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -51,7 +54,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const url = `${siteUrl}/products/${slug}`;
   const imageUrl = product.images && product.images.length > 0 ? normalizeImageUrl(product.images[0]) : undefined;
-
   return {
     title: `${product.name} | Bespokewala`,
     description: product.description?.slice(0, 160),
@@ -83,9 +85,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *   2. Product slug        → renders the individual product detail page
  *      e.g. /products/the-pink-diamond-ring
  */
-export default async function ProductsSlugPage({ params }: Props) {
+export default async function ProductsSlugPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  console.log("====== MATCHED SLUG PAGE ======", { slug });
+  const { page } = await searchParams;
+  console.log("====== MATCHED SLUG PAGE ======", { slug, page });
 
   // ── Case 1: Couture page is Homepage ─────────────────────────────────────
   if (slug === 'couture') {
@@ -95,7 +98,7 @@ export default async function ProductsSlugPage({ params }: Props) {
 
   // ── Case 2: Product-type listing ─────────────────────────────────────────
   if (PRODUCT_TYPES.includes(slug)) {
-    return <CollectionPageContent params={{ productType: slug }} />;
+    return <CollectionPageContent params={{ productType: slug, page }} />;
   }
 
   // ── Case 2: Individual product detail ────────────────────────────────────
@@ -127,19 +130,18 @@ export default async function ProductsSlugPage({ params }: Props) {
       if (url) allImages.push({ url, alt: `${product.name} - ${label}` });
     };
     addRef(product.referenceImages.front, 'Front View');
-    addRef(product.referenceImages.back,  'Back View');
-    addRef(product.referenceImages.left,  'Left View');
+    addRef(product.referenceImages.back, 'Back View');
+    addRef(product.referenceImages.left, 'Left View');
     addRef(product.referenceImages.right, 'Right View');
   }
 
   const containerStyle: React.CSSProperties = {
-    padding: '8rem 4rem 4rem 4rem',
+    padding: '8rem 4rem 0 4rem',
     maxWidth: '1600px',
     margin: '0 auto',
     display: 'grid',
     gridTemplateColumns: '1.2fr 1fr',
     gap: '6rem',
-    minHeight: '80vh',
     fontFamily: '"Jost", "Inter", sans-serif',
   };
 
@@ -202,12 +204,7 @@ export default async function ProductsSlugPage({ params }: Props) {
               {product.description}
             </div>
 
-            <div style={{ fontSize: '1.1rem', fontWeight: 500, color: '#000', marginTop: '0.5rem' }}>
-              MRP: ₹{product.price.toLocaleString('en-IN')}
-            </div>
-            <div style={{ fontSize: '0.85rem', color: '#888', marginTop: '-1.25rem' }}>
-              Price included of all taxes
-            </div>
+            <ProductPriceDisplay price={product.price} />
 
             {product.colors && product.colors.length > 0 && (
               <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '0.5rem' }}>
@@ -262,6 +259,9 @@ export default async function ProductsSlugPage({ params }: Props) {
           </div>
         </div>
       </main>
-          </>
+      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+        <ProductReviews productId={product._id.toString()} />
+      </div>
+    </>
   );
 }

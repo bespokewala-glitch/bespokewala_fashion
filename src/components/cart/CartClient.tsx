@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 
 export default function CartClient() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const { formatPrice } = useCurrency();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -60,7 +62,7 @@ export default function CartClient() {
                   <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '120px', height: '160px', objectFit: 'cover' }} />
                   <div>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 0.5rem', color: '#111' }}>{item.name}</h3>
-                    <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>₹{item.price.toLocaleString('en-IN')}</div>
+                    <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>{formatPrice(item.price)}</div>
                     {item.size && <div style={{ fontSize: '0.85rem', color: '#888' }}>Size: {item.size}</div>}
                     <button 
                       onClick={() => removeFromCart(item.id)}
@@ -80,7 +82,7 @@ export default function CartClient() {
                 </div>
 
                 <div style={{ flex: '1', textAlign: 'right', fontSize: '1.1rem', fontWeight: 500 }} className="mobile-w-full mobile-text-left">
-                  ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                  {formatPrice(item.price * item.quantity)}
                 </div>
               </div>
             ))}
@@ -93,7 +95,7 @@ export default function CartClient() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
             <span style={{ color: '#555' }}>Subtotal</span>
-            <span style={{ fontWeight: 500 }}>₹{cartTotal.toLocaleString('en-IN')}</span>
+            <span style={{ fontWeight: 500 }}>{formatPrice(cartTotal)}</span>
           </div>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontSize: '0.95rem', borderBottom: '1px solid #ddd', paddingBottom: '2rem' }}>
@@ -103,7 +105,7 @@ export default function CartClient() {
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2.5rem', fontSize: '1.2rem', fontWeight: 500 }}>
             <span>Total</span>
-            <span>₹{cartTotal.toLocaleString('en-IN')}</span>
+            <span>{formatPrice(cartTotal)}</span>
           </div>
 
           <button 

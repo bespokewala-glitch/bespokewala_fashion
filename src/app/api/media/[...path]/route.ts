@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bucket } from '@/lib/gcs';
+import sharp from 'sharp';
 
 // Map file extensions to MIME types for correct Content-Type headers
 const MIME_TYPES: Record<string, string> = {
@@ -7,6 +8,7 @@ const MIME_TYPES: Record<string, string> = {
   jpeg: 'image/jpeg',
   png:  'image/png',
   webp: 'image/webp',
+  avif: 'image/avif',
   gif:  'image/gif',
   svg:  'image/svg+xml',
   mp4:  'video/mp4',
@@ -37,7 +39,80 @@ export async function GET(
       return new NextResponse('Invalid file path', { status: 400 });
     }
 
-    console.log('[media] Serving GCS file:', fileParam);
+    const variant = request.nextUrl.searchParams.get('v');
+    const isImage = fileParam.match(/\.(jpg|jpeg|png|webp|avif)$/i);
+
+    if (isImage && (variant === 'thumbnail' || variant === 'medium' || variant === 'large')) {
+      const variantPath = `_variants/${variant}/${fileParam}.webp`;
+      const variantFile = bucket.file(variantPath);
+
+      // Check if variant already exists
+      const [variantExists] = await variantFile.exists();
+      if (variantExists) {
+        const [fileBuffer] = await variantFile.download();
+        const etag = `"${variantPath}-${fileBuffer.length}"`;
+        if (request.headers.get('if-none-match') === etag) {
+          return new NextResponse(null, { status: 304 });
+        }
+        return new NextResponse(fileBuffer as any, {
+          status: 200,
+          headers: {
+            'Content-Type': 'image/webp',
+            'Content-Length': String(fileBuffer.length),
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'ETag': etag,
+            'Vary': 'Accept-Encoding',
+          },
+        });
+      }
+
+      // Variant doesn't exist, generate it
+      const gcsFile = bucket.file(fileParam);
+      const [exists] = await gcsFile.exists();
+      if (exists) {
+        const [originalBuffer] = await gcsFile.download();
+        let targetWidth = 600;
+        let quality = 80;
+
+        if (variant === 'medium') {
+          targetWidth = 1000;
+          quality = 85;
+        } else if (variant === 'large') {
+          targetWidth = 1600;
+          quality = 85;
+        }
+
+        try {
+          const optimizedBuffer = await sharp(originalBuffer)
+            .resize(targetWidth, null, { withoutEnlargement: true })
+            .webp({ quality })
+            .toBuffer();
+
+          // Save back to GCS
+          await variantFile.save(optimizedBuffer, {
+            contentType: 'image/webp',
+            metadata: { cacheControl: 'public, max-age=31536000, immutable' },
+          });
+
+          const etag = `"${variantPath}-${optimizedBuffer.length}"`;
+          return new NextResponse(optimizedBuffer as any, {
+            status: 200,
+            headers: {
+              'Content-Type': 'image/webp',
+              'Content-Length': String(optimizedBuffer.length),
+              'Cache-Control': 'public, max-age=31536000, immutable',
+              'ETag': etag,
+              'Vary': 'Accept-Encoding',
+            },
+          });
+        } catch (err) {
+          console.error('[media] Sharp optimization error:', err);
+          // Fall through to serve original if sharp fails
+        }
+      }
+    }
+
+    console.log('[media] Serving original GCS file:', fileParam);
 
     const gcsFile = bucket.file(fileParam);
     const [exists] = await gcsFile.exists();

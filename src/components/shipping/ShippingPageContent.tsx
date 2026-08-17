@@ -1,5 +1,5 @@
 /* Pure server-compatible component — zero useState/useEffect, zero hydration risk.
-   All animations via CSS @keyframes, all hover via CSS :hover.                     */
+ All animations via CSS @keyframes, all hover via CSS :hover.                     */
 
 import Link from 'next/link';
 
@@ -150,7 +150,7 @@ export default function ShippingPageContent() {
         </h1>
         <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "0 auto 1.5rem" }} />
         <p style={{ fontSize: "clamp(0.85rem,2vw,0.975rem)", fontWeight: 300, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8, color: "rgba(255,255,255,0.72)" }}>
-          Every Bespoken order is handled with the same care that goes into crafting each piece — 
+          Every Bespokewala order is handled with the same care that goes into crafting each piece —
           packed, insured, and delivered safely to your door.
         </p>
       </section>
@@ -203,6 +203,27 @@ export default function ShippingPageContent() {
               <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹499</p>
               <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>Priority handling &amp; dispatch</p>
               <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>2–3 business days</strong></p>
+            </div>
+          </div>
+
+          {/* Category Delivery Breakdown */}
+          <div style={{ marginTop: "3rem", padding: "2rem", backgroundColor: "#fff", border: "1px solid #e8e0d6", borderRadius: "4px" }}>
+            <h3 style={{ fontSize: "0.95rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "1.25rem", textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "center" }}>
+              ⏱️ Category-Specific Delivery Timelines
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.5rem" }}>
+              <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
+                <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>👠 Footwear Collection</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Custom handcrafted &amp; delivered in <strong>15 to 20 Days</strong>.</p>
+              </div>
+              <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
+                <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>👑 Couture &amp; Bespoke</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Handcrafted couture created &amp; delivered in <strong>40 to 45 Days</strong>.</p>
+              </div>
+              <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
+                <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>✨ Accessories &amp; Jewellery</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Ready-to-wear pieces dispatched &amp; delivered in <strong>5 to 7 Business Days</strong>.</p>
+              </div>
             </div>
           </div>
 
@@ -310,11 +331,11 @@ export default function ShippingPageContent() {
 
           <div className="ship-steps">
             {[
-              { step: "01", icon: "🛍️", title: "Order Placed",    desc: "Your order is confirmed and payment verified" },
-              { step: "02", icon: "🔍", title: "Quality Check",   desc: "Every item inspected by our QC team" },
-              { step: "03", icon: "📦", title: "Packed & Sealed", desc: "Gift-wrapped in signature Bespoken packaging" },
-              { step: "04", icon: "🚚", title: "Dispatched",      desc: "Shipped with tracking via Blue Dart / Delhivery / FedEx" },
-              { step: "05", icon: "🏠", title: "Delivered",       desc: "Safely delivered to your address" },
+              { step: "01", icon: "🛍️", title: "Order Placed", desc: "Your order is confirmed and payment verified" },
+              { step: "02", icon: "🔍", title: "Quality Check", desc: "Every item inspected by our QC team" },
+              { step: "03", icon: "📦", title: "Packed & Sealed", desc: "Gift-wrapped in signature Bespokewala packaging" },
+              { step: "04", icon: "🚚", title: "Dispatched", desc: "Shipped with tracking via Blue Dart / Delhivery / FedEx" },
+              { step: "05", icon: "🏠", title: "Delivered", desc: "Safely delivered to your address" },
             ].map(({ step, icon, title, desc }) => (
               <div key={step} style={{ padding: "0 0.5rem", position: "relative", zIndex: 1 }}>
                 <div style={{
@@ -451,8 +472,8 @@ export default function ShippingPageContent() {
             {[
               { name: "Blue Dart", href: "https://www.bluedart.com" },
               { name: "Delhivery", href: "https://www.delhivery.com" },
-              { name: "FedEx",     href: "https://www.fedex.com" },
-              { name: "DHL",       href: "https://www.dhl.com" },
+              { name: "FedEx", href: "https://www.fedex.com" },
+              { name: "DHL", href: "https://www.dhl.com" },
             ].map(({ name, href }) => (
               <a
                 key={name}
@@ -505,11 +526,11 @@ export default function ShippingPageContent() {
             },
             {
               q: "Is my order insured during transit?",
-              a: "Yes. All Bespoken orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a full refund.",
+              a: "Yes. All Bespokewala orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a full refund.",
             },
             {
               q: "How are the orders packaged?",
-              a: "Every order is packaged in our signature Bespoken gift box, wrapped in tissue paper with a wax seal, and placed in a protective outer shipping box. Gift messaging is available free of charge — just add a note at checkout.",
+              a: "Every order is packaged in our signature Bespokewala gift box, wrapped in tissue paper with a wax seal, and placed in a protective outer shipping box. Gift messaging is available free of charge — just add a note at checkout.",
             },
             {
               q: "Do I have to pay customs duties on international orders?",

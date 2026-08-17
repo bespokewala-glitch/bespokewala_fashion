@@ -4,6 +4,7 @@ import "./globals.css";
 import "./responsive.css";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -31,11 +32,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={josefinSans.variable}>
       <body>
-        <WishlistProvider>
-          <CartProvider>
-            {children}
-          </CartProvider>
-        </WishlistProvider>
+        <CurrencyProvider>
+          <WishlistProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </WishlistProvider>
+        </CurrencyProvider>
       </body>
     </html>
   );

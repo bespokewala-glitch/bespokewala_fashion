@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Lightbox from './Lightbox';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 interface ProductGalleryProps {
   images: { url: string; alt: string }[];
@@ -63,7 +64,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         {images.map((img, idx) => (
           <img
             key={idx}
-            src={img.url}
+            src={normalizeImageUrl(img.url, 'large')}
             alt={img.alt}
             onClick={() => setIsLightboxOpen(true)}
             loading={idx === 0 ? "eager" : "lazy"}
@@ -104,7 +105,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
             aria-label={`View ${img.alt}`}
           >
             <img
-              src={img.url}
+              src={normalizeImageUrl(img.url, 'thumbnail')}
               alt={img.alt}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />

@@ -98,14 +98,14 @@ export default function TermsConditionsContent() {
 
         {/* Intro */}
         <p style={{ fontSize: "0.95rem", color: "#555", lineHeight: 1.9, marginBottom: "1rem" }}>
-          Welcome to <strong>Bespoken Fashion</strong> (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;).
+          Welcome to <strong>Bespokewala Fashion</strong> (&ldquo;Bespokewala&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;).
           These Terms &amp; Conditions govern your use of our website and the purchase of products from us.
           By accessing our website or placing an order, you agree to be bound by these terms.
           If you do not agree, please do not use our website.
         </p>
 
         <div className="legal-highlight">
-          ℹ️ These Terms constitute a legally binding agreement between you and Bespoken Fashion, a business
+          ℹ️ These Terms constitute a legally binding agreement between you and Bespokewala Fashion, a business
           registered in Mumbai, Maharashtra, India. All disputes are subject to the jurisdiction of courts in Mumbai.
         </div>
 
@@ -211,12 +211,14 @@ export default function TermsConditionsContent() {
             title: "Shipping & Delivery",
             content: (
               <>
-                <p>We ship across India and internationally. Delivery timelines are estimates and may be affected by courier delays, public holidays, natural disasters, or other unforeseen circumstances. We are not liable for delays caused by third-party courier partners.</p>
+                <p>We ship across India and internationally. Standard delivery timelines by product category are as follows:</p>
                 <ul>
+                  <li><strong>Footwear Collection:</strong> 15 to 20 days for custom crafting and delivery.</li>
+                  <li><strong>Couture &amp; Bespoke Garments:</strong> 40 to 45 days for handcrafted creation and delivery.</li>
+                  <li><strong>Ready-to-Wear &amp; Accessories:</strong> 5 to 7 business days.</li>
                   <li>Risk of loss passes to you upon delivery to the carrier.</li>
                   <li>If you are unavailable at delivery, the courier will attempt re-delivery up to 3 times. Unclaimed packages may be returned to us and re-shipping charges will apply.</li>
                   <li>For international shipments, customs duties and import taxes are the buyer&apos;s sole responsibility.</li>
-                  <li>We are not responsible for delays caused by customs clearance processes.</li>
                 </ul>
                 <p>Please refer to our <Link href="/shipping" style={{ color: "#d2b48c" }}>Shipping &amp; Returns page</Link> for full details on rates and timelines.</p>
               </>
@@ -270,7 +272,7 @@ export default function TermsConditionsContent() {
             title: "Intellectual Property",
             content: (
               <>
-                <p>All content on our website — including designs, photographs, text, graphics, logos, the Bespokewala brand name, and the overall website design — is the exclusive property of Bespoken Fashion and is protected under applicable Indian and international intellectual property laws.</p>
+                <p>All content on our website — including designs, photographs, text, graphics, logos, the Bespokewala brand name, and the overall website design — is the exclusive property of Bespokewala Fashion and is protected under applicable Indian and international intellectual property laws.</p>
                 <ul>
                   <li>You may not reproduce, distribute, modify, display, or use our content for commercial purposes without our express written consent.</li>
                   <li>You may not copy or imitate our designs, garments, or embroidery patterns.</li>

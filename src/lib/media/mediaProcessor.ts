@@ -37,9 +37,9 @@ export async function processImage(gcsKey: string, isPrivate = false): Promise<P
 
   try {
     // Dynamically import sharp — won't crash server if not installed
-    let sharp: typeof import('sharp');
+    let sharp: any;
     try {
-      sharp = (await import('sharp')).default as any;
+      sharp = (await import('sharp')).default || (await import('sharp'));
     } catch {
       console.warn('[MediaProcessor] sharp not installed — skipping image resizing.');
       return { success: true, file_url };

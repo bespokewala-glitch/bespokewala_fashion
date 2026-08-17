@@ -134,3 +134,12 @@ a {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+/* Product Card Hover Effect */
+.product-card-hover-image {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.product-card:hover .product-card-hover-image {
+  opacity: 1;
+}

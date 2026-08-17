@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
-import VirtualTryOnButton from '@/components/product/VirtualTryOnButton';
 import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 
@@ -19,7 +18,21 @@ interface ProductClientActionsProps {
 
 export default function ProductClientActions({ product }: ProductClientActionsProps) {
   const { addToCart } = useCart();
-  const [selectedSize, setSelectedSize] = useState<string | null>(product.sizes?.[0] || null);
+  const SIZES_ORDER = [
+    'EU 35', 'EU 35½', 'EU 36', 'EU 36½', 'EU 37', 'EU 37½', 'EU 38', 'EU 38½', 'EU 39', 'EU 39½', 'EU 40', 'EU 40½', 'EU 41', 'EU 41½', 'EU 42', 'EU 42½', 'EU 43', 'EU 44', 'EU 45',
+    'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'
+  ];
+  
+  const sortedSizes = [...(product.sizes || [])].sort((a, b) => {
+    const indexA = SIZES_ORDER.indexOf(a);
+    const indexB = SIZES_ORDER.indexOf(b);
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  const [selectedSize, setSelectedSize] = useState<string | null>(sortedSizes[0] || null);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -103,7 +116,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             <SizeGuide />
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {product.sizes.map((size: string) => (
+            {sortedSizes.map((size: string) => (
               <button 
                 key={size} 
                 onClick={() => setSelectedSize(size)}
@@ -126,11 +139,6 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
       </div>
 
-      <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '1rem' }}>
-        Made to order: 8-10 weeks
-      </div>
-
-      <VirtualTryOnButton garmentImageUrl={normalizeImageUrl(product.images?.[0] || '')} />
       <button style={primaryBtnStyle} onClick={handleAddToCart}>
         {isAdding ? 'Adding...' : 'Add to Cart'}
       </button>

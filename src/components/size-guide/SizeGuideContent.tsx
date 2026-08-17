@@ -605,7 +605,7 @@ export default function SizeGuideContent() {
             <table className="sg-table">
               <thead>
                 <tr>
-                  <th>Bespoken Size</th>
+                  <th>Bespokewala Size</th>
                   <th>India</th>
                   <th>US / Canada</th>
                   <th>UK</th>

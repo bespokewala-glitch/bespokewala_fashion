@@ -7,11 +7,11 @@ import Product from '@/models/Product';
 export async function GET() {
   try {
     await dbConnect();
-    
+
     // Create admin user
     const adminExists = await User.findOne({ email: 'admin@bespoken.com' });
     let adminUser;
-    
+
     if (!adminExists) {
       adminUser = await User.create({
         name: 'Admin User',
@@ -37,7 +37,7 @@ export async function GET() {
 
     // Check if we have products to create dummy orders
     const products = await Product.find().limit(2);
-    
+
     if (products.length > 0) {
       // Check if orders exist
       const ordersCount = await Order.countDocuments();
@@ -62,7 +62,7 @@ export async function GET() {
             country: 'India',
           }
         });
-        
+
         if (products.length > 1) {
           await Order.create({
             user: customer._id,
@@ -88,10 +88,10 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Admin user and dummy orders setup successfully.',
-      adminEmail: adminUser.email 
+      adminEmail: adminUser.email
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

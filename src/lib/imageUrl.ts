@@ -29,44 +29,53 @@ const GCS_BASE   = `https://storage.googleapis.com/${GCS_BUCKET}/`;
  *  - the original URL  for public images (Unsplash, etc.)
  *  - ''                for null / undefined / empty / malformed
  */
-export function normalizeImageUrl(url: string | null | undefined): string {
+export function normalizeImageUrl(url: string | null | undefined, variant?: 'thumbnail' | 'medium' | 'large'): string {
   if (!url || typeof url !== 'string' || url.trim() === '') return '';
 
   const trimmed = url.trim();
+  let proxyUrl = '';
 
   // Already a correct proxy URL
-  if (trimmed.startsWith('/api/media/')) return trimmed;
-
+  if (trimmed.startsWith('/api/media/')) {
+    proxyUrl = trimmed;
+  }
   // Legacy query-param proxy format:
   // /api/media?file=uploads/foo.png  ->  /api/media/uploads/foo.png
-  if (trimmed.startsWith('/api/media?file=')) {
+  else if (trimmed.startsWith('/api/media?file=')) {
     const key = trimmed.replace('/api/media?file=', '');
-    return `/api/media/${key}`;
+    proxyUrl = `/api/media/${key}`;
   }
-
   // Stale direct GCS CDN URL (private bucket) — rewrite to proxy:
   // https://storage.googleapis.com/bespokewala-storage/uploads/foo.png
   // -> /api/media/uploads/foo.png
-  if (trimmed.startsWith(GCS_BASE)) {
+  else if (trimmed.startsWith(GCS_BASE)) {
     const gcsKey = trimmed.slice(GCS_BASE.length);
     // Guard: never create /api/media/https://... garbage
     if (gcsKey && !gcsKey.startsWith('http')) {
-      return `/api/media/${gcsKey}`;
+      proxyUrl = `/api/media/${gcsKey}`;
     }
   }
-
   // Bare /uploads/ path (missing /api/media prefix) — old jewellery products
-  if (trimmed.startsWith('/uploads/')) {
-    return `/api/media${trimmed}`;
+  else if (trimmed.startsWith('/uploads/')) {
+    proxyUrl = `/api/media${trimmed}`;
   }
-
   // Public external URL (Unsplash, CDN, etc.) — keep as-is
-  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
-    return trimmed;
+  else if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed; // Don't append variant to external URLs
   }
-
   // Other relative paths
-  if (trimmed.startsWith('/')) return trimmed;
+  else if (trimmed.startsWith('/')) {
+    proxyUrl = trimmed;
+  }
+  
+  if (proxyUrl) {
+    // If there's already a query string, append with &, else ?
+    if (variant) {
+      const separator = proxyUrl.includes('?') ? '&' : '?';
+      return `${proxyUrl}${separator}v=${variant}`;
+    }
+    return proxyUrl;
+  }
 
   // Unrecognised / malformed
   return '';

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useCart, CartItem } from "@/context/CartContext";
+import { useCurrency } from "@/context/CurrencyContext";
 import { useRouter } from "next/navigation";
 import { normalizeImageUrl } from "@/lib/imageUrl";
 
@@ -46,6 +47,7 @@ export default function CheckoutClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { formatPrice, currency } = useCurrency();
   const subtotal = cartTotal;
   const shippingCost: number = 0; // subtotal > 10000 ? 0 : 500;
   const total = subtotal + shippingCost;
@@ -283,7 +285,7 @@ export default function CheckoutClient() {
                   {item.size && <span style={{ fontSize: "0.8rem", color: "#666" }}>Size: {item.size}</span>}
                   <div style={{ fontSize: "0.8rem", color: "#666" }}>Qty: {item.quantity}</div>
                 </div>
-                <div style={{ fontSize: "0.875rem" }}>₹{(item.price * item.quantity).toLocaleString("en-IN")}</div>
+                <div style={{ fontSize: "0.875rem" }}>{formatPrice(item.price * item.quantity)}</div>
               </div>
             ))}
           </div>
@@ -291,17 +293,24 @@ export default function CheckoutClient() {
           <div style={{ borderTop: "1px solid #e0e0e0", paddingTop: "1.5rem", marginBottom: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", color: "#666", fontSize: "0.9rem" }}>
               <span>Subtotal</span>
-              <span>₹{subtotal.toLocaleString("en-IN")}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", color: "#666", fontSize: "0.9rem" }}>
               <span>Shipping</span>
-              <span>{shippingCost === 0 ? "Free" : `₹${shippingCost.toLocaleString("en-IN")}`}</span>
+              <span>{shippingCost === 0 ? "Free" : formatPrice(shippingCost)}</span>
             </div>
           </div>
 
           <div style={{ borderTop: "1px solid #e0e0e0", paddingTop: "1.5rem", marginBottom: "2rem", display: "flex", justifyContent: "space-between", fontSize: "1.25rem", fontWeight: 400 }}>
             <span>Total</span>
-            <span>₹{total.toLocaleString("en-IN")}</span>
+            <span>{formatPrice(total)}</span>
+          </div>
+
+          <div style={{ padding: "1rem", backgroundColor: "#fff", border: "1px solid #e0e0e0", borderLeft: "3px solid #d2b48c", marginBottom: "1.5rem", fontSize: "0.78rem", color: "#555", lineHeight: 1.6 }}>
+            <div style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.3rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>⏱️ Estimated Delivery Timelines:</div>
+            • <strong>Footwear Collection:</strong> 15 to 20 Days<br />
+            • <strong>Couture &amp; Bespoke:</strong> 40 to 45 Days<br />
+            • <strong>Standard Ready-to-Wear:</strong> 5 to 7 Business Days
           </div>
 
           <button
@@ -321,7 +330,7 @@ export default function CheckoutClient() {
               transition: "opacity 0.2s",
             }}
           >
-            {loading ? "Processing..." : `Pay ₹${total.toLocaleString("en-IN")} with Razorpay`}
+            {loading ? "Processing..." : currency === "INR" ? `Pay ₹${total.toLocaleString("en-IN")} with Razorpay` : `Pay ₹${total.toLocaleString("en-IN")} (~${formatPrice(total)}) with Razorpay`}
           </button>
 
           <p style={{ textAlign: "center", fontSize: "0.75rem", color: "#999", marginTop: "1rem" }}>

@@ -282,7 +282,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '4rem' }}>
                   {currentPage > 1 && (
                     <Link 
-                      href={`?${new URLSearchParams({ ...params as Record<string, string>, page: (currentPage - 1).toString() }).toString()}`}
+                      href={`?${new URLSearchParams(
+                        Object.entries({ ...params, page: (currentPage - 1).toString() })
+                          .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
+                      ).toString()}`}
                       className="btn-secondary"
                     >
                       Previous
@@ -290,7 +293,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                   )}
                   {currentPage * productsPerPage < totalProducts && (
                     <Link 
-                      href={`?${new URLSearchParams({ ...params as Record<string, string>, page: (currentPage + 1).toString() }).toString()}`}
+                      href={`?${new URLSearchParams(
+                        Object.entries({ ...params, page: (currentPage + 1).toString() })
+                          .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
+                      ).toString()}`}
                       className="btn-secondary"
                     >
                       Next Page

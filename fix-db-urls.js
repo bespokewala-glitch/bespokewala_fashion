@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/bespoken_fashion').then(async () => {
+mongoose.connect('mongodb://localhost:27017/bespokewala_fashion').then(async () => {
   const col = mongoose.connection.collection('Products');
   const products = await col.find({}).toArray();
   let updated = 0;
