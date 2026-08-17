@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { shouldBypassOptimizer } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function SplitShowcase({ data }: { data?: any }) {
   const modelImage = data?.modelImage || "https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80";
@@ -76,13 +75,13 @@ export default function SplitShowcase({ data }: { data?: any }) {
       
       {/* Left side - Fixed Model Image */}
       <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
-        <Image 
+        <OptimizedImage 
           src={modelImage || ''} 
           alt="Bespokewala model showcasing luxury jewellery"
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
-          unoptimized={shouldBypassOptimizer(modelImage)}
+          variant="medium"
         />
       </div>
 
@@ -111,13 +110,13 @@ export default function SplitShowcase({ data }: { data?: any }) {
           
           <div key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem' }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
-              <Image 
+              <OptimizedImage 
                 src={products[currentIndex].image || ''} 
                 alt={products[currentIndex].name ? `Bespokewala ${products[currentIndex].name}` : 'Bespokewala luxury product'}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'contain' }}
-                unoptimized={shouldBypassOptimizer(products[currentIndex].image)}
+                variant="thumbnail"
               />
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>

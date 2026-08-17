@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useCurrency } from '@/context/CurrencyContext';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function PremiumFeaturedCarousel({ products }: { products: any[] }) {
   const { formatPrice } = useCurrency();
@@ -172,18 +173,24 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                 {/* Wrap in link ONLY if it's the center item, otherwise click just brings it to center */}
                 <div style={{ width: '100%', height: '100%', position: 'relative' }}>
                   {isCenter ? (
-                    <Link href={`/products/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%' }}>
-                      <img 
+                    <Link href={`/products/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>
+                      <OptimizedImage 
                         src={product.images[0]} 
                         alt={`Bespokewala ${product.name}`} 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        variant="thumbnail"
+                        sizes="(max-width: 768px) 300px, 400px"
                       />
                     </Link>
                   ) : (
-                    <img 
+                    <OptimizedImage 
                       src={product.images[0]} 
                       alt={`Bespokewala ${product.name}`} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      variant="thumbnail"
+                      sizes="(max-width: 768px) 300px, 400px"
                     />
                   )}
 

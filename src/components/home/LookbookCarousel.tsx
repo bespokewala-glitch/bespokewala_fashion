@@ -2,8 +2,7 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { shouldBypassOptimizer } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function LookbookCarousel({ data }: { data?: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -90,13 +89,13 @@ export default function LookbookCarousel({ data }: { data?: any }) {
               boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
               position: 'relative'
             }}>
-              <Image
+              <OptimizedImage
                 src={muse.img}
                 alt={muse.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 300px"
                 style={{ objectFit: 'cover' }}
-                unoptimized={shouldBypassOptimizer(muse.img)}
+                variant="medium"
               />
             </div>
             <h3 style={{ fontSize: '1rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#333', margin: 0 }}>

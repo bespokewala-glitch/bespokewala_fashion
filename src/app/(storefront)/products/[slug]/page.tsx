@@ -2,15 +2,19 @@ import React from 'react';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import ProductGallery from '@/components/product/ProductGallery';
-import ProductActions from '@/components/product/ProductActions';
-import ProductClientActions from '@/components/product/ProductClientActions';
-import ProductDetailsAccordion from '@/components/product/ProductDetailsAccordion';
 import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
 import { notFound, redirect } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
 import { normalizeImageUrl } from '@/lib/imageUrl';
-import ProductReviews from '@/components/product/reviews/ProductReviews';
+import ReactDOM from 'react-dom';
+import dynamic from 'next/dynamic';
+import FootwearGallery from '@/components/product/FootwearGallery';
+import ProductActions from '@/components/product/ProductActions';
+import ProductClientActions from '@/components/product/ProductClientActions';
+
+const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
+const ProductDetailsAccordion = dynamic(() => import('@/components/product/ProductDetailsAccordion'));
 
 export const revalidate = 60;
 
@@ -135,6 +139,14 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
     addRef(product.referenceImages.right, 'Right View');
   }
 
+  if (allImages.length > 0) {
+    const mainImg = allImages[0].url;
+    const preloadUrl = mainImg.includes('/api/media/') 
+      ? `${mainImg}${mainImg.includes('?') ? '&' : '?'}v=medium` 
+      : mainImg;
+    ReactDOM.preload(preloadUrl, { as: 'image', fetchPriority: 'high' });
+  }
+
   const containerStyle: React.CSSProperties = {
     padding: '8rem 4rem 0 4rem',
     maxWidth: '1600px',
@@ -181,7 +193,14 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
       />
       <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
         <div>
-          <ProductGallery images={allImages} />
+          {(() => {
+            const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';
+            return isFootwear ? (
+              <FootwearGallery images={allImages} />
+            ) : (
+              <ProductGallery images={allImages} />
+            );
+          })()}
         </div>
 
         <div style={{ position: 'relative' }}>
@@ -260,7 +279,10 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         </div>
       </main>
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
-        <ProductReviews productId={product._id.toString()} />
+        {(() => {
+          const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';
+          return <ProductReviews productId={product._id.toString()} deferFetch={isFootwear} />;
+        })()}
       </div>
     </>
   );

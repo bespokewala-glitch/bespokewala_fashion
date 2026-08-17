@@ -28,42 +28,7 @@ const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
   large:     { width: 1600, quality: 85 },
 };
 
-/**
- * Fire-and-forget thumbnail generation.
- * Called AFTER we've already started streaming the original to the browser.
- * Any failure here is logged but does NOT affect the response.
- */
-async function generateVariantInBackground(
-  fileParam: string,
-  variantName: string,
-  variantPath: string,
-  cfg: { width: number; quality: number },
-): Promise<void> {
-  try {
-    const gcsFile = bucket.file(fileParam);
-    const [exists] = await gcsFile.exists();
-    if (!exists) return;
-
-    const [originalBuffer] = await gcsFile.download();
-    const optimizedBuffer = await sharp(originalBuffer)
-      .resize(cfg.width, null, { withoutEnlargement: true })
-      .webp({ quality: cfg.quality })
-      .toBuffer();
-
-    await bucket.file(variantPath).save(optimizedBuffer, {
-      contentType: 'image/webp',
-      metadata: { cacheControl: 'public, max-age=31536000, immutable' },
-    });
-
-    console.log(`[media] ✅ Background variant saved: ${variantPath} (${optimizedBuffer.length} bytes)`);
-  } catch (err) {
-    console.error(
-      `[media] ⚠️  Background variant generation failed for "${variantPath}":`,
-      err instanceof Error ? err.message : err,
-    );
-  }
-}
-
+// `generateVariantInBackground` removed - we now generate inline to prevent cache poisoning.
 // ─── Route Handler ────────────────────────────────────────────────────────────
 export async function GET(
   request: NextRequest,
@@ -108,18 +73,20 @@ export async function GET(
       const variantPath = `_variants/${variant}/${fileParam}.webp`;
       const variantFile = bucket.file(variantPath);
 
+      // FAST ETAG CHECK (NO GCS DOWNLOAD)
+      // Since variants are immutable, the path itself is a safe ETag
+      const etag = `"${variantPath}"`;
+      if (request.headers.get('if-none-match') === etag) {
+        console.log(`[media] 304 variant (fast cached) ${variantPath} (${Date.now() - startMs}ms)`);
+        return new NextResponse(null, { status: 304 });
+      }
+
       // Check GCS for an already-generated variant
       const [variantExists] = await variantFile.exists();
 
       if (variantExists) {
         // ✅ Fast path: variant already generated — stream it directly
         const [fileBuffer] = await variantFile.download();
-        const etag = `"${variantPath}-${fileBuffer.length}"`;
-
-        if (request.headers.get('if-none-match') === etag) {
-          console.log(`[media] 304 variant (cached) ${variantPath} (${Date.now() - startMs}ms)`);
-          return new NextResponse(null, { status: 304 });
-        }
 
         console.log(
           `[media] 200 variant ${variantPath}` +
@@ -143,17 +110,82 @@ export async function GET(
       }
 
       // ⚡ Variant does NOT exist yet.
-      // KEY CHANGE: Do NOT block the response on thumbnail generation.
-      // Serve the original immediately, then generate the thumbnail in the background.
-      // This prevents Vercel timeouts when processing many products at once.
+      // KEY CHANGE: We MUST block and generate the thumbnail inline.
+      // If we serve the original here, Vercel will cache the 3MB file under the thumbnail URL!
       console.log(
-        `[media] ℹ️  Variant not found: "${variantPath}". ` +
-        `Serving original and scheduling background generation.`,
+        `[media] ℹ️  Variant not found: "${variantPath}". Generating inline...`,
       );
-      // Fall through to serve original (no return here — intentional)
+      
+      const gcsFile = bucket.file(fileParam);
+      const [exists] = await gcsFile.exists();
+
+      if (!exists) {
+        console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
+        const placeholder = Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+          'base64',
+        );
+        return new NextResponse(placeholder, {
+          status: 404,
+          headers: {
+            'Content-Type':  'image/png',
+            'Cache-Control': 'no-store, max-age=0',
+            'X-Media-Miss':  fileParam,
+          },
+        });
+      }
+
+      const [originalBuffer] = await gcsFile.download();
+
+      try {
+        const optimizedBuffer = await sharp(originalBuffer)
+          .resize(variantCfg.width, null, { withoutEnlargement: true })
+          .webp({ quality: variantCfg.quality })
+          .toBuffer();
+
+        // Await saving back to GCS to prevent serverless execution from halting early
+        await bucket.file(variantPath).save(optimizedBuffer, {
+          contentType: 'image/webp',
+          metadata: { cacheControl: 'public, max-age=31536000, immutable' },
+        }).catch(err => {
+          console.error(`[media] ⚠️  Background variant save failed for "${variantPath}":`, err);
+        });
+
+        const etag = `"${variantPath}"`;
+
+        console.log(
+          `[media] 200 variant generated "${variantPath}"` +
+          ` — ${optimizedBuffer.length} bytes, image/webp (${Date.now() - startMs}ms)`,
+        );
+
+        return new NextResponse(optimizedBuffer as unknown as BodyInit, {
+          status: 200,
+          headers: {
+            'Content-Type':            'image/webp',
+            'Content-Length':          String(optimizedBuffer.length),
+            'Cache-Control':           'public, max-age=31536000, immutable',
+            'ETag':                    etag,
+            'Vary':                    'Accept-Encoding',
+            'Content-Disposition':     'inline',
+            'X-Content-Type-Options':  'nosniff',
+            'X-Variant':               variant ?? '',
+            'X-Served-From':           'gcs-generated',
+          },
+        });
+      } catch (err) {
+        console.error(`[media] ⚠️  Inline variant generation failed for "${variantPath}":`, err);
+        // Fall through to serve original if generation fails
+      }
+
     }
 
     // ── Serve the original GCS file ───────────────────────────────────────────
+    const etagOrig = `"${fileParam}"`;
+    if (request.headers.get('if-none-match') === etagOrig) {
+      console.log(`[media] 304 original (fast cached) ${fileParam} (${Date.now() - startMs}ms)`);
+      return new NextResponse(null, { status: 304 });
+    }
+
     const gcsFile = bucket.file(fileParam);
     const [exists] = await gcsFile.exists();
 
@@ -188,13 +220,7 @@ export async function GET(
     // Download the original from GCS
     const [fileBuffer] = await gcsFile.download();
 
-    // Conditional request support (ETag / If-None-Match)
-    const etag        = `"${fileParam}-${fileBuffer.length}"`;
-    const ifNoneMatch = request.headers.get('if-none-match');
-    if (ifNoneMatch === etag) {
-      console.log(`[media] 304 original (cached) ${fileParam} (${Date.now() - startMs}ms)`);
-      return new NextResponse(null, { status: 304 });
-    }
+    // ETag check already happened at the top, just log and serve
 
     console.log(
       `[media] 200 original "${fileParam}"` +
@@ -208,7 +234,7 @@ export async function GET(
         'Content-Length':         String(fileBuffer.length),
         // Immutable: file content never changes for a given key
         'Cache-Control':          'public, max-age=31536000, immutable',
-        'ETag':                   etag,
+        'ETag':                   etagOrig,
         'Vary':                   'Accept-Encoding',
         'Content-Disposition':    'inline',
         'X-Content-Type-Options': 'nosniff',
@@ -216,13 +242,7 @@ export async function GET(
       },
     });
 
-    // ⚡ Fire-and-forget: generate the missing thumbnail variant asynchronously.
-    // The response is already being streamed — this runs after.
-    if (isImage && variantCfg && variant) {
-      const variantPath = `_variants/${variant}/${fileParam}.webp`;
-      // Use void to explicitly mark as intentionally unawaited
-      void generateVariantInBackground(fileParam, variant, variantPath, variantCfg);
-    }
+
 
     return response;
 

@@ -2,8 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { shouldBypassOptimizer } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface Campaign {
   _id?: string;
@@ -125,13 +124,13 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     <section style={heroStyle} className="mobile-hero-height">
       {isImage ? (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Image 
+          <OptimizedImage 
             src={currentCampaign?.videoUrl || ''}
             alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
             fill
             style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
             priority={true}
-            unoptimized={shouldBypassOptimizer(currentCampaign?.videoUrl)}
+            variant="medium"
           />
         </div>
       ) : (

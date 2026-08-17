@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { normalizeImageUrl, shouldBypassOptimizer, PLACEHOLDER_IMAGE } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import ProductCardWishlistButton from './ProductCardWishlistButton';
 
 export interface ProductCardProps {
@@ -25,44 +24,12 @@ export interface ProductCardProps {
 }
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
-  // Resolve primary image: try thumbnail variant first, fall back to original
-  const primaryImageRaw  = product.images[0];
-  const primaryThumb     = normalizeImageUrl(primaryImageRaw, 'thumbnail');
-  const primaryOriginal  = normalizeImageUrl(primaryImageRaw);
-
-  // Resolve hover image from images[1] or first available reference image
-  const hoverImageRaw = product.images[1]
+  const primaryImageRaw  = product.images?.[0];
+  const hoverImageRaw = product.images?.[1]
     || product.referenceImages?.front
     || product.referenceImages?.back
     || product.referenceImages?.left
     || product.referenceImages?.right;
-  const hoverThumb    = hoverImageRaw ? normalizeImageUrl(hoverImageRaw, 'thumbnail') : '';
-  const hoverOriginal = hoverImageRaw ? normalizeImageUrl(hoverImageRaw) : '';
-
-  // Track per-image error state so we can gracefully fall back
-  // Fallback order: thumbnail → original → placeholder (no infinite loops)
-  const [primarySrc, setPrimarySrc] = useState(primaryThumb || primaryOriginal || PLACEHOLDER_IMAGE);
-  const [hoverSrc,   setHoverSrc]   = useState(hoverThumb || hoverOriginal || PLACEHOLDER_IMAGE);
-
-  const handlePrimaryError = useCallback(() => {
-    if (primarySrc === primaryThumb && primaryOriginal) {
-      // Thumbnail failed → try full original
-      console.warn(`[ProductCard] Thumbnail failed for "${primaryImageRaw}", falling back to original`);
-      setPrimarySrc(primaryOriginal);
-    } else {
-      // Original also failed → show placeholder
-      console.warn(`[ProductCard] Original failed for "${primaryImageRaw}", falling back to placeholder`);
-      setPrimarySrc(PLACEHOLDER_IMAGE);
-    }
-  }, [primarySrc, primaryThumb, primaryOriginal, primaryImageRaw]);
-
-  const handleHoverError = useCallback(() => {
-    if (hoverSrc === hoverThumb && hoverOriginal) {
-      setHoverSrc(hoverOriginal);
-    } else {
-      setHoverSrc(PLACEHOLDER_IMAGE);
-    }
-  }, [hoverSrc, hoverThumb, hoverOriginal]);
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style:              'currency',
@@ -100,33 +67,30 @@ export default function ProductCard({ product, variant = 'default', priority = f
           borderRadius:    variant === 'slider' ? '24px' : '0px',
         }}
       >
-        {/* Primary image — uses thumbnail with automatic fallback to original then placeholder */}
-        {primarySrc && (
-          <Image
-            src={primarySrc}
+        {/* Primary image */}
+        {primaryImageRaw && (
+          <OptimizedImage
+            src={primaryImageRaw}
             alt={product.name}
             fill
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, objectPosition: 'top' }}
             priority={priority}
-            // All /api/media/ URLs bypass Next.js optimizer (prevents recursive /_next/image calls)
-            unoptimized={shouldBypassOptimizer(primarySrc)}
-            onError={handlePrimaryError}
+            variant="thumbnail"
             className="product-card-primary-image"
           />
         )}
 
         {/* Hover image — shown via CSS .product-card:hover .product-card-hover-image */}
-        {hoverSrc && hoverSrc !== primarySrc && (
-          <Image
-            src={hoverSrc}
+        {hoverImageRaw && hoverImageRaw !== primaryImageRaw && (
+          <OptimizedImage
+            src={hoverImageRaw}
             alt={`${product.name} alternate`}
             fill
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top' }}
             priority={false}
-            unoptimized={shouldBypassOptimizer(hoverSrc)}
-            onError={handleHoverError}
+            variant="thumbnail"
             className="product-card-hover-image"
           />
         )}
@@ -137,7 +101,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             slug:         product.slug,
             name:         product.name,
             price:        product.price,
-            primaryImage: primaryOriginal || '',
+            primaryImage: primaryImageRaw || '',
           }}
         />
       </div>

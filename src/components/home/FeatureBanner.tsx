@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { shouldBypassOptimizer } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function FeatureBanner({ data }: { data?: any }) {
   const image = data?.image || "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80";
@@ -49,7 +48,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
             autoPlay loop muted playsInline
           />
         ) : (
-          <Image
+          <OptimizedImage
             src={image || ''}
             alt={title ? `Bespokewala ${title} collection` : 'Bespokewala feature collection'}
             fill
@@ -58,7 +57,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               objectFit: 'cover',
               opacity: 0.7,
             }}
-            unoptimized={shouldBypassOptimizer(image)}
+            variant="medium"
           />
         )}
 

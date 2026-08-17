@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useCart, CartItem } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useRouter } from "next/navigation";
-import { normalizeImageUrl } from "@/lib/imageUrl";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 declare global {
   interface Window {
@@ -277,8 +277,8 @@ export default function CheckoutClient() {
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2rem" }}>
             {cart.map((item: CartItem, idx: number) => (
               <div key={idx} style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                <div style={{ width: "60px", height: "80px", flexShrink: 0, backgroundColor: "#eee" }}>
-                  <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <div style={{ position: "relative", width: "60px", height: "80px", flexShrink: 0, backgroundColor: "#eee" }}>
+                  <OptimizedImage src={item.image} alt={item.name} fill style={{ objectFit: "cover" }} variant="thumbnail" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontSize: "0.875rem", fontWeight: 400, margin: 0 }}>{item.name}</h4>

@@ -1,7 +1,8 @@
 import React from 'react';
 import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import dynamic from 'next/dynamic';
 
+const Footer = dynamic(() => import('@/components/layout/Footer'));
 export default function StorefrontLayout({
   children,
 }: {

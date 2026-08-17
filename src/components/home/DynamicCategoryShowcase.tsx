@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface Campaign {
   _id?: string;
@@ -80,10 +81,12 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
-                <img 
+                <OptimizedImage 
                   src={camp.videoUrl}
                   alt={camp.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  variant="medium"
                 />
               )}
 

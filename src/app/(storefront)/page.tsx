@@ -40,7 +40,7 @@ export default async function Home() {
   await dbConnect();
   
   // Fetch up to 4 featured products and serialize them for Client Components
-  const rawFeaturedProducts = await Product.find({ isFeatured: true }).limit(4).lean();
+  const rawFeaturedProducts = await Product.find({ isFeatured: true }).select('name slug price images category referenceImages').limit(4).lean();
   const featuredProducts = JSON.parse(JSON.stringify(rawFeaturedProducts));
   
   // Fetch hero campaigns

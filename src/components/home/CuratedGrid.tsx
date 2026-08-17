@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { shouldBypassOptimizer } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function CuratedGrid({ data }: { data?: any }) {
   const defaultImages = [
@@ -42,13 +41,13 @@ export default function CuratedGrid({ data }: { data?: any }) {
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }} className="mobile-carousel">
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
           <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }} aria-label={`Explore ${item.title} collection`}>
-            <Image 
+            <OptimizedImage 
               src={item.url || ''} 
               alt={item.title ? `Bespokewala ${item.title} collection` : 'Bespokewala curated collection'} 
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
-              unoptimized={shouldBypassOptimizer(item.url)}
+              variant="thumbnail"
             />
             <div style={{ 
               position: 'absolute', 

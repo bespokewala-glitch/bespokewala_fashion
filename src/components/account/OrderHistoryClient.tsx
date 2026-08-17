@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useCurrency } from '@/context/CurrencyContext';
-import { normalizeImageUrl } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 interface OrderItem {
   name: string;
@@ -220,8 +220,8 @@ export default function OrderHistoryClient({ orders }: { orders: OrderData[] }) 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {order.items.map((item, idx) => (
                       <div key={idx} style={{ display: 'flex', gap: '1.25rem', width: '100%', alignItems: 'center' }}>
-                        <div style={{ width: '70px', height: '95px', backgroundColor: '#fafafa', flexShrink: 0, overflow: 'hidden', border: '1px solid #eee' }}>
-                          {item.image && <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                        <div style={{ position: 'relative', width: '70px', height: '95px', backgroundColor: '#fafafa', flexShrink: 0, overflow: 'hidden', border: '1px solid #eee' }}>
+                          {item.image && <OptimizedImage src={item.image} alt={item.name} fill style={{ objectFit: 'cover' }} variant="thumbnail" />}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <h4 style={{ fontSize: '0.85rem', fontWeight: 500, margin: '0 0 0.4rem 0', color: '#000', lineHeight: 1.4 }}>{item.name}</h4>

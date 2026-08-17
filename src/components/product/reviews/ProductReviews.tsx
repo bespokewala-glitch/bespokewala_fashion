@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReviewSummary from './ReviewSummary';
 import ReviewList from './ReviewList';
 import ReviewForm from './ReviewForm';
@@ -8,9 +8,10 @@ import styles from './reviews.module.css';
 
 interface ProductReviewsProps {
   productId: string;
+  deferFetch?: boolean;
 }
 
-export default function ProductReviews({ productId }: ProductReviewsProps) {
+export default function ProductReviews({ productId, deferFetch = false }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<any[]>([]);
   const [stats, setStats] = useState<any>({
     averageRating: 0,
@@ -24,9 +25,31 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   const [sort, setSort] = useState('recent');
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const [inView, setInView] = useState(!deferFetch);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    fetchReviews();
-  }, [productId, page, sort, refreshKey]);
+    if (!deferFetch) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setInView(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '200px' }); // start fetching slightly before it comes into view
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [deferFetch]);
+
+  useEffect(() => {
+    if (inView) {
+      fetchReviews();
+    }
+  }, [productId, page, sort, refreshKey, inView]);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -56,7 +79,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={containerRef}>
       <h2 className={styles.title}>CUSTOMER REVIEWS</h2>
       
       {stats.totalReviews > 0 ? (

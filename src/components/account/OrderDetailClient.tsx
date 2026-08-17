@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useCurrency } from '@/context/CurrencyContext';
-import { normalizeImageUrl } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 import { ArrowLeft, MessageSquare, MapPin, Truck, CheckCircle, Package, Clock } from 'lucide-react';
 
 interface OrderItem {
@@ -136,8 +136,8 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {order.items.map((item, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: '1.25rem', alignItems: 'center' }}>
-                  <div style={{ width: '80px', height: '110px', backgroundColor: '#fafafa', flexShrink: 0, overflow: 'hidden', border: '1px solid #eee' }}>
-                    {item.image && <img src={normalizeImageUrl(item.image)} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                  <div style={{ position: 'relative', width: '80px', height: '110px', backgroundColor: '#fafafa', flexShrink: 0, overflow: 'hidden', border: '1px solid #eee' }}>
+                    {item.image && <OptimizedImage src={item.image} alt={item.name} fill style={{ objectFit: 'cover' }} variant="thumbnail" />}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <h4 style={{ fontSize: '0.9rem', fontWeight: 500, margin: '0 0 0.4rem 0', color: '#000', lineHeight: 1.4 }}>{item.name}</h4>

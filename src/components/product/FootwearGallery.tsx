@@ -10,20 +10,18 @@ interface ProductGalleryProps {
   images: { url: string; alt: string }[];
 }
 
-export default function ProductGallery({ images }: ProductGalleryProps) {
+export default function FootwearGallery({ images }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   // Track which images have been mounted into the DOM.
-  // Initially, only the first image is mounted to prioritize LCP.
+  // We only mount the first image initially. Others mount ONLY when clicked.
   const [mountedImages, setMountedImages] = useState<Set<number>>(new Set([0]));
-
+  
   // Track if the main LCP image has loaded so we can delay thumbnails.
   const [mainImageLoaded, setMainImageLoaded] = useState(false);
 
-
-
-  // Ensure the explicitly clicked thumbnail is instantly mounted if the timeout hasn't fired
+  // When a thumbnail is clicked, mount its corresponding main image
   useEffect(() => {
     setMountedImages(prev => {
       if (prev.has(selectedIndex)) return prev;
@@ -40,12 +38,12 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   return (
     <>
       <style>{`
-        .gallery-container {
+        .footwear-gallery-container {
           display: flex;
           gap: 1.5rem;
           flex-direction: row;
         }
-        .gallery-thumbnails {
+        .footwear-gallery-thumbnails {
           display: flex;
           flex-direction: column;
           gap: 1rem;
@@ -54,53 +52,57 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           opacity: 0;
           transition: opacity 0.5s ease-in;
         }
-        .gallery-thumbnails.visible {
+        .footwear-gallery-thumbnails.visible {
           opacity: 1;
         }
-        .gallery-thumbnail-btn {
+        .footwear-thumbnail-btn {
           width: 100px;
           height: 140px;
         }
         @media (max-width: 768px) {
-          .gallery-container {
+          .footwear-gallery-container {
             flex-direction: column-reverse;
           }
-          .gallery-thumbnails {
+          .footwear-gallery-thumbnails {
             flex-direction: row;
             width: 100%;
             overflow-x: auto;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
           }
-          .gallery-thumbnails::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
+          .footwear-gallery-thumbnails::-webkit-scrollbar {
+            display: none;
           }
-          .gallery-thumbnail-btn {
+          .footwear-thumbnail-btn {
             width: 70px;
             height: 98px;
             flex-shrink: 0;
           }
         }
-        /* NEW: Skeleton Animation */
-        @keyframes gallery-shimmer {
+        
+        @keyframes footwear-shimmer {
           0% { background-position: -1000px 0; }
           100% { background-position: 1000px 0; }
         }
-        .gallery-skeleton {
+        .footwear-skeleton {
           background: #f6f7f8;
           background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
           background-repeat: no-repeat;
           background-size: 1000px 100%;
-          animation: gallery-shimmer 2s infinite linear forwards;
+          animation: footwear-shimmer 2s infinite linear forwards;
         }
       `}</style>
-      <div className="gallery-container">
+      <div className="footwear-gallery-container">
         {/* Main Image (Left side) */}
-        {/* ADDED aspect-ratio to prevent layout shift and gallery-skeleton for shimmering effect */}
-        <div className="gallery-skeleton" style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}>
+        <div className="footwear-skeleton" style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}>
           {images.map((img, idx) => {
             if (!mountedImages.has(idx)) return null;
             
+            // Check if it's a proxy URL that supports ?v=thumbnail
+            const isProxy = img.url.includes('/api/media/');
+            // The image might already have query params
+            const thumbnailUrl = isProxy ? `${img.url}${img.url.includes('?') ? '&' : '?'}v=thumbnail` : img.url;
+
             return (
               <div key={idx} style={{
                   width: '100%',
@@ -111,6 +113,10 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   opacity: selectedIndex === idx ? 1 : 0,
                   transition: 'opacity 0.4s ease-in-out',
                   zIndex: selectedIndex === idx ? 2 : 1,
+                  // Use the already-loaded thumbnail as a background placeholder for instant switching
+                  backgroundImage: idx !== 0 ? `url(${thumbnailUrl})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
               }}>
                 <OptimizedImage
                   src={img.url}
@@ -132,12 +138,12 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         </div>
 
         {/* Thumbnails (Right side) - Only load progressively after main image */}
-        <div className={`gallery-thumbnails ${mainImageLoaded ? 'visible' : ''}`}>
+        <div className={`footwear-gallery-thumbnails ${mainImageLoaded ? 'visible' : ''}`}>
           {mainImageLoaded && images.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedIndex(idx)}
-              className="gallery-thumbnail-btn"
+              className="footwear-thumbnail-btn"
               style={{
                 padding: 0,
                 border: selectedIndex === idx ? '2px solid #d4af37' : '2px solid transparent',
@@ -149,7 +155,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
               }}
               aria-label={`View ${img.alt}`}
             >
-              <div className="gallery-skeleton" style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <div className="footwear-skeleton" style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <OptimizedImage
                   src={img.url}
                   alt={img.alt}
