@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export default function SplitShowcase({ data }: { data?: any }) {
   const modelImage = data?.modelImage || "https://images.unsplash.com/photo-1549439602-43ebca2327af?auto=format&fit=crop&q=80";
@@ -81,6 +82,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
+          unoptimized={shouldBypassOptimizer(modelImage)}
         />
       </div>
 
@@ -115,6 +117,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'contain' }}
+                unoptimized={shouldBypassOptimizer(products[currentIndex].image)}
               />
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>

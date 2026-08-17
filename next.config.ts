@@ -4,50 +4,80 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses
   compress: true,
 
-  // Enable Next.js Image Optimization for external URLs (like Unsplash).
-  // Private GCS images are served via the authenticated /api/media/ proxy.
-  // We bypass Vercel's image optimizer for these proxy URLs using unoptimized={true}
-  // to avoid recursive INVALID_IMAGE_OPTIMIZE_REQUEST errors.
+  // ── Image Optimization ──────────────────────────────────────────────────────
+  //
+  // ARCHITECTURE NOTE:
+  //   GCS bucket is PRIVATE.
+  //   All product images are served through /api/media/<gcs-key>.
+  //   Because the Vercel image optimizer cannot make a recursive call back into
+  //   the same serverless deployment, every <Image> that receives a /api/media/
+  //   URL MUST use:
+  //
+  //     unoptimized={shouldBypassOptimizer(src)}   // from @/lib/imageUrl
+  //
+  //   This is enforced component-by-component — NOT globally — so that external
+  //   images (Unsplash, public CDN) still benefit from Next.js optimization.
+  //
   images: {
     remotePatterns: [
       {
+        // Allow Next.js to optimize images from public GCS CDN URLs
+        // (these only appear as fallbacks — primary images go via /api/media/)
         protocol: 'https',
         hostname: 'storage.googleapis.com',
-        // Match ALL objects in ALL subfolders inside the bucket
         pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-storage'}/**`,
       },
       {
+        // Allow Unsplash images (used in homepage CMS sections)
         protocol: 'https',
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
     ],
-    // Allow /api/media/ proxy paths as valid next/image sources.
-    // Images using this path get unoptimized={true} so the browser fetches the proxy directly.
+
+    // Allow /api/media/ and /uploads/ as valid <Image> src values.
+    // NOTE: We intentionally DO NOT set `search: ''` here — that would block
+    //       URLs with query params like /api/media/uploads/file.png?v=thumbnail.
+    //       Since we already use unoptimized={true} for all /api/media/ URLs,
+    //       Next.js will never actually try to optimize these paths.
     localPatterns: [
       {
         pathname: '/api/media/**',
-        search: '',
+        // No `search` constraint — allow ?v=thumbnail / ?v=medium / ?v=large
       },
       {
         pathname: '/uploads/**',
-        search: '',
       },
     ],
-    // Serve images at these breakpoints only (fewer variants = faster processing)
+
+    // Serve images at these breakpoints only (fewer variants = faster CDN processing)
     deviceSizes: [640, 1080, 1920],
     imageSizes: [320, 480, 640],
+
     // WebP has ~30% better compression than JPEG/PNG
     formats: ['image/webp'],
+
     // Cache optimized images for 60 seconds minimum
     minimumCacheTTL: 60,
   },
 
-  // HTTP caching headers for static assets
+  // ── HTTP Caching Headers ────────────────────────────────────────────────────
   async headers() {
     return [
       {
-        // Aggressively cache product images — they never change once uploaded
+        // Cache /api/media responses at the CDN layer.
+        // Individual responses also set Cache-Control: public, max-age=31536000, immutable
+        // so Vercel's Edge Network caches them aggressively.
+        source: "/api/media/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Legacy: aggressively cache any /uploads/ static files (if served directly)
         source: "/uploads/:path*",
         headers: [
           {
@@ -57,7 +87,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Cache public static files (logo, icons) for 1 day
+        // Cache public static assets (logo, icons, fonts) for 1 day
         source: "/:path*(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2)",
         headers: [
           {

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -70,7 +71,7 @@ export default function WishlistPage() {
                 <Link href={`/products/${item.slug}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ position: 'relative', aspectRatio: '2/3', overflow: 'hidden', backgroundColor: '#f9f9f9' }}>
                     <img 
-                      src={item.image} 
+                      src={normalizeImageUrl(item.image) || item.image} 
                       alt={item.name} 
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
