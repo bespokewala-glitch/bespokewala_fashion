@@ -173,14 +173,14 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                     <Link href={`/products/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%' }}>
                       <img 
                         src={product.images[0]} 
-                        alt={product.name} 
+                        alt={`Bespokewala ${product.name}`} 
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     </Link>
                   ) : (
                     <img 
                       src={product.images[0]} 
-                      alt={product.name} 
+                      alt={`Bespokewala ${product.name}`} 
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                   )}
@@ -217,6 +217,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
       {/* Navigation Buttons (Optional, but good for manual control) */}
       <button 
         onClick={handlePrev}
+        aria-label="Previous featured product"
         style={{
           position: 'absolute',
           left: '5%',
@@ -240,6 +241,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
       </button>
       <button 
         onClick={handleNext}
+        aria-label="Next featured product"
         style={{
           position: 'absolute',
           right: '5%',

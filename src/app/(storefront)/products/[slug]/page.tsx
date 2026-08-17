@@ -22,23 +22,55 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
 
   // If it's a known product type, generate collection metadata
   if (PRODUCT_TYPES.includes(slug)) {
     const title = slug.charAt(0).toUpperCase() + slug.slice(1);
+    const url = `${siteUrl}/products/${slug}`;
     return {
-      title: `${title} | Bespoken`,
-      description: `Shop our luxury ${title.toLowerCase()} collection at Bespoken.`,
+      title: `${title} | Bespokewala`,
+      description: `Shop our luxury ${title.toLowerCase()} collection at Bespokewala.`,
+      alternates: {
+        canonical: url
+      },
+      openGraph: {
+        title: `${title} | Bespokewala`,
+        description: `Shop our luxury ${title.toLowerCase()} collection at Bespokewala.`,
+        url,
+        siteName: 'Bespokewala',
+        type: 'website'
+      }
     };
   }
 
   // Otherwise treat as product slug
   await dbConnect();
-  const product = await Product.findOne({ slug }).select('name description').lean() as any;
-  if (!product) return { title: 'Product Not Found | Bespoken' };
+  const product = await Product.findOne({ slug }).select('name description images').lean() as any;
+  if (!product) return { title: 'Product Not Found | Bespokewala' };
+  
+  const url = `${siteUrl}/products/${slug}`;
+  const imageUrl = product.images && product.images.length > 0 ? normalizeImageUrl(product.images[0]) : undefined;
+
   return {
-    title: `${product.name} | Bespoken`,
+    title: `${product.name} | Bespokewala`,
     description: product.description?.slice(0, 160),
+    alternates: {
+      canonical: url
+    },
+    openGraph: {
+      title: `${product.name} | Bespokewala`,
+      description: product.description?.slice(0, 160),
+      url,
+      siteName: 'Bespokewala',
+      images: imageUrl ? [{ url: imageUrl, width: 800, height: 800 }] : undefined,
+      type: 'website'
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.name} | Bespokewala`,
+      description: product.description?.slice(0, 160),
+    }
   };
 }
 
@@ -120,9 +152,32 @@ export default async function ProductsSlugPage({ params }: Props) {
     gap: '1.5rem',
   };
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  
+  const productSchema = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name,
+    "image": allImages.map(img => img.url),
+    "description": product.description,
+    "sku": product.slug,
+    "offers": {
+      "@type": "Offer",
+      "url": `${siteUrl}/products/${product.slug}`,
+      "priceCurrency": "INR",
+      "price": product.price,
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  };
+
   return (
     <>
-            <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
         <div>
           <ProductGallery images={allImages} />
         </div>

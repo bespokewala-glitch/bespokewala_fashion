@@ -77,7 +77,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
         <Image 
           src={modelImage || ''} 
-          alt="Model wearing jewellery"
+          alt="Bespokewala model showcasing luxury jewellery"
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
@@ -111,7 +111,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
               <Image 
                 src={products[currentIndex].image || ''} 
-                alt={products[currentIndex].name || 'Product Image'}
+                alt={products[currentIndex].name ? `Bespokewala ${products[currentIndex].name}` : 'Bespokewala luxury product'}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'contain' }}

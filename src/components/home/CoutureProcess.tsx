@@ -120,7 +120,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
             ) : (
               <img 
                 src={data?.mainMedia || data?.image || fallbackMedia} 
-                alt="Couture Process" 
+                alt="Bespokewala Couture Process and Craftsmanship" 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             )}

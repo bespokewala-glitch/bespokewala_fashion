@@ -51,7 +51,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
         ) : (
           <Image
             src={image || ''}
-            alt={title || 'Feature Banner'}
+            alt={title ? `Bespokewala ${title} collection` : 'Bespokewala feature collection'}
             fill
             sizes="100vw"
             style={{
@@ -110,7 +110,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               {subtitle}
             </p>
           </div>
-          <Link href={link} prefetch={false} style={{
+          <Link href={link} prefetch={false} aria-label={`Explore ${title || 'collection'}`} style={{
             color: '#fff',
             textDecoration: 'none',
             fontSize: '0.85rem',

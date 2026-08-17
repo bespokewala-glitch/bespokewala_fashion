@@ -127,7 +127,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <Image 
             src={currentCampaign?.videoUrl || ''}
-            alt={currentCampaign?.title || 'Hero Campaign'}
+            alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
             fill
             style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
             priority={true}
@@ -170,9 +170,9 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
       <div style={overlayContentStyle} className="hero-overlay mobile-p-4">
         <div style={subtitleStyle} className="mobile-font-sm">{currentCampaign?.subtitle}</div>
-        <h1 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h1>
+        <h2 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h2>
         {currentCampaign?.linkUrl && (
-          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }}>
+          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }} aria-label={`Explore ${currentCampaign?.title || 'collection'}`}>
             Explore Now
           </Link>
         )}
