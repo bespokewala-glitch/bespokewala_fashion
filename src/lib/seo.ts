@@ -51,7 +51,8 @@ export function generatePageMetadata(
   fallbackDescription: string,
   path: string,
   seoOverrides?: SEOFields,
-  fallbackImage?: string
+  fallbackImage?: string,
+  openGraphType: 'website' | 'article' | 'product' = 'website'
 ): Metadata {
   let title = seoOverrides?.title || fallbackTitle;
   
@@ -64,7 +65,13 @@ export function generatePageMetadata(
   const url = seoOverrides?.canonicalUrl || getCanonicalUrl(path);
   
   const rawImage = seoOverrides?.image || fallbackImage;
-  const imageUrl = rawImage ? normalizeImageUrl(rawImage) : undefined;
+  let imageUrl = rawImage ? normalizeImageUrl(rawImage) : undefined;
+  
+  if (imageUrl && imageUrl.startsWith('/')) {
+    imageUrl = `${SITE_URL}${imageUrl}`;
+  }
+
+  const twitterImageUrl = imageUrl ? `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}twitter=1` : undefined;
 
   const metadata: Metadata = {
     title,
@@ -77,14 +84,14 @@ export function generatePageMetadata(
       description,
       url,
       siteName: SITE_NAME,
-      type: 'website',
+      type: openGraphType as any,
       images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630 }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: imageUrl ? [imageUrl] : undefined,
+      images: twitterImageUrl ? [twitterImageUrl] : undefined,
     },
   };
 
@@ -147,7 +154,8 @@ export function generateCategoryMetadata(
   productType: string,
   category?: string,
   subcategory?: string,
-  seoOverrides?: SEOFields
+  seoOverrides?: SEOFields,
+  fallbackImage?: string
 ): Metadata {
   const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   
@@ -183,7 +191,10 @@ export function generateCategoryMetadata(
     description = `Shop our luxury ${pt.toLowerCase()} collection at ${SITE_NAME}.`;
   }
   
-  return generatePageMetadata(title, description, path, seoOverrides);
+  // Use a default category image if none provided
+  const finalFallbackImage = fallbackImage || `/images/categories/${productType}-default.jpg`;
+  
+  return generatePageMetadata(title, description, path, seoOverrides, finalFallbackImage);
 }
 
 /**
@@ -194,30 +205,33 @@ export function generateProductMetadata(
   seoOverrides?: SEOFields,
   fallbackImage?: string
 ): Metadata {
-  let path = '/products';
-  if (product.productType) path += `/${product.productType}`;
-  if (product.category) path += `/${product.category}`;
-  if (product.subcategory) path += `/${product.subcategory}`;
-  path += `/${product.slug}`;
+  const path = `/products/${product.slug}`;
 
   // Build a rich description using available product attributes if a custom one isn't provided
   let fallbackDesc = product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}.`;
   if (!product.seo?.description && !seoOverrides?.description) {
     const details = [];
-    if (product.colors && product.colors.length > 0) details.push(`Available in ${product.colors.join(', ')}.`);
-    if (product.details?.material || product.details?.composition) details.push(`Made of ${product.details.material || product.details.composition}.`);
+    if (product.colors && product.colors.length > 0) details.push(`Color: ${product.colors.join(', ')}.`);
+    if (product.details?.material || product.details?.composition || product.fabric) details.push(`Fabric: ${product.details?.material || product.details?.composition || product.fabric}.`);
+    if (product.productType) details.push(`Style: ${product.productType}.`);
     
     if (details.length > 0) {
-      fallbackDesc = `${product.name} from our ${product.category || 'luxury'} collection. ${details.join(' ')} Shop at ${SITE_NAME}.`;
+      fallbackDesc = `Shop the ${product.name}${product.category ? ` from our ${product.category} collection` : ''}. ${details.join(' ')} Explore luxury fashion at ${SITE_NAME}.`;
     }
   }
 
+  const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const formattedTitle = product.category 
+    ? `${product.name} | ${capitalize(product.category)}` 
+    : product.name;
+
   return generatePageMetadata(
-    product.name,
+    formattedTitle,
     fallbackDesc,
     path,
     seoOverrides || product.seo,
-    fallbackImage
+    fallbackImage,
+    'product'
   );
 }
 
@@ -256,7 +270,7 @@ export function generateProductSchema(product: any, allImages: { url: string }[]
     },
     "offers": {
       "@type": "Offer",
-      "url": getCanonicalUrl(product.productType ? `/products/${product.productType}${product.category ? `/${product.category}` : ''}${product.subcategory ? `/${product.subcategory}` : ''}/${product.slug}` : `/products/${product.slug}`),
+      "url": getCanonicalUrl(`/products/${product.slug}`),
       "priceCurrency": "INR",
       "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
@@ -309,7 +323,7 @@ export function generateItemListSchema(products: any[], listUrl: string) {
       "item": {
         "@type": "Product",
         "name": product.name,
-        "url": getCanonicalUrl(product.productType ? `/products/${product.productType}${product.category ? `/${product.category}` : ''}${product.subcategory ? `/${product.subcategory}` : ''}/${product.slug}` : `/products/${product.slug}`),
+        "url": getCanonicalUrl(`/products/${product.slug}`),
         "image": product.images?.[0] ? normalizeImageUrl(product.images[0]) : undefined
       }
     }))

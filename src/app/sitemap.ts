@@ -91,11 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     products.forEach((product: any) => {
       if (!product.slug) return;
       
-      let productPath = '/products';
-      if (product.productType) productPath += `/${product.productType}`;
-      if (product.category) productPath += `/${product.category}`;
-      if (product.subcategory) productPath += `/${product.subcategory}`;
-      productPath += `/${product.slug}`;
+      const productPath = `/products/${product.slug}`;
 
       routes.push({
         url: getCanonicalUrl(productPath),
