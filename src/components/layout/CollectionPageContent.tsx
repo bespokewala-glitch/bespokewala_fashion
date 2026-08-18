@@ -12,7 +12,7 @@ import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import { getOrFetch } from '@/lib/serverCache';
-import { generateBreadcrumbSchema, generateItemListSchema } from '@/lib/seo';
+import { generateBreadcrumbSchema, generateItemListSchema, generateCategoryHeading } from '@/lib/seo';
 
 export interface CollectionPageParams {
   productType?: string;
@@ -110,14 +110,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   });
 
   /**
-   * Page title priority: subcategory > collectionName > category > productType > 'All Products'
-   * e.g. subcategory "ring" → "Ring"
+   * Use reusable title logic to produce meaningful H1s 
+   * (e.g. "Luxury Women's Lehengas", "Luxury Footwear Collection")
    */
-  const rawTitle = subcategory || collectionName || category || productType || 'All Products';
-  const pageTitle = rawTitle
-    .split('-')
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+  const pageTitle = generateCategoryHeading(productType, category, subcategory, collectionName);
 
   /** Breadcrumb trail so users know where they are */
   const breadcrumbs: { label: string; href: string }[] = [{ label: 'Home', href: '/' }];
@@ -204,7 +200,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 className="h1">{pageTitle}</h1>
           <p className="subtitle" style={{ marginTop: '1rem' }}>
-            Discover our luxury {pageTitle.toLowerCase()} collection.
+            Discover our {pageTitle.toLowerCase()}.
           </p>
         </div>
 

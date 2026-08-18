@@ -81,6 +81,44 @@ export function generatePageMetadata(
   return metadata;
 }
 
+export function generateCategoryHeading(
+  productType?: string,
+  category?: string,
+  subcategory?: string,
+  collectionName?: string
+): string {
+  const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  
+  if (collectionName) {
+    return `${capitalize(collectionName)} Collection`;
+  }
+
+  const pt = productType ? capitalize(productType) : 'Products';
+  
+  if (subcategory && category) {
+    const sub = capitalize(subcategory);
+    const cat = capitalize(category);
+    const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
+    // Handle basic pluralization
+    const pluralSub = sub.endsWith('s') ? sub : `${sub}s`;
+    return `Luxury ${gender} ${pluralSub}`;
+  } else if (category && productType) {
+    const cat = capitalize(category);
+    const isGender = cat.toLowerCase() === 'womens' || cat.toLowerCase() === 'mens';
+    const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
+    
+    if (isGender) {
+      return `Luxury ${gender} ${pt}`;
+    } else {
+      return `Luxury ${cat} – ${pt}`;
+    }
+  } else if (productType) {
+    return `Luxury ${pt} Collection`;
+  }
+  
+  return 'All Products';
+}
+
 /**
  * Dynamically generate title and metadata for category pages.
  */
@@ -101,10 +139,10 @@ export function generateCategoryMetadata(
   if (subcategory && category) {
     const sub = capitalize(subcategory);
     const cat = capitalize(category);
-    // e.g. Womens -> Women
     const gender = cat.toLowerCase() === 'womens' ? 'Women' : cat.toLowerCase() === 'mens' ? 'Men' : cat;
-    title = `Luxury Designer ${sub}s for ${gender}`;
-    description = `Explore our exclusive collection of luxury designer ${sub.toLowerCase()}s for ${gender.toLowerCase()} at ${SITE_NAME}.`;
+    const pluralSub = sub.endsWith('s') ? sub : `${sub}s`;
+    title = `Luxury Designer ${pluralSub} for ${gender}`;
+    description = `Explore our exclusive collection of luxury designer ${pluralSub.toLowerCase()} for ${gender.toLowerCase()} at ${SITE_NAME}.`;
     path = `${path}/${category}/${subcategory}`;
   } else if (category) {
     const cat = capitalize(category);
