@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ContactPageContent from "@/components/contact/ContactPageContent";
 
 export const metadata: Metadata = {
-  title: "Contact Us | Bespokewala Fashion — Mumbai Atelier",
+  title: "Contact Us",
   description:
     "Get in touch with Bespokewala Fashion. Visit our Mumbai studio at Lotus Arc One, Andheri West, email us at bespokewala@gmail.com, or chat on WhatsApp for bridal consultations and custom orders.",
 };

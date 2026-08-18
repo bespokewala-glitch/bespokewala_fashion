@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
-import { generatePageMetadata } from '@/lib/seo';
+import { generatePageMetadata, generateCategoryMetadata } from '@/lib/seo';
 import dbConnect from '@/lib/mongoose';
 import Taxonomy from '@/models/Taxonomy';
 
@@ -13,27 +13,16 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: productType, category } = await params;
-  const pt = productType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  const cat = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   try {
     await dbConnect();
     const taxonomy = await Taxonomy.findOne({ slug: category, type: { $in: ['category', 'collection'] } }).lean();
     if (taxonomy && taxonomy.seo) {
-      return generatePageMetadata(
-        `${cat} – ${pt} | Bespokewala`,
-        `Explore the ${cat} collection from our ${pt.toLowerCase()} range at Bespokewala.`,
-        `/products/${productType}/${category}`,
-        taxonomy.seo
-      );
+      return generateCategoryMetadata(productType, category, undefined, taxonomy.seo);
     }
   } catch (err) {}
 
-  return generatePageMetadata(
-    `${cat} – ${pt} | Bespokewala`,
-    `Explore the ${cat} collection from our ${pt.toLowerCase()} range at Bespokewala.`,
-    `/products/${productType}/${category}`
-  );
+  return generateCategoryMetadata(productType, category);
 }
 
 /**

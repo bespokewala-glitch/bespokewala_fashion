@@ -14,6 +14,15 @@ export interface SEOFields {
 }
 
 /**
+ * Strips query strings and trailing slashes for canonical URLs to prevent duplicate indexing
+ */
+export function getCanonicalUrl(path: string): string {
+  const cleanPath = path.split('?')[0].replace(/\/+$/, '');
+  const pathWithSlash = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
+  return `${SITE_URL}${pathWithSlash}`;
+}
+
+/**
  * Generate Next.js Metadata based on provided SEO overrides or fallbacks.
  */
 export function generatePageMetadata(
@@ -23,12 +32,15 @@ export function generatePageMetadata(
   seoOverrides?: SEOFields,
   fallbackImage?: string
 ): Metadata {
-  const title = seoOverrides?.title || fallbackTitle;
+  let title = seoOverrides?.title || fallbackTitle;
+  
+  // Strip ALL existing " | Bespokewala" occurrences from database overrides so the Next.js 
+  // global template in layout.tsx can append it exactly once without duplication.
+  title = title.replace(new RegExp(`(?:\\s*\\|\\s*${SITE_NAME})+`, 'gi'), '');
+
   const description = seoOverrides?.description || fallbackDescription;
   
-  // Handle absolute URL paths correctly
-  const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
-  const url = seoOverrides?.canonicalUrl || `${SITE_URL}${pathWithSlash}`;
+  const url = seoOverrides?.canonicalUrl || getCanonicalUrl(path);
   
   const rawImage = seoOverrides?.image || fallbackImage;
   const imageUrl = rawImage ? normalizeImageUrl(rawImage) : undefined;
@@ -69,6 +81,69 @@ export function generatePageMetadata(
   return metadata;
 }
 
+/**
+ * Dynamically generate title and metadata for category pages.
+ */
+export function generateCategoryMetadata(
+  productType: string,
+  category?: string,
+  subcategory?: string,
+  seoOverrides?: SEOFields
+): Metadata {
+  const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  
+  let title = '';
+  let description = '';
+  let path = `/products/${productType}`;
+  
+  const pt = capitalize(productType);
+  
+  if (subcategory && category) {
+    const sub = capitalize(subcategory);
+    const cat = capitalize(category);
+    // e.g. Womens -> Women
+    const gender = cat.toLowerCase() === 'womens' ? 'Women' : cat.toLowerCase() === 'mens' ? 'Men' : cat;
+    title = `Luxury Designer ${sub}s for ${gender}`;
+    description = `Explore our exclusive collection of luxury designer ${sub.toLowerCase()}s for ${gender.toLowerCase()} at ${SITE_NAME}.`;
+    path = `${path}/${category}/${subcategory}`;
+  } else if (category) {
+    const cat = capitalize(category);
+    const isGender = cat.toLowerCase() === 'womens' || cat.toLowerCase() === 'mens';
+    const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
+    
+    if (isGender) {
+      title = `Luxury ${gender} ${pt}`;
+      description = `Discover luxury ${gender.toLowerCase()} ${pt.toLowerCase()} at ${SITE_NAME}.`;
+    } else {
+      title = `Luxury ${cat} – ${pt}`;
+      description = `Explore the ${cat} collection from our ${pt.toLowerCase()} range at ${SITE_NAME}.`;
+    }
+    path = `${path}/${category}`;
+  } else {
+    title = `Luxury ${pt} Collection`;
+    description = `Shop our luxury ${pt.toLowerCase()} collection at ${SITE_NAME}.`;
+  }
+  
+  return generatePageMetadata(title, description, path, seoOverrides);
+}
+
+/**
+ * Dynamically generate product metadata
+ */
+export function generateProductMetadata(
+  product: any,
+  seoOverrides?: SEOFields,
+  fallbackImage?: string
+): Metadata {
+  return generatePageMetadata(
+    product.name,
+    product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}`,
+    `/products/${product.slug}`,
+    seoOverrides || product.seo,
+    fallbackImage
+  );
+}
+
 // ─── Schema Generators (JSON-LD) ─────────────────────────────────────────────
 
 export function generateOrganizationSchema() {
@@ -91,7 +166,7 @@ export function generateWebSiteSchema() {
 }
 
 export function generateProductSchema(product: any, allImages: { url: string }[]) {
-  return {
+  const schema: any = {
     "@context": "https://schema.org/",
     "@type": "Product",
     "name": product.name,
@@ -113,6 +188,17 @@ export function generateProductSchema(product: any, allImages: { url: string }[]
         : "https://schema.org/OutOfStock"
     }
   };
+  
+  if (product.reviews && product.reviews.length > 0) {
+    const sum = product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      "ratingValue": (sum / product.reviews.length).toFixed(1),
+      "reviewCount": product.reviews.length
+    };
+  }
+  
+  return schema;
 }
 
 export function generateBreadcrumbSchema(items: { label: string; href: string }[]) {
@@ -120,8 +206,8 @@ export function generateBreadcrumbSchema(items: { label: string; href: string }[
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": items.map((item, index) => {
-      // Ensure href forms a complete absolute URL
-      const itemUrl = item.href.startsWith('http') ? item.href : `${SITE_URL}${item.href.startsWith('/') ? '' : '/'}${item.href}`;
+      const cleanHref = item.href.split('?')[0];
+      const itemUrl = cleanHref.startsWith('http') ? cleanHref : `${SITE_URL}${cleanHref.startsWith('/') ? '' : '/'}${cleanHref}`;
       return {
         "@type": "ListItem",
         "position": index + 1,
@@ -133,7 +219,8 @@ export function generateBreadcrumbSchema(items: { label: string; href: string }[
 }
 
 export function generateItemListSchema(products: any[], listUrl: string) {
-  const url = listUrl.startsWith('http') ? listUrl : `${SITE_URL}${listUrl.startsWith('/') ? '' : '/'}${listUrl}`;
+  const cleanUrl = listUrl.split('?')[0];
+  const url = cleanUrl.startsWith('http') ? cleanUrl : `${SITE_URL}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",

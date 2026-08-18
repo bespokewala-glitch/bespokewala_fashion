@@ -40,7 +40,7 @@ export default function ProductCardWishlistButton({ product }: ProductCardWishli
         right: '12px',
         background: 'transparent',
         border: 'none',
-        padding: '8px',
+        padding: '12px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

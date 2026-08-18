@@ -24,17 +24,22 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
   priority?: boolean;
 }
 
-const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
+const gcsLoader = ({ src, width, quality }: import('next/image').ImageLoaderProps) => {
   if (src.startsWith('/api/media/')) {
     // Strip any existing ?v= to recalculate based on width for retina/responsive support
-    const baseUrl = src.includes('?v=') ? src.slice(0, src.indexOf('?v=')) : src;
+    let baseUrl = src;
+    if (src.includes('?v=')) {
+      baseUrl = src.slice(0, src.indexOf('?v='));
+    } else if (src.includes('?')) {
+      baseUrl = src.slice(0, src.indexOf('?'));
+    }
 
     // Generate responsive variants based on Next.js requested width.
     let v = 'large';
     if (width <= 640) v = 'thumbnail';
     else if (width <= 1080) v = 'medium';
     
-    return `${baseUrl}?v=${v}`;
+    return `${baseUrl}?v=${v}&w=${width}&q=${quality || 75}`;
   }
   return src;
 };

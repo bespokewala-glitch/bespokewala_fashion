@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Wishlist | Bespokewala',
+  title: 'Wishlist',
   robots: {
     index: false,
     follow: false,

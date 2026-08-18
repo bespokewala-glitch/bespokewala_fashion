@@ -19,7 +19,7 @@ import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema
 export const revalidate = 3600; // Cache for 1 hour
 
 export const metadata: Metadata = generatePageMetadata(
-  "Bespokewala | Luxury Couture, Footwear & Jewellery",
+  "Luxury Couture, Footwear & Jewellery",
   "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
   "/"
 );

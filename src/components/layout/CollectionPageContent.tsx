@@ -174,7 +174,15 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       ] : [];
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
-  const itemListSchema = generateItemListSchema(products, `/${pageTitle.toLowerCase().replace(/ /g, '-')}`);
+  
+  // Construct canonical path for ItemList
+  let canonicalPath = '/products';
+  if (productType) canonicalPath += `/${productType}`;
+  if (category) canonicalPath += `/${category}`;
+  if (subcategory) canonicalPath += `/${subcategory}`;
+  else if (collectionName) canonicalPath += `/${collectionName}`; // Fallback if it's a collection page
+
+  const itemListSchema = generateItemListSchema(products, canonicalPath);
 
   return (
     <>

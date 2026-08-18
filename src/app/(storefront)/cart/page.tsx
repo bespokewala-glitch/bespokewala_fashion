@@ -3,7 +3,7 @@ import CartClient from '@/components/cart/CartClient';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Cart | Bespokewala',
+  title: 'Cart',
   robots: {
     index: false,
     follow: false,

@@ -18,7 +18,7 @@ const ProductReviews = dynamic(() => import('@/components/product/reviews/Produc
 
 export const revalidate = 60;
 
-import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema } from '@/lib/seo';
+import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
 
 // Known product types — used to distinguish /products/jewellery (listing)
 // from /products/the-pink-diamond-ring (product detail)
@@ -34,28 +34,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // If it's a known product type, generate collection metadata
   if (PRODUCT_TYPES.includes(slug)) {
-    const title = slug.charAt(0).toUpperCase() + slug.slice(1);
-    return generatePageMetadata(
-      `${title} | Bespokewala`,
-      `Shop our luxury ${title.toLowerCase()} collection at Bespokewala.`,
-      `/products/${slug}`
-    );
+    return generateCategoryMetadata(slug);
   }
 
   // Otherwise treat as product slug
   await dbConnect();
   const product = await Product.findOne({ slug }).select('name description images seo').lean() as any;
-  if (!product) return { title: 'Product Not Found | Bespokewala' };
+  if (!product) return { title: 'Product Not Found' };
   
   const imageUrl = product.images && product.images.length > 0 ? product.images[0] : undefined;
   
-  return generatePageMetadata(
-    `${product.name} | Bespokewala`,
-    product.description?.slice(0, 160) || '',
-    `/products/${slug}`,
-    product.seo,
-    imageUrl
-  );
+  return generateProductMetadata(product, product.seo, imageUrl);
 }
 
 /**

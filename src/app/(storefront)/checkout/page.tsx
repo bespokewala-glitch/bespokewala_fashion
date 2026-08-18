@@ -6,7 +6,7 @@ import CheckoutClient from '@/components/checkout/CheckoutClient';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Checkout | Bespokewala',
+  title: 'Checkout',
   robots: {
     index: false,
     follow: false,

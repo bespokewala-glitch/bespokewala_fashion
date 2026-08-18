@@ -85,7 +85,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
         {hoverImageRaw && hoverImageRaw !== primaryImageRaw && (
           <OptimizedImage
             src={hoverImageRaw}
-            alt={`${product.name} alternate`}
+            alt={`${product.name} - Alternate View`}
             fill
             sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top' }}

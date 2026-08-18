@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Login | Bespokewala',
+  title: 'Login',
   robots: {
     index: false,
     follow: false,

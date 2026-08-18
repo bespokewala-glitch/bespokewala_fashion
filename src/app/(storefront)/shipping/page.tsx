@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ShippingPageContent from "@/components/shipping/ShippingPageContent";
 
 export const metadata: Metadata = {
-  title: "Shipping & Returns | Bespokewala Fashion",
+  title: "Shipping & Returns",
   description:
     "Learn about Bespokewala Fashion's shipping options, delivery timelines, return policy, and how to track your order. Free shipping on orders above ₹15,000 within India.",
 };

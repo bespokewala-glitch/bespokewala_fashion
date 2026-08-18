@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import FaqPageContent from "@/components/faq/FaqPageContent";
 
 export const metadata: Metadata = {
-  title: "FAQ | Bespokewala Fashion — Frequently Asked Questions",
+  title: "FAQ",
   description:
     "Find answers to the most common questions about Bespokewala Fashion — orders, shipping, returns, custom garments, sizing, payments, and more.",
 };

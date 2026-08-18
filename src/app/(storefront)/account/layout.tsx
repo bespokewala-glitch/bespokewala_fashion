@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'My Account | Bespokewala',
+  title: 'My Account',
   robots: {
     index: false,
     follow: false,
