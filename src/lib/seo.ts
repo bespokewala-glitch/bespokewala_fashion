@@ -200,9 +200,21 @@ export function generateProductMetadata(
   if (product.subcategory) path += `/${product.subcategory}`;
   path += `/${product.slug}`;
 
+  // Build a rich description using available product attributes if a custom one isn't provided
+  let fallbackDesc = product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}.`;
+  if (!product.seo?.description && !seoOverrides?.description) {
+    const details = [];
+    if (product.colors && product.colors.length > 0) details.push(`Available in ${product.colors.join(', ')}.`);
+    if (product.details?.material || product.details?.composition) details.push(`Made of ${product.details.material || product.details.composition}.`);
+    
+    if (details.length > 0) {
+      fallbackDesc = `${product.name} from our ${product.category || 'luxury'} collection. ${details.join(' ')} Shop at ${SITE_NAME}.`;
+    }
+  }
+
   return generatePageMetadata(
     product.name,
-    product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}`,
+    fallbackDesc,
     path,
     seoOverrides || product.seo,
     fallbackImage
@@ -244,7 +256,7 @@ export function generateProductSchema(product: any, allImages: { url: string }[]
     },
     "offers": {
       "@type": "Offer",
-      "url": `${SITE_URL}/products/${product.slug}`,
+      "url": getCanonicalUrl(product.productType ? `/products/${product.productType}${product.category ? `/${product.category}` : ''}${product.subcategory ? `/${product.subcategory}` : ''}/${product.slug}` : `/products/${product.slug}`),
       "priceCurrency": "INR",
       "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
@@ -297,7 +309,7 @@ export function generateItemListSchema(products: any[], listUrl: string) {
       "item": {
         "@type": "Product",
         "name": product.name,
-        "url": `${SITE_URL}/products/${product.slug}`,
+        "url": getCanonicalUrl(product.productType ? `/products/${product.productType}${product.category ? `/${product.category}` : ''}${product.subcategory ? `/${product.subcategory}` : ''}/${product.slug}` : `/products/${product.slug}`),
         "image": product.images?.[0] ? normalizeImageUrl(product.images[0]) : undefined
       }
     }))

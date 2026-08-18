@@ -4,7 +4,10 @@ import Product from '@/models/Product';
 import Taxonomy from '@/models/Taxonomy';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  const { getCanonicalUrl } = await import('@/lib/seo');
+  
+  // Use getCanonicalUrl directly for base so we get the production domain correctly overridden
+  const siteUrl = getCanonicalUrl('/').replace(/\/$/, '');
 
   const routes: MetadataRoute.Sitemap = [
     {
@@ -64,14 +67,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         if (tax.productTypes && tax.productTypes.length > 0) {
           urlPath = `/products/${tax.productTypes[0]}/${tax.slug}`;
         } else {
-          urlPath = `/products?category=${tax.slug}`;
+          urlPath = `/products/${tax.slug}`; // Changed from query params to avoid duplicate issues
         }
       } else {
-        urlPath = `/products?${tax.type}=${tax.slug}`;
+        // Fallback for occasion or other types - generally we don't index ?query parameters in sitemap
+        // but if it's an occasion taxonomy it might have a dedicated path eventually
+        return; 
       }
 
       routes.push({
-        url: `${siteUrl}${urlPath}`,
+        url: getCanonicalUrl(urlPath),
         lastModified: tax.updatedAt ? new Date(tax.updatedAt) : new Date(),
         changeFrequency: 'weekly',
         priority: 0.8,
@@ -81,12 +86,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Add public products
     // TODO(SEO): If product count exceeds 10,000, implement Next.js generateSitemaps() 
     // to split sitemaps into chunks and prevent timeout/size limits.
-    const products = await Product.find({ 'seo.noIndex': { $ne: true } }).select('slug updatedAt').lean();
+    const products = await Product.find({ 'seo.noIndex': { $ne: true } }).select('slug productType category subcategory updatedAt').lean();
     
     products.forEach((product: any) => {
       if (!product.slug) return;
+      
+      let productPath = '/products';
+      if (product.productType) productPath += `/${product.productType}`;
+      if (product.category) productPath += `/${product.category}`;
+      if (product.subcategory) productPath += `/${product.subcategory}`;
+      productPath += `/${product.slug}`;
+
       routes.push({
-        url: `${siteUrl}/products/${product.slug}`,
+        url: getCanonicalUrl(productPath),
         lastModified: product.updatedAt ? new Date(product.updatedAt) : new Date(),
         changeFrequency: 'weekly',
         priority: 0.7,
@@ -96,5 +108,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error generating sitemap:', error);
   }
 
-  return routes;
+  // De-duplicate URLs just in case
+  const uniqueUrls = new Set<string>();
+  const uniqueRoutes: MetadataRoute.Sitemap = [];
+  
+  for (const route of routes) {
+    if (!uniqueUrls.has(route.url)) {
+      uniqueUrls.add(route.url);
+      uniqueRoutes.push(route);
+    }
+  }
+
+  return uniqueRoutes;
 }

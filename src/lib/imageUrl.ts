@@ -118,7 +118,7 @@ export function normalizeImageUrl(
  */
 export function shouldBypassOptimizer(url: string | null | undefined): boolean {
   if (!url) return false;
-  return url.startsWith('/api/');
+  return url.startsWith('/api/') || url.includes('/api/media/');
 }
 
 /**
