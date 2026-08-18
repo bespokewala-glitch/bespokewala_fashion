@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Otherwise treat as product slug
   await dbConnect();
-  const product = await Product.findOne({ slug }).select('name description images seo').lean() as any;
+  const product = await Product.findOne({ slug }).select('name slug description images seo productType category subcategory').lean() as any;
   if (!product) return { title: 'Product Not Found' };
   
   const imageUrl = product.images && product.images.length > 0 ? product.images[0] : undefined;

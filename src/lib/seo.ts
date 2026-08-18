@@ -17,9 +17,30 @@ export interface SEOFields {
  * Strips query strings and trailing slashes for canonical URLs to prevent duplicate indexing
  */
 export function getCanonicalUrl(path: string): string {
-  const cleanPath = path.split('?')[0].replace(/\/+$/, '');
+  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  
+  // Force production domain for canonicals if baseUrl is localhost, ngrok, or vercel preview
+  if (
+    baseUrl.includes('localhost') || 
+    baseUrl.includes('ngrok') || 
+    baseUrl.includes('vercel.app')
+  ) {
+    baseUrl = 'https://www.bespokewala.com';
+  }
+
+  // Remove trailing slash from base url if present
+  baseUrl = baseUrl.replace(/\/+$/, '');
+
+  // Strip query string and remove trailing slashes from path
+  let cleanPath = path.split('?')[0].replace(/\/+$/, '');
+  
+  // Handle root vs nested paths
+  if (cleanPath === '') {
+    return `${baseUrl}/`; // Root domain canonical usually has trailing slash
+  }
+  
   const pathWithSlash = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
-  return `${SITE_URL}${pathWithSlash}`;
+  return `${baseUrl}${pathWithSlash}`;
 }
 
 /**
@@ -173,10 +194,16 @@ export function generateProductMetadata(
   seoOverrides?: SEOFields,
   fallbackImage?: string
 ): Metadata {
+  let path = '/products';
+  if (product.productType) path += `/${product.productType}`;
+  if (product.category) path += `/${product.category}`;
+  if (product.subcategory) path += `/${product.subcategory}`;
+  path += `/${product.slug}`;
+
   return generatePageMetadata(
     product.name,
     product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}`,
-    `/products/${product.slug}`,
+    path,
     seoOverrides || product.seo,
     fallbackImage
   );
