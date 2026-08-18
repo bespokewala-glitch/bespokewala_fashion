@@ -4,6 +4,33 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses
   compress: true,
 
+  // ── Redirects ───────────────────────────────────────────────────────────────
+  async redirects() {
+    return [
+      {
+        source: '/index.html',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/index',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        // Redirect any *.html page to its clean route (e.g., /about.html -> /about)
+        source: '/:path*.html',
+        destination: '/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   // ── Image Optimization ──────────────────────────────────────────────────────
   //
   // ARCHITECTURE NOTE:
