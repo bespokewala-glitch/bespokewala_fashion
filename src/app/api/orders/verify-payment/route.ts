@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
@@ -52,11 +52,16 @@ export async function POST(request: Request) {
     let calculatedSubtotal = 0;
     const finalItems = [];
 
+    const productSlugs = items.map((i: any) => {
+      if (!i.productSlug) throw new Error("Product slug is required");
+      return i.productSlug;
+    });
+
+    const products = await Product.find({ slug: { $in: productSlugs } }).lean();
+    const productMap = new Map(products.map((p: any) => [p.slug, p]));
+
     for (const item of items) {
-      if (!item.productSlug) {
-        return NextResponse.json({ message: "Product slug is required" }, { status: 400 });
-      }
-      const product = await Product.findOne({ slug: item.productSlug });
+      const product = productMap.get(item.productSlug);
       if (!product) {
         return NextResponse.json({ message: `Product not found: ${item.productSlug}` }, { status: 404 });
       }

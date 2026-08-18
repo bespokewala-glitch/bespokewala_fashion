@@ -79,6 +79,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     // Add public products
+    // TODO(SEO): If product count exceeds 10,000, implement Next.js generateSitemaps() 
+    // to split sitemaps into chunks and prevent timeout/size limits.
     const products = await Product.find({ 'seo.noIndex': { $ne: true } }).select('slug updatedAt').lean();
     
     products.forEach((product: any) => {

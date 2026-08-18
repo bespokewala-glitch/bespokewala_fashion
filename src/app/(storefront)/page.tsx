@@ -16,7 +16,7 @@ import { Metadata } from 'next';
 
 import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
 
-export const revalidate = 0;
+export const revalidate = 3600; // Cache for 1 hour
 
 export const metadata: Metadata = generatePageMetadata(
   "Bespokewala | Luxury Couture, Footwear & Jewellery",
@@ -30,6 +30,9 @@ export default async function Home() {
   // Fetch up to 4 featured products and serialize them for Client Components
   const rawFeaturedProducts = await Product.find({ isFeatured: true }).select('name slug price images category referenceImages').limit(4).lean();
   const featuredProducts = JSON.parse(JSON.stringify(rawFeaturedProducts));
+  
+  // Track used product IDs to avoid duplicates on the homepage
+  const usedProductIds = new Set(rawFeaturedProducts.map(p => p._id.toString()));
   
   // Fetch hero campaigns
   const campaigns = await HeroCampaign.find({}).sort({ order: 1 }).lean();
@@ -60,6 +63,32 @@ export default async function Home() {
   hpSections.forEach(s => {
     sectionMap[s.sectionType] = s.content;
   });
+
+  // Dynamically resolve product slugs for CuratedGrid based on title
+  if (sectionMap.CuratedGrid?.items) {
+    const titles = sectionMap.CuratedGrid.items.map((i: any) => i.title).filter(Boolean);
+    const matchingProducts = await Product.find({ name: { $in: titles } }).select('_id name slug').lean();
+    matchingProducts.forEach(p => usedProductIds.add(p._id.toString()));
+    sectionMap.CuratedGrid.items = sectionMap.CuratedGrid.items.map((item: any) => {
+      const match = matchingProducts.find(p => p.name === item.title);
+      return {
+        ...item,
+        link: match ? `/products/${match.slug}` : '#'
+      };
+    });
+  }
+
+  // Populate SplitShowcase with actual products instead of dummy/hardcoded data without slugs
+  const showcaseProducts = await Product.find({ _id: { $nin: Array.from(usedProductIds) } }).sort({ createdAt: -1 }).limit(5).select('name slug price images').lean();
+  if (showcaseProducts.length > 0) {
+    if (!sectionMap.SplitShowcase) sectionMap.SplitShowcase = {};
+    sectionMap.SplitShowcase.products = showcaseProducts.map((p: any) => ({
+      name: p.name,
+      slug: p.slug,
+      price: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(p.price),
+      image: p.images?.[0] || ''
+    }));
+  }
 
   const organizationSchema = generateOrganizationSchema();
   const websiteSchema = generateWebSiteSchema();
@@ -100,16 +129,9 @@ export default async function Home() {
           <PremiumFeaturedCarousel products={featuredProducts} />
 
           <div style={{ marginTop: '4rem' }} className="mobile-section-mt">
-            <Link href="/products" style={{
-              display: 'inline-block',
-              padding: '1rem 3rem',
-              backgroundColor: '#000',
-              color: '#fff',
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontSize: '0.9rem'
-            }} className="mobile-label-clamp">View All Products</Link>
+            <Link href="/products" className="btn-primary mobile-label-clamp" aria-label="View All Products">
+              View All Products
+            </Link>
           </div>
         </section>
       </main>

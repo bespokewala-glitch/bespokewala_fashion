@@ -101,14 +101,14 @@ export default function SplitShowcase({ data }: { data?: any }) {
         
         {/* Top Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }} className="mobile-label-clamp">Our Collection</p>
+          <h2 style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }} className="mobile-label-clamp">Our Collection</h2>
           <div style={{ width: '30px', height: '1px', backgroundColor: '#ccc', margin: '0 auto' }} />
         </div>
 
         {/* Main Slider Area */}
         <div style={{ position: 'relative', width: '100%', maxWidth: '500px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           
-          <div key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem' }}>
+          <Link href={products[currentIndex].slug ? `/products/${products[currentIndex].slug}` : '#'} key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem', textDecoration: 'none' }} aria-label={`View ${products[currentIndex].name}`}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
               <OptimizedImage 
                 src={products[currentIndex].image || ''} 
@@ -121,18 +121,20 @@ export default function SplitShowcase({ data }: { data?: any }) {
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>
             <p style={{ fontSize: '1rem', color: '#888' }} className="mobile-body-clamp">{products[currentIndex].price}</p>
-          </div>
+          </Link>
           
           {/* Pagination Dots */}
           <div style={{ display: 'flex', gap: '10px', marginTop: '1.5rem' }} className="mobile-section-mt">
             {products.map((_: any, idx: number) => (
-              <div 
+              <button 
                 key={idx}
                 onClick={() => setCurrentIndex(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
                 style={{ 
                   width: '6px', height: '6px', borderRadius: '50%', 
                   backgroundColor: idx === currentIndex ? '#333' : '#e0e0e0',
-                  cursor: 'pointer', transition: 'background-color 0.3s'
+                  cursor: 'pointer', transition: 'background-color 0.3s',
+                  border: 'none', padding: 0
                 }} 
               />
             ))}

@@ -1,0 +1,1 @@
+const { MongoClient } = require('mongodb'); require('dotenv').config(); async function run() { const client = new MongoClient(process.env.MONGODB_URI); await client.connect(); const db = client.db('bespoken_fashion'); const p = await db.collection('Products').findOne({ name: 'Pastel Blossom Lehenga' }); console.log('Pastel:', p); process.exit(0); } run();

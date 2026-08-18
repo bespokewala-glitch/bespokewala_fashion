@@ -72,11 +72,11 @@ function errorResponse(
 }
 
 /**
- * Extracts the authenticated user ID from the JWT cookie.
+ * Extracts the authenticated user from the JWT cookie.
  * Tries both 'token' and 'auth-token' cookie names.
  * Returns null if no valid token is found.
  */
-async function getAuthenticatedUserId(): Promise<string | null> {
+async function getAuthenticatedUser(): Promise<{ id: string, role?: string } | null> {
   const cookieStore = await cookies();
   const rawToken =
     cookieStore.get('token')?.value ||
@@ -85,21 +85,33 @@ async function getAuthenticatedUserId(): Promise<string | null> {
   if (!rawToken) return null;
 
   const decoded = await verifyToken(rawToken);
-  return (decoded?.userId as string) ?? (decoded?.id as string) ?? null;
+  if (!decoded) return null;
+  const id = (decoded?.userId as string) ?? (decoded?.id as string);
+  if (!id) return null;
+  
+  return { id, role: decoded?.role as string | undefined };
 }
 
 // ─── POST Handler ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     // ── 1. JWT Authentication ─────────────────────────────────────────────────
-    const uploader_id = await getAuthenticatedUserId();
-    if (!uploader_id) {
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) {
       return errorResponse(
         'Authentication required. Please log in before uploading.',
         'UNAUTHORIZED',
         401
       );
     }
+    if (authUser.role !== 'admin') {
+      return errorResponse(
+        'Admin privileges required to upload media.',
+        'FORBIDDEN',
+        403
+      );
+    }
+    const uploader_id = authUser.id;
 
     // ── 2. Parse body ─────────────────────────────────────────────────────────
     let body: any;

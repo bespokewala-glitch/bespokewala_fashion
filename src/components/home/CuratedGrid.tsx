@@ -64,17 +64,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
       </div>
 
       <div style={{ marginTop: '3rem', textAlign: 'center' }} className="mobile-section-mt">
-        <Link href="/products" prefetch={false} style={{ 
-          display: 'inline-block',
-          padding: '0.8rem 2rem',
-          border: '1px solid #000',
-          color: '#000',
-          textDecoration: 'none',
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          fontSize: '0.9rem',
-          transition: 'all 0.3s ease'
-        }} className="mobile-label-clamp" aria-label="View all Bespokewala products">
+        <Link href="/products" prefetch={false} className="btn-secondary mobile-label-clamp" aria-label="View all Bespokewala products">
           View All
         </Link>
       </div>

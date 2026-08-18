@@ -102,9 +102,9 @@ export default function FeatureBanner({ data }: { data?: any }) {
           background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)'
         }} className="mobile-flex-col mobile-p-4" >
           <div className="mobile-text-left" style={{ textAlign: 'left', width: '100%', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.5rem', letterSpacing: '0.15em', fontWeight: 300, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+            <h3 style={{ fontSize: '1.5rem', letterSpacing: '0.15em', fontWeight: 300, margin: '0 0 8px 0', textTransform: 'uppercase' }}>
               {title}
-            </h2>
+            </h3>
             <p style={{ fontSize: '1rem', fontStyle: 'italic', margin: 0, color: '#c1a68d', fontWeight: 500 }}>
               {subtitle}
             </p>

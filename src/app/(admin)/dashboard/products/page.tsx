@@ -76,12 +76,16 @@ function AdminProductsContent() {
     isFeatured: false,
   });
 
-  const fetchProductsAndTaxonomies = async () => {
+  const fetchProductsAndTaxonomies = async (type?: string) => {
     try {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       
+      const queryParams = new URLSearchParams();
+      queryParams.set('limit', '1000');
+      if (type) queryParams.set('productType', type);
+
       const [productsRes, taxRes] = await Promise.all([
-        fetch(`${baseUrl}/api/products?limit=1000`),
+        fetch(`${baseUrl}/api/products?${queryParams.toString()}`),
         fetch(`${baseUrl}/api/taxonomies`)
       ]);
 
@@ -139,8 +143,8 @@ function AdminProductsContent() {
   };
 
   useEffect(() => {
-    fetchProductsAndTaxonomies();
-  }, []);
+    fetchProductsAndTaxonomies(activeProductType);
+  }, [activeProductType]);
 
   const fetchMenuImages = async () => {
     if (!activeProductType) return;

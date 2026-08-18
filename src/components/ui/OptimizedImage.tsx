@@ -56,16 +56,22 @@ export default function OptimizedImage({
   // 1. Resolve URLs
   const targetSrc = normalizeImageUrl(src, variant);
   const originalSrc = normalizeImageUrl(src);
+  const resolvedSrc = targetSrc || originalSrc || PLACEHOLDER_IMAGE;
   
-  // 2. Track state for fallbacks
-  const [currentSrc, setCurrentSrc] = useState<string>(targetSrc || originalSrc || PLACEHOLDER_IMAGE);
+  // 2. Track error state
+  const [hasError, setHasError] = useState(false);
 
   // 3. Fallback logic
   const handleError = useCallback(() => {
-    if (currentSrc !== PLACEHOLDER_IMAGE) {
-      setCurrentSrc(PLACEHOLDER_IMAGE);
-    }
-  }, [currentSrc]);
+    setHasError(true);
+  }, []);
+
+  // Update error state if src changes
+  React.useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const currentSrc = hasError ? PLACEHOLDER_IMAGE : resolvedSrc;
 
   if (!currentSrc) {
     return <div style={{ width: '100%', height: '100%', backgroundColor: '#f5f5f5' }} aria-hidden="true" />;

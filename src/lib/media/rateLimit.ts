@@ -23,6 +23,7 @@ const LIMITS: Record<string, RateLimitConfig> = {
   uploaderEntity: { windowMs: 60 * 60_000,    maxRequests: 30 },   // 30/hr per user+type (upload)
   // Private file serving — tighter window to prevent abuse and excessive GCS costs
   serve:          { windowMs: 60_000,         maxRequests: 30 },   // 30/min per user  (serve)
+  auth:           { windowMs: 15 * 60_000,    maxRequests: 5 },    // 5/15min per IP   (auth)
 };
 
 export interface RateLimitResult {
