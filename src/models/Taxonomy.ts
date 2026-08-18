@@ -9,6 +9,14 @@ export interface ITaxonomy {
   enabled: boolean;
   productTypes: string[];
   genders: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string;
+    canonicalUrl?: string;
+    noIndex?: boolean;
+    image?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,6 +30,14 @@ const taxonomySchema = new Schema<ITaxonomy>(
     enabled: { type: Boolean, default: true },
     productTypes: { type: [String], default: [] },
     genders: { type: [String], default: [] },
+    seo: {
+      title: { type: String },
+      description: { type: String },
+      keywords: { type: String },
+      canonicalUrl: { type: String },
+      noIndex: { type: Boolean, default: false },
+      image: { type: String },
+    },
   },
   {
     timestamps: true,

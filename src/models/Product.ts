@@ -34,6 +34,14 @@ const productSchema = new Schema<IProduct>(
       disclaimer: { type: String },
       legal: { type: String },
     },
+    seo: {
+      title: { type: String },
+      description: { type: String },
+      keywords: { type: String },
+      canonicalUrl: { type: String },
+      noIndex: { type: Boolean, default: false },
+      image: { type: String },
+    },
   },
   {
     timestamps: true,

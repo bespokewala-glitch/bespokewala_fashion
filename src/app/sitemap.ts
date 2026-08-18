@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
+import Taxonomy from '@/models/Taxonomy';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
@@ -52,7 +53,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     await dbConnect();
-    const products = await Product.find({}).select('slug updatedAt').lean();
+    
+    // Add dynamic taxonomies
+    const taxonomies = await Taxonomy.find({ enabled: true }).select('slug type updatedAt seo').lean();
+    taxonomies.forEach((tax: any) => {
+      if (!tax.slug || tax.seo?.noIndex) return;
+      
+      let urlPath = `/products`;
+      if (tax.type === 'category' || tax.type === 'collection') {
+        if (tax.productTypes && tax.productTypes.length > 0) {
+          urlPath = `/products/${tax.productTypes[0]}/${tax.slug}`;
+        } else {
+          urlPath = `/products?category=${tax.slug}`;
+        }
+      } else {
+        urlPath = `/products?${tax.type}=${tax.slug}`;
+      }
+
+      routes.push({
+        url: `${siteUrl}${urlPath}`,
+        lastModified: tax.updatedAt ? new Date(tax.updatedAt) : new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      });
+    });
+
+    // Add public products
+    const products = await Product.find({ 'seo.noIndex': { $ne: true } }).select('slug updatedAt').lean();
     
     products.forEach((product: any) => {
       if (!product.slug) return;

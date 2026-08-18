@@ -12,6 +12,7 @@ import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import { getOrFetch } from '@/lib/serverCache';
+import { generateBreadcrumbSchema, generateItemListSchema } from '@/lib/seo';
 
 export interface CollectionPageParams {
   productType?: string;
@@ -172,8 +173,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         { title: 'New Arrivals', href: '/products/jewellery/new-arrivals', subtitle: 'Latest creations', image: '' },
       ] : [];
 
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+  const itemListSchema = generateItemListSchema(products, `/${pageTitle.toLowerCase().replace(/ /g, '-')}`);
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
       <main style={containerStyle} className="mobile-px-4 desktop-pt-hero">
         {/* Curated Sections */}

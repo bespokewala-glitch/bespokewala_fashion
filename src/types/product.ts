@@ -31,6 +31,14 @@ export interface IProduct {
     disclaimer?: string;
     legal?: string;
   };
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string;
+    canonicalUrl?: string;
+    noIndex?: boolean;
+    image?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

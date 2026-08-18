@@ -9,13 +9,18 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
+    const productType = searchParams.get('productType');
+    
     const skip = (page - 1) * limit;
+    
+    const query: any = {};
+    if (productType) query.productType = productType;
 
-    const products = await Product.find({})
-      .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType')
+    const products = await Product.find(query)
+      .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType isFeatured')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit > 100 ? 100 : limit)
+      .limit(limit > 1000 ? 1000 : limit)
       .lean();
       
     return NextResponse.json(products);

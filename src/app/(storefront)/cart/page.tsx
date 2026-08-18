@@ -1,5 +1,14 @@
 import React from 'react';
 import CartClient from '@/components/cart/CartClient';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Cart | Bespokewala',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function CartPage() {
   return (

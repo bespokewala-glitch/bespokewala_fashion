@@ -3,6 +3,15 @@ import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import CheckoutClient from '@/components/checkout/CheckoutClient';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Checkout | Bespokewala',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function CheckoutPage() {
   const cookieStore = await cookies();

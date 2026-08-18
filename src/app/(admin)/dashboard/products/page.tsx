@@ -81,7 +81,7 @@ function AdminProductsContent() {
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
       
       const [productsRes, taxRes] = await Promise.all([
-        fetch(`${baseUrl}/api/products`),
+        fetch(`${baseUrl}/api/products?limit=1000`),
         fetch(`${baseUrl}/api/taxonomies`)
       ]);
 

@@ -19,8 +19,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Bespokewala",
-  description: "Luxury Indian Fashion",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com'),
+  title: {
+    template: '%s | Bespokewala',
+    default: 'Bespokewala | Luxury Indian Fashion',
+  },
+  description: "Discover Bespokewala's luxury couture, footwear and jewellery collections.",
+  openGraph: {
+    title: 'Bespokewala | Luxury Indian Fashion',
+    description: "Discover Bespokewala's luxury couture, footwear and jewellery collections.",
+    siteName: 'Bespokewala',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  }
 };
 
 

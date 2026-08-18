@@ -3,6 +3,15 @@ import AccountSidebar from '@/components/account/AccountSidebar';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'My Account | Bespokewala',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function AccountLayout({
   children,

@@ -14,27 +14,15 @@ import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import { Metadata } from 'next';
 
+import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
+
 export const revalidate = 0;
 
-export const metadata: Metadata = {
-  title: "Bespokewala | Luxury Couture, Footwear & Jewellery",
-  description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
-  alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/` : undefined
-  },
-  openGraph: {
-    title: "Bespokewala | Luxury Couture, Footwear & Jewellery",
-    description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
-    url: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/` : undefined,
-    siteName: "Bespokewala",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Bespokewala | Luxury Couture, Footwear & Jewellery",
-    description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
-  }
-};
+export const metadata: Metadata = generatePageMetadata(
+  "Bespokewala | Luxury Couture, Footwear & Jewellery",
+  "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
+  "/"
+);
 
 export default async function Home() {
   await dbConnect();
@@ -73,22 +61,8 @@ export default async function Home() {
     sectionMap[s.sectionType] = s.content;
   });
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
-
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Bespokewala",
-    "url": siteUrl,
-    "logo": `${siteUrl}/logo.png`,
-  };
-
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Bespokewala",
-    "url": siteUrl,
-  };
+  const organizationSchema = generateOrganizationSchema();
+  const websiteSchema = generateWebSiteSchema();
 
   return (
     <>
