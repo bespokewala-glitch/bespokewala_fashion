@@ -51,8 +51,7 @@ export function generatePageMetadata(
   fallbackDescription: string,
   path: string,
   seoOverrides?: SEOFields,
-  fallbackImage?: string,
-  openGraphType: 'website' | 'article' | 'product' = 'website'
+  fallbackImage?: string
 ): Metadata {
   let title = seoOverrides?.title || fallbackTitle;
   
@@ -84,7 +83,7 @@ export function generatePageMetadata(
       description,
       url,
       siteName: SITE_NAME,
-      type: openGraphType as any,
+      type: 'website',
       images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630 }] : undefined,
     },
     twitter: {
@@ -230,8 +229,7 @@ export function generateProductMetadata(
     fallbackDesc,
     path,
     seoOverrides || product.seo,
-    fallbackImage,
-    'product'
+    fallbackImage
   );
 }
 
