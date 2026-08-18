@@ -26,15 +26,15 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
 
 const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
   if (src.startsWith('/api/media/')) {
-    // If a variant is explicitly forced via the URL, retain it across all widths.
-    if (src.includes('?v=')) return src;
+    // Strip any existing ?v= to recalculate based on width for retina/responsive support
+    const baseUrl = src.includes('?v=') ? src.slice(0, src.indexOf('?v=')) : src;
 
-    // Otherwise, generate responsive variants based on Next.js requested width.
+    // Generate responsive variants based on Next.js requested width.
     let v = 'large';
     if (width <= 640) v = 'thumbnail';
     else if (width <= 1080) v = 'medium';
     
-    return `${src}?v=${v}`;
+    return `${baseUrl}?v=${v}`;
   }
   return src;
 };
@@ -79,10 +79,6 @@ export default function OptimizedImage({
 
   // Determine if it's a proxy URL that should use our custom GCS loader
   const isProxyUrl = shouldBypassOptimizer(currentSrc);
-  
-  // If the variant is explicitly forced in the proxy URL, we don't need a responsive srcset.
-  // Using unoptimized=true prevents Next.js from generating multiple widths mapping to the same URL.
-  const isVariantForced = isProxyUrl && currentSrc.includes('?v=');
 
   return (
     <Image
@@ -90,8 +86,8 @@ export default function OptimizedImage({
       src={currentSrc}
       alt={alt || "Bespokewala Image"}
       priority={priority}
-      unoptimized={isVariantForced}
-      loader={isProxyUrl && !isVariantForced ? gcsLoader : undefined}
+      unoptimized={false}
+      loader={isProxyUrl ? gcsLoader : undefined}
       onError={handleError}
     />
   );

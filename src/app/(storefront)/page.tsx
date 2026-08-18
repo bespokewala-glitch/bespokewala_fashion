@@ -27,15 +27,19 @@ export const metadata: Metadata = generatePageMetadata(
 export default async function Home() {
   await dbConnect();
   
-  // Fetch up to 4 featured products and serialize them for Client Components
-  const rawFeaturedProducts = await Product.find({ isFeatured: true }).select('name slug price images category referenceImages').limit(4).lean();
+  // Fetch up to 10 featured products and serialize them for Client Components (minimum 7 needed for smooth carousel loop without duplicating)
+  const rawFeaturedProducts = await Product.find({ isFeatured: true })
+    .sort({ _id: -1 })
+    .select('name slug price images category referenceImages')
+    .limit(10)
+    .lean();
   const featuredProducts = JSON.parse(JSON.stringify(rawFeaturedProducts));
   
   // Track used product IDs to avoid duplicates on the homepage
   const usedProductIds = new Set(rawFeaturedProducts.map(p => p._id.toString()));
   
   // Fetch hero campaigns
-  const campaigns = await HeroCampaign.find({}).sort({ order: 1 }).lean();
+  const campaigns = await HeroCampaign.find({}).sort({ order: 1, _id: -1 }).lean();
   const plainCampaigns = campaigns.map(c => ({
     _id: c._id.toString(),
     title: c.title,
@@ -58,7 +62,7 @@ export default async function Home() {
   const beautyMedia = plainCampaigns.filter(c => c.category === 'beauty');
 
   // Fetch Homepage Sections
-  const hpSections = await HomepageSection.find({ page: 'home' }).lean();
+  const hpSections = await HomepageSection.find({ page: 'home' }).sort({ _id: -1 }).lean();
   const sectionMap: any = {};
   hpSections.forEach(s => {
     sectionMap[s.sectionType] = s.content;
@@ -67,7 +71,10 @@ export default async function Home() {
   // Dynamically resolve product slugs for CuratedGrid based on title
   if (sectionMap.CuratedGrid?.items) {
     const titles = sectionMap.CuratedGrid.items.map((i: any) => i.title).filter(Boolean);
-    const matchingProducts = await Product.find({ name: { $in: titles } }).select('_id name slug').lean();
+    const matchingProducts = await Product.find({ name: { $in: titles } })
+      .sort({ _id: -1 })
+      .select('_id name slug')
+      .lean();
     matchingProducts.forEach(p => usedProductIds.add(p._id.toString()));
     sectionMap.CuratedGrid.items = sectionMap.CuratedGrid.items.map((item: any) => {
       const match = matchingProducts.find(p => p.name === item.title);
@@ -79,7 +86,11 @@ export default async function Home() {
   }
 
   // Populate SplitShowcase with actual products instead of dummy/hardcoded data without slugs
-  const showcaseProducts = await Product.find({ _id: { $nin: Array.from(usedProductIds) } }).sort({ createdAt: -1 }).limit(5).select('name slug price images').lean();
+  const showcaseProducts = await Product.find({ _id: { $nin: Array.from(usedProductIds) } })
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(5)
+    .select('name slug price images')
+    .lean();
   if (showcaseProducts.length > 0) {
     if (!sectionMap.SplitShowcase) sectionMap.SplitShowcase = {};
     sectionMap.SplitShowcase.products = showcaseProducts.map((p: any) => ({
