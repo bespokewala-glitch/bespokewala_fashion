@@ -41,7 +41,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
   };
 
   return (
-    <section style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }} className="mobile-flex-col mobile-m-0 couture-process-section">
+    <section id="couture-process" style={{ backgroundColor: '#faf8f5', display: 'flex', flexWrap: 'wrap', minHeight: '80vh', marginTop: '6rem' }} className="mobile-flex-col mobile-m-0 couture-process-section">
       {/* Left Column - Accordion */}
       <div className="couture-process-accordion mobile-section-py mobile-px-container" style={{ flex: '1 1 50%', padding: '6rem 4rem', boxSizing: 'border-box' }}>
         <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '4rem', textTransform: 'uppercase', color: '#333' }} className="mobile-h2-clamp mobile-section-mb">

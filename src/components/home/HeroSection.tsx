@@ -21,9 +21,9 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const fallbackCampaigns: Campaign[] = [
-    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/' },
-    { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products?productType=jewellery' },
-    { title: 'Footwear', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products?productType=footwear' }
+    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products/couture/womens' },
+    { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products/jewellery' },
+    { title: 'Footwear', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products/footwear' }
   ];
 
   const activeCampaigns = campaigns && campaigns.length > 0 ? campaigns : fallbackCampaigns;
@@ -171,8 +171,12 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         <div style={subtitleStyle} className="mobile-font-sm">{currentCampaign?.subtitle}</div>
         <h2 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h2>
         {currentCampaign?.linkUrl && (
-          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem' }} aria-label={`Explore ${currentCampaign?.title || 'collection'}`}>
-            Explore Now
+          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label={`Explore ${currentCampaign?.title || 'collection'}`}>
+            {currentCampaign?.title ? (
+              currentCampaign.title.toLowerCase().includes('jewellery') || currentCampaign.title.toLowerCase().includes('footwear') 
+                ? `Shop ${currentCampaign.title}` 
+                : `Explore ${currentCampaign.title}`
+            ) : 'Discover Collection'}
           </Link>
         )}
       </div>

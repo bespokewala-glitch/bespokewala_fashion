@@ -12,6 +12,7 @@ import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
+import TrustSection from '@/components/home/TrustSection';
 import { Metadata } from 'next';
 
 import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
@@ -122,6 +123,7 @@ export default async function Home() {
         
         {/* Curated Sections */}
         <CuratedGrid data={sectionMap.CuratedGrid} />
+        <TrustSection />
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <CoutureProcess data={sectionMap.CoutureProcess} />
@@ -129,19 +131,76 @@ export default async function Home() {
 
 
         {/* Featured Products */}
-        <section style={{ padding: '8rem 0', textAlign: 'center', width: '100%', overflow: 'hidden' }} className="mobile-section-py">
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 300, letterSpacing: '0.1em', marginBottom: '1rem', textTransform: 'uppercase' }} className="mobile-h2-clamp">
+        {/* Featured Products */}
+        <section className="featured-arrivals-section">
+          <style>{`
+            .featured-arrivals-section {
+              padding: 6rem 0;
+              text-align: center;
+              width: 100%;
+              overflow: hidden;
+            }
+            .featured-arrivals-h2 {
+              font-size: 2.5rem;
+              font-weight: 300;
+              letter-spacing: 0.1em;
+              margin-bottom: 1rem;
+              text-transform: uppercase;
+            }
+            .featured-arrivals-sub {
+              color: #666;
+              font-size: 0.9rem;
+              margin-bottom: 0rem;
+              font-style: italic;
+              max-width: 600px;
+              margin: 0 auto;
+              line-height: 1.6;
+            }
+            .featured-cta-container {
+              margin-top: 4rem;
+            }
+            
+            @media (max-width: 767px) {
+              .featured-arrivals-section {
+                padding: 40px 0 30px 0;
+              }
+              .featured-arrivals-h2 {
+                font-size: 22px;
+                letter-spacing: 2px;
+                margin-bottom: 8px;
+              }
+              .featured-arrivals-sub {
+                font-size: 12px;
+                font-style: normal;
+                margin-bottom: 30px;
+              }
+              .featured-cta-container {
+                margin-top: 30px;
+              }
+              .featured-cta-btn {
+                font-size: 10px !important;
+                letter-spacing: 1.5px !important;
+                height: 46px !important;
+                padding: 0 24px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+              }
+            }
+          `}</style>
+          
+          <h2 className="featured-arrivals-h2">
             Featured Arrivals
           </h2>
-          <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '0rem', fontStyle: 'italic', maxWidth: '600px', margin: '0 auto', lineHeight: '1.6' }} className="mobile-body-clamp">
+          <p className="featured-arrivals-sub">
             Curated collection for the season
           </p>
           
           <PremiumFeaturedCarousel products={featuredProducts} />
 
-          <div style={{ marginTop: '4rem' }} className="mobile-section-mt">
-            <Link href="/products" className="btn-primary mobile-label-clamp" aria-label="View All Products">
-              View All Products
+          <div className="featured-cta-container">
+            <Link href="/products" className="btn-primary featured-cta-btn" aria-label="Explore Full Collection">
+              Explore Full Collection
             </Link>
           </div>
         </section>

@@ -97,6 +97,7 @@
 
   .mobile-hero-height {
     height: 65dvh !important;
+    min-height: 480px !important;
   }
 
   .mobile-p-4 {
@@ -201,7 +202,7 @@
   }
 
   .hero-overlay {
-    bottom: 2rem !important;
+    bottom: 3rem !important;
     left: 1.5rem !important;
     padding: 0 !important;
   }
@@ -771,8 +772,8 @@
   .mobile-px-container > section {
     width: 100% !important;
     max-width: 100% !important;
-    /* Responsive height: ~52vw gives good editorial proportion without full-screen */
-    height: clamp(180px, 52vw, 320px) !important;
+    /* Increased height so the long jewellery title + subtitle + link in the overlay fit without clipping */
+    height: clamp(240px, 65vw, 380px) !important;
     border-radius: 14px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
     overflow: hidden !important;
@@ -1221,7 +1222,7 @@
 
   /* FeatureBanner hero */
   .mobile-px-container > section {
-    height: clamp(160px, 48vw, 260px) !important;
+    height: clamp(220px, 60vw, 300px) !important;
   }
 
   /* Curated grid cards */
@@ -1231,7 +1232,7 @@
   }
 
   /* SplitShowcase model image */
-  .mobile-flex-col > div:first-child {
+  .split-showcase-section.mobile-flex-col > div:first-child {
     height: 200px !important;
   }
 

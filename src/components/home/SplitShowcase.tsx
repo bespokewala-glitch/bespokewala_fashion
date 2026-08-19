@@ -74,7 +74,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       `}} />
       
       {/* Left side - Fixed Model Image */}
-      <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', position: 'relative' }}>
+      <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', minHeight: '400px', position: 'relative' }}>
         <OptimizedImage 
           src={modelImage || ''} 
           alt="Bespokewala model showcasing luxury jewellery"

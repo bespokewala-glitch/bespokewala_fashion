@@ -7,17 +7,17 @@ export default function CuratedGrid({ data }: { data?: any }) {
     {
       url: 'https://images.unsplash.com/photo-1579298245158-33e8f568f7d3?auto=format&fit=crop&q=80',
       title: 'Bridal Couture',
-      link: '/products?productType=couture'
+      link: '/products/couture/womens'
     },
     {
       url: 'https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80',
       title: 'Fine Jewellery',
-      link: '/products?productType=jewellery'
+      link: '/products/jewellery'
     },
     {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
       title: 'Footwear',
-      link: '/products?productType=footwear'
+      link: '/products/footwear'
     }
   ];
 
@@ -64,8 +64,8 @@ export default function CuratedGrid({ data }: { data?: any }) {
       </div>
 
       <div style={{ marginTop: '3rem', textAlign: 'center' }} className="mobile-section-mt">
-        <Link href="/products" prefetch={false} className="btn-secondary mobile-label-clamp" aria-label="View all Bespokewala products">
-          View All
+        <Link href="/products" prefetch={false} className="btn-secondary mobile-label-clamp" aria-label="Explore all Bespokewala collections">
+          Explore Collections
         </Link>
       </div>
     </section>

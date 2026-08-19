@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -8,26 +8,115 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function PremiumFeaturedCarousel({ products }: { products: any[] }) {
   const { formatPrice } = useCurrency();
-  // We need enough items to create a smooth loop. 
-  // If the user only has 2-4 featured products, we duplicate them to ensure the carousel never runs empty.
+  const [items, setItems] = useState<any[]>([]);
+
+  // Mobile Auto-Scroll Logic
+  const mobileRailRef = useRef<HTMLDivElement>(null);
+  const isInteractingRef = useRef(false);
+  
+  // Duplicate products extensively to create a robust seamless infinite loop 
+  // without complex mid-scroll jump math. 15 sets is typically ~60-75 cards.
+  const mobileProducts = Array.from({ length: 15 }).flatMap(() => products);
+
+  useEffect(() => {
+    const rail = mobileRailRef.current;
+    if (!rail) return;
+    
+    // We will use a reliable, continuous interval.
+    const interval = setInterval(() => {
+      // Pause if tab is hidden or user is interacting
+      if (document.hidden || isInteractingRef.current) return;
+      
+      const el = mobileRailRef.current;
+      if (!el) return;
+      
+      const cards = el.children;
+      if (cards.length === 0) return;
+      
+      const firstCard = cards[0] as HTMLElement;
+      const cardWidth = firstCard.offsetWidth + 14; 
+      if (cardWidth <= 14) return; // Not fully rendered yet
+      
+      // Calculate which card we are currently snapped to
+      const currentIndex = Math.round(el.scrollLeft / cardWidth);
+      
+      // If we are reaching the end of our cloned sets, jump back to the middle
+      if (currentIndex >= mobileProducts.length - 4) {
+        const middleIndex = Math.floor(mobileProducts.length / 2);
+        const middleChild = cards[middleIndex] as HTMLElement;
+        if (middleChild) {
+          // Instant jump (invisible to user)
+          el.scrollTo({ left: middleChild.offsetLeft - 20, behavior: 'auto' });
+          
+          // Wait a tiny fraction for DOM to settle, then smooth scroll to the *next* one
+          setTimeout(() => {
+            if (mobileRailRef.current) {
+              const nextTarget = mobileRailRef.current.children[middleIndex + 1] as HTMLElement;
+              if (nextTarget) {
+                mobileRailRef.current.scrollTo({ left: nextTarget.offsetLeft - 20, behavior: 'smooth' });
+              }
+            }
+          }, 50);
+        }
+        return;
+      }
+      
+      // Normal smooth advance to the exact next card
+      const nextIndex = currentIndex + 1;
+      const targetChild = cards[nextIndex] as HTMLElement;
+      
+      if (targetChild) {
+        // We subtract 20 to account for the container's padding-left: 20px
+        el.scrollTo({ left: targetChild.offsetLeft - 20, behavior: 'smooth' });
+      }
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [mobileProducts.length]);
+
+  // Handle touch interactions to pause auto-scroll
+  useEffect(() => {
+    const rail = mobileRailRef.current;
+    if (!rail) return;
+    
+    let resumeTimeout: NodeJS.Timeout;
+    
+    const handleInteractStart = () => {
+      isInteractingRef.current = true;
+      clearTimeout(resumeTimeout);
+    };
+    
+    const handleInteractEnd = () => {
+      clearTimeout(resumeTimeout);
+      // Wait 4 seconds after user stops touching before resuming
+      resumeTimeout = setTimeout(() => {
+        isInteractingRef.current = false;
+      }, 4000);
+    };
+
+    // Use passive listeners for scroll performance
+    rail.addEventListener('touchstart', handleInteractStart, { passive: true });
+    rail.addEventListener('touchend', handleInteractEnd, { passive: true });
+    rail.addEventListener('pointerdown', handleInteractStart, { passive: true });
+    rail.addEventListener('pointerup', handleInteractEnd, { passive: true });
+    
+    return () => {
+      rail.removeEventListener('touchstart', handleInteractStart);
+      rail.removeEventListener('touchend', handleInteractEnd);
+      rail.removeEventListener('pointerdown', handleInteractStart);
+      rail.removeEventListener('pointerup', handleInteractEnd);
+      clearTimeout(resumeTimeout);
+    };
+  }, []);
+
+  // Desktop Carousel Logic
   const getExtendedProducts = () => {
     let extended = [...products];
     while (extended.length < 7) {
       extended = [...extended, ...products];
     }
-    // Give them unique IDs for Framer Motion to track them properly during reordering
     return extended.map((p, i) => ({ ...p, uniqueId: `${p._id}-${i}` }));
   };
-
-  const [items, setItems] = useState<any[]>([]);
-  const [windowWidth, setWindowWidth] = useState(1200);
-
-  useEffect(() => {
-    setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -35,12 +124,11 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
     }
   }, [products]);
 
-  // Auto-scroll logic
   useEffect(() => {
     if (items.length === 0) return;
     const interval = setInterval(() => {
       handleNext();
-    }, 4000); // 4 seconds
+    }, 4000);
     return () => clearInterval(interval);
   }, [items]);
 
@@ -63,8 +151,6 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
   };
 
   const handleItemClick = (index: number) => {
-    // We only care if they clicked an item that is NOT the center.
-    // Center is index 3 (in an array of 7 visible items: 0, 1, 2, [3], 4, 5, 6)
     const centerIndex = 3;
     if (index === centerIndex) return;
 
@@ -73,13 +159,11 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
     setItems((prev) => {
       let newItems = [...prev];
       if (diff > 0) {
-        // shift left by diff
         for (let i = 0; i < diff; i++) {
           const first = newItems.shift();
           if (first) newItems.push(first);
         }
       } else {
-        // shift right by abs(diff)
         for (let i = 0; i < Math.abs(diff); i++) {
           const last = newItems.pop();
           if (last) newItems.unshift(last);
@@ -89,189 +173,308 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
     });
   };
 
-  if (items.length === 0) return null;
+  if (items.length === 0 || products.length === 0) return null;
 
-  // We will render exactly 7 items to have a center (3), two adjacents (2, 4), two outers (1, 5) and two hidden edges (0, 6)
   const visibleItems = items.slice(0, 7);
   const centerIndex = 3;
 
   return (
-    <div style={{ position: 'relative', width: '100%', overflow: 'hidden', padding: '4rem 0', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', position: 'relative' }}>
-        <AnimatePresence mode="popLayout">
-          {visibleItems.map((product, index) => {
-            const isCenter = index === centerIndex;
-            const distance = Math.abs(index - centerIndex);
-            
-            // Calculate dynamic styles based on distance from center
-            let width = '300px';
-            let height = '450px';
-            let scale = 1;
-            let opacity = 1;
-            let zIndex = 10;
-            let display = 'flex';
+    <div className="premium-carousel-wrapper">
+      <style>{`
+        .premium-carousel-wrapper {
+          width: 100%;
+        }
 
-            const isMobile = windowWidth < 768;
+        /* -----------------------
+           DESKTOP CAROUSEL
+           ----------------------- */
+        .desktop-carousel-container {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+          padding: 4rem 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
 
-            if (distance === 0) {
-              // Center item
-              width = isMobile ? '280px' : '320px';
-              height = isMobile ? '420px' : '480px';
-              scale = 1.05;
-              opacity = 1;
-              zIndex = 20;
-            } else if (distance === 1) {
-              // Immediate left/right
-              width = isMobile ? '0px' : '240px';
-              height = isMobile ? '0px' : '360px';
-              scale = 0.95;
-              opacity = isMobile ? 0 : 0.7;
-              zIndex = 10;
-              if (isMobile) display = 'none';
-            } else if (distance === 2) {
-              // Outer left/right
-              width = '180px';
-              height = '270px';
-              scale = 0.85;
-              opacity = 0.3;
-              zIndex = 5;
-            } else {
-              // Hidden edges (for smooth entrance/exit)
-              width = '0px';
-              height = '0px';
-              scale = 0;
-              opacity = 0;
-              zIndex = 0;
-              display = 'none'; // Completely hide them, but keep in DOM for layout animation
-            }
+        .desktop-nav-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background-color: #fff;
+          border: 1px solid #eee;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          cursor: pointer;
+          z-index: 30;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+        }
 
-            return (
-              <motion.div
-                layout // This tells Framer Motion to animate the change in position and size!
-                key={product.uniqueId}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ width, height, scale, opacity, zIndex }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 25,
-                  mass: 1,
-                }}
-                onClick={() => handleItemClick(index)}
-                style={{
-                  display,
-                  flexDirection: 'column',
-                  position: 'relative',
-                  cursor: isCenter ? 'default' : 'pointer',
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.15)' : 'none',
-                }}
-              >
-                {/* Wrap in link ONLY if it's the center item, otherwise click just brings it to center */}
-                <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                  {isCenter ? (
-                    <Link href={`/products/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>
+        /* -----------------------
+           MOBILE CAROUSEL
+           ----------------------- */
+        .mobile-carousel-container {
+          display: none;
+        }
+
+        @media (max-width: 767px) {
+          .desktop-carousel-container {
+            display: none !important;
+          }
+          .mobile-carousel-container {
+            display: block;
+            width: 100%;
+          }
+
+          .mobile-product-rail {
+            position: relative;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 14px;
+            padding: 0 0 20px 20px; /* Right padding allows scroll bleed */
+            scroll-behavior: smooth;
+          }
+
+          .mobile-product-rail::-webkit-scrollbar {
+            display: none;
+          }
+
+          .mobile-product-card {
+            scroll-snap-align: start;
+            flex: 0 0 72vw; /* Approx 295px at 412 viewport */
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+          }
+          
+          .mobile-product-card:last-child {
+            margin-right: 20px;
+          }
+
+          .mobile-product-image-wrap {
+            width: 100%;
+            aspect-ratio: 4 / 5;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+            background-color: #F8F6F1;
+            border: 1px solid rgba(80,70,60,0.08);
+          }
+
+          .mobile-product-info {
+            margin-top: 12px;
+            padding-right: 10px;
+          }
+
+          .mobile-product-title {
+            font-size: 11.5px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #111;
+            margin: 0 0 5px 0;
+            line-height: 1.35;
+            font-weight: 500;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          .mobile-product-price {
+            font-size: 12px;
+            font-weight: 400;
+            color: #555;
+            margin: 0;
+          }
+
+          .mobile-swipe-indicator {
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            color: #887a6d;
+            text-transform: uppercase;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+          }
+        }
+      `}</style>
+
+      {/* =========================================
+          DESKTOP VIEW 
+          ========================================= */}
+      <div className="desktop-carousel-container">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', position: 'relative' }}>
+          <AnimatePresence mode="popLayout">
+            {visibleItems.map((product, index) => {
+              const isCenter = index === centerIndex;
+              const distance = Math.abs(index - centerIndex);
+              
+              let width = '300px';
+              let height = '450px';
+              let scale = 1;
+              let opacity = 1;
+              let zIndex = 10;
+              let display = 'flex';
+
+              if (distance === 0) {
+                width = '320px';
+                height = '480px';
+                scale = 1.05;
+                opacity = 1;
+                zIndex = 20;
+              } else if (distance === 1) {
+                width = '240px';
+                height = '360px';
+                scale = 0.95;
+                opacity = 0.7;
+                zIndex = 10;
+              } else if (distance === 2) {
+                width = '180px';
+                height = '270px';
+                scale = 0.85;
+                opacity = 0.3;
+                zIndex = 5;
+              } else {
+                width = '0px';
+                height = '0px';
+                scale = 0;
+                opacity = 0;
+                zIndex = 0;
+                display = 'none';
+              }
+
+              return (
+                <motion.div
+                  layout
+                  key={product.uniqueId}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ width, height, scale, opacity, zIndex }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 200,
+                    damping: 25,
+                    mass: 1,
+                  }}
+                  onClick={() => handleItemClick(index)}
+                  style={{
+                    display,
+                    flexDirection: 'column',
+                    position: 'relative',
+                    cursor: isCenter ? 'default' : 'pointer',
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    boxShadow: isCenter ? '0 20px 40px rgba(0,0,0,0.15)' : 'none',
+                  }}
+                >
+                  <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                    {isCenter ? (
+                      <Link href={`/products/${product.slug}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>
+                        <OptimizedImage 
+                          src={product.images[0]} 
+                          alt={`Bespokewala ${product.name}`} 
+                          fill
+                          style={{ objectFit: 'cover' }}
+                          variant="thumbnail"
+                        />
+                      </Link>
+                    ) : (
                       <OptimizedImage 
                         src={product.images[0]} 
                         alt={`Bespokewala ${product.name}`} 
                         fill
                         style={{ objectFit: 'cover' }}
                         variant="thumbnail"
-                        sizes="(max-width: 768px) 300px, 400px"
                       />
-                    </Link>
-                  ) : (
-                    <OptimizedImage 
-                      src={product.images[0]} 
-                      alt={`Bespokewala ${product.name}`} 
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      variant="thumbnail"
-                      sizes="(max-width: 768px) 300px, 400px"
-                    />
-                  )}
+                    )}
 
-                  {/* Gradient Overlay for Text */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '2rem 1.5rem',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    opacity: isCenter ? 1 : 0, // Only show text on center item
-                    transition: 'opacity 0.4s ease',
-                    pointerEvents: 'none',
-                  }}>
-                    <h3 style={{ color: '#fff', fontSize: '1.25rem', margin: '0 0 0.5rem 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {product.name}
-                    </h3>
-                    <p style={{ color: '#eee', margin: 0, fontSize: '0.9rem' }}>
-                      {formatPrice(product.price)}
-                    </p>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      padding: '2rem 1.5rem',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                      opacity: isCenter ? 1 : 0,
+                      transition: 'opacity 0.4s ease',
+                      pointerEvents: 'none',
+                    }}>
+                      <h3 style={{ color: '#fff', fontSize: '1.25rem', margin: '0 0 0.5rem 0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        {product.name}
+                      </h3>
+                      <p style={{ color: '#eee', margin: 0, fontSize: '0.9rem' }}>
+                        {formatPrice(product.price)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        <button 
+          onClick={handlePrev}
+          aria-label="Previous featured product"
+          className="desktop-nav-btn"
+          style={{ left: '5%' }}
+        >
+          ←
+        </button>
+        <button 
+          onClick={handleNext}
+          aria-label="Next featured product"
+          className="desktop-nav-btn"
+          style={{ right: '5%' }}
+        >
+          →
+        </button>
       </div>
 
-      {/* Navigation Buttons (Optional, but good for manual control) */}
-      <button 
-        onClick={handlePrev}
-        aria-label="Previous featured product"
-        style={{
-          position: 'absolute',
-          left: '5%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          backgroundColor: '#fff',
-          border: '1px solid #eee',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          cursor: 'pointer',
-          zIndex: 30,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem'
-        }}
-      >
-        ←
-      </button>
-      <button 
-        onClick={handleNext}
-        aria-label="Next featured product"
-        style={{
-          position: 'absolute',
-          right: '5%',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '50px',
-          height: '50px',
-          borderRadius: '50%',
-          backgroundColor: '#fff',
-          border: '1px solid #eee',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          cursor: 'pointer',
-          zIndex: 30,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem'
-        }}
-      >
-        →
-      </button>
+      {/* =========================================
+          MOBILE VIEW (LUXURY HORIZONTAL RAIL)
+          ========================================= */}
+      <div className="mobile-carousel-container">
+        <div className="mobile-product-rail" ref={mobileRailRef}>
+          {mobileProducts.map((product, index) => (
+            <Link href={`/products/${product.slug}`} key={`${product._id}-${index}`} className="mobile-product-card">
+              <div className="mobile-product-image-wrap">
+                <OptimizedImage 
+                  src={product.images[0]} 
+                  alt={`Bespokewala ${product.name}`} 
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  variant="thumbnail"
+                  sizes="(max-width: 768px) 80vw"
+                />
+              </div>
+              <div className="mobile-product-info">
+                <h3 className="mobile-product-title">{product.name}</h3>
+                <p className="mobile-product-price">{formatPrice(product.price)}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div className="mobile-swipe-indicator">
+          SWIPE TO EXPLORE <span>&rarr;</span>
+        </div>
+      </div>
 
     </div>
   );
