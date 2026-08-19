@@ -102,6 +102,29 @@ export default function CoutureProcess({ data }: { data?: any }) {
             );
           })}
         </div>
+
+        {/* CTA Button */}
+        <div style={{ marginTop: '3rem' }}>
+          <a 
+            href="/contact" 
+            className="btn-primary" 
+            style={{ 
+              display: 'inline-block',
+              padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.25rem, 4vw, 2.5rem)',
+              backgroundColor: '#1c1c1c',
+              color: '#fff',
+              textDecoration: 'none',
+              fontSize: 'clamp(0.7rem, 1.5vw, 0.85rem)',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              transition: 'background-color 0.3s ease',
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#d2b48c'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1c1c1c'}
+          >
+            Book a Consultation
+          </a>
+        </div>
       </div>
 
       {/* Right Column - Media */}

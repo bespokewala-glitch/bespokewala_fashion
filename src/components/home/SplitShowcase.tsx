@@ -109,7 +109,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
         {/* Main Slider Area */}
         <div style={{ position: 'relative', width: '100%', maxWidth: '500px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           
-          <Link href={products[currentIndex].slug ? `/products/${products[currentIndex].slug}` : '#'} key={currentIndex} className="slide-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem', textDecoration: 'none' }} aria-label={`View ${products[currentIndex].name}`}>
+          <Link href={products[currentIndex].slug ? `/products/${products[currentIndex].slug}` : '#'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem', textDecoration: 'none', width: '100%' }} aria-label={`View ${products[currentIndex].name}`}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
               <OptimizedImage 
                 src={products[currentIndex].image || ''} 

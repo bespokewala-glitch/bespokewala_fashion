@@ -53,7 +53,10 @@ const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
     if (width <= 750) v = 'thumbnail';
     else if (width <= 1200) v = 'medium';
 
-    return `${baseUrl}?v=${v}`;
+    // IMPORTANT: We must include the requested Next.js width in the URL as a query param
+    // (even though our API route ignores it) so that Next.js doesn't complain about
+    // a missing width parameter, and so the browser correctly caches different srcset entries.
+    return `${baseUrl}?v=${v}&w=${width}`;
   }
   // External URLs (Unsplash, public CDN) — return as-is
   return src;

@@ -110,8 +110,10 @@ export default async function Home() {
     });
   }
 
-  // Populate SplitShowcase
-  if ((showcaseProducts as any[]).length > 0) {
+  // Populate SplitShowcase ONLY if the CMS didn't provide custom products
+  const hasCustomShowcase = sectionMap.SplitShowcase?.products?.some((p: any) => p.image && p.image.trim() !== '');
+  
+  if (!hasCustomShowcase && (showcaseProducts as any[]).length > 0) {
     if (!sectionMap.SplitShowcase) sectionMap.SplitShowcase = {};
     sectionMap.SplitShowcase.products = (showcaseProducts as any[]).map((p: any) => ({
       name: p.name,
@@ -123,6 +125,8 @@ export default async function Home() {
       }).format(p.price),
       image: p.images?.[0] || '',
     }));
+  } else if (hasCustomShowcase) {
+    sectionMap.SplitShowcase.products = sectionMap.SplitShowcase.products.filter((p: any) => p.image && p.image.trim() !== '');
   }
 
   const organizationSchema = generateOrganizationSchema();

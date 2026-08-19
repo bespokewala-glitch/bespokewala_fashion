@@ -142,7 +142,7 @@ const CATEGORIES = [
       },
       {
         q: "What items cannot be returned?",
-        a: "The following are non-returnable: Custom / bespoke orders, altered garments, jewellery (for hygiene), sale items marked 'Final Sale', gift cards, and items without original tags or packaging.",
+        a: "The following are non-returnable: Custom / bespoke orders, altered garments, jewellery (for hygiene), sale items marked 'Final Sale', and items without original tags or packaging.",
       },
       {
         q: "What if I received a damaged or wrong item?",
