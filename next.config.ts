@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses
   compress: true,
 
+  // Ensure sharp's native binaries are included in the serverless function bundle on Vercel
+  serverExternalPackages: ['sharp'],
+
   // ── Redirects ───────────────────────────────────────────────────────────────
   async redirects() {
     return [

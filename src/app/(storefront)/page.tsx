@@ -7,6 +7,7 @@ import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import TrustSection from '@/components/home/TrustSection';
+import TestimonialsSection from '@/components/home/TestimonialsSection';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
@@ -167,6 +168,7 @@ export default async function Home() {
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <CoutureProcess data={sectionMap.CoutureProcess} />
+        <TestimonialsSection />
 
         {/* Featured Products */}
         <section className="featured-arrivals-section">

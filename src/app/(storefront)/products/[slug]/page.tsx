@@ -13,6 +13,7 @@ import FootwearGallery from '@/components/product/FootwearGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
+import ProductTrustBadges from '@/components/product/ProductTrustBadges';
 import { getOrFetch } from '@/lib/serverCache';
 
 const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
@@ -244,6 +245,8 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
                 sizes: product.sizes,
               }}
             />
+
+            <ProductTrustBadges />
 
             <ProductDetailsAccordionWrapper details={product.details} productType={product.productType} category={product.category} />
           </div>
