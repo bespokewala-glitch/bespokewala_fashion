@@ -399,7 +399,7 @@
   }
 
   .mobile-hero-title {
-    font-size: 2rem !important;
+    font-size: 1.5rem !important; /* Reduced from 2rem */
   }
 
   .mobile-overflow-x {
@@ -793,8 +793,9 @@
     gap: 4px !important;
   }
 
-  .mobile-flex-col.mobile-p-4 h2 {
-    font-size: clamp(13px, 3.5vw, 16px) !important;
+  .mobile-flex-col.mobile-p-4 h2,
+  .mobile-flex-col.mobile-p-4 h3 {
+    font-size: clamp(13px, 3.5vw, 15px) !important;
     margin: 0 0 3px 0 !important;
     letter-spacing: 0.12em !important;
   }
@@ -1036,33 +1037,58 @@
      ═══════════════════════════════════════════════════════════════════════ */
 
   section.mobile-hero-height {
-    height: clamp(260px, 70vw, 480px) !important;
-    max-height: 520px !important;
-    min-height: 220px !important;
+    height: clamp(320px, 75vw, 480px) !important;
     width: 100% !important;
     max-width: 100% !important;
   }
 
+  .mobile-hero-height img, .mobile-hero-height video {
+    object-position: center 20% !important; /* Keep faces/upper body in view */
+  }
+
   .mobile-hero-title {
-    font-size: clamp(18px, 5vw, 24px) !important;
-    line-height: 1.15 !important;
-    letter-spacing: 0.08em !important;
+    font-size: clamp(22px, 6vw, 32px) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.1em !important;
+    margin: 4px 0 8px 0 !important;
   }
 
   .hero-overlay {
-    bottom: 1.5rem !important;
-    left: 1rem !important;
+    bottom: 2rem !important;
+    left: 1.5rem !important;
+    right: 1.5rem !important;
+    gap: 0 !important;
+    align-items: flex-start !important;
   }
 
   .hero-overlay > div:first-child {
-    font-size: clamp(10px, 2.6vw, 11px) !important;
-    letter-spacing: 0.18em !important;
+    font-size: clamp(9px, 2.5vw, 11px) !important;
+    letter-spacing: 0.2em !important;
+    margin-bottom: 0 !important;
   }
 
   .hero-overlay .btn-secondary {
-    padding: 0.55rem 1.2rem !important;
-    font-size: 0.7rem !important;
-    margin-top: 0.4rem !important;
+    padding: 0.6rem 1.25rem !important;
+    font-size: 0.75rem !important;
+    margin-top: 0.5rem !important;
+    min-height: 40px !important;
+  }
+  
+  /* Mobile Header Optimization */
+  .mobile-main-header {
+    padding: 0.8rem 1.25rem !important;
+  }
+  
+  .header-logo-img {
+    width: 48px !important;
+  }
+  
+  .mobile-icon-right {
+    gap: 12px !important;
+  }
+  .mobile-icon-right svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
