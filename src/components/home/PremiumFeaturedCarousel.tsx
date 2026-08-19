@@ -14,9 +14,10 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
   const mobileRailRef = useRef<HTMLDivElement>(null);
   const isInteractingRef = useRef(false);
   
-  // Duplicate products extensively to create a robust seamless infinite loop 
-  // without complex mid-scroll jump math. 15 sets is typically ~60-75 cards.
-  const mobileProducts = Array.from({ length: 15 }).flatMap(() => products);
+  // Duplicate products to create a seamless infinite scroll loop.
+  // 5 sets gives ~35-50 cards — enough for smooth looping without creating
+  // 75-150 image nodes that all get loaded upfront (was previously 15x).
+  const mobileProducts = Array.from({ length: 5 }).flatMap(() => products);
 
   useEffect(() => {
     if (products.length === 0) return;
@@ -387,7 +388,8 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                           alt={`Bespokewala ${product.name}`} 
                           fill
                           style={{ objectFit: 'cover' }}
-                          variant="thumbnail"
+                          variant="medium"
+                          priority={true}
                         />
                       </Link>
                     ) : (
@@ -397,6 +399,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                         fill
                         style={{ objectFit: 'cover' }}
                         variant="thumbnail"
+                        loading="lazy"
                       />
                     )}
 
@@ -461,6 +464,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                   style={{ objectFit: 'cover' }}
                   variant="thumbnail"
                   sizes="(max-width: 768px) 80vw"
+                  loading="lazy"
                 />
               </div>
               <div className="mobile-product-info">

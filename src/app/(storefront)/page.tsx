@@ -1,23 +1,21 @@
 import Link from 'next/link';
 import HeroSection from '@/components/home/HeroSection';
-import HorizontalVideoScroll from '@/components/home/HorizontalVideoScroll';
 import DynamicCategoryShowcase from '@/components/home/DynamicCategoryShowcase';
-import ProductCard from '@/components/product/ProductCard';
-import dbConnect from '@/lib/mongoose';
-import Product from '@/models/Product';
-import HeroCampaign from '@/models/HeroCampaign';
-import HomepageSection from '@/models/HomepageSection';
 import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
 import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import TrustSection from '@/components/home/TrustSection';
+import dbConnect from '@/lib/mongoose';
+import Product from '@/models/Product';
+import HeroCampaign from '@/models/HeroCampaign';
+import HomepageSection from '@/models/HomepageSection';
+import { getOrFetch } from '@/lib/serverCache';
 import { Metadata } from 'next';
-
 import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
 
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 3600; // ISR: revalidate every hour
 
 export const metadata: Metadata = generatePageMetadata(
   "Luxury Couture, Footwear & Jewellery",
@@ -27,78 +25,103 @@ export const metadata: Metadata = generatePageMetadata(
 
 export default async function Home() {
   await dbConnect();
-  
-  // Fetch up to 10 featured products and serialize them for Client Components (minimum 7 needed for smooth carousel loop without duplicating)
-  const rawFeaturedProducts = await Product.find({ isFeatured: true })
-    .sort({ _id: -1 })
-    .select('name slug price images category referenceImages')
-    .limit(10)
-    .lean();
+
+  // ─── Run all independent DB queries IN PARALLEL ─────────────────────────────
+  // Each query is individually memoized in the in-process cache (5-min TTL),
+  // so warm requests within 5 minutes are served instantly with zero DB round-trips.
+  const [rawFeaturedProducts, campaigns, hpSections] = await Promise.all([
+    getOrFetch('home:featuredProducts', 300, () =>
+      Product.find({ isFeatured: true })
+        .sort({ _id: -1 })
+        .select('name slug price images category referenceImages')
+        .limit(10)
+        .lean()
+    ),
+    getOrFetch('home:campaigns', 300, () =>
+      HeroCampaign.find({}).sort({ order: 1, _id: -1 }).lean()
+    ),
+    getOrFetch('home:hpSections', 300, () =>
+      HomepageSection.find({ page: 'home' }).sort({ _id: -1 }).lean()
+    ),
+  ]);
+
+  // ─── Serialize for Client Components ────────────────────────────────────────
   const featuredProducts = JSON.parse(JSON.stringify(rawFeaturedProducts));
-  
-  // Track used product IDs to avoid duplicates on the homepage
-  const usedProductIds = new Set(rawFeaturedProducts.map(p => p._id.toString()));
-  
-  // Fetch hero campaigns
-  const campaigns = await HeroCampaign.find({}).sort({ order: 1, _id: -1 }).lean();
-  const plainCampaigns = campaigns.map(c => ({
+
+  // ─── Campaign processing ─────────────────────────────────────────────────────
+  const plainCampaigns = (campaigns as any[]).map((c: any) => ({
     _id: c._id.toString(),
     title: c.title,
     subtitle: c.subtitle,
     videoUrl: c.videoUrl,
     linkUrl: c.linkUrl,
     category: c.category || 'general',
-    mediaType: c.mediaType || (c.videoUrl?.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image')
+    mediaType: c.mediaType || (c.videoUrl?.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image'),
   }));
 
-  // Categorize campaigns
-  // General & Couture campaigns go to the top HeroSection (Homepage is the Couture page)
-  const heroCampaigns = plainCampaigns.filter(c => c.category === 'general' || c.category === 'couture');
+  const heroCampaigns = plainCampaigns.filter(
+    (c) => c.category === 'general' || c.category === 'couture'
+  );
   const finalHeroCampaigns = heroCampaigns.length > 0 ? heroCampaigns : plainCampaigns;
-  
-  // Specific categories go ONLY to their respective DynamicCategoryShowcase
-  const coutureMedia = plainCampaigns.filter(c => c.category === 'couture');
-  const jewelleryMedia = plainCampaigns.filter(c => c.category === 'jewellery');
-  const diffusionMedia = plainCampaigns.filter(c => c.category === 'diffusion');
-  const beautyMedia = plainCampaigns.filter(c => c.category === 'beauty');
 
-  // Fetch Homepage Sections
-  const hpSections = await HomepageSection.find({ page: 'home' }).sort({ _id: -1 }).lean();
+  // ─── Homepage section map ────────────────────────────────────────────────────
   const sectionMap: any = {};
-  hpSections.forEach(s => {
+  (hpSections as any[]).forEach((s: any) => {
     sectionMap[s.sectionType] = s.content;
   });
 
-  // Dynamically resolve product slugs for CuratedGrid based on title
+  // Track used product IDs to avoid duplicates on the homepage
+  const usedProductIds = new Set(
+    (rawFeaturedProducts as any[]).map((p: any) => p._id.toString())
+  );
+
+  // ─── CuratedGrid slug resolution + SplitShowcase (parallel) ─────────────────
+  const curatedTitles: string[] =
+    sectionMap.CuratedGrid?.items?.map((i: any) => i.title).filter(Boolean) ?? [];
+
+  const [curatedMatchingProducts, showcaseProducts] = await Promise.all([
+    curatedTitles.length > 0
+      ? getOrFetch(`home:curatedSlugs:${curatedTitles.join(',')}`, 300, () =>
+          Product.find({ name: { $in: curatedTitles } })
+            .sort({ _id: -1 })
+            .select('_id name slug')
+            .lean()
+        )
+      : Promise.resolve([]),
+    getOrFetch('home:showcaseProducts', 300, () =>
+      Product.find({ _id: { $nin: Array.from(usedProductIds) } })
+        .sort({ createdAt: -1, _id: -1 })
+        .limit(5)
+        .select('name slug price images')
+        .lean()
+    ),
+  ]);
+
+  // Apply CuratedGrid slugs
   if (sectionMap.CuratedGrid?.items) {
-    const titles = sectionMap.CuratedGrid.items.map((i: any) => i.title).filter(Boolean);
-    const matchingProducts = await Product.find({ name: { $in: titles } })
-      .sort({ _id: -1 })
-      .select('_id name slug')
-      .lean();
-    matchingProducts.forEach(p => usedProductIds.add(p._id.toString()));
+    (curatedMatchingProducts as any[]).forEach((p: any) =>
+      usedProductIds.add(p._id.toString())
+    );
     sectionMap.CuratedGrid.items = sectionMap.CuratedGrid.items.map((item: any) => {
-      const match = matchingProducts.find(p => p.name === item.title);
-      return {
-        ...item,
-        link: match ? `/products/${match.slug}` : '#'
-      };
+      const match = (curatedMatchingProducts as any[]).find(
+        (p: any) => p.name === item.title
+      );
+      return { ...item, link: match ? `/products/${match.slug}` : '#' };
     });
   }
 
-  // Populate SplitShowcase with actual products instead of dummy/hardcoded data without slugs
-  const showcaseProducts = await Product.find({ _id: { $nin: Array.from(usedProductIds) } })
-    .sort({ createdAt: -1, _id: -1 })
-    .limit(5)
-    .select('name slug price images')
-    .lean();
-  if (showcaseProducts.length > 0) {
+  // Populate SplitShowcase
+  if ((showcaseProducts as any[]).length > 0) {
     if (!sectionMap.SplitShowcase) sectionMap.SplitShowcase = {};
-    sectionMap.SplitShowcase.products = showcaseProducts.map((p: any) => ({
+    sectionMap.SplitShowcase.products = (showcaseProducts as any[]).map((p: any) => ({
       name: p.name,
       slug: p.slug,
-      price: new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(p.price),
-      image: p.images?.[0] || ''
+      price: new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        maximumFractionDigits: 0,
+      }).format(p.price),
+      image: p.images?.[0] || '',
     }));
   }
 
@@ -115,12 +138,25 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', borderWidth: 0 }}>
-        Luxury Couture, Footwear & Jewellery Crafted for You
+      <h1
+        className="sr-only"
+        style={{
+          position: 'absolute',
+          width: '1px',
+          height: '1px',
+          padding: 0,
+          margin: '-1px',
+          overflow: 'hidden',
+          clip: 'rect(0, 0, 0, 0)',
+          whiteSpace: 'nowrap',
+          borderWidth: 0,
+        }}
+      >
+        Luxury Couture, Footwear &amp; Jewellery Crafted for You
       </h1>
       <main style={{ backgroundColor: '#fff' }}>
         <HeroSection campaigns={finalHeroCampaigns} />
-        
+
         {/* Curated Sections */}
         <CuratedGrid data={sectionMap.CuratedGrid} />
         <TrustSection />
@@ -128,9 +164,6 @@ export default async function Home() {
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <CoutureProcess data={sectionMap.CoutureProcess} />
 
-
-
-        {/* Featured Products */}
         {/* Featured Products */}
         <section className="featured-arrivals-section">
           <style>{`
@@ -188,18 +221,18 @@ export default async function Home() {
               }
             }
           `}</style>
-          
-          <h2 className="featured-arrivals-h2">
-            Featured Arrivals
-          </h2>
-          <p className="featured-arrivals-sub">
-            Curated collection for the season
-          </p>
-          
+
+          <h2 className="featured-arrivals-h2">Featured Arrivals</h2>
+          <p className="featured-arrivals-sub">Curated collection for the season</p>
+
           <PremiumFeaturedCarousel products={featuredProducts} />
 
           <div className="featured-cta-container">
-            <Link href="/products" className="btn-primary featured-cta-btn" aria-label="Explore Full Collection">
+            <Link
+              href="/products"
+              className="btn-primary featured-cta-btn"
+              aria-label="Explore Full Collection"
+            >
               Explore Full Collection
             </Link>
           </div>

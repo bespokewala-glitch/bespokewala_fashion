@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import ProductCardWishlistButton from './ProductCardWishlistButton';
@@ -24,21 +24,23 @@ export interface ProductCardProps {
 }
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
-  const primaryImageRaw  = product.images?.[0];
-  const hoverImageRaw = product.images?.[1]
-    || product.referenceImages?.front
-    || product.referenceImages?.back
-    || product.referenceImages?.left
-    || product.referenceImages?.right;
+  const [isHovered, setIsHovered] = useState(false);
+  const primaryImageRaw = product.images?.[0];
+  const hoverImageRaw =
+    product.images?.[1] ||
+    product.referenceImages?.front ||
+    product.referenceImages?.back ||
+    product.referenceImages?.left ||
+    product.referenceImages?.right;
 
   const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style:              'currency',
-    currency:           'INR',
+    style: 'currency',
+    currency: 'INR',
     maximumFractionDigits: 0,
   }).format(product.price);
 
   const sharedImgStyle: React.CSSProperties = {
-    objectFit:  'cover',
+    objectFit: 'cover',
     transition: 'opacity 0.35s ease',
   };
 
@@ -46,33 +48,35 @@ export default function ProductCard({ product, variant = 'default', priority = f
     <Link
       href={`/products/${product.slug}`}
       prefetch={false}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
-        display:        'flex',
-        flexDirection:  'column',
-        gap:            '1rem',
-        cursor:         'pointer',
-        position:       'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+        cursor: 'pointer',
+        position: 'relative',
         textDecoration: 'none',
-        color:          'inherit',
+        color: 'inherit',
       }}
       className="product-card"
     >
       <div
         style={{
-          position:        'relative',
-          width:           '100%',
-          aspectRatio:     '2/3',
-          overflow:        'hidden',
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '2/3',
+          overflow: 'hidden',
           backgroundColor: '#f5f5f5',
-          borderRadius:    variant === 'slider' ? '24px' : '0px',
+          borderRadius: variant === 'slider' ? '24px' : '0px',
         }}
       >
         {primaryImageRaw && (
           <OptimizedImage
             src={primaryImageRaw}
-            alt={`${product.name} ${product.category ? `in ${product.category}` : ''}`}
+            alt={`${product.name}${product.category ? ` in ${product.category}` : ''}`}
             fill
-            sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, objectPosition: 'top' }}
             priority={priority}
             variant="thumbnail"
@@ -80,26 +84,30 @@ export default function ProductCard({ product, variant = 'default', priority = f
           />
         )}
 
-        {/* Hover image — shown via CSS .product-card:hover .product-card-hover-image */}
-        {hoverImageRaw && hoverImageRaw !== primaryImageRaw && (
+        {/*
+          Hover image — desktop only, strictly lazy-loaded on actual hover event.
+          This saves massive amounts of unnecessary network requests for category grids.
+        */}
+        {hoverImageRaw && hoverImageRaw !== primaryImageRaw && isHovered && (
           <OptimizedImage
             src={hoverImageRaw}
-            alt={`Alternate view of ${product.name} ${product.category ? `(${product.category})` : ''}`}
+            alt={`Alternate view of ${product.name}${product.category ? ` (${product.category})` : ''}`}
             fill
-            sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 480px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ ...sharedImgStyle, zIndex: 2, objectPosition: 'top' }}
             priority={false}
             variant="thumbnail"
             className="product-card-hover-image"
+            loading="lazy"
           />
         )}
 
         {/* Wishlist button */}
         <ProductCardWishlistButton
           product={{
-            slug:         product.slug,
-            name:         product.name,
-            price:        product.price,
+            slug: product.slug,
+            name: product.name,
+            price: product.price,
             primaryImage: primaryImageRaw || '',
           }}
         />
@@ -107,18 +115,18 @@ export default function ProductCard({ product, variant = 'default', priority = f
 
       {/* Product info */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-        <h3 style={{
-          fontSize:      '0.875rem',
-          fontWeight:    400,
-          letterSpacing: '0.05em',
-          marginBottom:  '0.5rem',
-          textTransform: 'uppercase',
-        }}>
+        <h3
+          style={{
+            fontSize: '0.875rem',
+            fontWeight: 400,
+            letterSpacing: '0.05em',
+            marginBottom: '0.5rem',
+            textTransform: 'uppercase',
+          }}
+        >
           {product.name}
         </h3>
-        <span style={{ fontSize: '0.875rem', color: '#666' }}>
-          {formattedPrice}
-        </span>
+        <span style={{ fontSize: '0.875rem', color: '#666' }}>{formattedPrice}</span>
       </div>
     </Link>
   );

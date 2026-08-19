@@ -89,7 +89,7 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
     let isMounted = true;
 
     async function init() {
-      // ── Step 1: Load cached exchange rates instantly ────────────────────────
+      // ── Step 1: Load cached exchange rates instantly (zero-latency) ───────────
       try {
         const cachedRates = localStorage.getItem(LOCAL_RATES_KEY);
         if (cachedRates) {
@@ -98,54 +98,60 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
         }
       } catch (_) { /* ignore */ }
 
-      // ── Step 2: Check user's saved preference ───────────────────────────────
+      // ── Step 2: Check user's saved preference ─────────────────────────────────
       const pref = readPref();
 
       if (pref?.source === 'manual') {
-        // User manually selected → respect it, never overwrite with auto-detection
+        // User manually selected → respect it, never overwrite
         if (isMounted) {
           setCurrencyState(pref.currency);
           setIsLoading(false);
         }
-        // Still refresh exchange rates in background
+        // Still refresh exchange rates in background (don't await — fire & forget)
         fetchAndCacheRates(isMounted, setRates);
         return;
       }
 
-      // ── Step 3: IP Geolocation for new visitors or auto-detected visits ─────
-      try {
-        const controller = new AbortController();
-        const geoTimeout = setTimeout(() => controller.abort(), 4000); // 4s timeout
-
-        const geoRes = await fetch('/api/geolocation', {
-          signal: controller.signal,
-        });
-        clearTimeout(geoTimeout);
-
-        if (geoRes.ok && isMounted) {
-          const geoData = await geoRes.json();
-          const detectedCurrency = geoData.currency;
-          const finalCurrency =
-            detectedCurrency && SUPPORTED_CURRENCIES[detectedCurrency]
-              ? detectedCurrency
-              : DEFAULT_FALLBACK_CURRENCY;
-
-          setCurrencyState(finalCurrency);
-          // Save as 'auto' — will be re-detected next fresh visit (not treated as manual)
-          writePref({ currency: finalCurrency, source: 'auto' });
-        }
-      } catch (err) {
-        // ── Step 4: Browser locale fallback ─────────────────────────────────
-        if (isMounted) {
-          const fallbackCurrency = getCurrencyFromBrowserLocale();
-          setCurrencyState(fallbackCurrency);
-          writePref({ currency: fallbackCurrency, source: 'auto' });
-        }
-        console.warn('[CurrencyContext] Geolocation failed, using browser locale fallback:', err);
+      // ── Step 3: For returning 'auto' visitors, apply saved pref immediately ───
+      // This prevents the INR flash while geo runs.
+      if (pref?.source === 'auto' && isMounted) {
+        setCurrencyState(pref.currency);
       }
 
-      // ── Fetch live exchange rates in parallel ───────────────────────────────
-      await fetchAndCacheRates(isMounted, setRates);
+      // ── Step 4: Run geolocation + exchange rates IN PARALLEL ─────────────────
+      // They are independent of each other — no reason to wait sequentially.
+      const [geoResult] = await Promise.allSettled([
+        (async () => {
+          try {
+            const controller = new AbortController();
+            const geoTimeout = setTimeout(() => controller.abort(), 4000);
+            const geoRes = await fetch('/api/geolocation', { signal: controller.signal });
+            clearTimeout(geoTimeout);
+
+            if (geoRes.ok && isMounted) {
+              const geoData = await geoRes.json();
+              const detectedCurrency = geoData.currency;
+              const finalCurrency =
+                detectedCurrency && SUPPORTED_CURRENCIES[detectedCurrency]
+                  ? detectedCurrency
+                  : DEFAULT_FALLBACK_CURRENCY;
+              setCurrencyState(finalCurrency);
+              writePref({ currency: finalCurrency, source: 'auto' });
+            }
+          } catch {
+            // Browser locale fallback
+            if (isMounted) {
+              const fallbackCurrency = getCurrencyFromBrowserLocale();
+              // Only overwrite if we didn't already have a valid pref
+              if (!pref) {
+                setCurrencyState(fallbackCurrency);
+                writePref({ currency: fallbackCurrency, source: 'auto' });
+              }
+            }
+          }
+        })(),
+        fetchAndCacheRates(isMounted, setRates),
+      ]);
 
       if (isMounted) setIsLoading(false);
     }
@@ -156,6 +162,7 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
       isMounted = false;
     };
   }, []);
+
 
   // ── Manual selection from dropdown ─────────────────────────────────────────
   const handleSetCurrency = (code: string) => {

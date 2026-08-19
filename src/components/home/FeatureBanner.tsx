@@ -52,12 +52,13 @@ export default function FeatureBanner({ data }: { data?: any }) {
             src={image || ''}
             alt={title ? `Bespokewala ${title} collection` : 'Bespokewala feature collection'}
             fill
-            sizes="100vw"
+            sizes="(max-width: 767px) 100vw, min(100vw, 1200px)"
             style={{
               objectFit: 'cover',
               opacity: 0.7,
             }}
             variant="medium"
+            loading="lazy"
           />
         )}
 

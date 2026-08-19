@@ -18,11 +18,6 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   // Initially, only the first image is mounted to prioritize LCP.
   const [mountedImages, setMountedImages] = useState<Set<number>>(new Set([0]));
 
-  // Track if the main LCP image has loaded so we can delay thumbnails.
-  const [mainImageLoaded, setMainImageLoaded] = useState(false);
-
-
-
   // Ensure the explicitly clicked thumbnail is instantly mounted if the timeout hasn't fired
   useEffect(() => {
     setMountedImages(prev => {
@@ -120,9 +115,6 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   priority={idx === 0}
                   fetchPriority={idx === 0 ? "high" : "auto"}
                   variant="medium"
-                  onLoad={() => {
-                    if (idx === 0) setMainImageLoaded(true);
-                  }}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: 'cover', cursor: 'zoom-in' }}
                 />
@@ -131,9 +123,9 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           })}
         </div>
 
-        {/* Thumbnails (Right side) - Only load progressively after main image */}
-        <div className={`gallery-thumbnails ${mainImageLoaded ? 'visible' : ''}`}>
-          {mainImageLoaded && images.map((img, idx) => (
+        {/* Thumbnails (Right side on desktop, Top on mobile) */}
+        <div className="gallery-thumbnails visible">
+          {images.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedIndex(idx)}

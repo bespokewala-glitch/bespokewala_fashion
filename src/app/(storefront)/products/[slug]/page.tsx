@@ -13,6 +13,7 @@ import FootwearGallery from '@/components/product/FootwearGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
+import { getOrFetch } from '@/lib/serverCache';
 
 const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
 
@@ -37,9 +38,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return generateCategoryMetadata(slug);
   }
 
-  // Otherwise treat as product slug
+  // Otherwise treat as product slug — use server cache to avoid a second DB call
+  // when the page render immediately follows (revalidate=60 means ISR handles staleness)
   await dbConnect();
-  const product = await Product.findOne({ slug }).select('name slug description images seo productType category subcategory colors details fabric').lean() as any;
+  const product = await getOrFetch(`product:meta:${slug}`, 300, () =>
+    Product.findOne({ slug }).select('name slug description images seo productType category subcategory colors details fabric').lean()
+  ) as any;
   if (!product) notFound();
   
   const imageUrl = product.images && product.images.length > 0 ? product.images[0] : undefined;
@@ -59,11 +63,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductsSlugPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { page } = await searchParams;
-  console.log("====== MATCHED SLUG PAGE ======", { slug, page });
 
   // ── Case 1: Couture page is Homepage ─────────────────────────────────────
   if (slug === 'couture') {
-    console.log("====== Redirecting to / ======");
     redirect('/');
   }
 
@@ -72,9 +74,13 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
     return <CollectionPageContent params={{ productType: slug, page }} />;
   }
 
-  // ── Case 2: Individual product detail ────────────────────────────────────
+  // ── Case 3: Individual product detail ────────────────────────────────────
+  // Use server cache (5-min TTL) so navigating back to the same product
+  // within a session doesn't trigger a second DB round-trip.
   await dbConnect();
-  const rawProduct = await Product.findOne({ slug }).lean();
+  const rawProduct = await getOrFetch(`product:detail:${slug}`, 300, () =>
+    Product.findOne({ slug }).lean()
+  );
   const product = JSON.parse(JSON.stringify(rawProduct));
 
   if (!product) {
@@ -244,10 +250,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         </div>
       </main>
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
-        {(() => {
-          const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';
-          return <ProductReviews productId={product._id.toString()} deferFetch={isFootwear} />;
-        })()}
+        <ProductReviews productId={product._id.toString()} deferFetch={true} />
       </div>
     </>
   );

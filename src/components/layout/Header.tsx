@@ -45,7 +45,9 @@ export default function Header() {
         if (cached) {
           try {
             const parsed = JSON.parse(cached);
-            if (parsed.ts && Date.now() - parsed.ts < 60_000) {
+            // Cache taxonomies for 10 minutes — they rarely change and
+            // re-fetching on every navigation adds ~500ms of latency
+            if (parsed.ts && Date.now() - parsed.ts < 600_000) {
               setTaxonomies(parsed.data);
               return;
             }

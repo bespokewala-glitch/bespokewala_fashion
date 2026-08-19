@@ -24,31 +24,46 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
   priority?: boolean;
 }
 
-const gcsLoader = ({ src, width, quality }: import('next/image').ImageLoaderProps) => {
+/**
+ * Custom loader for GCS proxy URLs (/api/media/...).
+ *
+ * KEY FIX: We do NOT append ?w= or ?q= to the URL.
+ * The /api/media handler uses Sharp with fixed variant widths (600/1000/1600px).
+ * Appending Next.js's own w= param created URLs like ?v=large&w=1920&q=75
+ * which were being sent to the GCS path-based variant lookup, causing 404s
+ * because no variant file named with those extra params existed.
+ *
+ * Variant selection based on the requested width:
+ *   ≤ 750px  → thumbnail (600px WebP) — covers all mobile product cards/grids
+ *   ≤ 1200px → medium   (1000px WebP) — covers tablets and mid-size banners
+ *   > 1200px → large    (1600px WebP) — only for full-bleed desktop heroes
+ */
+const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
   if (src.startsWith('/api/media/')) {
-    // Strip any existing ?v= to recalculate based on width for retina/responsive support
+    // Strip any existing variant param to avoid duplication
     let baseUrl = src;
-    if (src.includes('?v=')) {
-      baseUrl = src.slice(0, src.indexOf('?v='));
-    } else if (src.includes('?')) {
+    if (src.includes('?')) {
       baseUrl = src.slice(0, src.indexOf('?'));
     }
 
-    // Generate responsive variants based on Next.js requested width.
+    // Map the Next.js requested display width to our 3-tier variant system.
+    // These thresholds are deliberately conservative so mobile never gets
+    // a variant larger than necessary.
     let v = 'large';
-    if (width <= 640) v = 'thumbnail';
-    else if (width <= 1080) v = 'medium';
-    
-    return `${baseUrl}?v=${v}&w=${width}&q=${quality || 75}`;
+    if (width <= 750) v = 'thumbnail';
+    else if (width <= 1200) v = 'medium';
+
+    return `${baseUrl}?v=${v}`;
   }
+  // External URLs (Unsplash, public CDN) — return as-is
   return src;
 };
 
 /**
  * A global, reusable Image component that handles:
- * 1. Automatic GCS variant requesting (thumbnail vs medium vs original).
+ * 1. Automatic GCS variant requesting (thumbnail vs medium vs large).
  * 2. Next.js image optimizer recursion prevention via custom loader.
- * 3. Graceful fallback on error (Target Variant -> Placeholder).
+ * 3. Graceful fallback on error (Target Variant → Placeholder).
  * 4. Default lazy loading for performance.
  */
 export default function OptimizedImage({ 
@@ -71,7 +86,7 @@ export default function OptimizedImage({
     setHasError(true);
   }, []);
 
-  // Update error state if src changes
+  // Reset error state if src changes (e.g. carousel slide change)
   React.useEffect(() => {
     setHasError(false);
   }, [src]);

@@ -79,9 +79,10 @@ export default function SplitShowcase({ data }: { data?: any }) {
           src={modelImage || ''} 
           alt="Bespokewala model showcasing luxury jewellery"
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes="(max-width: 767px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
           variant="medium"
+          loading="lazy"
         />
       </div>
 
@@ -117,6 +118,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'contain' }}
                 variant="thumbnail"
+                loading="lazy"
               />
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>

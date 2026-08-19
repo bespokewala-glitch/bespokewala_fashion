@@ -48,6 +48,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
               variant="thumbnail"
+              loading="lazy"
             />
             <div style={{ 
               position: 'absolute', 

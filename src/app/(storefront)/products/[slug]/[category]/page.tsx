@@ -3,6 +3,7 @@ import { CollectionPageContent } from '@/components/layout/CollectionPageContent
 import { generatePageMetadata, generateCategoryMetadata } from '@/lib/seo';
 import dbConnect from '@/lib/mongoose';
 import Taxonomy from '@/models/Taxonomy';
+import { getOrFetch } from '@/lib/serverCache';
 
 export const revalidate = 60;
 
@@ -16,9 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   try {
     await dbConnect();
-    const taxonomy = await Taxonomy.findOne({ slug: category, type: { $in: ['category', 'collection'] } }).lean();
-    if (taxonomy && taxonomy.seo) {
-      return generateCategoryMetadata(productType, category, undefined, taxonomy.seo);
+    const taxonomy = await getOrFetch(`taxonomy:meta:${category}`, 600, () => 
+      Taxonomy.findOne({ slug: category, type: { $in: ['category', 'collection'] } }).lean()
+    );
+    if (taxonomy && (taxonomy as any).seo) {
+      return generateCategoryMetadata(productType, category, undefined, (taxonomy as any).seo);
     }
   } catch (err) {}
 

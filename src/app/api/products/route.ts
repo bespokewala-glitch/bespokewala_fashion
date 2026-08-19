@@ -23,7 +23,12 @@ export async function GET(req: NextRequest) {
       .limit(limit > 1000 ? 1000 : limit)
       .lean();
       
-    return NextResponse.json(products);
+    return NextResponse.json(products, {
+      headers: {
+        // Cache at the CDN edge: fresh for 60s, serve stale for 30s while revalidating
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+      },
+    });
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
