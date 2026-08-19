@@ -95,19 +95,21 @@ export default function HomepageCMS() {
           
           if (index !== undefined) {
             // It's an array field
-            if (!updated[section][field]) updated[section][field] = [];
-            if (!updated[section][field][index]) updated[section][field][index] = {};
-            updated[section][field][index].image = result.videoUrl;
+            const newArray = [...(updated[section][field] || [])];
+            newArray[index] = { ...(newArray[index] || {}), image: result.videoUrl };
+            updated[section] = { ...updated[section], [field]: newArray };
           } else {
             // It's a top level field
-            updated[section][field] = result.videoUrl;
+            updated[section] = { ...updated[section], [field]: result.videoUrl };
           }
           return updated;
         });
+      } else {
+        alert(`Upload failed: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Upload failed', error);
-      alert('Upload failed');
+      alert('Upload failed: Network or server error');
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = '';
       setUploadTarget(null);
@@ -120,11 +122,11 @@ export default function HomepageCMS() {
       if (!updated[section]) updated[section] = {};
       
       if (index !== undefined && subfield) {
-        if (!updated[section][field]) updated[section][field] = [];
-        if (!updated[section][field][index]) updated[section][field][index] = {};
-        updated[section][field][index][subfield] = value;
+        const newArray = [...(updated[section][field] || [])];
+        newArray[index] = { ...(newArray[index] || {}), [subfield]: value };
+        updated[section] = { ...updated[section], [field]: newArray };
       } else {
-        updated[section][field] = value;
+        updated[section] = { ...updated[section], [field]: value };
       }
       return updated;
     });

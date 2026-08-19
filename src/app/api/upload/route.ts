@@ -54,6 +54,13 @@ export async function POST(request: NextRequest) {
     const bytes  = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    if (buffer.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'The uploaded file is empty (0 bytes). If using a cloud drive, please ensure the file is fully downloaded to your device before uploading.' },
+        { status: 400 }
+      );
+    }
+
     // Sanitize filename: replace spaces and special chars
     const safeName       = file.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
     const uniqueFilename = `${Date.now()}-${safeName}`;
