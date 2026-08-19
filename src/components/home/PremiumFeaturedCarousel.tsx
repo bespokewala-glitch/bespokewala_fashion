@@ -19,60 +19,59 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
   const mobileProducts = Array.from({ length: 15 }).flatMap(() => products);
 
   useEffect(() => {
-    const rail = mobileRailRef.current;
-    if (!rail) return;
-    
-    // We will use a reliable, continuous interval.
-    const interval = setInterval(() => {
-      // Pause if tab is hidden or user is interacting
-      if (document.hidden || isInteractingRef.current) return;
-      
-      const el = mobileRailRef.current;
-      if (!el) return;
-      
-      const cards = el.children;
-      if (cards.length === 0) return;
-      
-      const firstCard = cards[0] as HTMLElement;
-      const cardWidth = firstCard.offsetWidth + 14; 
-      if (cardWidth <= 14) return; // Not fully rendered yet
-      
-      // Calculate which card we are currently snapped to
-      const currentIndex = Math.round(el.scrollLeft / cardWidth);
-      
-      // If we are reaching the end of our cloned sets, jump back to the middle
-      if (currentIndex >= mobileProducts.length - 4) {
-        const middleIndex = Math.floor(mobileProducts.length / 2);
-        const middleChild = cards[middleIndex] as HTMLElement;
-        if (middleChild) {
-          // Instant jump (invisible to user)
-          el.scrollTo({ left: middleChild.offsetLeft - 20, behavior: 'auto' });
-          
-          // Wait a tiny fraction for DOM to settle, then smooth scroll to the *next* one
+    if (products.length === 0) return;
+
+    // Small delay to ensure the rail is fully rendered & measurable
+    const startTimer = setTimeout(() => {
+      const rail = mobileRailRef.current;
+      if (!rail) return;
+
+      const interval = setInterval(() => {
+        // Pause if tab is hidden or user is interacting
+        if (document.hidden || isInteractingRef.current) return;
+
+        const el = mobileRailRef.current;
+        if (!el) return;
+
+        const cards = el.children;
+        if (cards.length === 0) return;
+
+        const firstCard = cards[0] as HTMLElement;
+        const gap = 14;
+        const cardWidth = firstCard.offsetWidth + gap;
+        if (cardWidth <= gap) return; // Not fully rendered yet
+
+        // If we are near the end of the cloned sets, jump back to start instantly
+        const nearEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - cardWidth * 2;
+        if (nearEnd) {
+          el.style.scrollBehavior = 'auto';
+          el.scrollLeft = 0;
+          // Restore smooth scrolling after the instant jump
           setTimeout(() => {
             if (mobileRailRef.current) {
-              const nextTarget = mobileRailRef.current.children[middleIndex + 1] as HTMLElement;
-              if (nextTarget) {
-                mobileRailRef.current.scrollTo({ left: nextTarget.offsetLeft - 20, behavior: 'smooth' });
-              }
+              mobileRailRef.current.style.scrollBehavior = 'smooth';
             }
           }, 50);
+        } else {
+          // Advance by exactly one card width using scrollLeft (more reliable than scrollIntoView in a flex rail)
+          el.scrollLeft += cardWidth;
         }
-        return;
+      }, 3000);
+
+      (rail as any).__autoScrollInterval = interval;
+      return () => clearInterval(interval);
+    }, 500);
+
+    return () => {
+      clearTimeout(startTimer);
+      const rail = mobileRailRef.current;
+      if (rail && (rail as any).__autoScrollInterval) {
+        clearInterval((rail as any).__autoScrollInterval);
       }
-      
-      // Normal smooth advance to the exact next card
-      const nextIndex = currentIndex + 1;
-      const targetChild = cards[nextIndex] as HTMLElement;
-      
-      if (targetChild) {
-        // We subtract 20 to account for the container's padding-left: 20px
-        el.scrollTo({ left: targetChild.offsetLeft - 20, behavior: 'smooth' });
-      }
-    }, 4000);
-    
-    return () => clearInterval(interval);
-  }, [mobileProducts.length]);
+    };
+  // Re-run whenever the product list changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products.length]);
 
   // Handle touch interactions to pause auto-scroll
   useEffect(() => {
