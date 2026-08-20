@@ -21,7 +21,21 @@ export async function GET() {
   checks.env_client_email  = !!process.env.GOOGLE_CLOUD_CLIENT_EMAIL;
   checks.env_bucket_name   = !!process.env.GOOGLE_CLOUD_BUCKET_NAME;
 
-  // 2. Private key format check (no value exposed — only structural checks)
+  // 2a. Preferred: full JSON blob (GOOGLE_APPLICATION_CREDENTIALS_JSON)
+  const jsonBlob = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON ?? '';
+  checks.env_json_creds_present = jsonBlob.length > 0;
+  if (jsonBlob.length > 0) {
+    try {
+      const parsed = JSON.parse(jsonBlob);
+      checks.env_json_creds_has_project_id   = !!parsed.project_id;
+      checks.env_json_creds_has_client_email  = !!parsed.client_email;
+      checks.env_json_creds_has_private_key   = !!parsed.private_key;
+    } catch {
+      checks.env_json_creds_parse_error = true;
+    }
+  }
+
+  // 2b. Legacy: individual private key checks
   const rawKey = process.env.GOOGLE_CLOUD_PRIVATE_KEY ?? '';
   checks.env_private_key_present     = rawKey.length > 0;
   checks.env_private_key_has_begin   = rawKey.includes('BEGIN PRIVATE KEY');
