@@ -22,7 +22,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "redis": "^6.1.0",
-    "sharp": "^0.32.6"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -35,11 +35,13 @@
     "mongodb": "^7.5.0",
     "typescript": "^5"
   },
+  "optionalDependencies": {
+    "@img/sharp-linux-musl-x64": "^0.33.5",
+    "@img/sharp-linux-x64": "^0.33.5"
+  },
   "allowScripts": {
     "protobufjs@7.6.5": true,
-    "sharp@0.32.6": true,
-    "sharp@0.34.5": true,
-    "sharp@0.35.3": true,
+    "sharp@0.33.5": true,
     "unrs-resolver@1.12.2": true
   }
 }

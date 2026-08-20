@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bucket } from '@/lib/gcs';
-import sharp from 'sharp';
+
+// ─── Runtime declaration ──────────────────────────────────────────────────────
+// REQUIRED: This route uses native Node.js modules (sharp, @google-cloud/storage).
+// Without this, Vercel may attempt to run the route in the Edge Runtime, which
+// does NOT support native addons and will produce a bare 500 with no stack trace.
+export const runtime = 'nodejs';
+
+// REQUIRED: Every /api/media/ request is dynamic by nature (GCS fetch).
+// Prevents Next.js from accidentally pre-rendering this route at build time.
+export const dynamic = 'force-dynamic';
 
 // ─── MIME type map ────────────────────────────────────────────────────────────
 const MIME_TYPES: Record<string, string> = {
@@ -28,8 +37,24 @@ const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
   large:     { width: 1600, quality: 85 },
 };
 
-// `generateVariantInBackground` removed - we now generate inline to prevent cache poisoning.
+// Transparent 1×1 PNG — used as a controlled fallback for missing files.
+const PLACEHOLDER_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'base64',
+);
+
 // ─── Route Handler ────────────────────────────────────────────────────────────
+// NOTE: `sharp` is intentionally NOT imported at the top level.
+//
+// Rationale: sharp is a native C++ addon. If its platform binary fails to load
+// (e.g., ABI mismatch, missing libvips), a top-level static import causes the
+// ENTIRE route module to crash during initialisation — before any GET handler
+// runs, producing a bare 500 with no useful log output.
+//
+// By importing sharp dynamically inside the variant-generation block (inside a
+// try/catch), any native-load failure is caught, logged with a full stack trace,
+// and the route gracefully falls through to serve the original image instead of
+// returning 500.
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
@@ -121,11 +146,7 @@ export async function GET(
 
       if (!exists) {
         console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-        const placeholder = Buffer.from(
-          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-          'base64',
-        );
-        return new NextResponse(placeholder, {
+        return new NextResponse(PLACEHOLDER_PNG, {
           status: 404,
           headers: {
             'Content-Type':  'image/png',
@@ -137,7 +158,13 @@ export async function GET(
 
       const [originalBuffer] = await gcsFile.download();
 
+      // ── Dynamic sharp import ─────────────────────────────────────────────────
+      // IMPORTANT: sharp is loaded here (not at module top-level) so that any
+      // native-binary failure is caught by this try/catch and logged properly,
+      // rather than crashing the entire route module at startup.
       try {
+        const sharp = (await import('sharp')).default;
+
         const optimizedBuffer = await sharp(originalBuffer)
           .resize(variantCfg.width, null, { withoutEnlargement: true })
           .webp({ quality: variantCfg.quality })
@@ -151,7 +178,7 @@ export async function GET(
           console.error(`[media] ⚠️  Background variant save failed for "${variantPath}":`, err);
         });
 
-        const etag = `"${variantPath}"`;
+        const variantEtag = `"${variantPath}"`;
 
         console.log(
           `[media] 200 variant generated "${variantPath}"` +
@@ -164,7 +191,7 @@ export async function GET(
             'Content-Type':            'image/webp',
             'Content-Length':          String(optimizedBuffer.length),
             'Cache-Control':           'public, max-age=31536000, immutable',
-            'ETag':                    etag,
+            'ETag':                    variantEtag,
             'Vary':                    'Accept-Encoding',
             'Content-Disposition':     'inline',
             'X-Content-Type-Options':  'nosniff',
@@ -172,11 +199,19 @@ export async function GET(
             'X-Served-From':           'gcs-generated',
           },
         });
-      } catch (err) {
-        console.error(`[media] ⚠️  Inline variant generation failed for "${variantPath}":`, err);
-        // Fall through to serve original if generation fails
+      } catch (sharpErr: unknown) {
+        // ── Sharp failed (binary missing / ABI mismatch / libvips error) ──────
+        // Log the full error with stack so Vercel logs show the real cause.
+        // Fall through to serve the original image rather than returning 500.
+        const errMsg = sharpErr instanceof Error
+          ? `${sharpErr.message}\n${sharpErr.stack}`
+          : String(sharpErr);
+        console.error(
+          `[media] ⚠️  sharp failed for "${variantPath}" — falling back to original.\n` +
+          `  Error: ${errMsg}`,
+        );
+        // Fall through to original-file serving below ↓
       }
-
     }
 
     // ── Serve the original GCS file ───────────────────────────────────────────
@@ -194,11 +229,7 @@ export async function GET(
 
       // Return a transparent 1×1 PNG placeholder — prevents broken-image browser icon.
       // Status 404 so the browser doesn't cache it as "found".
-      const placeholder = Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-        'base64',
-      );
-      return new NextResponse(placeholder, {
+      return new NextResponse(PLACEHOLDER_PNG, {
         status: 404,
         headers: {
           'Content-Type':  'image/png',
@@ -220,14 +251,12 @@ export async function GET(
     // Download the original from GCS
     const [fileBuffer] = await gcsFile.download();
 
-    // ETag check already happened at the top, just log and serve
-
     console.log(
       `[media] 200 original "${fileParam}"` +
       ` — ${fileBuffer.length} bytes, ${contentType} (${Date.now() - startMs}ms)`,
     );
 
-    const response = new NextResponse(fileBuffer as unknown as BodyInit, {
+    return new NextResponse(fileBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type':           contentType,
@@ -242,13 +271,12 @@ export async function GET(
       },
     });
 
-
-
-    return response;
-
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error(`[media] 💥 Unhandled error: ${msg}`);
+    // ── Top-level catch: log full stack for Vercel logs ─────────────────────
+    const errMsg = error instanceof Error
+      ? `${error.message}\n${error.stack}`
+      : String(error);
+    console.error(`[media] 💥 Unhandled error:\n${errMsg}`);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
