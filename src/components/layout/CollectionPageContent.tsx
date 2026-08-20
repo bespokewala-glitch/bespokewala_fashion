@@ -54,7 +54,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, totalProducts, rawCampaigns, hpSections] = await Promise.all([
+  const [rawProducts, totalProducts, rawCampaigns, hpSections, rawTaxonomy] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
@@ -77,6 +77,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(sectionCacheKey, 60, () =>
       HomepageSection.find({ page: pageId }).lean()
     ),
+    getOrFetch(`taxonomy:${pageId}`, 60, () => {
+      import('@/models/Taxonomy');
+      return import('mongoose').then(m => m.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null);
+    }),
   ]);
 
   const products = (rawProducts as any[]).map((p: any) => ({
@@ -113,7 +117,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
    * Use reusable title logic to produce meaningful H1s 
    * (e.g. "Luxury Women's Lehengas", "Luxury Footwear Collection")
    */
-  const pageTitle = generateCategoryHeading(productType, category, subcategory, collectionName);
+  const generatedTitle = generateCategoryHeading(productType, category, subcategory, collectionName);
+  const taxonomySeo = (rawTaxonomy as any)?.seo || {};
+  const pageTitle = taxonomySeo.seoH1 || generatedTitle;
+  const seoIntro = taxonomySeo.seoIntro;
+  const seoContent = taxonomySeo.seoContent;
 
   /** Breadcrumb trail so users know where they are */
   const breadcrumbs: { label: string; href: string }[] = [{ label: 'Home', href: '/' }];
@@ -199,9 +207,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         {/* Page heading */}
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <h1 className="h1">{pageTitle}</h1>
-          <p className="subtitle" style={{ marginTop: '1rem' }}>
-            Discover our {pageTitle.toLowerCase()}.
-          </p>
+          {seoIntro ? (
+            <div className="seo-intro" style={{ marginTop: '1.5rem', maxWidth: '800px', margin: '1.5rem auto 0 auto', color: '#555', lineHeight: '1.6', fontSize: '1rem' }} dangerouslySetInnerHTML={{ __html: seoIntro }} />
+          ) : (
+            <p className="subtitle" style={{ marginTop: '1rem' }}>
+              Discover our {generatedTitle.toLowerCase()}.
+            </p>
+          )}
         </div>
 
         {/* Top-Level Department Navigation Cards (if top-level department like Jewellery) */}
@@ -316,6 +328,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
               )}
             </>
           )
+        )}
+        
+        {seoContent && (
+          <div className="seo-content" style={{ marginTop: '6rem', paddingTop: '4rem', borderTop: '1px solid #eaeaea', color: '#555', lineHeight: '1.8', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: seoContent }} />
         )}
       </main>
     </>

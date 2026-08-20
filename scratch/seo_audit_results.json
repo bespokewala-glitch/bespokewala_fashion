@@ -1,0 +1,273 @@
+{
+  "timestamp": "2026-08-20T08:11:21.114Z",
+  "sitemapCount": 278,
+  "results": [
+    {
+      "url": "/",
+      "status": 200,
+      "title": "Luxury Couture, Footwear &amp; Jewellery | Bespokewala",
+      "description": "Discover Bespokewala&#x27;s luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
+      "h1Count": 1,
+      "h1": "Luxury Couture, Footwear &amp; Jewellery Crafted for You",
+      "canonical": "https://www.bespokewala.com",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Organization",
+        "WebSite"
+      ]
+    },
+    {
+      "url": "/products",
+      "status": 200,
+      "title": "All Products | Bespokewala",
+      "description": "Explore the complete luxury collection at Bespokewala.",
+      "h1Count": 1,
+      "h1": "All Products",
+      "canonical": "https://www.bespokewala.com/products",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture",
+      "status": 200,
+      "title": "Luxury Couture Collection | Bespokewala",
+      "description": "Shop our luxury couture collection at Bespokewala.",
+      "h1Count": 0,
+      "h1": "",
+      "canonical": "https://www.bespokewala.com/products/couture",
+      "robots": "",
+      "schemaCount": 0,
+      "schemaTypes": []
+    },
+    {
+      "url": "/products/couture/womens",
+      "status": 200,
+      "title": "Luxury Women&#x27;s Couture | Bespokewala",
+      "description": "Discover luxury women&#x27;s couture at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Women&#x27;s Couture",
+      "canonical": "https://www.bespokewala.com/products/couture/womens",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture/mens",
+      "status": 200,
+      "title": "Luxury Men&#x27;s Couture | Bespokewala",
+      "description": "Discover luxury men&#x27;s couture at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Men&#x27;s Couture",
+      "canonical": "https://www.bespokewala.com/products/couture/mens",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture/bridal",
+      "status": 200,
+      "title": "Luxury Bridal – Couture | Bespokewala",
+      "description": "Explore the Bridal collection from our couture range at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Bridal – Couture",
+      "canonical": "https://www.bespokewala.com/products/couture/bridal",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture/womens/lehenga",
+      "status": 200,
+      "title": "Luxury Designer Lehengas for Women | Bespokewala",
+      "description": "Explore our exclusive collection of luxury designer lehengas for women at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Women&#x27;s Lehengas",
+      "canonical": "https://www.bespokewala.com/products/couture/womens/lehenga",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture/womens/saree",
+      "status": 200,
+      "title": "Luxury Designer Sarees for Women | Bespokewala",
+      "description": "Explore our exclusive collection of luxury designer sarees for women at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Women&#x27;s Sarees",
+      "canonical": "https://www.bespokewala.com/products/couture/womens/saree",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/couture/womens/draped-saree",
+      "status": 200,
+      "title": "Luxury Designer Draped Sarees for Women | Bespokewala",
+      "description": "Explore our exclusive collection of luxury designer draped sarees for women at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Women&#x27;s Draped Sarees",
+      "canonical": "https://www.bespokewala.com/products/couture/womens/draped-saree",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/footwear",
+      "status": 200,
+      "title": "Luxury Footwear Collection | Bespokewala",
+      "description": "Shop our luxury footwear collection at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Footwear Collection",
+      "canonical": "https://www.bespokewala.com/products/footwear",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/jewellery",
+      "status": 200,
+      "title": "Luxury Jewellery Collection | Bespokewala",
+      "description": "Shop our luxury jewellery collection at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Jewellery Collection",
+      "canonical": "https://www.bespokewala.com/products/jewellery",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/beauty",
+      "status": 200,
+      "title": "Luxury Beauty Collection | Bespokewala",
+      "description": "Shop our luxury beauty collection at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Beauty Collection",
+      "canonical": "https://www.bespokewala.com/products/beauty",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/diffusion",
+      "status": 200,
+      "title": "Luxury Diffusion Collection | Bespokewala",
+      "description": "Shop our luxury diffusion collection at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Luxury Diffusion Collection",
+      "canonical": "https://www.bespokewala.com/products/diffusion",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "BreadcrumbList",
+        "ItemList"
+      ]
+    },
+    {
+      "url": "/products/ethereal-bloom-gown",
+      "status": 200,
+      "title": "Ethereal bloom gown | Womens | Bespokewala",
+      "description": "Shop the Ethereal bloom gown from our womens collection. Style: couture. Explore luxury fashion at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Ethereal bloom gown",
+      "canonical": "https://www.bespokewala.com/products/ethereal-bloom-gown",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Product",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "url": "/products/midnight-heritage-sherwani",
+      "status": 200,
+      "title": "Midnight heritage sherwani | Mens | Bespokewala",
+      "description": "Shop the Midnight heritage sherwani from our mens collection. Style: couture. Explore luxury fashion at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Midnight heritage sherwani",
+      "canonical": "https://www.bespokewala.com/products/midnight-heritage-sherwani",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Product",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "url": "/products/ruby-royale-sherwani",
+      "status": 200,
+      "title": "Ruby Royale Sherwani | Mens | Bespokewala",
+      "description": "Shop the Ruby Royale Sherwani from our mens collection. Style: couture. Explore luxury fashion at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Ruby Royale Sherwani",
+      "canonical": "https://www.bespokewala.com/products/ruby-royale-sherwani",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Product",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "url": "/products/burgundy-imperial-sherwani",
+      "status": 200,
+      "title": "Burgundy Imperial Sherwani | Mens | Bespokewala",
+      "description": "Shop the Burgundy Imperial Sherwani from our mens collection. Style: couture. Explore luxury fashion at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Burgundy Imperial Sherwani",
+      "canonical": "https://www.bespokewala.com/products/burgundy-imperial-sherwani",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Product",
+        "BreadcrumbList"
+      ]
+    },
+    {
+      "url": "/products/moonstone-bloom-gown",
+      "status": 200,
+      "title": "Moonstone Bloom Gown | Womens | Bespokewala",
+      "description": "Shop the Moonstone Bloom Gown from our womens collection. Style: couture. Explore luxury fashion at Bespokewala.",
+      "h1Count": 1,
+      "h1": "Moonstone Bloom Gown",
+      "canonical": "https://www.bespokewala.com/products/moonstone-bloom-gown",
+      "robots": "",
+      "schemaCount": 2,
+      "schemaTypes": [
+        "Product",
+        "BreadcrumbList"
+      ]
+    }
+  ]
+}

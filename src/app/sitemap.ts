@@ -67,11 +67,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         if (tax.productTypes && tax.productTypes.length > 0) {
           urlPath = `/products/${tax.productTypes[0]}/${tax.slug}`;
         } else {
-          urlPath = `/products/${tax.slug}`; // Changed from query params to avoid duplicate issues
+          // If no parent productType, do NOT include in sitemap to prevent short-path cannibalization
+          return;
         }
       } else {
-        // Fallback for occasion or other types - generally we don't index ?query parameters in sitemap
-        // but if it's an occasion taxonomy it might have a dedicated path eventually
+        // Occasion or generic
         return; 
       }
 

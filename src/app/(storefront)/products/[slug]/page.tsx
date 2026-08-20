@@ -36,7 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // If it's a known product type, generate collection metadata
   if (PRODUCT_TYPES.includes(slug)) {
-    return generateCategoryMetadata(slug);
+    await dbConnect();
+    const taxonomy = await getOrFetch(`taxonomy:meta:${slug}`, 300, () => {
+      import('@/models/Taxonomy');
+      return import('mongoose').then(m => m.models.Taxonomy?.findOne({ slug }).select('seo').lean() || null);
+    }) as any;
+    return generateCategoryMetadata(slug, undefined, undefined, taxonomy?.seo);
   }
 
   // Otherwise treat as product slug — use server cache to avoid a second DB call

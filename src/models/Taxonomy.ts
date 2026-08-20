@@ -16,6 +16,9 @@ export interface ITaxonomy {
     canonicalUrl?: string;
     noIndex?: boolean;
     image?: string;
+    seoH1?: string;
+    seoIntro?: string;
+    seoContent?: string;
   };
   createdAt?: Date;
   updatedAt?: Date;
@@ -37,6 +40,9 @@ const taxonomySchema = new Schema<ITaxonomy>(
       canonicalUrl: { type: String },
       noIndex: { type: Boolean, default: false },
       image: { type: String },
+      seoH1: { type: String },
+      seoIntro: { type: String },
+      seoContent: { type: String },
     },
   },
   {

@@ -30,6 +30,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       ],
       disallow: [
         '/admin',
+        '/dashboard',
         '/api',
         '/account',
         '/cart',
