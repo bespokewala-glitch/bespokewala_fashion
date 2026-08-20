@@ -40,9 +40,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (collectionName) productQuery.collectionName = collectionName;
   if (occasion) productQuery.occasion = occasion;
 
-  // Campaign hero — only shown on top-level pages (productType or category).
-  // Subcategory and collectionName pages skip the hero and go straight to products.
-  const showHero = !subcategory && !collectionName;
+  // Campaign hero — only shown on top-level pages (productType).
+  // Category, subcategory, occasion, and collectionName pages skip the hero and go straight to products.
+  const showHero = Boolean(productType && !category && !subcategory && !collectionName && !occasion);
 
   let campaignCategory = 'general';
   if (productType) campaignCategory = productType;
