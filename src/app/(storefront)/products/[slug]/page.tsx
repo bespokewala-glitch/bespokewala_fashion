@@ -3,7 +3,7 @@ import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
 import { Metadata } from 'next';
 import { normalizeImageUrl } from '@/lib/imageUrl';
@@ -69,11 +69,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductsSlugPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const { page } = await searchParams;
-
-  // ── Case 1: Couture page is Homepage ─────────────────────────────────────
-  if (slug === 'couture') {
-    redirect('/');
-  }
 
   // ── Case 2: Product-type listing ─────────────────────────────────────────
   if (PRODUCT_TYPES.includes(slug)) {
