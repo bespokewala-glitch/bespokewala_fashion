@@ -150,7 +150,7 @@ function LoginContent() {
   };
 
   return (
-    <div style={containerStyle} className="mobile-p-4 mobile-pt-24">
+    <div style={containerStyle} className="mobile-content-top-pad">
       <div style={cardStyle}>
         <div style={headerStyle}>
           <h1 style={titleStyle}>Login</h1>

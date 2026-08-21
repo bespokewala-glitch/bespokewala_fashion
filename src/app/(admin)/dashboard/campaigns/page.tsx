@@ -8,6 +8,7 @@ export default function AdminCampaignsPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -100,14 +101,18 @@ export default function AdminCampaignsPage() {
     }
 
     try {
-      const res = await fetch('/api/campaigns', {
-        method: 'POST',
+      const url = editingId ? `/api/campaigns/${editingId}` : '/api/campaigns';
+      const method = editingId ? 'PUT' : 'POST';
+      
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (data.success) {
         setFormData({ title: '', subtitle: '', linkUrl: '/products?productType=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
+        setEditingId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
         fetchCampaigns();
       } else {
@@ -116,6 +121,19 @@ export default function AdminCampaignsPage() {
     } catch (err: any) {
       alert('Error submitting: ' + err.message);
     }
+  };
+
+  const handleEdit = (camp: any) => {
+    setEditingId(camp._id);
+    setFormData({
+      title: camp.title || '',
+      subtitle: camp.subtitle || '',
+      linkUrl: camp.linkUrl || '/products?productType=couture',
+      videoUrl: camp.videoUrl || '',
+      category: camp.category || 'couture',
+      mediaType: camp.mediaType || 'image'
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: string) => {
@@ -145,14 +163,13 @@ export default function AdminCampaignsPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start' }} className="admin-flex-row">
         {/* ADD NEW CAMPAIGN FORM */}
         <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', width: '100%', boxSizing: 'border-box' }} className="admin-page-container">
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Add New Campaign</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>{editingId ? 'Edit Campaign' : 'Add New Campaign'}</h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             
             <div style={{ width: '100%' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Title</label>
               <input 
                 type="text" 
-                required 
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
                 placeholder="e.g. INAYA SUMMER 2026"
@@ -164,7 +181,6 @@ export default function AdminCampaignsPage() {
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subtitle</label>
               <input 
                 type="text" 
-                required 
                 value={formData.subtitle}
                 onChange={e => setFormData({...formData, subtitle: e.target.value})}
                 placeholder="e.g. NEW COLLECTION"
@@ -237,24 +253,46 @@ export default function AdminCampaignsPage() {
               </div>
             </div>
 
-            <button 
-              type="submit" 
-              disabled={uploading || !formData.videoUrl}
-              style={{ 
-                marginTop: '10px', 
-                minHeight: '44px',
-                width: '100%',
-                boxSizing: 'border-box',
-                backgroundColor: '#000', 
-                color: '#fff', 
-                border: 'none', 
-                borderRadius: '4px', 
-                cursor: (uploading || !formData.videoUrl) ? 'not-allowed' : 'pointer',
-                opacity: (uploading || !formData.videoUrl) ? 0.5 : 1
-              }}
-            >
-              Save Campaign
-            </button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <button 
+                type="submit" 
+                disabled={uploading || !formData.videoUrl}
+                style={{ 
+                  flex: 1,
+                  minHeight: '44px',
+                  boxSizing: 'border-box',
+                  backgroundColor: '#000', 
+                  color: '#fff', 
+                  border: 'none', 
+                  borderRadius: '4px', 
+                  cursor: (uploading || !formData.videoUrl) ? 'not-allowed' : 'pointer',
+                  opacity: (uploading || !formData.videoUrl) ? 0.5 : 1
+                }}
+              >
+                {editingId ? 'Update Campaign' : 'Save Campaign'}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setEditingId(null);
+                    setFormData({ title: '', subtitle: '', linkUrl: '/products?productType=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
+                  }}
+                  style={{ 
+                    flex: 1,
+                    minHeight: '44px',
+                    boxSizing: 'border-box',
+                    backgroundColor: '#e0e0e0', 
+                    color: '#000', 
+                    border: 'none', 
+                    borderRadius: '4px', 
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel Edit
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -277,20 +315,36 @@ export default function AdminCampaignsPage() {
                     <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem' }}>{camp.subtitle}</p>
                     <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}><strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{camp.category || 'general'}</span> ({camp.mediaType || (isImage ? 'image' : 'video')})</p>
                     <p style={{ margin: '0 0 15px 0', fontSize: '0.8rem' }}><strong>Link:</strong> {camp.linkUrl}</p>
-                    <button 
-                      onClick={() => handleDelete(camp._id)}
-                      style={{ 
-                        padding: '6px 12px', 
-                        backgroundColor: '#ff4d4f', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem'
-                      }}
-                    >
-                      Delete
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        onClick={() => handleEdit(camp)}
+                        style={{ 
+                          padding: '6px 12px', 
+                          backgroundColor: '#1890ff', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(camp._id)}
+                        style={{ 
+                          padding: '6px 12px', 
+                          backgroundColor: '#ff4d4f', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               )})}

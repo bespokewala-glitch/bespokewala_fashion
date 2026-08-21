@@ -32,10 +32,14 @@
 /* Mobile & Tablet Styles */
 @media (max-width: 1023px) {
 
-  html,
-  body {
+  html {
     overflow-x: hidden;
     width: 100%;
+  }
+
+  body {
+    width: 100%;
+    padding-top: 110px !important;
   }
 
   .mobile-hide {
@@ -556,8 +560,11 @@
   }
 
   .mobile-header-sticky {
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 1000 !important;
     background-color: #fff !important;
     border-bottom: 1px solid #eee !important;
     color: #1c1c1c !important;
@@ -648,6 +655,30 @@
     .mobile-nav-link {
       font-size: 9px !important;
     }
+  }
+
+  /* Mobile UI Layout Fixes */
+  .mobile-hero-height.hero-section {
+    height: clamp(340px, 50vh, 460px) !important;
+    min-height: auto !important;
+  }
+  .hero-image, .hero-video {
+    object-position: 58% center !important; 
+  }
+
+  .mobile-carousel > * {
+    flex: 0 0 75vw !important;
+    max-width: 75vw !important;
+  }
+  .curated-card {
+    height: auto !important;
+    aspect-ratio: 9 / 16 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+  }
+  .curated-card-img {
+    object-position: center center !important;
   }
 }
 
@@ -818,10 +849,11 @@
      Each card: inline height '600px', img minHeight '400px'
      ═══════════════════════════════════════════════════════════════════════ */
 
-  /* Card container: 80vw wide (from mobile-carousel), height corrected */
+  /* Card container: 80vw wide (from mobile-carousel), tall height for full model view */
   .mobile-carousel > a,
   .mobile-carousel > div {
-    height: clamp(240px, 65vw, 320px) !important;
+    height: auto !important;
+    aspect-ratio: 9 / 16 !important;
     min-height: 0 !important;
     border-radius: 10px !important;
   }
@@ -1037,13 +1069,13 @@
      ═══════════════════════════════════════════════════════════════════════ */
 
   section.mobile-hero-height {
-    height: clamp(320px, 75vw, 480px) !important;
+    height: clamp(340px, 50vh, 460px) !important;
     width: 100% !important;
     max-width: 100% !important;
   }
 
   .mobile-hero-height img, .mobile-hero-height video {
-    object-position: center 20% !important; /* Keep faces/upper body in view */
+    object-position: 58% center !important; /* Show both male and female models */
   }
 
   .mobile-hero-title {
@@ -1241,9 +1273,9 @@
     padding-right: 12px !important;
   }
 
-  /* Hero even more compact on tiny screens */
+  /* Hero height on small mobile screens */
   section.mobile-hero-height {
-    height: clamp(220px, 62vw, 340px) !important;
+    height: clamp(340px, 50vh, 460px) !important;
   }
 
   /* FeatureBanner hero */
@@ -1254,7 +1286,8 @@
   /* Curated grid cards */
   .mobile-carousel > a,
   .mobile-carousel > div {
-    height: clamp(200px, 60vw, 280px) !important;
+    height: auto !important;
+    aspect-ratio: 9 / 16 !important;
   }
 
   /* SplitShowcase model image */
@@ -1327,5 +1360,221 @@
   .desktop-sticky {
     position: sticky !important;
     top: 100px !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MOBILE UX FIX — ADDITIONS
+   All changes are strictly scoped to mobile breakpoints.
+   Desktop is never touched.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Body scroll-lock when mobile drawer is open ───────────────────────────── */
+.body-drawer-open {
+  overflow: hidden !important;
+  /* Prevent iOS bounce scroll from bleeding through */
+  position: fixed;
+  width: 100%;
+}
+
+/* ── touch-action on horizontal carousels ─────────────────────────────────── */
+/* Prevents the browser from interpreting a horizontal swipe as a vertical
+   scroll, giving a natural native carousel feel. */
+.mobile-carousel,
+.mobile-product-rail {
+  touch-action: pan-x pinch-zoom;
+  scroll-snap-type: x mandatory;
+}
+
+/* ── Top-padding guard for pages without a hero ───────────────────────────── */
+/* Used on pages like /wishlist, /about, /contact where there is NO hero
+   section below the fixed header. The header is 64px + optional 36px top-nav = ~100px. */
+@media (max-width: 1023px) {
+}
+
+/* ── Department collection cards — mobile height fix ─────────────────────── */
+@media (max-width: 767px) {
+  /* CollectionPageContent top-level department grid cards */
+  .mobile-carousel > a[style],
+  .mobile-carousel > a {
+    min-height: 200px !important;
+    padding: 1.5rem 1rem !important;
+  }
+
+  .mobile-carousel > a[style],
+  .mobile-carousel > a,
+  .mobile-carousel > div,
+  .mobile-product-card {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* When carousel card is a department nav card (has minHeight:340px inline) */
+  /* Override the inline minHeight so cards aren't towering on mobile */
+  [style*="minHeight: '340px'"],
+  [style*="minHeight:340px"] {
+    min-height: 180px !important;
+  }
+  /* The inline columnStyle has minWidth:'200px' which overflows at 320px.
+     Target via the .mobile-stack children which are the columns. */
+  footer .mobile-stack > div {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Footer link touch targets — ensure 44px minimum */
+  footer ul li {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  footer ul li a {
+    display: block;
+    width: 100%;
+    padding: 4px 0;
+  }
+
+  /* ── TestimonialsSection — reduce mobile padding & min-height ──────────── */
+  .testimonials-section {
+    padding: 3rem 1.25rem !important;
+  }
+
+  .testimonial-container {
+    min-height: auto !important;
+    height: auto !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* testimonial-slide uses position:absolute — give the container a fixed height
+     just tall enough for the longest text block */
+  .testimonial-slide {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: none;
+    width: 100%;
+  }
+
+  .testimonial-slide.active {
+    display: block;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+  }
+
+  .testimonial-text {
+    font-size: clamp(1rem, 4vw, 1.3rem) !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .testimonial-indicators {
+    margin-top: 1.5rem !important;
+  }
+
+  /* ── ProductGallery — thumbnail row scroll-snap ────────────────────────── */
+  .gallery-thumbnails {
+    scroll-snap-type: x mandatory;
+  }
+
+  .gallery-thumbnail-btn {
+    scroll-snap-align: start;
+  }
+
+  /* ── Hero section — hide prev/next arrows on mobile ───────────────────── */
+  /* Arrow buttons in HeroSection add className="mobile-hide" */
+  /* This is a CSS fallback in case a future change drops the class */
+  .hero-arrow-btn {
+    display: none !important;
+  }
+
+  /* ── Collection page heading margin on mobile ─────────────────────────── */
+  /* The desktop 4rem marginBottom is too much on mobile */
+  main.mobile-px-4 > div[style*="marginBottom: '4rem'"],
+  main.mobile-px-4 > div[style*="marginBottom:4rem"] {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* ── Mobile product card info — better tap spacing ────────────────────── */
+  .product-card > div:last-child {
+    gap: 0.25rem !important;
+    padding: 0.5rem 0 !important;
+  }
+
+  .product-card h3 {
+    font-size: clamp(11px, 2.8vw, 13px) !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .product-card span {
+    font-size: clamp(11px, 2.8vw, 13px) !important;
+  }
+
+  /* ── Wishlist page — ensure full padding under fixed header ───────────── */
+  main.mobile-pt-20 {
+    padding-top: 5rem !important;
+  }
+}
+
+/* ── 320px micro-adjustments ──────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .testimonial-text {
+    font-size: 0.95rem !important;
+  }
+
+  .testimonials-section {
+    padding: 2.5rem 1rem !important;
+  }
+
+  footer ul li {
+    min-height: 40px;
+  }
+
+  .mobile-carousel > * {
+    flex: 0 0 86vw !important;
+    max-width: 86vw !important;
+  }
+
+  .mobile-product-card {
+    flex: 0 0 78vw !important;
+    max-width: 78vw !important;
+  }
+}
+
+/* ── Mobile Static Utility (for disabling sticky on mobile) ─────────────── */
+@media (max-width: 767px) {
+  .mobile-static {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
+/* ── Product Detail Page — mobile layout ─────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Override the 4rem horizontal padding from inline containerStyle */
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20 {
+    padding: 5rem 16px 2rem 16px !important;
+    gap: 2rem !important;
+  }
+
+  /* Make the sticky details panel static — avoids sticky getting "stuck"
+     in a single-column flex layout */
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20 > div:last-child > div {
+    position: static !important;
+    top: auto !important;
+  }
+
+  /* Product name — scale down from 2rem on desktop */
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20 h1 {
+    font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Product description text */
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20 > div:last-child > div > div[style*="lineHeight"] {
+    font-size: 0.875rem !important;
   }
 }

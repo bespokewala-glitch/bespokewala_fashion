@@ -125,11 +125,20 @@ export default function FeatureBanner({ data }: { data?: any }) {
             minWidth: '44px',
             justifyContent: 'flex-start'
           }}>
-            {title ? (
-              title.toLowerCase().includes('jewellery') || title.toLowerCase().includes('footwear')
-                ? `Shop ${title}`
-                : `Explore ${title}`
-            ) : 'Explore Collection'}
+            {(() => {
+              if (!title) return 'Explore Collection \u2192';
+              const lowerTitle = title.toLowerCase();
+              if (lowerTitle.includes('jewellery')) {
+                return 'Explore Fine Jewellery \u2192';
+              }
+              if (lowerTitle.includes('footwear')) {
+                return 'Shop Footwear \u2192';
+              }
+              if (lowerTitle.includes('couture')) {
+                return 'Explore Couture \u2192';
+              }
+              return `Explore ${title} \u2192`;
+            })()}
           </Link>
         </div>
       </section>

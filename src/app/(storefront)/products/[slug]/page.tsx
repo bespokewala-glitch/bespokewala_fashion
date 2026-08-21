@@ -163,7 +163,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <main style={containerStyle} className="mobile-grid-1 mobile-px-4 mobile-pt-20 mobile-pb-4">
+      <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-20 mobile-pb-4">
         <div>
           {(() => {
             const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';

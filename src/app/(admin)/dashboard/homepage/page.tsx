@@ -414,6 +414,23 @@ export default function HomepageCMS() {
               </div>
 
               <div style={{ display: 'flex', gap: '20px' }}>
+                <div style={{ width: '150px', position: 'relative' }}>
+                  <div 
+                    onClick={() => handleFileUploadClick('CoutureProcess', 'steps', i)}
+                    style={{ height: '150px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}
+                  >
+                    {step.image ? <MediaPreview src={step.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Step Image'}
+                  </div>
+                  {step.image && (
+                    <button 
+                      onClick={() => handleTextChange('CoutureProcess', 'steps', '', i, 'image')}
+                      className={styles.removeButton}
+                      title="Remove Image"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
                 <div style={{ flex: '1' }}>
                   <label style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', gap: '10px' }}>
                     <input 
@@ -445,6 +462,72 @@ export default function HomepageCMS() {
           <button onClick={addCoutureStep} style={{ padding: '10px 20px', backgroundColor: '#fff', border: '1px solid #ccc', cursor: 'pointer' }}>+ Add Step</button>
           <button disabled={saving} onClick={() => saveSection('CoutureProcess', sections.CoutureProcess)} style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Couture Process</button>
         </div>
+      </div>
+
+      {/* 6. Brand Story (Our Heritage) */}
+      <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>6. Brand Story (Media Only)</h2>
+        <div style={{ position: 'relative', height: '200px', maxWidth: '400px', marginBottom: '20px' }}>
+          <div 
+            onClick={() => handleFileUploadClick('BrandStory', 'image')}
+            style={{ height: '200px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden', border: '1px dashed #ccc' }}
+          >
+            {sections.BrandStory?.image ? <MediaPreview src={sections.BrandStory.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Image or Video'}
+          </div>
+          {sections.BrandStory?.image && (
+            <button 
+              onClick={() => handleTextChange('BrandStory', 'image', '')}
+              className={styles.removeButton}
+              title="Remove Media"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <button disabled={saving} onClick={() => saveSection('BrandStory', sections.BrandStory)} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Brand Story</button>
+      </div>
+
+      {/* 7. Category Navigation */}
+      <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>7. Category Navigation</h2>
+        <div style={{ display: 'grid', gap: '15px', marginBottom: '20px' }}>
+          <input 
+            placeholder="Eyebrow (e.g. Explore Bespokewala)" 
+            value={sections.CategoryNavigation?.eyebrow || ''}
+            onChange={e => handleTextChange('CategoryNavigation', 'eyebrow', e.target.value)}
+            style={{ padding: '10px', width: '100%' }}
+          />
+          <input 
+            placeholder="Headline (e.g. Find your signature style.)" 
+            value={sections.CategoryNavigation?.headline || ''}
+            onChange={e => handleTextChange('CategoryNavigation', 'headline', e.target.value)}
+            style={{ padding: '10px', width: '100%' }}
+          />
+        </div>
+        
+        <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Category Cards</h3>
+        <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '15px' }}>Configure the 3 category cards (Couture, Footwear, Jewellery).</p>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {[0, 1, 2].map((i) => {
+            const card = sections.CategoryNavigation?.cards?.[i] || {};
+            return (
+              <div key={i} style={{ border: '1px solid #eee', padding: '15px', borderRadius: '4px' }}>
+                <h4 style={{ fontSize: '1rem', margin: '0 0 10px 0' }}>Card {i + 1}</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <input placeholder="Title (e.g. Couture)" value={card.title || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'title')} style={{ padding: '8px', width: '100%' }} />
+                  <input placeholder="Number (e.g. 01)" value={card.num || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'num')} style={{ padding: '8px', width: '100%' }} />
+                  <input placeholder="Watermark Letter (e.g. C)" value={card.letter || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'letter')} style={{ padding: '8px', width: '100%' }} />
+                  <input placeholder="Link URL" value={card.link || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'link')} style={{ padding: '8px', width: '100%' }} />
+                  <input placeholder="ID (e.g. couture)" value={card.id || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'id')} style={{ padding: '8px', width: '100%' }} />
+                  <input placeholder="Description" value={card.desc || ''} onChange={e => handleTextChange('CategoryNavigation', 'cards', e.target.value, i, 'desc')} style={{ padding: '8px', width: '100%', gridColumn: '1 / -1' }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
+        <button disabled={saving} onClick={() => saveSection('CategoryNavigation', sections.CategoryNavigation)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Category Navigation</button>
       </div>
       
     </div>

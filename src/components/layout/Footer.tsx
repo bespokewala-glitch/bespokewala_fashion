@@ -20,7 +20,7 @@ export default function Footer() {
 
   const columnStyle: React.CSSProperties = {
     flex: '1',
-    minWidth: '200px',
+    minWidth: '160px',
   };
 
   const headingStyle: React.CSSProperties = {

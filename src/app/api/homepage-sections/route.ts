@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import HomepageSection from '@/models/HomepageSection';
+import { invalidateCachePrefix } from '@/lib/serverCache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {  
   try {
     await dbConnect();
     const body = await request.json();
@@ -30,6 +31,9 @@ export async function POST(request: NextRequest) {
       { sectionType, content, page },
       { new: true, upsert: true }
     );
+
+    // Invalidate the server-side cache so the next page request picks up fresh data
+    invalidateCachePrefix('home:');
 
     return NextResponse.json({ success: true, section }, { status: 201 });
   } catch (error: any) {

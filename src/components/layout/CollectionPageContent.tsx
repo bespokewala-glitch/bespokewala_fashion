@@ -54,7 +54,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, totalProducts, rawCampaigns, hpSections, rawTaxonomy] = await Promise.all([
+  const [rawProducts, totalProducts, rawCampaigns, hpSections, rawTaxonomy, rawFilters] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
@@ -80,6 +80,17 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(`taxonomy:${pageId}`, 60, () => {
       import('@/models/Taxonomy');
       return import('mongoose').then(m => m.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null);
+    }),
+    // Fetch distinct child categories/subcategories for the filter bar
+    getOrFetch(`filters:${productCacheKey}`, 60, async () => {
+      if (subcategory || collectionName || occasion) return []; // Too deep
+      if (category) {
+        return Product.distinct('subcategory', { productType, category });
+      }
+      if (productType) {
+        return Product.distinct('category', { productType });
+      }
+      return [];
     }),
   ]);
 
@@ -112,6 +123,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   (hpSections as any[]).forEach((s: any) => {
     sectionMap[s.sectionType] = s.content;
   });
+
+  const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
 
   /**
    * Use reusable title logic to produce meaningful H1s 
@@ -152,8 +165,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     // Only apply bottom padding and horizontal padding inline. 
     // Top padding is moved to CSS so we can easily override it on mobile without specificity wars.
     paddingBottom: '4rem',
-    paddingLeft: '2rem',
-    paddingRight: '2rem',
     maxWidth: '1600px',
     margin: '0 auto',
     minHeight: '80vh',
@@ -193,7 +204,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
-      <main style={containerStyle} className="mobile-px-4 desktop-pt-hero">
+      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         <div className="desktop-mx-negative mobile-m-0">
@@ -293,6 +304,50 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             </div>
           ) : (
             <>
+              {/* Filter Bar */}
+              {filterList && filterList.length > 0 && (
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '1rem', 
+                  marginBottom: '2rem', 
+                  justifyContent: 'center',
+                  flexWrap: 'wrap'
+                }} className="mobile-overflow-x">
+                  <Link 
+                    href={productType && category ? `/products/${productType}/${category}` : productType ? `/products/${productType}` : '/products'}
+                    className="btn-secondary" 
+                    style={{ 
+                      padding: '0.5rem 1rem', 
+                      fontSize: '0.85rem', 
+                      backgroundColor: (!subcategory && !category) || (category && !subcategory && !productType) ? '#000' : 'transparent',
+                      color: (!subcategory && !category) || (category && !subcategory && !productType) ? '#fff' : '#000'
+                    }}
+                  >
+                    All
+                  </Link>
+                  {filterList.map((filterItem: string) => {
+                    const filterName = filterItem.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                    const isActive = category === filterItem || subcategory === filterItem;
+                    const filterUrl = category ? `/products/${productType}/${category}/${filterItem}` : `/products/${productType}/${filterItem}`;
+                    return (
+                      <Link 
+                        key={filterItem}
+                        href={filterUrl}
+                        className="btn-secondary" 
+                        style={{ 
+                          padding: '0.5rem 1rem', 
+                          fontSize: '0.85rem',
+                          backgroundColor: isActive ? '#000' : 'transparent',
+                          color: isActive ? '#fff' : '#000'
+                        }}
+                      >
+                        {filterName}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className="product-grid">
                 {products.map((product: any, index: number) => (
                   <ProductCard key={product._id} product={product} priority={index < 4} />

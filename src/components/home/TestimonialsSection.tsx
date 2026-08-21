@@ -7,19 +7,25 @@ const testimonials = [
     id: 1,
     text: "The craftsmanship and attention to detail are unparalleled. My bespoke lehenga was absolutely flawless.",
     author: "Priya S.",
-    location: "Mumbai, India"
+    location: "Mumbai, India",
+    product: "Custom Bridal Lehenga",
+    rating: 5
   },
   {
     id: 2,
     text: "Exceptional service from start to finish. The team understood exactly what I wanted for my wedding sherwani.",
     author: "Rahul M.",
-    location: "London, UK"
+    location: "London, UK",
+    product: "Bespoke Sherwani Set",
+    rating: 5
   },
   {
     id: 3,
     text: "Wearing Bespokewala makes you feel like royalty. The fabrics, the fit, the embroidery—pure luxury.",
     author: "Ayesha K.",
-    location: "Dubai, UAE"
+    location: "Dubai, UAE",
+    product: "Emerald Zari Gown",
+    rating: 5
   }
 ];
 
@@ -32,6 +38,15 @@ export default function TestimonialsSection() {
     }, 5000);
     return () => clearInterval(timer);
   }, []);
+
+  // Generate SVG stars
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }).map((_, i) => (
+      <svg key={i} width="16" height="16" viewBox="0 0 24 24" fill={i < rating ? "#d2b48c" : "none"} stroke="#d2b48c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 2px' }}>
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+    ));
+  };
 
   return (
     <section className="testimonials-section">
@@ -58,7 +73,7 @@ export default function TestimonialsSection() {
           position: relative;
           width: 100%;
           max-width: 800px;
-          min-height: 250px;
+          min-height: 280px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -81,6 +96,11 @@ export default function TestimonialsSection() {
         .testimonial-slide.inactive {
           transform: translate(-50%, -50%) scale(0.95);
         }
+        .testimonial-stars {
+          margin-bottom: 1.5rem;
+          display: flex;
+          justify-content: center;
+        }
         .testimonial-text {
           font-size: clamp(1.2rem, 3vw, 1.8rem);
           font-weight: 300;
@@ -96,10 +116,18 @@ export default function TestimonialsSection() {
           font-weight: 500;
           color: #d2b48c;
         }
-        .testimonial-location {
+        .testimonial-meta {
           font-size: 0.75rem;
           color: #888;
-          margin-top: 0.5rem;
+          margin-top: 0.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          letter-spacing: 0.05em;
+        }
+        .testimonial-product {
+          color: #aaa;
+          font-style: italic;
         }
         .testimonial-indicators {
           display: flex;
@@ -122,10 +150,10 @@ export default function TestimonialsSection() {
         
         @media (max-width: 768px) {
           .testimonials-section {
-            padding: 4rem 1.5rem;
+            padding: 3rem 1.25rem;
           }
           .testimonial-container {
-            min-height: 280px;
+            min-height: 320px;
           }
           .testimonial-text {
             font-size: 1.25rem;
@@ -142,9 +170,15 @@ export default function TestimonialsSection() {
             className={`testimonial-slide ${index === activeIndex ? 'active' : 'inactive'}`}
             aria-hidden={index !== activeIndex}
           >
+            <div className="testimonial-stars">
+              {renderStars(t.rating)}
+            </div>
             <div className="testimonial-text">"{t.text}"</div>
             <div className="testimonial-author">{t.author}</div>
-            <div className="testimonial-location">{t.location}</div>
+            <div className="testimonial-meta">
+              <span className="testimonial-location">{t.location}</span>
+              <span className="testimonial-product">Purchased: {t.product}</span>
+            </div>
           </div>
         ))}
       </div>

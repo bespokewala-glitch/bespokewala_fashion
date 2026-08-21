@@ -16,12 +16,12 @@ const HeroCampaignSchema = new Schema<IHeroCampaign>(
   {
     title: {
       type: String,
-      required: [true, 'Please provide a title'],
+      required: false,
       trim: true,
     },
     subtitle: {
       type: String,
-      required: [true, 'Please provide a subtitle'],
+      required: false,
       trim: true,
     },
     videoUrl: {
@@ -52,7 +52,11 @@ const HeroCampaignSchema = new Schema<IHeroCampaign>(
   }
 );
 
-// Use existing compiled model in development to avoid hot-reload re-compilation
-const HeroCampaign: Model<IHeroCampaign> = (mongoose.models.HeroCampaign as Model<IHeroCampaign>) || mongoose.model<IHeroCampaign>('HeroCampaign', HeroCampaignSchema);
+// Delete cached model in development to ensure schema updates are applied
+if (mongoose.models.HeroCampaign) {
+  delete mongoose.models.HeroCampaign;
+}
+
+const HeroCampaign: Model<IHeroCampaign> = mongoose.model<IHeroCampaign>('HeroCampaign', HeroCampaignSchema);
 
 export default HeroCampaign;

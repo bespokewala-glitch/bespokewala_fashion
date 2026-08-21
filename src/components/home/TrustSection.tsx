@@ -142,40 +142,24 @@ export default function TrustSection() {
           }
           
           .trust-grid {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-padding-left: 20px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-            gap: 14px;
-            padding: 0 0 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px 16px;
+            padding: 0 20px;
             text-align: left;
-            margin-bottom: 0;
-          }
-          .trust-grid::-webkit-scrollbar {
-            display: none;
+            margin-bottom: 30px;
           }
           
           .trust-item {
-            flex: 0 0 72vw; /* ~70-74vw to allow next card to clearly peek */
-            max-width: 300px;
-            scroll-snap-align: start;
             align-items: flex-start;
-            background-color: #F8F6F1; /* Warm ivory brand color */
-            border: 1px solid rgba(80,70,60,0.12); /* Subtle beige border */
-            border-radius: 2px;
-            padding: 24px;
-            height: 180px; /* Slightly taller for breathing room */
-            gap: 0; /* Removing auto gap, managing it manually */
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            height: auto;
+            gap: 0;
             justify-content: flex-start;
-          }
-          
-          .trust-item:last-child {
-            margin-right: 20px;
+            max-width: 100%;
           }
           
           .trust-card-num {

@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
-import { Menu, X, ShoppingBag, User } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, Heart } from 'lucide-react';
 import CurrencySelector from '@/components/layout/CurrencySelector';
 
 export default function Header() {
@@ -16,6 +16,18 @@ export default function Header() {
   const [expandedMobileSubMenu, setExpandedMobileSubMenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  // Lock body scroll when mobile drawer is open (prevents iOS bounce bleed)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.classList.add('body-drawer-open');
+    } else {
+      document.body.classList.remove('body-drawer-open');
+    }
+    return () => {
+      document.body.classList.remove('body-drawer-open');
+    };
+  }, [isMobileMenuOpen]);
   const isHomePage = pathname === '/';
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
   const [displayNav, setDisplayNav] = useState<string | null>(null);
@@ -212,7 +224,7 @@ export default function Header() {
     borderTop: '1px solid #eee',
     display: 'flex',
     justifyContent: 'center',
-    padding: '0', 
+    padding: '0',
     opacity: hoveredNav ? 1 : 0,
     visibility: hoveredNav ? 'visible' : 'hidden',
     transform: hoveredNav ? 'translateY(0)' : 'translateY(-10px)',
@@ -220,21 +232,21 @@ export default function Header() {
     pointerEvents: hoveredNav ? 'auto' : 'none',
   };
 
-  const menuData: Record<string, { id: string; label: string; href: string }[]> = {
+  const menuData: Record<string, { id: string; label: string; href: string; children?: { label: string; href: string }[] }[]> = {
     couture: [
       { id: 'new-arrivals', label: 'New Arrivals', href: '/products/couture/new-arrivals' },
       { id: 'womens', label: 'Women', href: '/products/couture/womens' },
       { id: 'mens', label: 'Men', href: '/products/couture/mens' },
+    ],
+    footwear: [
+      { id: 'womens', label: 'Women', href: '/products/footwear/womens' },
+      { id: 'mens', label: 'Men', href: '/products/footwear/mens' },
     ],
     jewellery: [
       { id: 'new-arrivals', label: 'New Arrivals', href: '/products/jewellery/new-arrivals' },
       { id: 'signature-collection', label: 'Signature Collection', href: '/products/jewellery/signature-collection' },
       { id: 'diamond-collection', label: 'Diamond Collection', href: '/products/jewellery/diamond-collection' },
       { id: 'menswear-collection', label: 'Menswear Collection', href: '/products/jewellery/menswear-collection' },
-    ],
-    footwear: [
-      { id: 'womens', label: 'Women', href: '/products/footwear/womens' },
-      { id: 'mens', label: 'Men', href: '/products/footwear/mens' },
     ],
   };
 
@@ -276,11 +288,32 @@ export default function Header() {
         }
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
+        {/* Mobile Top Category Bar (matches Manish Malhotra reference) */}
+        <div className="mobile-top-bar desktop-hide" style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '2rem',
+          padding: '0.75rem 1rem',
+          backgroundColor: '#ffffff',
+          borderBottom: '1px solid #eeeeee',
+          width: '100%',
+          zIndex: 101
+        }}>
+          <Link href="/products/couture" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Couture</Link>
+          <Link href="/products/footwear" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Footwear</Link>
+          <Link href="/products/jewellery" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Jewellery</Link>
+        </div>
+
         <div style={navContainer} className="mobile-main-header">
 
           {/* Mobile Hamburger — left */}
           <div className="desktop-hide" style={{ flex: '0 0 44px', display: 'flex', alignItems: 'center' }}>
-            <button onClick={() => setIsMobileMenuOpen(true)} className="touch-target" style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}>
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="touch-target"
+              aria-label="Open navigation menu"
+              style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
+            >
               <Menu size={22} />
             </button>
           </div>
@@ -319,10 +352,27 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Mobile Right Icons — right */}
-          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 80px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
-            <Link href="/account" className="touch-target" style={{ display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}><User size={20} /></Link>
-            <Link href="/cart" className="touch-target" style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
+          {/* Mobile Right Icons — right: Wishlist + Cart */}
+          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 96px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+            <Link
+              href="/wishlist"
+              className="touch-target"
+              aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}
+            >
+              <Heart size={20} />
+              {wishlistCount > 0 && (
+                <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              href="/cart"
+              className="touch-target"
+              aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}
+            >
               <ShoppingBag size={20} />
               {cartCount > 0 && (
                 <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
@@ -360,7 +410,7 @@ export default function Header() {
         <div style={{ ...subNavContainer, minHeight: hoveredNav ? '50px' : '0' }} onMouseEnter={handleMouseEnterSubMenu} onMouseLeave={handleMouseLeaveSubMenu}>
           {/* Hover-safe bridge to connect gaps safely */}
           <div style={{ position: 'absolute', top: '-2rem', left: 0, width: '100%', height: '2rem', background: 'transparent' }}></div>
-          
+
           <ul style={{ ...menuStyle, gap: '3rem', fontSize: '0.75rem', fontWeight: 500, color: '#333' }}>
             {activeSecondaryNav?.map((item) => (
               <li
@@ -377,62 +427,12 @@ export default function Header() {
                   {item.label}
                 </Link>
 
-                {/* Simple Dropdown for Jewellery */}
-                {displayNav === 'jewellery' && displayCategory === item.id && (categories.length > 0 || collections.length > 0) && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: '0',
-                    backgroundColor: '#fff',
-                    padding: '1.5rem',
-                    minWidth: '200px',
-                    boxShadow: '4px 15px 30px rgba(0,0,0,0.03)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
-                    zIndex: 100,
-                    textAlign: 'left',
-                    opacity: (hoveredNav === 'jewellery' && hoveredCategory === item.id) ? 1 : 0,
-                    visibility: (hoveredNav === 'jewellery' && hoveredCategory === item.id) ? 'visible' : 'hidden',
-                    transform: (hoveredNav === 'jewellery' && hoveredCategory === item.id) ? 'translateY(0)' : 'translateY(-5px)',
-                    transition: 'opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease',
-                    pointerEvents: (hoveredNav === 'jewellery' && hoveredCategory === item.id) ? 'auto' : 'none',
-                  }}>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {categories.map(cat => (
-                        <li key={cat._id}>
-                          <Link
-                            prefetch={true}
-                            href={`/products/${displayNav}/${displayCategory}/${cat.slug}`}
-                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
-                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                            className="sub-link-hover"
-                          >
-                            {cat.name}
-                          </Link>
-                        </li>
-                      ))}
-                      {collections.map(col => (
-                        <li key={col._id}>
-                          <Link
-                            prefetch={false}
-                            href={`/products/${displayNav}/${displayCategory}/${col.slug}`}
-                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
-                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-                            className="sub-link-hover"
-                          >
-                            {col.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {/* Jewellery now just uses the same Tertiary panel logic, remove dropdown */}
               </li>
             ))}
           </ul>
 
-          {/* Tertiary Mega Menu Panel for Non-Jewellery Items */}
+          {/* Tertiary Mega Menu Panel */}
           <div style={{
             position: 'absolute',
             top: '100%',
@@ -446,58 +446,73 @@ export default function Header() {
             padding: '3rem 4rem',
             zIndex: 90,
             minHeight: '400px',
-            opacity: (hoveredCategory && hoveredNav !== 'jewellery') ? 1 : 0,
-            visibility: (hoveredCategory && hoveredNav !== 'jewellery') ? 'visible' : 'hidden',
-            transform: (hoveredCategory && hoveredNav !== 'jewellery') ? 'translateY(0)' : 'translateY(-5px)',
+            opacity: hoveredCategory ? 1 : 0,
+            visibility: hoveredCategory ? 'visible' : 'hidden',
+            transform: hoveredCategory ? 'translateY(0)' : 'translateY(-5px)',
             transition: 'opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease',
-            pointerEvents: (hoveredCategory && hoveredNav !== 'jewellery') ? 'auto' : 'none',
+            pointerEvents: hoveredCategory ? 'auto' : 'none',
           }}>
             <div style={{ display: 'flex', width: '100%', maxWidth: '1400px' }}>
               <div style={{ flex: 1, display: 'flex', gap: '3rem' }}>
+                {/* 1. Collections */}
                 {collections.length > 0 && (
                   <div style={{ width: '220px' }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>COLLECTIONS</h4>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Collections</h4>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {collections.map(col => (
-                        <li key={col._id}>
-                          <Link prefetch={false} href={`/products/${displayNav}/${displayCategory}/${col.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
-                            {col.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {occasions.length > 0 && (
-                  <div style={{ width: '220px' }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>OCCASION</h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {occasions.map(occ => (
-                        <li key={occ._id}>
-                          <Link prefetch={false} href={`/products/${displayNav}/${displayCategory}/${occ.slug}`} style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="sub-link-hover">
-                            {occ.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {categories.length > 0 && (
-                  <div style={{ width: '220px' }}>
-                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em' }}>CATEGORIES</h4>
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {categories.map(cat => (
-                        <li key={cat._id}>
+                      {collections.map(tax => (
+                        <li key={tax._id}>
                           <Link
                             prefetch={true}
-                            href={`/products/${displayNav}/${displayCategory}/${cat.slug}`}
+                            href={`/products/${displayNav}/${displayCategory}/${tax.slug}`}
                             onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
                             style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
                             className="sub-link-hover"
                           >
-                            {cat.name}
+                            {tax.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 2. Occasion */}
+                {occasions.length > 0 && (
+                  <div style={{ width: '220px' }}>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Occasion</h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {occasions.map(tax => (
+                        <li key={tax._id}>
+                          <Link
+                            prefetch={true}
+                            href={`/products/${displayNav}/${displayCategory}/${tax.slug}`}
+                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
+                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            className="sub-link-hover"
+                          >
+                            {tax.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* 3. Categories */}
+                {categories.length > 0 && (
+                  <div style={{ width: '220px' }}>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem', color: '#000', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Categories</h4>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {categories.map(tax => (
+                        <li key={tax._id}>
+                          <Link
+                            prefetch={true}
+                            href={`/products/${displayNav}/${displayCategory}/${tax.slug}`}
+                            onClick={() => { setHoveredNav(null); setHoveredCategory(null); }}
+                            style={{ fontSize: '0.75rem', color: '#555', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            className="sub-link-hover"
+                          >
+                            {tax.name}
                           </Link>
                         </li>
                       ))}
@@ -523,7 +538,12 @@ export default function Header() {
         <div className={`mobile-menu-drawer desktop-hide ${isMobileMenuOpen ? 'open' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '1.25rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
             <span style={{ fontSize: '1.1rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#000' }}>Menu</span>
-            <button onClick={() => setIsMobileMenuOpen(false)} className="touch-target" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#000' }}>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="touch-target"
+              aria-label="Close navigation menu"
+              style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#000' }}
+            >
               <X size={24} />
             </button>
           </div>

@@ -11,7 +11,7 @@ export default function SizeGuide() {
         textDecoration: 'underline',
       }}
     >
-      Need help finding your size? View Size Guide ?
+      Not sure about your size? View Size Guide &rarr;
     </Link>
   );
 }

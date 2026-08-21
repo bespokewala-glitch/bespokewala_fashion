@@ -92,7 +92,7 @@ export default function CartClient() {
         </div>
 
         {/* Right Side - Order Summary */}
-        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0 mobile-p-4">
+        <div style={{ backgroundColor: '#faf8f5', padding: '2.5rem', height: 'fit-content', position: 'sticky', top: '8rem', width: '100%', boxSizing: 'border-box' }} className="mobile-m-0 mobile-p-4 mobile-static">
           <h2 style={{ fontSize: '1.2rem', fontWeight: 400, margin: '0 0 2rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Order Summary</h2>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.95rem' }}>

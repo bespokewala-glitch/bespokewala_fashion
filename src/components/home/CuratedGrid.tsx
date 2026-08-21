@@ -40,7 +40,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${images.length}, 1fr)`, gap: '1.5rem', width: '100%' }} className="mobile-carousel">
         {images.map((item: { url: string; title: string; link: string }, index: number) => (
-          <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }} aria-label={`Explore ${item.title} collection`}>
+          <Link href={item.link} prefetch={false} key={index} style={{ position: 'relative', overflow: 'hidden', display: 'block', height: '600px', borderRadius: '12px' }} aria-label={`Explore ${item.title} collection`} className={`curated-card card-${index}`}>
             <OptimizedImage 
               src={item.url || ''} 
               alt={item.title ? `Bespokewala ${item.title} collection` : 'Bespokewala curated collection'} 
@@ -49,6 +49,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
               style={{ objectFit: 'cover' }}
               variant="thumbnail"
               loading="lazy"
+              className="curated-card-img"
             />
             <div style={{ 
               position: 'absolute', 

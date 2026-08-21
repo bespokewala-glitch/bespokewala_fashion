@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import HeroSection from '@/components/home/HeroSection';
+import CategoryNavigation from '@/components/home/CategoryNavigation';
 import DynamicCategoryShowcase from '@/components/home/DynamicCategoryShowcase';
 import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
 import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
+import BrandStory from '@/components/home/BrandStory';
 import TrustSection from '@/components/home/TrustSection';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
 import dbConnect from '@/lib/mongoose';
@@ -83,11 +85,11 @@ export default async function Home() {
   const [curatedMatchingProducts, showcaseProducts] = await Promise.all([
     curatedTitles.length > 0
       ? getOrFetch(`home:curatedSlugs:${curatedTitles.join(',')}`, 300, () =>
-          Product.find({ name: { $in: curatedTitles } })
-            .sort({ _id: -1 })
-            .select('_id name slug')
-            .lean()
-        )
+        Product.find({ name: { $in: curatedTitles } })
+          .sort({ _id: -1 })
+          .select('_id name slug')
+          .lean()
+      )
       : Promise.resolve([]),
     getOrFetch('home:showcaseProducts', 300, () =>
       Product.find({ _id: { $nin: Array.from(usedProductIds) } })
@@ -113,7 +115,7 @@ export default async function Home() {
 
   // Populate SplitShowcase ONLY if the CMS didn't provide custom products
   const hasCustomShowcase = sectionMap.SplitShowcase?.products?.some((p: any) => p.image && p.image.trim() !== '');
-  
+
   if (!hasCustomShowcase && (showcaseProducts as any[]).length > 0) {
     if (!sectionMap.SplitShowcase) sectionMap.SplitShowcase = {};
     sectionMap.SplitShowcase.products = (showcaseProducts as any[]).map((p: any) => ({
@@ -168,81 +170,83 @@ export default async function Home() {
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <CoutureProcess data={sectionMap.CoutureProcess} />
+        <BrandStory data={sectionMap.BrandStory} />
         <TestimonialsSection />
 
-        {/* Featured Products */}
-        <section className="featured-arrivals-section">
-          <style>{`
-            .featured-arrivals-section {
-              padding: 6rem 0;
-              text-align: center;
-              width: 100%;
-              overflow: hidden;
-            }
-            .featured-arrivals-h2 {
-              font-size: 2.5rem;
-              font-weight: 300;
-              letter-spacing: 0.1em;
-              margin-bottom: 1rem;
-              text-transform: uppercase;
-            }
-            .featured-arrivals-sub {
-              color: #666;
-              font-size: 0.9rem;
-              margin-bottom: 0rem;
-              font-style: italic;
-              max-width: 600px;
-              margin: 0 auto;
-              line-height: 1.6;
-            }
-            .featured-cta-container {
-              margin-top: 4rem;
-            }
-            
-            @media (max-width: 767px) {
+        {featuredProducts && featuredProducts.length > 0 && (
+          <section className="featured-arrivals-section">
+            <style>{`
               .featured-arrivals-section {
-                padding: 40px 0 30px 0;
+                padding: 6rem 0;
+                text-align: center;
+                width: 100%;
+                overflow: hidden;
               }
               .featured-arrivals-h2 {
-                font-size: 22px;
-                letter-spacing: 2px;
-                margin-bottom: 8px;
+                font-size: 2.5rem;
+                font-weight: 300;
+                letter-spacing: 0.1em;
+                margin-bottom: 1rem;
+                text-transform: uppercase;
               }
               .featured-arrivals-sub {
-                font-size: 12px;
-                font-style: normal;
-                margin-bottom: 30px;
+                color: #666;
+                font-size: 0.9rem;
+                margin-bottom: 0rem;
+                font-style: italic;
+                max-width: 600px;
+                margin: 0 auto;
+                line-height: 1.6;
               }
               .featured-cta-container {
-                margin-top: 30px;
+                margin-top: 4rem;
               }
-              .featured-cta-btn {
-                font-size: 10px !important;
-                letter-spacing: 1.5px !important;
-                height: 46px !important;
-                padding: 0 24px !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+              
+              @media (max-width: 767px) {
+                .featured-arrivals-section {
+                  padding: 40px 0 30px 0;
+                }
+                .featured-arrivals-h2 {
+                  font-size: 22px;
+                  letter-spacing: 2px;
+                  margin-bottom: 8px;
+                }
+                .featured-arrivals-sub {
+                  font-size: 12px;
+                  font-style: normal;
+                  margin-bottom: 30px;
+                }
+                .featured-cta-container {
+                  margin-top: 30px;
+                }
+                .featured-cta-btn {
+                  font-size: 10px !important;
+                  letter-spacing: 1.5px !important;
+                  height: 46px !important;
+                  padding: 0 24px !important;
+                  display: inline-flex !important;
+                  align-items: center !important;
+                  justify-content: center !important;
+                }
               }
-            }
-          `}</style>
+            `}</style>
 
-          <h2 className="featured-arrivals-h2">Featured Arrivals</h2>
-          <p className="featured-arrivals-sub">Curated collection for the season</p>
+            <h2 className="featured-arrivals-h2">Featured Arrivals</h2>
+            <p className="featured-arrivals-sub">Curated collection for the season</p>
 
-          <PremiumFeaturedCarousel products={featuredProducts} />
+            <PremiumFeaturedCarousel products={featuredProducts} />
 
-          <div className="featured-cta-container">
-            <Link
-              href="/products"
-              className="btn-primary featured-cta-btn"
-              aria-label="Explore Full Collection"
-            >
-              Explore Full Collection
-            </Link>
-          </div>
-        </section>
+            <div className="featured-cta-container">
+              <Link
+                href="/products"
+                className="btn-primary featured-cta-btn"
+                aria-label="Explore Full Collection"
+              >
+                Explore Full Collection
+              </Link>
+            </div>
+          </section>
+        )}
       </main>
     </>
   );

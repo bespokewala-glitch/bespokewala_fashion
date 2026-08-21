@@ -36,7 +36,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const isImg = activeCampaigns[currentIndex]?.videoUrl?.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
-    
+
     // Only auto-slide if we have more than 1 campaign
     if (activeCampaigns.length > 1) {
       if (isImg) {
@@ -45,12 +45,12 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         }, 5000);
       }
     }
-    
+
     // Always attempt to autoplay video when index changes
     if (!isImg && videoRef.current) {
       videoRef.current.play().catch(e => console.log("Autoplay prevented:", e));
     }
-    
+
     return () => {
       if (timer) clearTimeout(timer);
     };
@@ -63,6 +63,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     overflow: 'hidden',
     display: 'flex',
     backgroundColor: '#000',
+    touchAction: 'pan-y',
   };
 
   const arrowStyle: React.CSSProperties = {
@@ -118,23 +119,56 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     margin: 0,
   };
 
+  const primaryBtnStyle: React.CSSProperties = {
+    backgroundColor: '#fff',
+    color: '#000',
+    border: '1px solid #fff',
+    padding: '0.8rem 1.5rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    fontSize: '0.75rem',
+    textDecoration: 'none',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '160px',
+  };
+
+  const secondaryBtnStyle: React.CSSProperties = {
+    backgroundColor: 'transparent',
+    color: '#fff',
+    border: '1px solid #fff',
+    padding: '0.8rem 1.5rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    fontSize: '0.75rem',
+    textDecoration: 'none',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '160px',
+  };
+
   const isImage = currentCampaign?.videoUrl?.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
 
   return (
-    <section style={heroStyle} className="mobile-hero-height">
+    <section style={heroStyle} className="mobile-hero-height hero-section">
       {isImage ? (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <OptimizedImage 
+          <OptimizedImage
             src={currentCampaign?.videoUrl || ''}
             alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
             fill
             style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
             priority={true}
             variant="medium"
+            className="hero-image"
           />
         </div>
       ) : (
-        <video 
+        <video
           ref={videoRef}
           src={currentCampaign?.videoUrl}
           autoPlay
@@ -143,22 +177,27 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
           playsInline
           onEnded={activeCampaigns.length > 1 ? handleVideoEnd : undefined}
           style={videoStyle}
+          className="hero-video"
         />
       )}
-      
+
       {activeCampaigns.length > 1 && (
         <>
-          <button 
+          <button
             onClick={() => setCurrentIndex((prev) => (prev - 1 + activeCampaigns.length) % activeCampaigns.length)}
             style={{ ...arrowStyle, left: '1rem' }}
+            className="hero-arrow-btn mobile-hide"
+            aria-label="Previous campaign"
             onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
           >
             &#10094;
           </button>
-          <button 
+          <button
             onClick={() => setCurrentIndex((prev) => (prev + 1) % activeCampaigns.length)}
             style={{ ...arrowStyle, right: '1rem' }}
+            className="hero-arrow-btn mobile-hide"
+            aria-label="Next campaign"
             onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
           >
@@ -168,17 +207,38 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
       )}
 
       <div style={overlayContentStyle} className="hero-overlay mobile-p-4">
+        <style>{`
+          .hero-cta-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+          }
+          .hero-primary-btn:hover {
+            background-color: #f0f0f0 !important;
+          }
+          .hero-secondary-btn:hover {
+            background-color: rgba(255,255,255,0.1) !important;
+          }
+          @media (max-width: 768px) {
+            .hero-cta-group {
+              flex-direction: column;
+              width: 100%;
+              gap: 0.75rem;
+            }
+            .hero-primary-btn, .hero-secondary-btn {
+              width: 100%;
+            }
+          }
+        `}</style>
         <div style={subtitleStyle} className="mobile-font-sm">{currentCampaign?.subtitle}</div>
         <h2 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h2>
-        {currentCampaign?.linkUrl && (
-          <Link href={currentCampaign.linkUrl} prefetch={false} className="btn-secondary" style={{ borderColor: '#fff', color: '#fff', marginTop: '1rem', minHeight: '44px', minWidth: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} aria-label={`Explore ${currentCampaign?.title || 'collection'}`}>
-            {currentCampaign?.title ? (
-              currentCampaign.title.toLowerCase().includes('jewellery') || currentCampaign.title.toLowerCase().includes('footwear') 
-                ? `Shop ${currentCampaign.title}` 
-                : `Explore ${currentCampaign.title}`
-            ) : 'Discover Collection'}
+
+        <div className="hero-cta-group">
+          <Link href="/contact" className="hero-secondary-btn" style={secondaryBtnStyle}>
+            Book a Consultation
           </Link>
-        )}
+        </div>
       </div>
     </section>
   );

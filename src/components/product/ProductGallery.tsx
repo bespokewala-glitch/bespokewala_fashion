@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 
@@ -13,6 +13,7 @@ interface ProductGalleryProps {
 export default function ProductGallery({ images }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const touchStartXRef = useRef<number | null>(null);
   
   // Track which images have been mounted into the DOM.
   // Initially, only the first image is mounted to prioritize LCP.
@@ -27,6 +28,24 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
       return next;
     });
   }, [selectedIndex]);
+
+  // Touch swipe handlers for the main gallery image
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    // Require a minimum 40px swipe to trigger navigation
+    if (Math.abs(deltaX) < 40) return;
+    if (deltaX < 0) {
+      setSelectedIndex(prev => (prev + 1) % images.length);
+    } else {
+      setSelectedIndex(prev => (prev - 1 + images.length) % images.length);
+    }
+  };
 
   if (!images || images.length === 0) {
     return <div style={{ width: '100%', aspectRatio: '2/3', backgroundColor: '#f0f0f0', borderRadius: '12px' }} />;
@@ -92,7 +111,12 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
       <div className="gallery-container">
         {/* Main Image (Left side) */}
         {/* ADDED aspect-ratio to prevent layout shift and gallery-skeleton for shimmering effect */}
-        <div className="gallery-skeleton" style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}>
+        <div
+          className="gallery-skeleton"
+          style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           {images.map((img, idx) => {
             if (!mountedImages.has(idx)) return null;
             

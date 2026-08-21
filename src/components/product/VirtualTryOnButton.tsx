@@ -21,7 +21,7 @@ export default function VirtualTryOnButton({ garmentImageUrl }: VirtualTryOnButt
     fontSize: '0.9rem',
     cursor: 'pointer',
     marginBottom: '1rem', // Space before Add to Cart
-  };
+  };  
 
   return (
     <>
