@@ -142,6 +142,30 @@ function AdminProductsContent() {
     }
   };
 
+  const handleDeleteTaxonomy = async (slug: string, fieldName: 'subcategory' | 'collectionName' | 'occasion') => {
+    const tax = taxonomies.find(t => t.slug === slug);
+    if (!tax) return;
+    if (!confirm(`Are you sure you want to delete "${tax.name}"? This cannot be undone.`)) return;
+
+    try {
+      const res = await fetch(`/api/taxonomies/${tax._id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setTaxonomies(prev => prev.filter(t => t._id !== tax._id));
+        if (formData[fieldName] === slug) {
+          setFormData(prev => ({ ...prev, [fieldName]: '' }));
+        }
+      } else {
+        const error = await res.json();
+        alert(`Failed to delete: ${error.error || 'Unknown error'}`);
+      }
+    } catch (e) {
+      alert(`An error occurred while deleting.`);
+    }
+  };
+
   useEffect(() => {
     fetchProductsAndTaxonomies(activeProductType);
   }, [activeProductType]);
@@ -622,7 +646,12 @@ function AdminProductsContent() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <label className={styles.formLabel} style={{ marginBottom: 0 }}>Dynamic Category</label>
-                  <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    {formData.subcategory && (
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.subcategory, 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                    )}
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  </div>
                 </div>
                 <select 
                   required
@@ -642,7 +671,12 @@ function AdminProductsContent() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <label className={styles.formLabel} style={{ marginBottom: 0 }}>Collection (Optional)</label>
-                  <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    {formData.collectionName && (
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.collectionName, 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                    )}
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  </div>
                 </div>
                 <select 
                   value={formData.collectionName}
@@ -658,7 +692,12 @@ function AdminProductsContent() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <label className={styles.formLabel} style={{ marginBottom: 0 }}>Occasion (Optional)</label>
-                  <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  <div style={{ display: 'flex', gap: '5px' }}>
+                    {formData.occasion && (
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.occasion, 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                    )}
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                  </div>
                 </div>
                 <select 
                   value={formData.occasion}
