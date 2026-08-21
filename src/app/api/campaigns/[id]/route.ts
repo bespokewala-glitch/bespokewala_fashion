@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import HeroCampaign from '@/models/HeroCampaign';
+import { invalidateCachePrefix } from '@/lib/serverCache';
+import { revalidatePath } from 'next/cache';
 
 export async function DELETE(
   request: NextRequest,
@@ -19,6 +21,10 @@ export async function DELETE(
     if (!deletedCampaign) {
       return NextResponse.json({ success: false, error: 'Campaign not found' }, { status: 404 });
     }
+
+    // Invalidate caches so frontend updates instantly
+    invalidateCachePrefix('home:campaigns');
+    revalidatePath('/');
 
     return NextResponse.json({ success: true, message: 'Campaign deleted successfully' }, { status: 200 });
   } catch (error: any) {
@@ -50,6 +56,10 @@ export async function PUT(
     if (!updatedCampaign) {
       return NextResponse.json({ success: false, error: 'Campaign not found' }, { status: 404 });
     }
+
+    // Invalidate caches so frontend updates instantly
+    invalidateCachePrefix('home:campaigns');
+    revalidatePath('/');
 
     return NextResponse.json({ success: true, campaign: updatedCampaign }, { status: 200 });
   } catch (error: any) {

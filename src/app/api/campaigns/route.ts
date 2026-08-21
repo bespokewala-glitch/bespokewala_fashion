@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import HeroCampaign from '@/models/HeroCampaign';
+import { invalidateCachePrefix } from '@/lib/serverCache';
+import { revalidatePath } from 'next/cache';
 
 export async function GET() {
   try {
@@ -25,6 +27,11 @@ export async function POST(req: NextRequest) {
     }
     
     const campaign = await HeroCampaign.create(body);
+    
+    // Invalidate caches so frontend updates instantly
+    invalidateCachePrefix('home:campaigns');
+    revalidatePath('/');
+    
     return NextResponse.json({ success: true, campaign }, { status: 201 });
   } catch (error: any) {
     console.error('Error creating campaign:', error);

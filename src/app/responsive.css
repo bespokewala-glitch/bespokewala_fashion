@@ -7,15 +7,18 @@
   }
 
   .desktop-pt-hero {
-    padding-top: 4rem; /* Standard desktop top padding when hero is present */
+    padding-top: 4rem;
+    /* Standard desktop top padding when hero is present */
   }
 
   .desktop-pt-no-hero {
-    padding-top: 8rem; /* Padding when no hero */
+    padding-top: 8rem;
+    /* Padding when no hero */
   }
 
   .desktop-mx-negative {
-    margin: -4rem -2rem 4rem -2rem; /* Negative margins to push content to edges on desktop */
+    margin: -4rem -2rem 4rem -2rem;
+    /* Negative margins to push content to edges on desktop */
   }
 
   .admin-desktop-sidebar {
@@ -27,7 +30,9 @@
     bottom: 4rem;
     left: 4rem;
   }
-} /* end @media (min-width: 1024px) */
+}
+
+/* end @media (min-width: 1024px) */
 
 /* Mobile & Tablet Styles */
 @media (max-width: 1023px) {
@@ -241,7 +246,10 @@
   /* Admin Mobile Sidebar Drawer */
   .admin-mobile-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     z-index: 95;
@@ -278,7 +286,7 @@
   .admin-page-container {
     padding: 16px !important;
   }
-  
+
   .admin-flex-row {
     flex-direction: column !important;
     gap: 20px !important;
@@ -288,7 +296,8 @@
     flex-direction: column !important;
   }
 
-  .admin-card-stack img, .admin-card-stack video {
+  .admin-card-stack img,
+  .admin-card-stack video {
     width: 100% !important;
     height: auto !important;
     aspect-ratio: 16/9;
@@ -365,7 +374,9 @@
     -webkit-overflow-scrolling: touch;
   }
 
-} /* end @media (max-width: 1023px) */
+}
+
+/* end @media (max-width: 1023px) */
 
 /* Smartphone specific */
 @media (max-width: 767px) {
@@ -395,7 +406,7 @@
     position: static !important;
   }
 
-/* Make sure images in grids don't overflow */
+  /* Make sure images in grids don't overflow */
   .mobile-grid-2 img {
     width: 100% !important;
     height: auto !important;
@@ -403,7 +414,8 @@
   }
 
   .mobile-hero-title {
-    font-size: 1.5rem !important; /* Reduced from 2rem */
+    font-size: 1.5rem !important;
+    /* Reduced from 2rem */
   }
 
   .mobile-overflow-x {
@@ -646,12 +658,15 @@
       padding: 0 6px !important;
       height: 58px !important;
     }
+
     .header-logo-img {
       width: 50px !important;
     }
+
     .mobile-top-nav {
       gap: 0.85rem !important;
     }
+
     .mobile-nav-link {
       font-size: 9px !important;
     }
@@ -662,14 +677,17 @@
     height: clamp(340px, 50vh, 460px) !important;
     min-height: auto !important;
   }
-  .hero-image, .hero-video {
-    object-position: 58% center !important; 
+
+  .hero-image,
+  .hero-video {
+    object-position: 58% center !important;
   }
 
-  .mobile-carousel > * {
+  .mobile-carousel>* {
     flex: 0 0 75vw !important;
     max-width: 75vw !important;
   }
+
   .curated-card {
     height: auto !important;
     aspect-ratio: 9 / 16 !important;
@@ -677,6 +695,7 @@
     margin: 0 !important;
     border-radius: 8px !important;
   }
+
   .curated-card-img {
     object-position: center center !important;
   }
@@ -690,16 +709,31 @@
 
 /* Desktop: 1440px+ */
 @media (min-width: 1440px) {
-  .header-logo-img { width: 100px; height: auto; object-fit: contain; }
+  .header-logo-img {
+    width: 100px;
+    height: auto;
+    object-fit: contain;
+  }
 }
+
 /* Desktop: 1024px–1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
-  .header-logo-img { width: 88px; height: auto; object-fit: contain; }
+  .header-logo-img {
+    width: 88px;
+    height: auto;
+    object-fit: contain;
+  }
 }
+
 /* Tablet: 768px–1023px */
 @media (min-width: 768px) and (max-width: 1023px) {
-  .header-logo-img { width: 72px; height: auto; object-fit: contain; }
+  .header-logo-img {
+    width: 72px;
+    height: auto;
+    object-fit: contain;
+  }
 }
+
 /* Desktop logo wrapper — centered in flex row */
 @media (min-width: 1024px) {
   .header-logo-wrap {
@@ -708,11 +742,13 @@
     align-items: center;
     justify-content: center;
   }
+
   .header-logo-link {
     display: flex;
     align-items: center;
     justify-content: center;
   }
+
   /* When the desktop header is transparent (top of homepage), invert logo to white */
   .header-logo-inverted {
     filter: brightness(0) invert(1);
@@ -737,7 +773,8 @@
   /* ── 1. MAIN CONTAINER ─────────────────────────────────────────────────── */
   /* CollectionPageContent <main>: inline paddingLeft/Right '2rem' */
   main.mobile-px-4 {
-    padding-top: 4rem !important;     /* keep header clearance */
+    padding-top: 4rem !important;
+    /* keep header clearance */
     padding-left: 16px !important;
     padding-right: 16px !important;
     max-width: 100% !important;
@@ -767,16 +804,16 @@
   }
 
   /* Eyebrow text "OUR CRAFT, YOUR FOREVER" */
-  .mobile-section-py.mobile-px-container > div > p:first-child,
-  .mobile-px-container > div > p[class*="label"] {
+  .mobile-section-py.mobile-px-container>div>p:first-child,
+  .mobile-px-container>div>p[class*="label"] {
     font-size: 11px !important;
     letter-spacing: 0.15em !important;
     margin-bottom: 6px !important;
   }
 
   /* Decorative thin line below eyebrow */
-  .mobile-px-container > div > div[style*="height: 1px"],
-  .mobile-px-container > div > div[style*="height:1px"] {
+  .mobile-px-container>div>div[style*="height: 1px"],
+  .mobile-px-container>div>div[style*="height:1px"] {
     margin-bottom: 10px !important;
   }
 
@@ -800,18 +837,18 @@
   }
 
   /* FeatureBanner hero image/video section: inline height '70vh', maxWidth '1200px' */
-  .mobile-px-container > section {
+  .mobile-px-container>section {
     width: 100% !important;
     max-width: 100% !important;
     /* Increased height so the long jewellery title + subtitle + link in the overlay fit without clipping */
     height: clamp(240px, 65vw, 380px) !important;
     border-radius: 14px !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
     overflow: hidden !important;
   }
 
-  .mobile-px-container > section img,
-  .mobile-px-container > section video {
+  .mobile-px-container>section img,
+  .mobile-px-container>section video {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -838,8 +875,8 @@
 
   /* ── Bottom divider: inline margin '4rem auto 0' ─────────────────────── */
   /* The ──◇── decorative divider below the hero image */
-  .mobile-px-container > div[style*="margin: 4rem"],
-  .mobile-px-container > div[style*="margin:4rem"] {
+  .mobile-px-container>div[style*="margin: 4rem"],
+  .mobile-px-container>div[style*="margin:4rem"] {
     margin: 16px auto 0 auto !important;
     max-width: 100% !important;
   }
@@ -850,16 +887,16 @@
      ═══════════════════════════════════════════════════════════════════════ */
 
   /* Card container: 80vw wide (from mobile-carousel), tall height for full model view */
-  .mobile-carousel > a,
-  .mobile-carousel > div {
+  .mobile-carousel>a,
+  .mobile-carousel>div {
     height: auto !important;
     aspect-ratio: 9 / 16 !important;
     min-height: 0 !important;
     border-radius: 10px !important;
   }
 
-  .mobile-carousel > a img,
-  .mobile-carousel > div img {
+  .mobile-carousel>a img,
+  .mobile-carousel>div img {
     min-height: 0 !important;
     height: 100% !important;
     width: 100% !important;
@@ -886,8 +923,8 @@
   }
 
   /* CuratedGrid subtitle: inline margin '0 auto 4rem auto' */
-  .mobile-carousel ~ p,
-  section > p.mobile-body-clamp {
+  .mobile-carousel~p,
+  section>p.mobile-body-clamp {
     margin-bottom: 16px !important;
   }
 
@@ -910,7 +947,7 @@
     position: relative !important;
   }
 
-  .split-showcase-section .split-showcase-image > img {
+  .split-showcase-section .split-showcase-image>img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -922,13 +959,15 @@
     min-width: 0 !important;
     width: 100% !important;
     flex: none !important;
-    padding: 16px 16px 8px 16px !important; /* Minimized padding to reduce white space */
+    padding: 16px 16px 8px 16px !important;
+    /* Minimized padding to reduce white space */
     justify-content: center !important;
   }
 
   /* "OUR COLLECTION" label + divider top header area */
-  .split-showcase-section .split-showcase-content > div:first-child {
-    margin-bottom: 8px !important; /* Pulled extremely close */
+  .split-showcase-section .split-showcase-content>div:first-child {
+    margin-bottom: 8px !important;
+    /* Pulled extremely close */
   }
 
   .split-showcase-section .slide-anim {
@@ -947,10 +986,11 @@
 
   /* Product slider image - PERFECT SQUARE TO ACCOMMODATE BOTH TALL AND WIDE IMAGES */
   .split-showcase-section .mobile-slider-img {
-    width: clamp(220px, 75vw, 320px) !important; 
-    height: clamp(220px, 75vw, 320px) !important; /* 1:1 Aspect ratio fixes the massive vertical gap */
+    width: clamp(220px, 75vw, 320px) !important;
+    height: clamp(220px, 75vw, 320px) !important;
+    /* 1:1 Aspect ratio fixes the massive vertical gap */
     position: relative !important;
-    margin-bottom: 8px !important; 
+    margin-bottom: 8px !important;
   }
 
   .split-showcase-section .mobile-slider-img img {
@@ -974,7 +1014,8 @@
   /* Pagination dots */
   .split-showcase-section .mobile-section-mt[style*="gap: 10px"],
   .split-showcase-section .mobile-section-mt[style*="gap:10px"] {
-    margin-top: 8px !important; /* Very tight below the image */
+    margin-top: 8px !important;
+    /* Very tight below the image */
     gap: 8px !important;
   }
 
@@ -1054,7 +1095,7 @@
   }
 
   /* Right media column: inline minHeight '400px' */
-  .mobile-flex-col.mobile-m-0 > div:not(:first-child) {
+  .mobile-flex-col.mobile-m-0>div:not(:first-child) {
     min-height: 220px !important;
     height: clamp(200px, 56vw, 320px) !important;
     position: relative !important;
@@ -1074,8 +1115,10 @@
     max-width: 100% !important;
   }
 
-  .mobile-hero-height img, .mobile-hero-height video {
-    object-position: 58% center !important; /* Show both male and female models */
+  .mobile-hero-height img,
+  .mobile-hero-height video {
+    object-position: 58% center !important;
+    /* Show both male and female models */
   }
 
   .mobile-hero-title {
@@ -1093,7 +1136,7 @@
     align-items: flex-start !important;
   }
 
-  .hero-overlay > div:first-child {
+  .hero-overlay>div:first-child {
     font-size: clamp(9px, 2.5vw, 11px) !important;
     letter-spacing: 0.2em !important;
     margin-bottom: 0 !important;
@@ -1105,19 +1148,20 @@
     margin-top: 0.5rem !important;
     min-height: 40px !important;
   }
-  
+
   /* Mobile Header Optimization */
   .mobile-main-header {
     padding: 0.8rem 1.25rem !important;
   }
-  
+
   .header-logo-img {
     width: 48px !important;
   }
-  
+
   .mobile-icon-right {
     gap: 12px !important;
   }
+
   .mobile-icon-right svg {
     width: 18px !important;
     height: 18px !important;
@@ -1149,7 +1193,7 @@
   }
 
   /* Each column: full width, no min-width */
-  .mobile-footer-grid > div {
+  .mobile-footer-grid>div {
     flex: none !important;
     width: 100% !important;
     min-width: 0 !important;
@@ -1233,8 +1277,8 @@
   }
 
   /* Footer bottom bar: inline marginTop '4rem', paddingTop '2rem' */
-  footer > div[style*="marginTop: 4rem"],
-  footer > div[style*="marginTop:4rem"] {
+  footer>div[style*="marginTop: 4rem"],
+  footer>div[style*="marginTop:4rem"] {
     margin-top: 20px !important;
     padding-top: 14px !important;
     font-size: 11px !important;
@@ -1279,19 +1323,19 @@
   }
 
   /* FeatureBanner hero */
-  .mobile-px-container > section {
+  .mobile-px-container>section {
     height: clamp(220px, 60vw, 300px) !important;
   }
 
   /* Curated grid cards */
-  .mobile-carousel > a,
-  .mobile-carousel > div {
+  .mobile-carousel>a,
+  .mobile-carousel>div {
     height: auto !important;
     aspect-ratio: 9 / 16 !important;
   }
 
   /* SplitShowcase model image */
-  .split-showcase-section.mobile-flex-col > div:first-child {
+  .split-showcase-section.mobile-flex-col>div:first-child {
     height: 200px !important;
   }
 
@@ -1301,7 +1345,7 @@
   }
 
   /* Couture process right media */
-  .mobile-flex-col.mobile-m-0 > div:not(:first-child) {
+  .mobile-flex-col.mobile-m-0>div:not(:first-child) {
     height: clamp(180px, 50vw, 260px) !important;
   }
 
@@ -1389,21 +1433,21 @@
 /* ── Top-padding guard for pages without a hero ───────────────────────────── */
 /* Used on pages like /wishlist, /about, /contact where there is NO hero
    section below the fixed header. The header is 64px + optional 36px top-nav = ~100px. */
-@media (max-width: 1023px) {
-}
+@media (max-width: 1023px) {}
 
 /* ── Department collection cards — mobile height fix ─────────────────────── */
 @media (max-width: 767px) {
+
   /* CollectionPageContent top-level department grid cards */
-  .mobile-carousel > a[style],
-  .mobile-carousel > a {
+  .mobile-carousel>a[style],
+  .mobile-carousel>a {
     min-height: 200px !important;
     padding: 1.5rem 1rem !important;
   }
 
-  .mobile-carousel > a[style],
-  .mobile-carousel > a,
-  .mobile-carousel > div,
+  .mobile-carousel>a[style],
+  .mobile-carousel>a,
+  .mobile-carousel>div,
   .mobile-product-card {
     scroll-snap-align: start;
     scroll-snap-stop: always;
@@ -1415,9 +1459,10 @@
   [style*="minHeight:340px"] {
     min-height: 180px !important;
   }
+
   /* The inline columnStyle has minWidth:'200px' which overflows at 320px.
      Target via the .mobile-stack children which are the columns. */
-  footer .mobile-stack > div {
+  footer .mobile-stack>div {
     min-width: 0 !important;
     width: 100% !important;
   }
@@ -1492,13 +1537,13 @@
 
   /* ── Collection page heading margin on mobile ─────────────────────────── */
   /* The desktop 4rem marginBottom is too much on mobile */
-  main.mobile-px-4 > div[style*="marginBottom: '4rem'"],
-  main.mobile-px-4 > div[style*="marginBottom:4rem"] {
+  main.mobile-px-4>div[style*="marginBottom: '4rem'"],
+  main.mobile-px-4>div[style*="marginBottom:4rem"] {
     margin-bottom: 1.5rem !important;
   }
 
   /* ── Mobile product card info — better tap spacing ────────────────────── */
-  .product-card > div:last-child {
+  .product-card>div:last-child {
     gap: 0.25rem !important;
     padding: 0.5rem 0 !important;
   }
@@ -1533,7 +1578,7 @@
     min-height: 40px;
   }
 
-  .mobile-carousel > * {
+  .mobile-carousel>* {
     flex: 0 0 86vw !important;
     max-width: 86vw !important;
   }
@@ -1554,6 +1599,7 @@
 
 /* ── Product Detail Page — mobile layout ─────────────────────────────────── */
 @media (max-width: 767px) {
+
   /* Override the 4rem horizontal padding from inline containerStyle */
   main.mobile-flex-col.mobile-px-4.mobile-pt-20 {
     padding: 5rem 16px 2rem 16px !important;
@@ -1562,7 +1608,7 @@
 
   /* Make the sticky details panel static — avoids sticky getting "stuck"
      in a single-column flex layout */
-  main.mobile-flex-col.mobile-px-4.mobile-pt-20 > div:last-child > div {
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20>div:last-child>div {
     position: static !important;
     top: auto !important;
   }
@@ -1574,7 +1620,7 @@
   }
 
   /* Product description text */
-  main.mobile-flex-col.mobile-px-4.mobile-pt-20 > div:last-child > div > div[style*="lineHeight"] {
+  main.mobile-flex-col.mobile-px-4.mobile-pt-20>div:last-child>div>div[style*="lineHeight"] {
     font-size: 0.875rem !important;
   }
 }

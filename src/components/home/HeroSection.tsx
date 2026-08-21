@@ -90,7 +90,6 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     height: '100%',
     objectFit: 'cover',
     zIndex: 0,
-    filter: 'brightness(0.7)',
     transition: 'opacity 0.5s ease-in-out',
   };
 
@@ -103,6 +102,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: '1rem',
+    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
   };
 
   const subtitleStyle: React.CSSProperties = {
@@ -161,9 +161,9 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
             src={currentCampaign?.videoUrl || ''}
             alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
             fill
-            style={{ objectFit: 'cover', filter: 'brightness(0.7)' }}
+            style={{ objectFit: 'cover' }}
             priority={true}
-            variant="medium"
+            variant="large"
             className="hero-image"
           />
         </div>
