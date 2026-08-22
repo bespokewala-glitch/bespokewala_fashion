@@ -47,8 +47,10 @@ export default function AdminSidebar() {
     "/dashboard/products": pathname.startsWith("/dashboard/products"),
   });
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleOpen = () => setIsMobileOpen(true);
     window.addEventListener("openAdminSidebar", handleOpen);
     return () => window.removeEventListener("openAdminSidebar", handleOpen);
@@ -155,8 +157,9 @@ export default function AdminSidebar() {
         </div>
 
         {navItems.map((item) => {
-          const isActive = pathname === item.path;
-          const isProductsActive = pathname.startsWith("/dashboard/products");
+          // Use mounted state to prevent hydration mismatches from Next.js router hooks
+          const isActive = mounted && pathname === item.path;
+          const isProductsActive = mounted && pathname.startsWith("/dashboard/products");
           const Icon = item.icon;
 
           if (item.subItems) {

@@ -7,6 +7,7 @@ import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
+import LookbookCarousel from '@/components/home/LookbookCarousel';
 import BrandStory from '@/components/home/BrandStory';
 import TrustSection from '@/components/home/TrustSection';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
@@ -170,6 +171,7 @@ export default async function Home() {
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
         <CoutureProcess data={sectionMap.CoutureProcess} />
+        <LookbookCarousel data={sectionMap.LookbookCarousel} />
         <BrandStory data={sectionMap.BrandStory} />
         <TestimonialsSection />
 
