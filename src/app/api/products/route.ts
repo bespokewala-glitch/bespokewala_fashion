@@ -10,15 +10,57 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const page = parseInt(searchParams.get('page') || '1', 10);
     const productType = searchParams.get('productType');
+    const category = searchParams.get('category');
+    const subcategory = searchParams.get('subcategory');
+    const collectionName = searchParams.get('collectionName');
+    const occasion = searchParams.get('occasion');
+    const q = searchParams.get('q');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const colors = searchParams.get('colors');
+    const sort = searchParams.get('sort');
     
     const skip = (page - 1) * limit;
     
     const query: any = {};
     if (productType) query.productType = productType;
+    if (category) query.category = category;
+    if (subcategory) query.subcategory = subcategory;
+    if (collectionName) query.collectionName = collectionName;
+    if (occasion) query.occasion = occasion;
+    
+    if (q) {
+      const words = q.trim().split(/\s+/).filter(Boolean);
+      const regexPattern = words.map(w => `(?=.*${w})`).join('');
+      const regexString = `^${regexPattern}`;
+
+      query.$or = [
+        { name: { $regex: regexString, $options: 'i' } },
+        { category: { $regex: regexString, $options: 'i' } },
+        { subcategory: { $regex: regexString, $options: 'i' } },
+        { collectionName: { $regex: regexString, $options: 'i' } }
+      ];
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (colors) {
+      query.colors = colors;
+    }
+
+    let sortQuery: any = { createdAt: -1 };
+    if (sort === 'price_asc') sortQuery = { price: 1 };
+    if (sort === 'price_desc') sortQuery = { price: -1 };
+    if (sort === 'newest') sortQuery = { createdAt: -1 };
+    if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
     const products = await Product.find(query)
       .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType isFeatured')
-      .sort({ createdAt: -1 })
+      .sort(sortQuery)
       .skip(skip)
       .limit(limit > 1000 ? 1000 : limit)
       .lean();

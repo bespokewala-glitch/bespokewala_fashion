@@ -122,8 +122,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
       {/* Filter Toggle Bar */}
       <div className="mobile-filter-bar">
         <button className="mobile-filter-btn" onClick={() => setIsMobileFilterOpen(true)}>
+          <Filter size={16} strokeWidth={1.5} />
           <span>FILTER {activeFiltersCount > 0 && `(${activeFiltersCount})`}</span>
-          <span className="hamburger-icon">☰</span>
         </button>
         <div className="mobile-sort-dropdown">
           <select
@@ -377,41 +377,36 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         __html: `
         .mobile-filter-bar {
           display: flex;
-          border-top: 1px solid #eaeaea;
-          border-bottom: 1px solid #eaeaea;
           position: sticky;
-          top: 60px; /* Adjust based on mobile header height */
+          top: 60px;
           background: #fff;
           z-index: 90;
+          padding: 0.5rem 0;
+          align-items: center;
         }
         
         .mobile-filter-btn, .mobile-sort-dropdown {
           flex: 1;
           display: flex;
           align-items: center;
-          padding: 1.25rem 2rem;
+          padding: 1rem 0;
           background: none;
           border: none;
           font-family: inherit;
-          font-size: 0.875rem;
-          letter-spacing: 0.1em;
+          font-size: 0.85rem;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
         }
         
         .mobile-filter-btn {
-          border-right: 1px solid #eaeaea;
-          gap: 0.75rem;
+          gap: 0.5rem;
           justify-content: flex-start;
           cursor: pointer;
+          color: #1c1c1c;
         }
 
         .mobile-sort-dropdown {
           justify-content: flex-end;
-        }
-
-        .hamburger-icon {
-          font-size: 1.25rem;
-          line-height: 1;
         }
         
         .mobile-sort-select {

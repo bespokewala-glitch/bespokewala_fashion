@@ -195,7 +195,7 @@ export default function Header() {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1.5rem 4rem',
+    padding: '0 4rem',
   };
 
   const logoStyle: React.CSSProperties = {
@@ -721,7 +721,9 @@ export default function Header() {
           </div>
         </div>
       </header>
-      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <React.Suspense fallback={null}>
+        <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      </React.Suspense>
     </>
   );
 }

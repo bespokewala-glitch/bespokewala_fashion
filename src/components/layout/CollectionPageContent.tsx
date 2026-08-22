@@ -5,6 +5,7 @@ import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
 import ProductCard from '@/components/product/ProductCard';
 import ProductFilters from '@/components/product/ProductFilters';
+import InfiniteProductGrid from '@/components/product/InfiniteProductGrid';
 import HeroSection from '@/components/home/HeroSection';
 import HomepageSection from '@/models/HomepageSection';
 import CuratedGrid from '@/components/home/CuratedGrid';
@@ -233,15 +234,17 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-hero mobile-content-top-pad">
+      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
-        <div className="desktop-mx-negative mobile-m-0">
-          {sectionMap.CuratedGrid && !isTopLevelDepartment && <CuratedGrid data={sectionMap.CuratedGrid} />}
-          {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
-          {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
-          {sectionMap.CoutureProcess && <CoutureProcess data={sectionMap.CoutureProcess} />}
-        </div>
+        {(!isTopLevelDepartment && (sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess)) && (
+          <div className="desktop-mx-negative mobile-m-0">
+            {sectionMap.CuratedGrid && <CuratedGrid data={sectionMap.CuratedGrid} />}
+            {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
+            {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
+            {sectionMap.CoutureProcess && <CoutureProcess data={sectionMap.CoutureProcess} />}
+          </div>
+        )}
 
 
         {/* Page heading */}
@@ -250,8 +253,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           {seoIntro ? (
             <div className="seo-intro" dangerouslySetInnerHTML={{ __html: seoIntro }} />
           ) : (
-            <p className="subtitle">
-              Discover our {generatedTitle.toLowerCase()}.
+            <p className="subtitle" style={{ color: '#555', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: 0, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              Discover our {pageTitle.toLowerCase()}.
             </p>
           )}
         </div>
@@ -341,41 +344,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                 />
 
                 <div style={{ width: '100%' }}>
-                  <div className="product-grid" style={{ marginTop: 0 }}>
-                    {products.map((product: any, index: number) => (
-                      <ProductCard key={product._id} product={product} priority={index < 4} />
-                    ))}
-                  </div>
+                  <InfiniteProductGrid 
+                    key={JSON.stringify(params)}
+                    initialProducts={products}
+                    totalProducts={totalProducts}
+                    queryParams={params as Record<string, string | undefined>}
+                  />
                 </div>
               </div>
-
-              {/* Pagination */}
-              {totalProducts > productsPerPage && (
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '4rem' }}>
-                  {currentPage > 1 && (
-                    <Link
-                      href={`?${new URLSearchParams(
-                        Object.entries({ ...params, page: (currentPage - 1).toString() })
-                          .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
-                      ).toString()}`}
-                      className="btn-secondary"
-                    >
-                      Previous
-                    </Link>
-                  )}
-                  {currentPage * productsPerPage < totalProducts && (
-                    <Link
-                      href={`?${new URLSearchParams(
-                        Object.entries({ ...params, page: (currentPage + 1).toString() })
-                          .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
-                      ).toString()}`}
-                      className="btn-secondary"
-                    >
-                      Next Page
-                    </Link>
-                  )}
-                </div>
-              )}
             </>
           )
         )}

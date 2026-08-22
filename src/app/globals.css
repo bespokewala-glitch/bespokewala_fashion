@@ -465,10 +465,11 @@ a {
 /* Page Heading Container */
 .page-heading-container {
   text-align: center;
-  margin-bottom: 4rem;
-  padding: 2.5rem 0;
-  border-top: 1px solid #eaeaea;
-  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+}
+.page-heading-container .h1 {
+  margin: 0;
 }
 .page-heading-container .seo-intro {
   margin-top: 1.5rem;

@@ -12,9 +12,8 @@
   }
 
   .desktop-pt-no-hero {
-    padding-top: 8rem;
-    /* Padding when no hero */
-  }
+    padding-top: 6rem;
+  }  /* Padding when no hero */
 
   .desktop-mx-negative {
     margin: -4rem -2rem 4rem -2rem;
@@ -710,7 +709,7 @@
 /* Desktop: 1440px+ */
 @media (min-width: 1440px) {
   .header-logo-img {
-    width: 100px;
+    width: 60px;
     height: auto;
     object-fit: contain;
   }
@@ -719,7 +718,7 @@
 /* Desktop: 1024px–1439px */
 @media (min-width: 1024px) and (max-width: 1439px) {
   .header-logo-img {
-    width: 88px;
+    width: 60px;
     height: auto;
     object-fit: contain;
   }
@@ -728,7 +727,7 @@
 /* Tablet: 768px–1023px */
 @media (min-width: 768px) and (max-width: 1023px) {
   .header-logo-img {
-    width: 72px;
+    width: 54px;
     height: auto;
     object-fit: contain;
   }
