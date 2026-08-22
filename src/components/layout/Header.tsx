@@ -582,8 +582,8 @@ export default function Header() {
                       <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
                           {hasTax ? (
-                            <div 
-                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} 
+                            <div
+                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)}
                               style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer', alignItems: 'center' }}
                             >
                               <span>{item.label}</span>
@@ -665,8 +665,8 @@ export default function Header() {
                       <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
                           {hasTax ? (
-                            <div 
-                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} 
+                            <div
+                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)}
                               style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer', alignItems: 'center' }}
                             >
                               <span>{item.label}</span>

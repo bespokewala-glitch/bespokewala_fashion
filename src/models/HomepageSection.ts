@@ -4,7 +4,7 @@ const HomepageSectionSchema = new mongoose.Schema({
   sectionType: {
     type: String,
     required: true,
-    enum: ['CuratedGrid', 'FeatureBanner', 'SplitShowcase', 'LookbookCarousel', 'CoutureProcess', 'CategoryNavigation', 'BrandStory']
+    enum: ['CuratedGrid', 'FeatureBanner', 'SplitShowcase', 'LookbookCarousel', 'CoutureProcess', 'JewelleryProcess', 'CategoryNavigation', 'BrandStory']
   },
   page: {
     type: String,

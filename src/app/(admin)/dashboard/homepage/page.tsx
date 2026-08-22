@@ -365,8 +365,9 @@ export default function HomepageCMS() {
         <button disabled={saving} onClick={() => saveSection('LookbookCarousel', sections.LookbookCarousel)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Lookbook</button>
       </div>
 
-      {/* 5. The Couture Process */}
+      {page !== 'jewellery' && (
       <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+        {/* 5. The Couture Process */}
         <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>5. The Couture Process</h2>
         
         <div style={{ marginBottom: '20px' }}>
@@ -463,6 +464,36 @@ export default function HomepageCMS() {
           <button disabled={saving} onClick={() => saveSection('CoutureProcess', sections.CoutureProcess)} style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Couture Process</button>
         </div>
       </div>
+      )}
+
+      {page === 'jewellery' && (
+      <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
+        {/* 5. The Jewellery Process */}
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>5. The Jewellery Process</h2>
+        <div style={{ position: 'relative', height: '200px', maxWidth: '300px', marginBottom: '20px' }}>
+          <div 
+            onClick={() => handleFileUploadClick('JewelleryProcess', 'image')}
+            style={{ height: '200px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
+          >
+            {sections.JewelleryProcess?.image ? <MediaPreview src={sections.JewelleryProcess.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Click to Upload Image'}
+          </div>
+          {sections.JewelleryProcess?.image && (
+            <button 
+              onClick={() => handleTextChange('JewelleryProcess', 'image', '')}
+              className={styles.removeButton}
+              title="Remove Image"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+        <div style={{ display: 'grid', gap: '10px' }}>
+          <input placeholder="Title (e.g. The Jewellery Process)" value={sections.JewelleryProcess?.title || ''} onChange={e => handleTextChange('JewelleryProcess', 'title', e.target.value)} style={{ padding: '10px', width: '100%' }} />
+          <textarea placeholder="Description" value={sections.JewelleryProcess?.description || ''} onChange={e => handleTextChange('JewelleryProcess', 'description', e.target.value)} style={{ padding: '10px', width: '100%', minHeight: '80px', resize: 'vertical' }} />
+        </div>
+        <button disabled={saving} onClick={() => saveSection('JewelleryProcess', sections.JewelleryProcess)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Jewellery Process</button>
+      </div>
+      )}
 
       {/* 6. Brand Story (Our Heritage) */}
       <div style={{ border: '1px solid #ddd', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>

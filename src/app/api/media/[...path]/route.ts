@@ -13,16 +13,16 @@ export const dynamic = 'force-dynamic';
 
 // ─── MIME type map ────────────────────────────────────────────────────────────
 const MIME_TYPES: Record<string, string> = {
-  jpg:  'image/jpeg',
+  jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
-  png:  'image/png',
+  png: 'image/png',
   webp: 'image/webp',
   avif: 'image/avif',
-  gif:  'image/gif',
-  svg:  'image/svg+xml',
-  mp4:  'video/mp4',
+  gif: 'image/gif',
+  svg: 'image/svg+xml',
+  mp4: 'video/mp4',
   webm: 'video/webm',
-  pdf:  'application/pdf',
+  pdf: 'application/pdf',
 };
 
 function getMimeType(key: string, fallback = 'application/octet-stream'): string {
@@ -32,9 +32,9 @@ function getMimeType(key: string, fallback = 'application/octet-stream'): string
 
 // ─── Thumbnail dimensions ─────────────────────────────────────────────────────
 const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
-  thumbnail: { width: 600,  quality: 80 },
-  medium:    { width: 1000, quality: 85 },
-  large:     { width: 1600, quality: 85 },
+  thumbnail: { width: 600, quality: 80 },
+  medium: { width: 1000, quality: 85 },
+  large: { width: 1600, quality: 85 },
 };
 
 // Transparent 1×1 PNG — used as a controlled fallback for missing files.
@@ -82,8 +82,8 @@ export async function GET(
       return new NextResponse('Invalid file path', { status: 400 });
     }
 
-    const variant   = request.nextUrl.searchParams.get('v');
-    const isImage   = /\.(jpg|jpeg|png|webp|avif)$/i.test(fileParam);
+    const variant = request.nextUrl.searchParams.get('v');
+    const isImage = /\.(jpg|jpeg|png|webp|avif)$/i.test(fileParam);
     const variantCfg = variant ? VARIANT_CONFIG[variant] : null;
 
     // ── DIAGNOSTIC LOG (production-safe — no credentials/tokens) ────────────
@@ -121,15 +121,15 @@ export async function GET(
         return new NextResponse(fileBuffer as unknown as BodyInit, {
           status: 200,
           headers: {
-            'Content-Type':            'image/webp',
-            'Content-Length':          String(fileBuffer.length),
-            'Cache-Control':           'public, max-age=31536000, immutable',
-            'ETag':                    etag,
-            'Vary':                    'Accept-Encoding',
-            'Content-Disposition':     'inline',
-            'X-Content-Type-Options':  'nosniff',
-            'X-Variant':               variant ?? '',
-            'X-Served-From':           'gcs-variant',
+            'Content-Type': 'image/webp',
+            'Content-Length': String(fileBuffer.length),
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'ETag': etag,
+            'Vary': 'Accept-Encoding',
+            'Content-Disposition': 'inline',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Variant': variant ?? '',
+            'X-Served-From': 'gcs-variant',
           },
         });
       }
@@ -140,7 +140,7 @@ export async function GET(
       console.log(
         `[media] ℹ️  Variant not found: "${variantPath}". Generating inline...`,
       );
-      
+
       const gcsFile = bucket.file(fileParam);
       const [exists] = await gcsFile.exists();
 
@@ -149,9 +149,9 @@ export async function GET(
         return new NextResponse(PLACEHOLDER_PNG, {
           status: 404,
           headers: {
-            'Content-Type':  'image/png',
+            'Content-Type': 'image/png',
             'Cache-Control': 'no-store, max-age=0',
-            'X-Media-Miss':  fileParam,
+            'X-Media-Miss': fileParam,
           },
         });
       }
@@ -188,15 +188,15 @@ export async function GET(
         return new NextResponse(optimizedBuffer as unknown as BodyInit, {
           status: 200,
           headers: {
-            'Content-Type':            'image/webp',
-            'Content-Length':          String(optimizedBuffer.length),
-            'Cache-Control':           'public, max-age=31536000, immutable',
-            'ETag':                    variantEtag,
-            'Vary':                    'Accept-Encoding',
-            'Content-Disposition':     'inline',
-            'X-Content-Type-Options':  'nosniff',
-            'X-Variant':               variant ?? '',
-            'X-Served-From':           'gcs-generated',
+            'Content-Type': 'image/webp',
+            'Content-Length': String(optimizedBuffer.length),
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'ETag': variantEtag,
+            'Vary': 'Accept-Encoding',
+            'Content-Disposition': 'inline',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Variant': variant ?? '',
+            'X-Served-From': 'gcs-generated',
           },
         });
       } catch (sharpErr: unknown) {
@@ -232,9 +232,9 @@ export async function GET(
       return new NextResponse(PLACEHOLDER_PNG, {
         status: 404,
         headers: {
-          'Content-Type':  'image/png',
+          'Content-Type': 'image/png',
           'Cache-Control': 'no-store, max-age=0',
-          'X-Media-Miss':  fileParam,
+          'X-Media-Miss': fileParam,
         },
       });
     }
@@ -259,15 +259,15 @@ export async function GET(
     return new NextResponse(fileBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
-        'Content-Type':           contentType,
-        'Content-Length':         String(fileBuffer.length),
+        'Content-Type': contentType,
+        'Content-Length': String(fileBuffer.length),
         // Immutable: file content never changes for a given key
-        'Cache-Control':          'public, max-age=31536000, immutable',
-        'ETag':                   etagOrig,
-        'Vary':                   'Accept-Encoding',
-        'Content-Disposition':    'inline',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'ETag': etagOrig,
+        'Vary': 'Accept-Encoding',
+        'Content-Disposition': 'inline',
         'X-Content-Type-Options': 'nosniff',
-        'X-Served-From':          'gcs-original',
+        'X-Served-From': 'gcs-original',
       },
     });
 

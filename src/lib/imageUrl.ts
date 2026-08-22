@@ -21,7 +21,7 @@
  */
 
 const GCS_BUCKET = 'bespokewala-storage';
-const GCS_BASE   = `https://storage.googleapis.com/${GCS_BUCKET}/`;
+const GCS_BASE = `https://storage.googleapis.com/${GCS_BUCKET}/`;
 
 // Transparent 1×1 pixel PNG data URI — used as the final image fallback
 // when both the original and its thumbnail are unavailable.

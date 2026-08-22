@@ -12,6 +12,7 @@ import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
+import JewelleryProcess from '@/components/home/JewelleryProcess';
 import { getOrFetch } from '@/lib/serverCache';
 import { generateBreadcrumbSchema, generateItemListSchema, generateCategoryHeading } from '@/lib/seo';
 
@@ -80,7 +81,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, totalProducts, hpSections, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
+  const [rawProducts, totalProducts, hpSections, rawCampaigns, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
@@ -95,6 +96,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(sectionCacheKey, 60, () =>
       HomepageSection.find({ page: pageId }).lean()
     ),
+    getOrFetch(`campaigns:${productType || category || 'none'}`, 60, () => {
+      const campCategory = productType || category;
+      if (!campCategory) return Promise.resolve([]);
+      return HeroCampaign.find({ category: campCategory }).sort({ order: 1, _id: -1 }).lean();
+    }),
     getOrFetch(`taxonomy:${pageId}`, 60, () => {
       import('@/models/Taxonomy');
       return import('mongoose').then(m => m.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null);
@@ -139,6 +145,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
   const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], productTypes: string[] };
+
+  const plainCampaigns = (rawCampaigns as any[] || []).map((c: any) => ({
+    _id: c._id.toString(),
+    title: c.title,
+    subtitle: c.subtitle,
+    videoUrl: c.videoUrl,
+    linkUrl: c.linkUrl,
+  }));
 
   const sectionMap: Record<string, any> = {};
   if (hpSections && Array.isArray(hpSections)) {
@@ -221,15 +235,21 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
+      {plainCampaigns.length > 0 && (
+        <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+          <HeroSection campaigns={plainCampaigns} />
+        </div>
+      )}
+      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${plainCampaigns.length > 0 ? 'desktop-pt-hero' : 'desktop-pt-no-hero mobile-content-top-pad'}`}>
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
-        {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess) && (
+        {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (
           <div className="desktop-mx-negative mobile-m-0">
             {sectionMap.CuratedGrid && <CuratedGrid data={sectionMap.CuratedGrid} />}
             {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
             {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
-            {sectionMap.CoutureProcess && <CoutureProcess data={sectionMap.CoutureProcess} />}
+            {sectionMap.CoutureProcess && pageId !== 'jewellery' && <CoutureProcess data={sectionMap.CoutureProcess} />}
+            {sectionMap.JewelleryProcess && pageId === 'jewellery' && <JewelleryProcess data={sectionMap.JewelleryProcess} />}
           </div>
         )}
 
