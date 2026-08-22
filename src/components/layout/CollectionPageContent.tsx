@@ -45,12 +45,15 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (collectionName) productQuery.collectionName = collectionName;
   if (occasion) productQuery.occasion = occasion;
   if (q) {
-    const regex = new RegExp(q, 'i');
+    const words = q.trim().split(/\s+/).filter(Boolean);
+    const regexPattern = words.map(w => `(?=.*${w})`).join('');
+    const regexString = `^${regexPattern}`;
+    
     (productQuery as any).$or = [
-      { name: { $regex: regex } },
-      { category: { $regex: regex } },
-      { subcategory: { $regex: regex } },
-      { collectionName: { $regex: regex } }
+      { name: { $regex: regexString, $options: 'i' } },
+      { category: { $regex: regexString, $options: 'i' } },
+      { subcategory: { $regex: regexString, $options: 'i' } },
+      { collectionName: { $regex: regexString, $options: 'i' } }
     ];
   }
   
@@ -70,21 +73,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (sort === 'newest') sortQuery = { createdAt: -1 };
   if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
-  // Campaign hero — only shown on top-level pages (productType).
-  // Category, subcategory, occasion, and collectionName pages skip the hero and go straight to products.
-  const showHero = Boolean(productType && !category && !subcategory && !collectionName && !occasion);
-
-  let campaignCategory = 'general';
-  if (productType) campaignCategory = productType;
-  else if (category && !['womens', 'mens', 'new-arrivals'].includes(category)) campaignCategory = category;
-
   const pageId = subcategory || collectionName || category || productType || 'all-products';
 
   const productCacheKey = `products:${JSON.stringify(productQuery)}:p${currentPage}`;
   const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, totalProducts, rawCampaigns, hpSections, rawTaxonomy, rawFilters] = await Promise.all([
+  const [rawProducts, totalProducts, hpSections, rawTaxonomy, rawFilters] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
@@ -96,15 +91,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(totalProductsCacheKey, 60, () =>
       Product.countDocuments(productQuery)
     ),
-    // Only fetch campaigns for top-level pages
-    showHero
-      ? getOrFetch(`campaigns:${campaignCategory}`, 60, () =>
-          HeroCampaign.find({ category: campaignCategory })
-            .select('_id title subtitle videoUrl linkUrl mediaType order')
-            .sort({ order: 1 })
-            .lean()
-        )
-      : Promise.resolve([]),
     getOrFetch(sectionCacheKey, 60, () =>
       HomepageSection.find({ page: pageId }).lean()
     ),
@@ -141,21 +127,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     inventoryCount: p.inventoryCount,
   }));
 
-  const campaigns = (rawCampaigns as any[]).map((c: any) => ({
-    _id: c._id.toString(),
-    title: c.title,
-    subtitle: c.subtitle,
-    videoUrl: c.videoUrl,
-    linkUrl: c.linkUrl,
-    mediaType: c.mediaType,
-  }));
+  const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
 
   const sectionMap: Record<string, any> = {};
-  (hpSections as any[]).forEach((s: any) => {
-    sectionMap[s.sectionType] = s.content;
-  });
-
-  const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
+  if (hpSections && Array.isArray(hpSections)) {
+    hpSections.forEach((s: any) => {
+      sectionMap[s.sectionType] = s.content;
+    });
+  }
 
   /**
    * Use reusable title logic to produce meaningful H1s 
@@ -202,7 +181,17 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   };
 
   // ... (keeping other variables unchanged)
-  const isTopLevelDepartment = Boolean(productType && !category && !subcategory && !collectionName && !occasion);
+  const isTopLevelDepartment = Boolean(
+    productType && 
+    !category && 
+    !subcategory && 
+    !collectionName && 
+    !occasion &&
+    !q &&
+    !minPrice &&
+    !maxPrice &&
+    !colors
+  );
 
   const cmsGridItems = sectionMap.CuratedGrid?.items;
   const departmentCollections = (cmsGridItems && cmsGridItems.some((it: any) => it.image || it.title))
@@ -234,7 +223,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      {showHero && campaigns.length > 0 && <HeroSection campaigns={campaigns} />}
       <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}

@@ -145,22 +145,42 @@ a {
 }
 
 /* Search Overlay */
-.search-overlay {
+.search-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  max-width: none;
+  height: auto;
+  max-height: 90vh;
   background-color: var(--background);
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
   animation: slideDownFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes slideDownFade {
   0% { opacity: 0; transform: translateY(-20px); }
   100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 .search-overlay-header {
@@ -174,7 +194,6 @@ a {
   display: flex;
   align-items: center;
   flex: 1;
-  margin-right: 2rem;
   position: relative;
 }
 
@@ -212,6 +231,7 @@ a {
   color: var(--foreground);
   cursor: pointer;
   padding: 0.5rem;
+  margin-left: 2rem;
   transition: transform 0.2s ease;
 }
 
@@ -222,14 +242,87 @@ a {
 .search-overlay-content {
   flex: 1;
   overflow-y: auto;
-  padding: 4rem;
+  padding: 2rem 4rem 3rem 4rem;
 }
 
-.pre-search-state {
+.search-results-state, .pre-search-state {
+  padding-bottom: 2rem;
+}
+
+/* Two Column Layout for Desktop */
+.predictive-search-layout {
   display: flex;
-  gap: 6rem;
-  max-width: 1200px;
+  gap: 4rem;
+  max-width: 1400px;
   margin: 0 auto;
+}
+
+.predictive-suggestions {
+  flex: 0 0 300px;
+  border-right: 1px solid #eaeaea;
+  padding-right: 2rem;
+}
+
+.predictive-results {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .predictive-search-layout {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .predictive-suggestions {
+    flex: none;
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 2rem;
+  }
+  .search-overlay-header {
+    padding: 1rem;
+  }
+  .search-overlay-content {
+    padding: 1.5rem;
+  }
+  .search-results-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Popular Search */
+.popular-search-wrapper {
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.popular-search-wrapper h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #888;
+  margin-bottom: 1.5rem;
+}
+
+.popular-search-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.popular-search-links a {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #333;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+
+.popular-search-links a:hover {
+  color: #a0816c;
 }
 
 .search-section h3 {
@@ -280,10 +373,9 @@ a {
 
 .search-results-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 3rem 2rem;
-  max-width: 1600px;
-  margin: 0 auto;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem 1rem;
+  width: 100%;
 }
 
 .search-result-card {

@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string; category: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; minPrice?: string; maxPrice?: string; colors?: string; sort?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -38,14 +38,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  */
 export default async function ProductCategoryPage({ params, searchParams }: Props) {
   const { slug: productType, category } = await params;
-  const { page } = await searchParams;
+  const searchParamsAwaited = await searchParams;
 
   await dbConnect();
   const taxonomy = await getOrFetch(`taxonomy:meta:${category}`, 600, () => 
     Taxonomy.findOne({ slug: category }).lean()
   );
 
-  const collectionParams: any = { productType, page };
+  const collectionParams: any = { ...searchParamsAwaited, productType };
   
   let isOccasion = false;
   let isCollection = false;
@@ -59,9 +59,7 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
       isOccasion = true;
     } else {
       const productWithCollection = await Product.findOne({ collectionName: category }).select('_id').lean();
-      if (productWithCollection) {
-        isCollection = true;
-      }
+      if (productWithCollection) isCollection = true;
     }
   }
 

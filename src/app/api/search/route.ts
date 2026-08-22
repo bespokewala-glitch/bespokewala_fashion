@@ -15,12 +15,17 @@ export async function GET(req: NextRequest) {
     
     // Text search using regex for partial matching (live search)
     if (q) {
-      const regex = new RegExp(q, 'i');
+      const words = q.trim().split(/\s+/).filter(Boolean);
+      // Create a regex that ensures every word is present somewhere in the string, in any order.
+      // e.g. "Designer Saree" -> /^(?=.*Designer)(?=.*Saree)/i
+      const regexPattern = words.map(w => `(?=.*${w})`).join('');
+      const regexString = `^${regexPattern}`;
+      
       query.$or = [
-        { name: { $regex: regex } },
-        { category: { $regex: regex } },
-        { subcategory: { $regex: regex } },
-        { collectionName: { $regex: regex } }
+        { name: { $regex: regexString, $options: 'i' } },
+        { category: { $regex: regexString, $options: 'i' } },
+        { subcategory: { $regex: regexString, $options: 'i' } },
+        { collectionName: { $regex: regexString, $options: 'i' } }
       ];
     }
     
