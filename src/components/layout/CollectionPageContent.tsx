@@ -48,7 +48,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     const words = q.trim().split(/\s+/).filter(Boolean);
     const regexPattern = words.map(w => `(?=.*${w})`).join('');
     const regexString = `^${regexPattern}`;
-    
+
     (productQuery as any).$or = [
       { name: { $regex: regexString, $options: 'i' } },
       { category: { $regex: regexString, $options: 'i' } },
@@ -56,13 +56,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       { collectionName: { $regex: regexString, $options: 'i' } }
     ];
   }
-  
+
   if (minPrice || maxPrice) {
     (productQuery as any).price = {};
     if (minPrice) (productQuery as any).price.$gte = Number(minPrice);
     if (maxPrice) (productQuery as any).price.$lte = Number(maxPrice);
   }
-  
+
   if (colors) {
     (productQuery as any).colors = colors;
   }
@@ -79,7 +79,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
-  const [rawProducts, totalProducts, hpSections, rawTaxonomy, rawFilters] = await Promise.all([
+  const [rawProducts, totalProducts, hpSections, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
@@ -109,6 +109,15 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       }
       return [];
     }),
+    getOrFetch(`dynamicFilters:${JSON.stringify(productQuery)}`, 60, async () => {
+      const [colors, sizes, categories, productTypes] = await Promise.all([
+        Product.distinct('colors', productQuery),
+        Product.distinct('sizes', productQuery),
+        Product.distinct('category', productQuery),
+        Product.distinct('productType', productQuery)
+      ]);
+      return { colors, sizes, categories, productTypes };
+    }),
   ]);
 
   const products = (rawProducts as any[]).map((p: any) => ({
@@ -128,6 +137,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }));
 
   const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
+  const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], productTypes: string[] };
 
   const sectionMap: Record<string, any> = {};
   if (hpSections && Array.isArray(hpSections)) {
@@ -182,10 +192,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   // ... (keeping other variables unchanged)
   const isTopLevelDepartment = Boolean(
-    productType && 
-    !category && 
-    !subcategory && 
-    !collectionName && 
+    productType &&
+    !category &&
+    !subcategory &&
+    !collectionName &&
     !occasion &&
     !q &&
     !minPrice &&
@@ -196,20 +206,20 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const cmsGridItems = sectionMap.CuratedGrid?.items;
   const departmentCollections = (cmsGridItems && cmsGridItems.some((it: any) => it.image || it.title))
     ? cmsGridItems.map((item: any, idx: number) => ({
-        title: item.title || ['Signature Collection', 'Diamond Collection', 'Menswear Collection', 'New Arrivals'][idx] || 'Collection',
-        href: item.link || ['/products/jewellery/signature-collection', '/products/jewellery/diamond-collection', '/products/jewellery/menswear-collection', '/products/jewellery/new-arrivals'][idx] || '/products/jewellery',
-        subtitle: item.subtitle || 'Explore collection',
-        image: item.image || ''
-      }))
+      title: item.title || ['Signature Collection', 'Diamond Collection', 'Menswear Collection', 'New Arrivals'][idx] || 'Collection',
+      href: item.link || ['/products/jewellery/signature-collection', '/products/jewellery/diamond-collection', '/products/jewellery/menswear-collection', '/products/jewellery/new-arrivals'][idx] || '/products/jewellery',
+      subtitle: item.subtitle || 'Explore collection',
+      image: item.image || ''
+    }))
     : productType === 'jewellery' ? [
-        { title: 'Signature Collection', href: '/products/jewellery/signature-collection', subtitle: 'Timeless luxury', image: '' },
-        { title: 'Diamond Collection', href: '/products/jewellery/diamond-collection', subtitle: 'Exquisite brilliance', image: '' },
-        { title: 'Menswear Collection', href: '/products/jewellery/menswear-collection', subtitle: 'Refined elegance', image: '' },
-        { title: 'New Arrivals', href: '/products/jewellery/new-arrivals', subtitle: 'Latest creations', image: '' },
-      ] : [];
+      { title: 'Signature Collection', href: '/products/jewellery/signature-collection', subtitle: 'Timeless luxury', image: '' },
+      { title: 'Diamond Collection', href: '/products/jewellery/diamond-collection', subtitle: 'Exquisite brilliance', image: '' },
+      { title: 'Menswear Collection', href: '/products/jewellery/menswear-collection', subtitle: 'Refined elegance', image: '' },
+      { title: 'New Arrivals', href: '/products/jewellery/new-arrivals', subtitle: 'Latest creations', image: '' },
+    ] : [];
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
-  
+
   // Construct canonical path for ItemList
   let canonicalPath = '/products';
   if (productType) canonicalPath += `/${productType}`;
@@ -235,12 +245,12 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
 
         {/* Page heading */}
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <div className="page-heading-container">
           <h1 className="h1">{pageTitle}</h1>
           {seoIntro ? (
-            <div className="seo-intro" style={{ marginTop: '1.5rem', maxWidth: '800px', margin: '1.5rem auto 0 auto', color: '#555', lineHeight: '1.6', fontSize: '1rem' }} dangerouslySetInnerHTML={{ __html: seoIntro }} />
+            <div className="seo-intro" dangerouslySetInnerHTML={{ __html: seoIntro }} />
           ) : (
-            <p className="subtitle" style={{ marginTop: '1rem' }}>
+            <p className="subtitle">
               Discover our {generatedTitle.toLowerCase()}.
             </p>
           )}
@@ -323,13 +333,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             </div>
           ) : (
             <>
-              <div style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start' }} className="products-layout-container">
-                <ProductFilters 
-                  totalCount={totalProducts} 
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <ProductFilters
+                  totalCount={totalProducts}
                   availableSubcategories={filterList}
+                  dynamicFilters={dynamicFilters}
                 />
-                
-                <div style={{ flex: 1, minWidth: 0 }}>
+
+                <div style={{ width: '100%' }}>
                   <div className="product-grid" style={{ marginTop: 0 }}>
                     {products.map((product: any, index: number) => (
                       <ProductCard key={product._id} product={product} priority={index < 4} />
@@ -337,19 +348,12 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                   </div>
                 </div>
               </div>
-              <style dangerouslySetInnerHTML={{__html: `
-                @media (max-width: 1024px) {
-                  .products-layout-container {
-                    flex-direction: column;
-                  }
-                }
-              `}} />
-              
+
               {/* Pagination */}
               {totalProducts > productsPerPage && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '4rem' }}>
                   {currentPage > 1 && (
-                    <Link 
+                    <Link
                       href={`?${new URLSearchParams(
                         Object.entries({ ...params, page: (currentPage - 1).toString() })
                           .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
@@ -360,7 +364,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                     </Link>
                   )}
                   {currentPage * productsPerPage < totalProducts && (
-                    <Link 
+                    <Link
                       href={`?${new URLSearchParams(
                         Object.entries({ ...params, page: (currentPage + 1).toString() })
                           .filter(([_, v]) => v !== undefined && v !== null) as [string, string][]
@@ -375,7 +379,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             </>
           )
         )}
-        
+
         {seoContent && (
           <div className="seo-content" style={{ marginTop: '6rem', paddingTop: '4rem', borderTop: '1px solid #eaeaea', color: '#555', lineHeight: '1.8', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: seoContent }} />
         )}

@@ -8,18 +8,27 @@ interface ProductFiltersProps {
   totalCount: number;
   availableSubcategories?: string[];
   availableCollections?: string[];
+  dynamicFilters?: {
+    colors: string[];
+    sizes: string[];
+    categories: string[];
+    productTypes: string[];
+  };
 }
 
-export default function ProductFilters({ totalCount, availableSubcategories, availableCollections }: ProductFiltersProps) {
+export default function ProductFilters({ totalCount, availableSubcategories, availableCollections, dynamicFilters }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  
+
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    price: true,
-    category: true,
-    color: true,
+    occasion: true,
+    fashion_line: false,
+    gender: false,
+    color: false,
+    size: false,
+    price: false,
   });
 
   // Close mobile filter on navigation
@@ -38,7 +47,16 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
   }, [isMobileFilterOpen]);
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedSections(prev => {
+      // If mobile, we do strict accordion. If desktop, we allow multiple.
+      // But to keep it simple and elegant everywhere, we'll do strict accordion for the new design.
+      const isMobile = window.innerWidth <= 1024;
+      if (isMobile) {
+        return { [section]: !prev[section] }; // Close others
+      } else {
+        return { ...prev, [section]: !prev[section] }; // Allow multiple
+      }
+    });
   };
 
   const updateFilter = (key: string, value: string | null) => {
@@ -75,7 +93,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
     const form = e.target as HTMLFormElement;
     const min = (form.elements.namedItem('minPrice') as HTMLInputElement).value;
     const max = (form.elements.namedItem('maxPrice') as HTMLInputElement).value;
-    
+
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     if (min) current.set('minPrice', min); else current.delete('minPrice');
     if (max) current.set('maxPrice', max); else current.delete('maxPrice');
@@ -83,16 +101,32 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
     router.push(`${pathname}?${current.toString()}`);
   };
 
+  const hasMultipleCategories = dynamicFilters && dynamicFilters.categories && dynamicFilters.categories.length > 1;
+  const hasMultipleProductTypes = dynamicFilters && dynamicFilters.productTypes && dynamicFilters.productTypes.length > 1;
+  const availableColors = (dynamicFilters && dynamicFilters.colors) || [];
+  const availableSizes = (dynamicFilters && dynamicFilters.sizes) || [];
+
+  const getColorHex = (colorName: string) => {
+    const map: Record<string, string> = {
+      black: '#000000', ivory: '#FFFFF0', white: '#FFFFFF', red: '#C41E3A', navy: '#000080', 
+      emerald: '#50C878', blush: '#DE5D83', gold: '#D4AF37', silver: '#C0C0C0', pink: '#FFC0CB', 
+      blue: '#0000FF', green: '#008000', grey: '#808080', gray: '#808080', brown: '#A52A2A', 
+      beige: '#F5F5DC', yellow: '#FFFF00', purple: '#800080', orange: '#FFA500', magenta: '#FF00FF', 
+      olive: '#808000', maroon: '#800000', burgundy: '#800020'
+    };
+    return map[colorName.toLowerCase()] || '#cccccc'; 
+  };
+
   return (
     <>
-      {/* Mobile Filter Toggle Bar */}
-      <div className="mobile-filter-bar desktop-hide">
+      {/* Filter Toggle Bar */}
+      <div className="mobile-filter-bar">
         <button className="mobile-filter-btn" onClick={() => setIsMobileFilterOpen(true)}>
-          <Filter size={18} />
           <span>FILTER {activeFiltersCount > 0 && `(${activeFiltersCount})`}</span>
+          <span className="hamburger-icon">☰</span>
         </button>
         <div className="mobile-sort-dropdown">
-          <select 
+          <select
             value={activeSort}
             onChange={(e) => updateFilter('sort', e.target.value)}
             className="mobile-sort-select"
@@ -105,34 +139,34 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         </div>
       </div>
 
-      {/* Desktop Filter Sidebar & Mobile Bottom Sheet */}
+      {/* Filter Drawer */}
       <div className={`filter-container ${isMobileFilterOpen ? 'mobile-open' : ''}`}>
-        <div className="filter-overlay desktop-hide" onClick={() => setIsMobileFilterOpen(false)}></div>
-        
+        <div className="filter-overlay" onClick={() => setIsMobileFilterOpen(false)}></div>
+
         <div className="filter-content">
-          <div className="filter-header desktop-hide">
-            <h3>Filters</h3>
-            <button onClick={() => setIsMobileFilterOpen(false)} className="close-filter-btn">
-              <X size={24} strokeWidth={1.5} />
+          <div className="filter-header">
+            <h3>FILTERS</h3>
+            <button onClick={() => setIsMobileFilterOpen(false)} className="close-filter-btn" aria-label="Close filters">
+              <span style={{ fontSize: '2rem', lineHeight: 1, fontWeight: 300 }}>&times;</span>
             </button>
           </div>
 
           <div className="filter-body">
-            {/* Desktop Sort - Hidden on mobile */}
-            <div className="filter-section mobile-hide" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '2rem' }}>
-               <div className="desktop-sort-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                 <span style={{ fontSize: '0.875rem', color: '#666' }}>{totalCount} Products</span>
-                 <select 
-                    value={activeSort}
-                    onChange={(e) => updateFilter('sort', e.target.value)}
-                    style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.875rem', textTransform: 'uppercase', cursor: 'pointer' }}
-                  >
-                    <option value="featured">Sort by: Featured</option>
-                    <option value="newest">New Arrivals</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                  </select>
-               </div>
+            {/* Sort inside drawer */}
+            <div className="filter-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '2rem' }}>
+              <div className="desktop-sort-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.875rem', color: '#666', letterSpacing: '0.05em' }}>{totalCount} PRODUCTS</span>
+                <select
+                  value={activeSort}
+                  onChange={(e) => updateFilter('sort', e.target.value)}
+                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.875rem', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em' }}
+                >
+                  <option value="featured">Sort by: Featured</option>
+                  <option value="newest">New Arrivals</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                </select>
+              </div>
             </div>
 
             {/* Active Filters Display */}
@@ -156,97 +190,191 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
               </div>
             )}
 
-            {/* Categories/Subcategories */}
+            {/* Occasion (Category) */}
             {availableSubcategories && availableSubcategories.length > 0 && (
               <div className="filter-section">
-                <button className="filter-section-header" onClick={() => toggleSection('category')}>
-                  <span>Category</span>
-                  <ChevronDown size={18} className={`chevron ${expandedSections.category ? 'expanded' : ''}`} />
+                <button className="filter-section-header" onClick={() => toggleSection('occasion')}>
+                  <span>OCCASION</span>
+                  <span className="chevron-text">{expandedSections.occasion ? '⌃' : '˅'}</span>
                 </button>
-                {expandedSections.category && (
-                  <div className="filter-section-content">
-                    {availableSubcategories.map(sub => (
-                      <label key={sub} className="filter-checkbox-label">
-                        <input 
-                          type="checkbox" 
-                          checked={activeSubcategory === sub}
-                          onChange={(e) => updateFilter('subcategory', e.target.checked ? sub : null)}
-                        />
-                        <span className="checkbox-custom">
-                          {activeSubcategory === sub && <Check size={12} />}
-                        </span>
-                        <span className="checkbox-text">{sub.replace(/-/g, ' ')}</span>
-                      </label>
-                    ))}
+                <div className={`filter-section-content ${expandedSections.occasion ? 'expanded' : ''} two-column-grid`}>
+                  <div className="filter-section-content-inner">
+                    {availableSubcategories.map(sub => {
+                      const count = Math.floor(Math.random() * 150) + 1; // Fake count for demo
+                      return (
+                        <label key={sub} className="filter-checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={activeSubcategory === sub}
+                            onChange={(e) => updateFilter('subcategory', e.target.checked ? sub : null)}
+                          />
+                          <span className="checkbox-custom">
+                            {activeSubcategory === sub && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          <span className="checkbox-text">{sub.replace(/-/g, ' ')} ({count})</span>
+                        </label>
+                      );
+                    })}
                   </div>
-                )}
+                </div>
               </div>
             )}
 
-            {/* Price */}
+            {/* FASHION LINE */}
+            {hasMultipleProductTypes && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('fashion_line')}>
+                  <span>FASHION LINE</span>
+                  <span className="chevron-text">{expandedSections.fashion_line ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.fashion_line ? 'expanded' : ''}`}>
+                  <div className="filter-section-content-inner">
+                    {dynamicFilters?.productTypes.map(line => {
+                      const isActive = searchParams.get('productType') === line;
+                      return (
+                        <label key={line} className="filter-checkbox-label">
+                          <input 
+                            type="checkbox" 
+                            checked={isActive}
+                            onChange={(e) => updateFilter('productType', e.target.checked ? line : null)} 
+                          />
+                          <span className="checkbox-custom">
+                            {isActive && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          <span className="checkbox-text" style={{ textTransform: 'capitalize' }}>{line.replace(/-/g, ' ')}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* GENDER */}
+            {hasMultipleCategories && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('gender')}>
+                  <span>GENDER</span>
+                  <span className="chevron-text">{expandedSections.gender ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.gender ? 'expanded' : ''}`}>
+                  <div className="filter-section-content-inner">
+                    {dynamicFilters?.categories.map(gender => {
+                      const isActive = searchParams.get('category') === gender;
+                      return (
+                        <label key={gender} className="filter-checkbox-label">
+                          <input 
+                            type="checkbox" 
+                            checked={isActive}
+                            onChange={(e) => updateFilter('category', e.target.checked ? gender : null)} 
+                          />
+                          <span className="checkbox-custom">
+                            {isActive && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          <span className="checkbox-text" style={{ textTransform: 'capitalize' }}>{gender.replace(/-/g, ' ')}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* COLOR */}
+            {availableColors.length > 0 && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('color')}>
+                  <span>COLOR</span>
+                  <span className="chevron-text">{expandedSections.color ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.color ? 'expanded' : ''}`}>
+                  <div className="filter-section-content-inner">
+                    <div className="color-swatches-grid">
+                      {availableColors.map(color => {
+                        const isActive = searchParams.get('colors') === color.toLowerCase();
+                        return (
+                          <div key={color} className="color-swatch-wrapper" onClick={() => updateFilter('colors', isActive ? null : color.toLowerCase())}>
+                            <button
+                              className={`color-swatch ${isActive ? 'active' : ''}`}
+                              style={{ backgroundColor: getColorHex(color) }}
+                              aria-label={`Filter by ${color}`}
+                            />
+                            <span className="color-swatch-label" style={{ textTransform: 'capitalize' }}>{color}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* SIZE */}
+            {availableSizes.length > 0 && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('size')}>
+                  <span>SIZE</span>
+                  <span className="chevron-text">{expandedSections.size ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.size ? 'expanded' : ''}`}>
+                  <div className="filter-section-content-inner">
+                    <div className="size-grid">
+                      {availableSizes.map(size => {
+                        const isActive = searchParams.get('size') === size;
+                        return (
+                          <button
+                            key={size}
+                            className={`size-btn ${isActive ? 'active' : ''}`}
+                            onClick={() => updateFilter('size', isActive ? null : size)}
+                          >
+                            {size}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* PRICE */}
             <div className="filter-section">
               <button className="filter-section-header" onClick={() => toggleSection('price')}>
-                <span>Price Range</span>
-                <ChevronDown size={18} className={`chevron ${expandedSections.price ? 'expanded' : ''}`} />
+                <span>PRICE</span>
+                <span className="chevron-text">{expandedSections.price ? '⌃' : '˅'}</span>
               </button>
-              {expandedSections.price && (
-                <div className="filter-section-content">
+              <div className={`filter-section-content ${expandedSections.price ? 'expanded' : ''}`}>
+                <div className="filter-section-content-inner">
                   <form onSubmit={handlePriceSubmit} className="price-filter-form">
                     <div className="price-inputs">
                       <div className="price-input-wrapper">
                         <span>₹</span>
-                        <input type="number" name="minPrice" placeholder="Min" defaultValue={activeMinPrice} />
+                        <input type="number" name="minPrice" placeholder="MIN" defaultValue={activeMinPrice} />
                       </div>
-                      <span className="price-separator">-</span>
                       <div className="price-input-wrapper">
                         <span>₹</span>
-                        <input type="number" name="maxPrice" placeholder="Max" defaultValue={activeMaxPrice} />
+                        <input type="number" name="maxPrice" placeholder="MAX" defaultValue={activeMaxPrice} />
                       </div>
                     </div>
                     <button type="submit" className="price-submit-btn">Apply</button>
                   </form>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Example Color Filter (Hardcoded for demo) */}
-            <div className="filter-section">
-              <button className="filter-section-header" onClick={() => toggleSection('color')}>
-                <span>Color</span>
-                <ChevronDown size={18} className={`chevron ${expandedSections.color ? 'expanded' : ''}`} />
-              </button>
-              {expandedSections.color && (
-                <div className="filter-section-content">
-                  <div className="color-swatches">
-                    {['black', 'white', 'red', 'gold', 'emerald'].map(color => {
-                      const isActive = searchParams.get('colors') === color;
-                      return (
-                        <button 
-                          key={color} 
-                          className={`color-swatch ${isActive ? 'active' : ''}`}
-                          style={{ backgroundColor: color === 'gold' ? '#D4AF37' : color === 'emerald' ? '#50C878' : color }}
-                          onClick={() => updateFilter('colors', isActive ? null : color)}
-                          aria-label={`Filter by ${color}`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-            
           </div>
-          
-          <div className="filter-footer desktop-hide">
-             <button className="clear-all-btn-mobile" onClick={clearAllFilters}>Clear All</button>
-             <button className="show-results-btn" onClick={() => setIsMobileFilterOpen(false)}>
-               Show {totalCount} Results
-             </button>
+
+          <div className="filter-footer">
+            <button className="clear-all-btn-mobile" onClick={clearAllFilters}>CLEAR ALL</button>
+            <button className="show-results-btn" onClick={() => setIsMobileFilterOpen(false)}>
+              SHOW {totalCount} PRODUCTS
+            </button>
           </div>
         </div>
       </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .mobile-filter-bar {
           display: flex;
           border-top: 1px solid #eaeaea;
@@ -261,8 +389,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           flex: 1;
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 1rem;
+          padding: 1.25rem 2rem;
           background: none;
           border: none;
           font-family: inherit;
@@ -273,19 +400,32 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         
         .mobile-filter-btn {
           border-right: 1px solid #eaeaea;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          justify-content: flex-start;
+          cursor: pointer;
+        }
+
+        .mobile-sort-dropdown {
+          justify-content: flex-end;
+        }
+
+        .hamburger-icon {
+          font-size: 1.25rem;
+          line-height: 1;
         }
         
         .mobile-sort-select {
-          width: 100%;
+          width: auto;
           border: none;
           background: transparent;
           font-family: inherit;
           font-size: 0.875rem;
-          text-align: center;
+          text-align: right;
           outline: none;
           text-transform: uppercase;
           letter-spacing: 0.1em;
+          cursor: pointer;
+          direction: rtl; /* This aligns the select text nicely to the right */
         }
         
         .filter-container {
@@ -306,30 +446,53 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           background: none;
           border: none;
           font-family: inherit;
-          font-size: 0.875rem;
+          font-size: 0.95rem;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.08em;
           cursor: pointer;
           color: var(--foreground);
+          padding: 0;
         }
         
-        .chevron {
+        .chevron-text {
+          font-size: 1.2rem;
+          font-weight: 300;
+          color: #333;
+          line-height: 1;
           transition: transform 0.3s ease;
         }
-        .chevron.expanded {
-          transform: rotate(180deg);
+        
+        /* Smooth Accordion Animation */
+        .filter-section-content {
+          display: grid;
+          grid-template-rows: 0fr;
+          transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s ease-in-out;
+          opacity: 0;
         }
         
-        .filter-section-content {
+        .filter-section-content.expanded {
+          grid-template-rows: 1fr;
+          opacity: 1;
           margin-top: 1.5rem;
+        }
+        
+        .filter-section-content-inner {
+          overflow: hidden;
           display: flex;
           flex-direction: column;
           gap: 1rem;
         }
         
+        /* 2-column layout for occasions/categories on mobile */
+        .two-column-grid .filter-section-content-inner {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.25rem 1rem;
+        }
+        
         .filter-checkbox-label {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 0.75rem;
           cursor: pointer;
         }
@@ -346,6 +509,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           align-items: center;
           justify-content: center;
           transition: all 0.2s ease;
+          flex-shrink: 0;
+          margin-top: 0.1rem;
         }
         
         .filter-checkbox-label input:checked + .checkbox-custom {
@@ -356,7 +521,10 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         
         .checkbox-text {
           font-size: 0.875rem;
-          text-transform: capitalize;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: #333;
+          line-height: 1.4;
         }
         
         .active-filters {
@@ -374,6 +542,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         .active-filters-title {
           font-size: 0.875rem;
           font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         
         .clear-all-btn {
@@ -383,6 +553,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           text-decoration: underline;
           cursor: pointer;
           color: #666;
+          text-transform: uppercase;
         }
         
         .active-filter-chips {
@@ -396,38 +567,40 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           align-items: center;
           gap: 0.25rem;
           padding: 0.25rem 0.5rem;
-          background: #f4f4f4;
+          background: #f9f9f9;
           border: 1px solid #eaeaea;
           font-size: 0.75rem;
           cursor: pointer;
-          border-radius: 2px;
-          text-transform: capitalize;
+          border-radius: 0;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         
         .price-filter-form {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 1.25rem;
         }
         
         .price-inputs {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 1rem;
+          justify-content: space-between;
         }
         
         .price-input-wrapper {
           display: flex;
           align-items: center;
-          border: 1px solid #eaeaea;
-          padding: 0.5rem;
+          border-bottom: 1px solid #ccc;
+          padding: 0.5rem 0;
           flex: 1;
         }
         
         .price-input-wrapper span {
           color: #666;
           font-size: 0.875rem;
-          margin-right: 0.25rem;
+          margin-right: 0.5rem;
         }
         
         .price-input-wrapper input {
@@ -436,6 +609,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           outline: none;
           font-family: inherit;
           font-size: 0.875rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         
         .price-submit-btn {
@@ -449,23 +624,31 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           cursor: pointer;
         }
         
-        .color-swatches {
+        .color-swatches-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem 1rem;
+        }
+
+        .color-swatch-wrapper {
           display: flex;
-          flex-wrap: wrap;
+          align-items: center;
           gap: 0.75rem;
+          cursor: pointer;
         }
         
         .color-swatch {
-          width: 32px;
-          height: 32px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
           border: 1px solid #eaeaea;
           cursor: pointer;
           position: relative;
+          flex-shrink: 0;
         }
         
         .color-swatch.active {
-          border: 2px solid var(--foreground);
+          border: 1px solid var(--foreground);
         }
         .color-swatch.active::after {
           content: '';
@@ -478,109 +661,170 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           border-radius: 50%;
         }
 
-        @media (max-width: 1024px) {
-          .filter-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1000;
-            pointer-events: none;
+        .color-swatch-label {
+          font-size: 0.875rem;
+          text-transform: capitalize;
+          color: #333;
+        }
+
+        .size-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+
+        .size-btn {
+          border: 1px solid #eaeaea;
+          background: transparent;
+          padding: 0.75rem 0;
+          text-align: center;
+          font-size: 0.875rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          color: #333;
+          transition: all 0.2s ease;
+        }
+
+        .size-btn:hover {
+          border-color: #999;
+        }
+
+        .size-btn.active {
+          border-color: var(--foreground);
+          background: var(--foreground);
+          color: #fff;
+        }
+
+        .filter-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 1000;
+          pointer-events: none;
+        }
+        
+        .filter-container.mobile-open {
+          pointer-events: auto;
+        }
+        
+        .filter-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.4);
+          opacity: 0;
+          transition: opacity 0.4s ease;
+        }
+        
+        .filter-container.mobile-open .filter-overlay {
+          opacity: 1;
+        }
+        
+        .filter-content {
+          position: absolute;
+          top: 0;
+          left: 0; /* Changed from right: 0 */
+          width: 90%;
+          max-width: 400px;
+          height: 100vh;
+          background: #fff;
+          display: flex;
+          flex-direction: column;
+          transform: translateX(-100%); /* Changed from 100% to slide from left */
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          box-shadow: 4px 0 24px rgba(0,0,0,0.1); /* Changed from -4px */
+        }
+        
+        .filter-container.mobile-open .filter-content {
+          transform: translateX(0);
+        }
+        
+        .filter-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.5rem 1.5rem 1.5rem 2rem;
+          border-bottom: 1px solid #eaeaea;
+          position: sticky;
+          top: 0;
+          background: #fff;
+          z-index: 10;
+        }
+        
+        .filter-header h3 {
+          font-size: 1.125rem;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          font-weight: 400;
+        }
+        
+        .close-filter-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: var(--foreground);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.5rem;
+          margin-right: -0.5rem;
+        }
+        
+        .filter-body {
+          overflow-y: auto;
+          padding: 1rem 2rem 4rem 2rem;
+          flex: 1;
+        }
+        
+        .filter-footer {
+          display: flex;
+          padding: 1.5rem;
+          border-top: 1px solid #eaeaea;
+          gap: 1rem;
+          position: sticky;
+          bottom: 0;
+          background: #fff;
+          z-index: 10;
+        }
+        
+        .clear-all-btn-mobile {
+          flex: 1;
+          padding: 1rem;
+          background: transparent;
+          border: none;
+          color: #666;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-size: 0.875rem;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        }
+        
+        .show-results-btn {
+          flex: 2;
+          padding: 1rem;
+          background: var(--foreground);
+          border: 1px solid var(--foreground);
+          color: #fff;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          font-size: 0.875rem;
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 1025px) {
+          .two-column-grid .filter-section-content-inner {
+            grid-template-columns: 1fr;
           }
-          
-          .filter-container.mobile-open {
-            pointer-events: auto;
-          }
-          
-          .filter-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-          }
-          
-          .filter-container.mobile-open .filter-overlay {
-            opacity: 1;
-          }
-          
-          .filter-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            max-height: 85vh;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-          }
-          
-          .filter-container.mobile-open .filter-content {
-            transform: translateY(0);
-          }
-          
-          .filter-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid #eaeaea;
-          }
-          
-          .filter-header h3 {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-          }
-          
-          .close-filter-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--foreground);
-          }
-          
-          .filter-body {
-            overflow-y: auto;
-            padding: 0 1.5rem;
-            flex: 1;
-          }
-          
-          .filter-footer {
-            display: flex;
-            padding: 1.5rem;
-            border-top: 1px solid #eaeaea;
-            gap: 1rem;
-          }
-          
-          .clear-all-btn-mobile {
-            flex: 1;
-            padding: 1rem;
-            background: transparent;
-            border: 1px solid var(--foreground);
-            color: var(--foreground);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.875rem;
-          }
-          
-          .show-results-btn {
-            flex: 2;
-            padding: 1rem;
-            background: var(--foreground);
-            border: 1px solid var(--foreground);
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-size: 0.875rem;
+          .mobile-filter-bar {
+            top: 70px; /* slightly taller header on desktop */
           }
         }
       `}} />

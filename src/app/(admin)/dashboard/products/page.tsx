@@ -51,6 +51,7 @@ function AdminProductsContent() {
         referenceImages: { front: '', back: '', left: '', right: '' },
         details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
         sizes: [],
+        colors: [],
         inventoryCount: '10',
         isFeatured: false,
       });
@@ -72,6 +73,7 @@ function AdminProductsContent() {
     referenceImages: { front: '', back: '', left: '', right: '' },
     details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
     sizes: [] as string[],
+    colors: [] as string[],
     inventoryCount: '10',
     isFeatured: false,
   });
@@ -284,6 +286,16 @@ function AdminProductsContent() {
     });
   };
 
+  const toggleColor = (color: string) => {
+    setFormData(prev => {
+      if (prev.colors.includes(color)) {
+        return { ...prev, colors: prev.colors.filter(c => c !== color) };
+      } else {
+        return { ...prev, colors: [...prev.colors, color] };
+      }
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.imageUrl) {
@@ -305,6 +317,7 @@ function AdminProductsContent() {
       referenceImages: formData.referenceImages,
       details: formData.details,
       sizes: formData.sizes,
+      colors: formData.colors,
       inventoryCount: Number(formData.inventoryCount),
       isFeatured: formData.isFeatured,
     };
@@ -326,6 +339,7 @@ function AdminProductsContent() {
           referenceImages: { front: '', back: '', left: '', right: '' },
           details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
           sizes: [],
+          colors: [],
           inventoryCount: '10', isFeatured: false 
         });
         setEditingId(null);
@@ -375,8 +389,18 @@ function AdminProductsContent() {
       occasion: prod.occasion || '',
       imageUrl: (prod.images && prod.images[0]) ? prod.images[0] : '',
       referenceImages: prod.referenceImages || { front: '', back: '', left: '', right: '' },
-      details: prod.details || { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
+      details: {
+        styleCode: prod.details?.styleCode || '',
+        commodityName: prod.details?.commodityName || '',
+        composition: prod.details?.composition || '',
+        componentsCount: prod.details?.componentsCount || '',
+        includes: prod.details?.includes || '',
+        shipping: prod.details?.shipping || '',
+        disclaimer: prod.details?.disclaimer || '',
+        legal: prod.details?.legal || '',
+      },
       sizes: prod.sizes || [],
+      colors: prod.colors || [],
       inventoryCount: prod.inventoryCount?.toString() || '10',
       isFeatured: prod.isFeatured || false,
     });
@@ -539,7 +563,7 @@ function AdminProductsContent() {
                 type="button" 
                 onClick={() => {
                   setEditingId(null);
-                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], inventoryCount: '10', isFeatured: false });
+                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], colors: [], inventoryCount: '10', isFeatured: false });
                 }}
                 style={{ fontSize: '0.8rem', marginLeft: '15px', padding: '4px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}
               >
@@ -744,6 +768,34 @@ function AdminProductsContent() {
                       style={{ display: 'none' }}
                     />
                     {size}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.formGroup} style={{ marginTop: '20px' }}>
+              <label className={styles.formLabel}>Available Colors</label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {['Black', 'Ivory', 'White', 'Red', 'Navy', 'Emerald', 'Blush', 'Gold', 'Silver', 'Pink', 'Blue', 'Green', 'Grey', 'Brown', 'Beige', 'Yellow', 'Purple', 'Orange', 'Magenta', 'Olive', 'Maroon', 'Burgundy'].map(color => (
+                  <label key={color} style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '5px', 
+                    cursor: 'pointer',
+                    padding: '8px 12px',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    backgroundColor: formData.colors.includes(color.toLowerCase()) ? '#000' : '#fff',
+                    color: formData.colors.includes(color.toLowerCase()) ? '#fff' : '#000',
+                    fontSize: '0.875rem'
+                  }}>
+                    <input 
+                      type="checkbox"
+                      checked={formData.colors.includes(color.toLowerCase())}
+                      onChange={() => toggleColor(color.toLowerCase())}
+                      style={{ display: 'none' }}
+                    />
+                    {color}
                   </label>
                 ))}
               </div>
