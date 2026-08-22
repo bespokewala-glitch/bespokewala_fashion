@@ -260,8 +260,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         </div>
 
         {/* Top-Level Department Navigation Cards (if top-level department like Jewellery) */}
-        {isTopLevelDepartment ? (
-          departmentCollections.length > 0 && (
+        {isTopLevelDepartment && departmentCollections.length > 0 ? (
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -327,9 +326,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                 </Link>
               ))}
             </div>
-          )
         ) : (
-          /* Product grid — shown ONLY when a category, subcategory, collection, or occasion is selected */
+          /* Product grid — shown when a category is selected, OR when no department collections exist */
           products.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <p className="text-body">No products found in this category.</p>
