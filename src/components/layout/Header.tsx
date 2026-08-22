@@ -7,13 +7,15 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
-import { Menu, X, ShoppingBag, User, Heart } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, Heart, Search } from 'lucide-react';
 import CurrencySelector from '@/components/layout/CurrencySelector';
+import SearchOverlay from '@/components/layout/SearchOverlay';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const [expandedMobileSubMenu, setExpandedMobileSubMenu] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -354,6 +356,14 @@ export default function Header() {
 
           {/* Mobile Right Icons — right: Wishlist + Cart */}
           <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 96px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="touch-target"
+              aria-label="Search"
+              style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0', display: 'flex', alignItems: 'center', marginRight: '4px' }}
+            >
+              <Search size={20} />
+            </button>
             <Link
               href="/wishlist"
               className="touch-target"
@@ -400,6 +410,7 @@ export default function Header() {
               ) : (
                 <li><Link href="/login">Login</Link></li>
               )}
+              <li><button onClick={() => setIsSearchOpen(true)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }} aria-label="Search"><Search size={20} /></button></li>
               <li><Link href="/wishlist">Wishlist ({wishlistCount})</Link></li>
               <li><Link href="/cart">Cart ({cartCount})</Link></li>
             </ul>
@@ -694,6 +705,7 @@ export default function Header() {
           </div>
         </div>
       </header>
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
-
 import ProductCard from '@/components/product/ProductCard';
+import ProductFilters from '@/components/product/ProductFilters';
 import HeroSection from '@/components/home/HeroSection';
 import HomepageSection from '@/models/HomepageSection';
 import CuratedGrid from '@/components/home/CuratedGrid';
@@ -21,13 +21,18 @@ export interface CollectionPageParams {
   collectionName?: string;
   occasion?: string;
   page?: string;
+  q?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  colors?: string;
+  sort?: string;
 }
 
 /** Shared data-fetching and rendering logic for all collection / category pages */
 export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
   await dbConnect();
 
-  const { productType, category, subcategory, collectionName, occasion, page } = params;
+  const { productType, category, subcategory, collectionName, occasion, page, q, minPrice, maxPrice, colors, sort } = params;
   const currentPage = parseInt(page || '1', 10) || 1;
   const productsPerPage = 24;
   const skip = (currentPage - 1) * productsPerPage;
@@ -39,6 +44,31 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (subcategory) productQuery.subcategory = subcategory;
   if (collectionName) productQuery.collectionName = collectionName;
   if (occasion) productQuery.occasion = occasion;
+  if (q) {
+    const regex = new RegExp(q, 'i');
+    (productQuery as any).$or = [
+      { name: { $regex: regex } },
+      { category: { $regex: regex } },
+      { subcategory: { $regex: regex } },
+      { collectionName: { $regex: regex } }
+    ];
+  }
+  
+  if (minPrice || maxPrice) {
+    (productQuery as any).price = {};
+    if (minPrice) (productQuery as any).price.$gte = Number(minPrice);
+    if (maxPrice) (productQuery as any).price.$lte = Number(maxPrice);
+  }
+  
+  if (colors) {
+    (productQuery as any).colors = colors;
+  }
+
+  let sortQuery: any = { createdAt: -1 };
+  if (sort === 'price_asc') sortQuery = { price: 1 };
+  if (sort === 'price_desc') sortQuery = { price: -1 };
+  if (sort === 'newest') sortQuery = { createdAt: -1 };
+  if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
   // Campaign hero — only shown on top-level pages (productType).
   // Category, subcategory, occasion, and collectionName pages skip the hero and go straight to products.
@@ -58,6 +88,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(productCacheKey, 60, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
+        .sort(sortQuery)
         .skip(skip)
         .limit(productsPerPage)
         .lean()
@@ -304,55 +335,27 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             </div>
           ) : (
             <>
-              {/* Filter Bar */}
-              {filterList && filterList.length > 0 && (
-                <div style={{ 
-                  display: 'flex', 
-                  gap: '1rem', 
-                  marginBottom: '2rem', 
-                  justifyContent: 'center',
-                  flexWrap: 'wrap'
-                }} className="mobile-overflow-x">
-                  <Link 
-                    href={productType && category ? `/products/${productType}/${category}` : productType ? `/products/${productType}` : '/products'}
-                    className="btn-secondary" 
-                    style={{ 
-                      padding: '0.5rem 1rem', 
-                      fontSize: '0.85rem', 
-                      backgroundColor: (!subcategory && !category) || (category && !subcategory && !productType) ? '#000' : 'transparent',
-                      color: (!subcategory && !category) || (category && !subcategory && !productType) ? '#fff' : '#000'
-                    }}
-                  >
-                    All
-                  </Link>
-                  {filterList.map((filterItem: string) => {
-                    const filterName = filterItem.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-                    const isActive = category === filterItem || subcategory === filterItem;
-                    const filterUrl = category ? `/products/${productType}/${category}/${filterItem}` : `/products/${productType}/${filterItem}`;
-                    return (
-                      <Link 
-                        key={filterItem}
-                        href={filterUrl}
-                        className="btn-secondary" 
-                        style={{ 
-                          padding: '0.5rem 1rem', 
-                          fontSize: '0.85rem',
-                          backgroundColor: isActive ? '#000' : 'transparent',
-                          color: isActive ? '#fff' : '#000'
-                        }}
-                      >
-                        {filterName}
-                      </Link>
-                    );
-                  })}
+              <div style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start' }} className="products-layout-container">
+                <ProductFilters 
+                  totalCount={totalProducts} 
+                  availableSubcategories={filterList}
+                />
+                
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="product-grid" style={{ marginTop: 0 }}>
+                    {products.map((product: any, index: number) => (
+                      <ProductCard key={product._id} product={product} priority={index < 4} />
+                    ))}
+                  </div>
                 </div>
-              )}
-
-              <div className="product-grid">
-                {products.map((product: any, index: number) => (
-                  <ProductCard key={product._id} product={product} priority={index < 4} />
-                ))}
               </div>
+              <style dangerouslySetInnerHTML={{__html: `
+                @media (max-width: 1024px) {
+                  .products-layout-container {
+                    flex-direction: column;
+                  }
+                }
+              `}} />
               
               {/* Pagination */}
               {totalProducts > productsPerPage && (

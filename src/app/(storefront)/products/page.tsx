@@ -8,7 +8,7 @@ export const revalidate = 60;
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; productType?: string; subcategory?: string; collectionName?: string; occasion?: string }>;
+  searchParams: Promise<{ category?: string; productType?: string; subcategory?: string; collectionName?: string; occasion?: string; q?: string; minPrice?: string; maxPrice?: string; colors?: string; sort?: string }>;
 }): Promise<Metadata> {
   const p = await searchParams;
   
@@ -26,7 +26,7 @@ export async function generateMetadata({
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; productType?: string; subcategory?: string; collectionName?: string; occasion?: string }>;
+  searchParams: Promise<{ category?: string; productType?: string; subcategory?: string; collectionName?: string; occasion?: string; q?: string; minPrice?: string; maxPrice?: string; colors?: string; sort?: string; page?: string }>;
 }) {
   const p = await searchParams;
   
