@@ -581,15 +581,23 @@ export default function Header() {
                     return (
                       <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
-                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
-                          {hasTax && (
-                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
-                              {isSubOpen ? '−' : '›'}
-                            </button>
+                          {hasTax ? (
+                            <div 
+                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} 
+                              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer', alignItems: 'center' }}
+                            >
+                              <span>{item.label}</span>
+                              <span style={{ color: '#666', fontSize: '1.1rem', lineHeight: 1, minWidth: '32px', textAlign: 'right' }}>
+                                {isSubOpen ? '−' : '›'}
+                              </span>
+                            </div>
+                          ) : (
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
                           )}
                         </div>
                         {isSubOpen && (
                           <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '0.75rem', fontWeight: 600, color: '#000', paddingTop: '0.5rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>VIEW ALL {item.label}</Link>
                             {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
                               .filter(g => g.items.length > 0)
                               .map(group => (
@@ -656,15 +664,23 @@ export default function Header() {
                     return (
                       <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
-                          <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
-                          {hasTax && (
-                            <button onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#666', fontSize: '1.1rem', padding: '0.5rem', lineHeight: 1, minWidth: '32px' }}>
-                              {isSubOpen ? '−' : '›'}
-                            </button>
+                          {hasTax ? (
+                            <div 
+                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)} 
+                              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer', alignItems: 'center' }}
+                            >
+                              <span>{item.label}</span>
+                              <span style={{ color: '#666', fontSize: '1.1rem', lineHeight: 1, minWidth: '32px', textAlign: 'right' }}>
+                                {isSubOpen ? '−' : '›'}
+                              </span>
+                            </div>
+                          ) : (
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
                           )}
                         </div>
                         {isSubOpen && (
                           <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '0.75rem', fontWeight: 600, color: '#000', paddingTop: '0.5rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>VIEW ALL {item.label}</Link>
                             {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
                               .filter(g => g.items.length > 0)
                               .map(group => (
