@@ -87,10 +87,10 @@ export default function AboutPageContent() {
 
   /* Team */
   const team = [
-    { name: "Arjun Bespoke", role: "Creative Director", initial: "A" },
-    { name: "Meera Kapoor", role: "Head of Atelier", initial: "M" },
-    { name: "Rohan Das", role: "Fabric Curator", initial: "R" },
-    { name: "Priya Sharma", role: "Bridal Specialist", initial: "P" },
+    { name: "Hemali Patil", role: "Creative Director", initial: "H", image: "/Hemali%20Patil.jpeg" },
+    { name: "Hemkumar Jayant", role: "Head of Atelier", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
+    { name: "Manish Verma", role: "Fabric Curator", initial: "M", image: "/Manish%20Verma.jpeg" },
+    { name: "Savitri Verma", role: "Bridal Specialist", initial: "S", image: "/Savitri%20Verma.jpeg" },
   ];
 
   /* ── HERO ── */
@@ -127,8 +127,8 @@ export default function AboutPageContent() {
   const visionRef  = useInView();
 
   const missionVision = (
-    <section style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
+      <div className="about-grid-2" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "start" }}>
 
         {/* Mission */}
         <div
@@ -155,6 +155,7 @@ export default function AboutPageContent() {
         {/* Vision */}
         <div
           ref={visionRef.ref}
+          className="about-vision"
           style={{
             opacity: visionRef.visible ? 1 : 0,
             transform: visionRef.visible ? "translateY(0)" : "translateY(40px)",
@@ -184,8 +185,8 @@ export default function AboutPageContent() {
   /* ── HOW WE STARTED ── */
   const storyRef = useInView(0.1);
   const howWeStarted = (
-    <section style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "7rem 2rem", overflow: "hidden" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "7rem 2rem", overflow: "hidden" }}>
+      <div className="about-grid-2" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
 
         {/* Text */}
         <div
@@ -239,8 +240,8 @@ export default function AboutPageContent() {
   /* ── OWNER'S MESSAGE ── */
   const ownerRef = useInView(0.1);
   const ownerMessage = (
-    <section style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "5rem", alignItems: "center" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
+      <div className="about-grid-owner" style={{ maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "5rem", alignItems: "center" }}>
 
         {/* Portrait */}
         <div style={{ position: "relative" }}>
@@ -300,7 +301,7 @@ export default function AboutPageContent() {
   /* ── WHY CHOOSE US ── */
   const whyRef = useInView(0.05);
   const whyChooseUs = (
-    <section style={{ backgroundColor: "#fff", padding: "7rem 2rem" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#fff", padding: "7rem 2rem" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         {/* heading */}
@@ -315,6 +316,7 @@ export default function AboutPageContent() {
         {/* cards grid */}
         <div
           ref={whyRef.ref}
+          className="about-grid-3"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
@@ -375,7 +377,7 @@ export default function AboutPageContent() {
   /* ── TEAM ── */
   const teamRef = useInView(0.1);
   const teamSection = (
-    <section style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#faf9f7", padding: "7rem 2rem" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
 
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
@@ -388,6 +390,7 @@ export default function AboutPageContent() {
 
         <div
           ref={teamRef.ref}
+          className="about-grid-4"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
@@ -399,7 +402,7 @@ export default function AboutPageContent() {
         >
           {team.map((member, i) => (
             <div key={i} style={{ textAlign: "center" }}>
-              {/* Avatar placeholder */}
+              {/* Avatar placeholder or Image */}
               <div style={{
                 width: "100%",
                 aspectRatio: "1",
@@ -413,8 +416,18 @@ export default function AboutPageContent() {
                 letterSpacing: "0.05em",
                 marginBottom: "1.25rem",
                 transition: "background-color 0.3s",
+                overflow: "hidden",
+                position: "relative"
               }}>
-                {member.initial}
+                {member.image ? (
+                  <img 
+                    src={member.image} 
+                    alt={member.name} 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                  />
+                ) : (
+                  member.initial
+                )}
               </div>
               <p style={{ fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#1c1c1c", marginBottom: "0.35rem" }}>
                 {member.name}
@@ -431,7 +444,7 @@ export default function AboutPageContent() {
 
   /* ── CTA STRIP ── */
   const ctaStrip = (
-    <section style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "5rem 2rem", textAlign: "center" }}>
+    <section className="about-section-m-v" style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "5rem 2rem", textAlign: "center" }}>
       <p style={{ fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "1.25rem" }}>
         Experience Bespokewala
       </p>
@@ -441,17 +454,71 @@ export default function AboutPageContent() {
       <p style={{ fontSize: "0.975rem", color: "#aaa", maxWidth: "480px", margin: "0 auto 2.5rem", lineHeight: 1.8 }}>
         Explore our latest collections or book a personal styling consultation at your nearest atelier.
       </p>
-      <Link href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
-        Discover Couture
-      </Link>
-      <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
-        Book an Appointment
-      </Link>
+      <div className="cta-buttons" style={{ display: 'flex', justifyContent: 'center' }}>
+        <Link href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
+          Discover Couture
+        </Link>
+        <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
+          Book an Appointment
+        </Link>
+      </div>
     </section>
   );
 
   return (
-    <>
+    <div style={{ overflowX: "hidden", maxWidth: "100%" }}>
+      <style>{`
+        @media (max-width: 992px) {
+          .about-grid-2, .about-grid-owner {
+            gap: 3rem !important;
+          }
+          .about-grid-3 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .about-grid-4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          .about-vision {
+            padding-left: 2rem !important;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .about-grid-2, .about-grid-owner {
+            grid-template-columns: 1fr !important;
+            gap: 3rem !important;
+          }
+          .about-grid-3 {
+            grid-template-columns: 1fr !important;
+          }
+          .about-grid-4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1rem !important;
+          }
+          .about-vision {
+            padding-top: 2.5rem !important;
+            border-left: none !important;
+            padding-left: 0 !important;
+            border-top: 1px solid #e8e0d6 !important;
+            margin-top: 0.5rem !important;
+          }
+          .about-section-m-v {
+            padding: 4rem 1.5rem !important;
+          }
+          .cta-buttons {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 1rem !important;
+          }
+          .cta-buttons a {
+            margin-right: 0 !important;
+            width: 100% !important;
+            max-width: 300px !important;
+            display: flex !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
       {heroSection}
       {missionVision}
       {howWeStarted}
@@ -459,6 +526,6 @@ export default function AboutPageContent() {
       {whyChooseUs}
       {teamSection}
       {ctaStrip}
-    </>
+    </div>
   );
 }
