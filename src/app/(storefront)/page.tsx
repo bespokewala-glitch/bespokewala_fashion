@@ -179,25 +179,29 @@ export default async function Home() {
           <section className="featured-arrivals-section">
             <style>{`
               .featured-arrivals-section {
-                padding: 6rem 0;
+                padding: 8rem 0;
                 text-align: center;
                 width: 100%;
                 overflow: hidden;
+                background-color: #fff;
               }
               .featured-arrivals-h2 {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
                 font-weight: 300;
-                letter-spacing: 0.1em;
-                margin-bottom: 1rem;
+                letter-spacing: 0.15em;
+                margin-bottom: 1.5rem;
                 text-transform: uppercase;
+                color: #111;
               }
               .featured-arrivals-sub {
-                color: #666;
-                font-size: 0.9rem;
-                margin-bottom: 0rem;
-                font-style: italic;
+                color: #555;
+                font-size: 0.85rem;
+                margin-bottom: 0;
+                font-weight: 300;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
                 max-width: 600px;
-                margin: 0 auto;
+                margin: 0 auto 3rem auto;
                 line-height: 1.6;
               }
               .featured-cta-container {
@@ -206,17 +210,17 @@ export default async function Home() {
               
               @media (max-width: 767px) {
                 .featured-arrivals-section {
-                  padding: 40px 0 30px 0;
+                  padding: 5rem 0 3rem 0;
                 }
                 .featured-arrivals-h2 {
-                  font-size: 22px;
-                  letter-spacing: 2px;
-                  margin-bottom: 8px;
+                  font-size: 1.7rem;
+                  letter-spacing: 0.12em;
+                  margin-bottom: 1rem;
                 }
                 .featured-arrivals-sub {
-                  font-size: 12px;
-                  font-style: normal;
-                  margin-bottom: 30px;
+                  font-size: 0.75rem;
+                  margin-bottom: 2.5rem;
+                  letter-spacing: 0.08em;
                 }
                 .featured-cta-container {
                   margin-top: 30px;

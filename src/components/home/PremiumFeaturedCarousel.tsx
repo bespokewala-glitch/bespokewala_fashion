@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useCurrency } from '@/context/CurrencyContext';
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -10,43 +10,114 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
   const { formatPrice } = useCurrency();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    // Only show arrows on desktop where hover is a thing and screens are wider
     const mql = window.matchMedia('(min-width: 768px)');
     setShowArrows(mql.matches);
     const handler = (e: MediaQueryListEvent) => setShowArrows(e.matches);
     if (mql.addEventListener) {
       mql.addEventListener('change', handler);
-      return () => mql.removeEventListener('change', handler);
     } else {
       mql.addListener(handler);
-      return () => mql.removeListener(handler);
+    }
+
+    return () => {
+      if (mql.removeEventListener) {
+        mql.removeEventListener('change', handler);
+      } else {
+        mql.removeListener(handler);
+      }
+    };
+  }, []);
+
+  // Intersection Observer to detect the currently centered card
+  useEffect(() => {
+    const root = carouselRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number(entry.target.getAttribute('data-index'));
+            if (!isNaN(index)) {
+              setActiveIndex(index);
+            }
+          }
+        });
+      },
+      {
+        root: root,
+        rootMargin: '0px -49% 0px -49%', // Highly sensitive to the center line
+        threshold: 0,
+      }
+    );
+
+    const cards = root.querySelectorAll('.unified-product-card');
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [products]);
+
+  const scrollToIndex = useCallback((index: number) => {
+    if (carouselRef.current) {
+      const cards = carouselRef.current.querySelectorAll('.unified-product-card');
+      const card = cards[index] as HTMLElement;
+      if (card) {
+        const container = carouselRef.current;
+        const containerCenter = container.clientWidth / 2;
+        const cardCenter = card.offsetLeft + card.clientWidth / 2;
+        container.scrollTo({
+          left: cardCenter - containerCenter,
+          behavior: 'smooth',
+        });
+      }
     }
   }, []);
 
+  // Auto-swipe functionality
+  useEffect(() => {
+    if (isHovered || !products || products.length <= 1) return;
+
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % products.length;
+      scrollToIndex(nextIndex);
+    }, 2500); // Normal, faster transition (2.5s)
+
+    return () => clearInterval(interval);
+  }, [activeIndex, isHovered, products, scrollToIndex]);
+
   const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: -320, behavior: 'smooth' });
-    }
+    const prevIndex = (activeIndex - 1 + products.length) % products.length;
+    scrollToIndex(prevIndex);
   };
 
   const scrollRight = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: 320, behavior: 'smooth' });
-    }
+    const nextIndex = (activeIndex + 1) % products.length;
+    scrollToIndex(nextIndex);
   };
 
   if (!products || products.length === 0) return null;
 
   return (
-    <div className="unified-carousel-wrapper">
+    <div 
+      className="unified-carousel-wrapper"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={() => setIsHovered(true)}
+      onTouchEnd={() => {
+        // Short delay before resuming auto-swipe after touch
+        setTimeout(() => setIsHovered(false), 2000);
+      }}
+    >
       <style>{`
         .unified-carousel-wrapper {
           position: relative;
           width: 100%;
-          overflow: hidden; /* Prevents page-level horizontal overflow */
-          padding: 2rem 0;
+          overflow: hidden;
+          padding: 2rem 0 4rem 0;
         }
 
         .unified-product-rail {
@@ -57,7 +128,8 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           scrollbar-width: none;
           -ms-overflow-style: none;
           gap: 1.5rem;
-          padding: 0 2rem 2rem 2rem;
+          /* Mobile padding to center the 75vw card */
+          padding: 2rem calc(50vw - 37.5vw);
           scroll-behavior: smooth;
         }
 
@@ -66,52 +138,68 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
         }
 
         .unified-product-card {
-          scroll-snap-align: start;
-          flex: 0 0 72vw; /* Mobile width */
-          max-width: 280px; /* Max width for desktop */
+          scroll-snap-align: center;
+          flex: 0 0 75vw;
+          max-width: 320px;
           display: flex;
           flex-direction: column;
           text-align: left;
           position: relative;
+          transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          opacity: 0.75;
+          transform: scale(0.95);
         }
         
-        /* Hack to ensure the last item has right margin in flex scroll container */
-        .unified-product-rail::after {
-          content: '';
-          flex: 0 0 1px;
+        .unified-product-card.is-active {
+          opacity: 1;
+          transform: scale(1.02);
+          z-index: 10;
         }
 
         .unified-product-image-wrap {
           width: 100%;
           aspect-ratio: 4 / 5;
           position: relative;
-          border-radius: 4px;
+          border-radius: 2px;
           overflow: hidden;
           background-color: #F8F6F1;
-          border: 1px solid rgba(80,70,60,0.08);
-          transition: transform 0.3s ease;
+          transition: transform 0.4s ease;
         }
 
         @media (min-width: 768px) {
+          .unified-product-rail {
+            /* Desktop padding to perfectly center a 300px card */
+            padding: 2rem calc(50% - 150px);
+            gap: 3rem;
+          }
+          .unified-product-card {
+            flex: 0 0 300px;
+            opacity: 0.65;
+            transform: scale(0.92);
+          }
+          .unified-product-card.is-active {
+            opacity: 1;
+            transform: scale(1.05);
+          }
           .unified-product-card:hover .unified-product-image-wrap {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transform: scale(1.02);
           }
         }
 
         .unified-product-info {
-          margin-top: 16px;
-          padding-right: 10px;
+          margin-top: 20px;
+          text-align: center;
+          padding: 0 10px;
         }
 
         .unified-product-title {
-          font-size: 13px;
-          letter-spacing: 1px;
+          font-size: 0.85rem;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           color: #111;
           margin: 0 0 6px 0;
-          line-height: 1.4;
-          font-weight: 500;
+          line-height: 1.5;
+          font-weight: 300;
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
@@ -119,43 +207,44 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
         }
 
         .unified-product-price {
-          font-size: 13px;
-          font-weight: 400;
-          color: #555;
+          font-size: 0.85rem;
+          font-weight: 300;
+          color: #777;
           margin: 0;
+          letter-spacing: 0.05em;
         }
 
         .unified-nav-btn {
           position: absolute;
-          top: 50%;
+          /* Roughly center with the image part of the card (4/5 aspect ratio) */
+          top: calc(2rem + 350px / 2); 
           transform: translateY(-50%);
-          width: 48px;
-          height: 48px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background-color: #fff;
-          border: 1px solid #eee;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          background-color: transparent;
+          border: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           z-index: 30;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.2rem;
           color: #111;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
+          backdrop-filter: blur(4px);
         }
         
         .unified-nav-btn:hover {
-          background-color: #111;
-          color: #fff;
+          border-color: rgba(0,0,0,0.4);
+          background-color: rgba(255,255,255,0.9);
         }
 
         .nav-left {
-          left: 1rem;
+          left: 2rem;
         }
 
         .nav-right {
-          right: 1rem;
+          right: 2rem;
         }
 
         .mobile-swipe-indicator {
@@ -163,7 +252,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           letter-spacing: 1.5px;
           color: #887a6d;
           text-transform: uppercase;
-          margin-top: 10px;
+          margin-top: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -171,21 +260,24 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
         }
 
         @media (min-width: 768px) {
-          .unified-product-card {
-            flex: 0 0 280px; /* Fixed width on desktop */
-          }
           .mobile-swipe-indicator {
             display: none;
           }
-          .unified-carousel-wrapper {
-            padding: 2rem 4rem; /* More padding on desktop for arrows */
+          .unified-nav-btn {
+            top: calc(2rem + 375px / 2); /* Desktop height adjustment */
           }
         }
       `}</style>
 
       <div className="unified-product-rail" ref={carouselRef}>
         {products.map((product, index) => (
-          <Link href={`/products/${product.slug}`} key={product._id} className="unified-product-card" prefetch={false}>
+          <Link 
+            href={`/products/${product.slug}`} 
+            key={product._id} 
+            className={`unified-product-card ${index === activeIndex ? 'is-active' : ''}`} 
+            data-index={index}
+            prefetch={false}
+          >
             <div className="unified-product-image-wrap">
               <OptimizedImage 
                 src={product.images[0]} 
@@ -221,14 +313,18 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
             aria-label="Previous featured product"
             className="unified-nav-btn nav-left"
           >
-            ←
+            <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="10 18 4 12 10 6"></polyline>
+            </svg>
           </button>
           <button 
             onClick={scrollRight}
             aria-label="Next featured product"
             className="unified-nav-btn nav-right"
           >
-            →
+            <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="4 18 10 12 4 6"></polyline>
+            </svg>
           </button>
         </>
       )}
@@ -241,4 +337,3 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
     </div>
   );
 }
-
