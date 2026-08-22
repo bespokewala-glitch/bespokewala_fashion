@@ -204,20 +204,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
-  const cmsGridItems = sectionMap.CuratedGrid?.items;
-  const departmentCollections = (cmsGridItems && cmsGridItems.some((it: any) => it.image || it.title))
-    ? cmsGridItems.map((item: any, idx: number) => ({
-      title: item.title || ['Signature Collection', 'Diamond Collection', 'Menswear Collection', 'New Arrivals'][idx] || 'Collection',
-      href: item.link || ['/products/jewellery/signature-collection', '/products/jewellery/diamond-collection', '/products/jewellery/menswear-collection', '/products/jewellery/new-arrivals'][idx] || '/products/jewellery',
-      subtitle: item.subtitle || 'Explore collection',
-      image: item.image || ''
-    }))
-    : productType === 'jewellery' ? [
-      { title: 'Signature Collection', href: '/products/jewellery/signature-collection', subtitle: 'Timeless luxury', image: '' },
-      { title: 'Diamond Collection', href: '/products/jewellery/diamond-collection', subtitle: 'Exquisite brilliance', image: '' },
-      { title: 'Menswear Collection', href: '/products/jewellery/menswear-collection', subtitle: 'Refined elegance', image: '' },
-      { title: 'New Arrivals', href: '/products/jewellery/new-arrivals', subtitle: 'Latest creations', image: '' },
-    ] : [];
+
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
 
@@ -237,7 +224,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
-        {(!isTopLevelDepartment && (sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess)) && (
+        {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess) && (
           <div className="desktop-mx-negative mobile-m-0">
             {sectionMap.CuratedGrid && <CuratedGrid data={sectionMap.CuratedGrid} />}
             {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
@@ -259,76 +246,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           )}
         </div>
 
-        {/* Top-Level Department Navigation Cards (if top-level department like Jewellery) */}
-        {isTopLevelDepartment && departmentCollections.length > 0 ? (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '2rem',
-              marginTop: '2rem',
-              marginBottom: '4rem',
-            }} className="mobile-carousel">
-              {departmentCollections.map((col: any) => (
-                <Link
-                  key={col.href}
-                  href={col.href}
-                  draggable={false}
-                  style={{
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    minHeight: '340px',
-                    padding: '3rem 2rem',
-                    backgroundColor: col.image ? '#000' : '#fafafa',
-                    backgroundImage: col.image ? `url(${col.image})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    border: '1px solid #eaeaea',
-                    textDecoration: 'none',
-                    color: col.image ? '#ffffff' : '#1c1c1c',
-                    transition: 'transform 0.4s ease, box-shadow 0.4s ease',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    userSelect: 'none',
-                  }}
-                  className="department-card-hover"
-                >
-                  {col.image && (
-                    <div style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 70%)',
-                      zIndex: 1,
-                    }} />
-                  )}
-                  <div style={{ position: 'relative', zIndex: 2 }}>
-                    <h3 style={{
-                      fontSize: '1.2rem',
-                      fontWeight: 400,
-                      letterSpacing: '0.12em',
-                      textTransform: 'uppercase',
-                      marginBottom: '0.5rem',
-                      color: col.image ? '#ffffff' : '#1c1c1c'
-                    }}>
-                      {col.title}
-                    </h3>
-                    <span style={{
-                      fontSize: '0.85rem',
-                      color: col.image ? 'rgba(255,255,255,0.8)' : '#888',
-                      fontStyle: 'italic',
-                      letterSpacing: '0.05em'
-                    }}>
-                      {col.subtitle}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-        ) : (
-          /* Product grid — shown when a category is selected, OR when no department collections exist */
-          products.length === 0 ? (
+        {/* Product grid — shown when a category is selected, OR for top-level departments */}
+        {products.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <p className="text-body">No products found in this category.</p>
             </div>
@@ -352,7 +271,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
               </div>
             </>
           )
-        )}
+        }
 
         {seoContent && (
           <div className="seo-content" style={{ marginTop: '6rem', paddingTop: '4rem', borderTop: '1px solid #eaeaea', color: '#555', lineHeight: '1.8', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: seoContent }} />
