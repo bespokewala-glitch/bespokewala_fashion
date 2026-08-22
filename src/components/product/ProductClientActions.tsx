@@ -32,7 +32,9 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
     return a.localeCompare(b);
   });
 
-  const [selectedSize, setSelectedSize] = useState<string | null>(sortedSizes[0] || null);
+  const filteredSizes = sortedSizes.filter(size => size.toLowerCase() !== 'custom');
+
+  const [selectedSize, setSelectedSize] = useState<string | null>(filteredSizes[0] || 'Custom');
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -116,7 +118,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             <SizeGuide />
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            {sortedSizes.map((size: string) => (
+            {filteredSizes.map((size: string) => (
               <button 
                 key={size} 
                 onClick={() => setSelectedSize(size)}
@@ -125,7 +127,12 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
                 {size}
               </button>
             ))}
-            <button style={optionBtnStyle}>CUSTOM SIZE</button>
+            <button 
+              onClick={() => setSelectedSize('Custom')}
+              style={selectedSize === 'Custom' ? activeOptionBtnStyle : optionBtnStyle}
+            >
+              CUSTOM SIZE
+            </button>
           </div>
         </div>
       )}

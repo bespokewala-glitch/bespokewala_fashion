@@ -7,7 +7,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 
 export default function WishlistPage() {
-  const { wishlist, removeFromWishlist } = useWishlist();
+  const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const { formatPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
 
@@ -43,7 +43,28 @@ export default function WishlistPage() {
   return (
     <>
             <main style={containerStyle} className="mobile-p-4 mobile-pt-20">
-        <h1 style={titleStyle}>Your Wishlist</h1>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', marginBottom: '3rem' }}>
+          <h1 style={{ ...titleStyle, marginBottom: 0 }}>Your Wishlist</h1>
+          {wishlist.length > 0 && (
+            <button 
+              onClick={clearWishlist}
+              style={{
+                position: 'absolute',
+                right: 0,
+                background: 'none',
+                border: 'none',
+                color: '#666',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+            >
+              Clear All
+            </button>
+          )}
+        </div>
 
         {wishlist.length === 0 ? (
           <div style={{ textAlign: 'center', marginTop: '4rem', color: '#666' }}>

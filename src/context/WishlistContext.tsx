@@ -13,6 +13,7 @@ interface WishlistContextType {
   wishlist: WishlistItem[];
   addToWishlist: (item: WishlistItem) => void;
   removeFromWishlist: (slug: string) => void;
+  clearWishlist: () => void;
   isInWishlist: (slug: string) => boolean;
   wishlistCount: number;
 }
@@ -55,6 +56,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setWishlist(prev => prev.filter(item => item.slug !== slug));
   };
 
+  const clearWishlist = () => {
+    setWishlist([]);
+  };
+
   const isInWishlist = (slug: string) => {
     return wishlist.some(item => item.slug === slug);
   };
@@ -62,7 +67,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const wishlistCount = wishlist.length;
 
   return (
-    <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist, isInWishlist, wishlistCount }}>
+    <WishlistContext.Provider value={{ wishlist, addToWishlist, removeFromWishlist, clearWishlist, isInWishlist, wishlistCount }}>
       {children}
     </WishlistContext.Provider>
   );

@@ -87,10 +87,10 @@ export default function AboutPageContent() {
 
   /* Team */
   const team = [
-    { name: "Hemali Patil", role: "Creative Director", initial: "H", image: "/Hemali%20Patil.jpeg" },
-    { name: "Hemkumar Jayant", role: "Head of Atelier", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
-    { name: "Manish Verma", role: "Fabric Curator", initial: "M", image: "/Manish%20Verma.jpeg" },
-    { name: "Savitri Verma", role: "Bridal Specialist", initial: "S", image: "/Savitri%20Verma.jpeg" },
+    { name: "Hemali Patil", role: "Head Designer & CMO", initial: "H", image: "/Hemali%20Patil.jpeg" },
+    { name: "Hemkumar Jayant", role: "Head Designer", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
+    { name: "Manish Verma", role: "Chief Technology Officer", initial: "M", image: "/Manish%20Verma.jpeg" },
+    { name: "Savitri Verma", role: "Head OF Ecommerce", initial: "S", image: "/Savitri%20Verma.jpeg" },
   ];
 
   /* ── HERO ── */
