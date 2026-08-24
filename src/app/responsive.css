@@ -1425,7 +1425,6 @@
    scroll, giving a natural native carousel feel. */
 .mobile-carousel,
 .mobile-product-rail {
-  touch-action: pan-x pinch-zoom;
   scroll-snap-type: x mandatory;
 }
 
