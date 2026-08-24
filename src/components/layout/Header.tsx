@@ -395,24 +395,50 @@ export default function Header() {
 
           {/* Desktop Right Nav */}
           <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-            <ul style={{ ...menuStyle, alignItems: 'center' }}>
+            <ul style={{ ...menuStyle, alignItems: 'center', gap: '1.5rem' }}>
               <li style={{ display: 'flex', alignItems: 'center' }}>
                 <CurrencySelector isDarkHeader={isLightHeader} />
               </li>
-              {user ? (
-                <>
-                  <li><Link href="/account">Account</Link></li>
-                  {user.role === 'admin' && (
-                    <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>
-                  )}
-                  <li><a href="#" onClick={handleLogout} className="text-gray-500 hover:text-current transition-colors">Logout</a></li>
-                </>
-              ) : (
-                <li><Link href="/login">Login</Link></li>
+              
+              {/* Text Links */}
+              {user && user.role === 'admin' && (
+                <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>
               )}
-              <li><button onClick={() => setIsSearchOpen(true)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }} aria-label="Search"><Search size={20} /></button></li>
-              <li><Link href="/wishlist">Wishlist ({wishlistCount})</Link></li>
-              <li><Link href="/cart">Cart ({cartCount})</Link></li>
+              {user && (
+                <li><a href="#" onClick={handleLogout} className="text-gray-500 hover:text-current transition-colors">Logout</a></li>
+              )}
+
+              {/* Icons */}
+              <li>
+                <button onClick={() => setIsSearchOpen(true)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }} aria-label="Search">
+                  <Search size={20} />
+                </button>
+              </li>
+              <li>
+                <Link href={user ? "/account" : "/login"} aria-label={user ? "Account" : "Login"} style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
+                  <User size={20} />
+                </Link>
+              </li>
+              <li>
+                <Link href="/wishlist" aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
+                  <Heart size={20} />
+                  {wishlistCount > 0 && (
+                    <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+              </li>
+              <li>
+                <Link href="/cart" aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
+                  <ShoppingBag size={20} />
+                  {cartCount > 0 && (
+                    <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>

@@ -13,6 +13,7 @@ interface ProductFiltersProps {
     sizes: string[];
     categories: string[];
     productTypes: string[];
+    occasions?: string[];
   };
 }
 
@@ -105,6 +106,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
   const hasMultipleProductTypes = dynamicFilters && dynamicFilters.productTypes && dynamicFilters.productTypes.length > 1;
   const availableColors = (dynamicFilters && dynamicFilters.colors) || [];
   const availableSizes = (dynamicFilters && dynamicFilters.sizes) || [];
+  const availableOccasions = (dynamicFilters && dynamicFilters.occasions) || [];
 
   const getColorHex = (colorName: string) => {
     const map: Record<string, string> = {
@@ -190,17 +192,16 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
               </div>
             )}
 
-            {/* Occasion (Category) */}
+            {/* Subcategory */}
             {availableSubcategories && availableSubcategories.length > 0 && (
               <div className="filter-section">
-                <button className="filter-section-header" onClick={() => toggleSection('occasion')}>
-                  <span>OCCASION</span>
-                  <span className="chevron-text">{expandedSections.occasion ? '⌃' : '˅'}</span>
+                <button className="filter-section-header" onClick={() => toggleSection('subcategory')}>
+                  <span>SUBCATEGORY</span>
+                  <span className="chevron-text">{expandedSections.subcategory ? '⌃' : '˅'}</span>
                 </button>
-                <div className={`filter-section-content ${expandedSections.occasion ? 'expanded' : ''} two-column-grid`}>
+                <div className={`filter-section-content ${expandedSections.subcategory ? 'expanded' : ''} two-column-grid`}>
                   <div className="filter-section-content-inner">
                     {availableSubcategories.map(sub => {
-                      const count = Math.floor(Math.random() * 150) + 1; // Fake count for demo
                       return (
                         <label key={sub} className="filter-checkbox-label">
                           <input
@@ -211,7 +212,37 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                           <span className="checkbox-custom">
                             {activeSubcategory === sub && <Check size={12} strokeWidth={3} />}
                           </span>
-                          <span className="checkbox-text">{sub.replace(/-/g, ' ')} ({count})</span>
+                          <span className="checkbox-text">{sub.replace(/-/g, ' ')}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* OCCASION */}
+            {availableOccasions && availableOccasions.length > 0 && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('occasion')}>
+                  <span>OCCASION</span>
+                  <span className="chevron-text">{expandedSections.occasion ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.occasion ? 'expanded' : ''} two-column-grid`}>
+                  <div className="filter-section-content-inner">
+                    {availableOccasions.map(occ => {
+                      const isActive = searchParams.get('occasion') === occ;
+                      return (
+                        <label key={occ} className="filter-checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={isActive}
+                            onChange={(e) => updateFilter('occasion', e.target.checked ? occ : null)}
+                          />
+                          <span className="checkbox-custom">
+                            {isActive && <Check size={12} strokeWidth={3} />}
+                          </span>
+                          <span className="checkbox-text" style={{ textTransform: 'capitalize' }}>{occ.replace(/-/g, ' ')}</span>
                         </label>
                       );
                     })}

@@ -27,6 +27,7 @@ export interface CollectionPageParams {
   minPrice?: string;
   maxPrice?: string;
   colors?: string;
+  size?: string;
   sort?: string;
 }
 
@@ -34,18 +35,25 @@ export interface CollectionPageParams {
 export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
   await dbConnect();
 
-  const { productType, category, subcategory, collectionName, occasion, page, q, minPrice, maxPrice, colors, sort } = params;
+  const { productType, category, subcategory, collectionName, occasion, page, q, minPrice, maxPrice, colors, size, sort } = params;
   const currentPage = parseInt(page || '1', 10) || 1;
   const productsPerPage = 24;
   const skip = (currentPage - 1) * productsPerPage;
 
   // Build MongoDB query from whatever filters are active
-  const productQuery: Record<string, string> = {};
-  if (productType) productQuery.productType = productType;
-  if (category) productQuery.category = category;
-  if (subcategory) productQuery.subcategory = subcategory;
-  if (collectionName) productQuery.collectionName = collectionName;
-  if (occasion) productQuery.occasion = occasion;
+  const productQuery: Record<string, any> = {};
+  const buildInQuery = (val: string) => {
+    const arr = val.split(',').map(v => v.trim()).filter(Boolean);
+    if (arr.length === 0) return undefined;
+    // Case-insensitive match for each item
+    return { $in: arr.map(item => new RegExp(`^${item.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')) };
+  };
+
+  if (productType) (productQuery as any).productType = buildInQuery(productType);
+  if (category) (productQuery as any).category = buildInQuery(category);
+  if (subcategory) (productQuery as any).subcategory = buildInQuery(subcategory);
+  if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
+  if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
   if (q) {
     const words = q.trim().split(/\s+/).filter(Boolean);
     const regexPattern = words.map(w => `(?=.*${w})`).join('');
@@ -66,7 +74,15 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }
 
   if (colors) {
-    (productQuery as any).colors = colors;
+    (productQuery as any).colors = buildInQuery(colors);
+  }
+
+  if (size) {
+    const sizeArr = size.split(',').map(s => s.trim()).filter(Boolean);
+    if (sizeArr.length > 0) {
+      // Sizes are usually exactly matched (e.g., 'L', 'XL') but making it case-insensitive is safer
+      (productQuery as any).sizes = { $in: sizeArr.map(s => new RegExp(`^${s}$`, 'i')) };
+    }
   }
 
   let sortQuery: any = { createdAt: -1 };
@@ -77,8 +93,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const pageId = subcategory || collectionName || category || productType || 'all-products';
 
-  const productCacheKey = `products:${JSON.stringify(productQuery)}:p${currentPage}`;
-  const totalProductsCacheKey = `products:total:${JSON.stringify(productQuery)}`;
+  const productCacheKey = `products:${JSON.stringify(params)}:p${currentPage}`;
+  const totalProductsCacheKey = `products:total:${JSON.stringify(params)}`;
   const sectionCacheKey = `sections:${pageId}`;
 
   const [rawProducts, totalProducts, hpSections, rawCampaigns, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
@@ -117,13 +133,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       return [];
     }),
     getOrFetch(`dynamicFilters:${JSON.stringify(productQuery)}`, 60, async () => {
-      const [colors, sizes, categories, productTypes] = await Promise.all([
+      const [colors, sizes, categories, productTypes, occasions] = await Promise.all([
         Product.distinct('colors', productQuery),
         Product.distinct('sizes', productQuery),
         Product.distinct('category', productQuery),
-        Product.distinct('productType', productQuery)
+        Product.distinct('productType', productQuery),
+        Product.distinct('occasion', productQuery)
       ]);
-      return { colors, sizes, categories, productTypes };
+      return { colors, sizes, categories, productTypes, occasions: occasions.filter(Boolean) };
     }),
   ]);
 
@@ -144,7 +161,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }));
 
   const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
-  const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], productTypes: string[] };
+  const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], productTypes: string[], occasions: string[] };
 
   const plainCampaigns = (rawCampaigns as any[] || []).map((c: any) => ({
     _id: c._id.toString(),

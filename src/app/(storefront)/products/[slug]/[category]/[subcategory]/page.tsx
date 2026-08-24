@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string; category: string; subcategory: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; minPrice?: string; maxPrice?: string; colors?: string; size?: string; occasion?: string; sort?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductSubcategoryPage({ params, searchParams }: Props) {
   const { slug: productType, category, subcategory } = await params;
-  const { page } = await searchParams;
+  const searchParamsAwaited = await searchParams;
   console.log(`[SUBCATEGORY] page render called for ${productType}/${category}/${subcategory}`);
   
   await dbConnect();
@@ -40,7 +40,7 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
     Taxonomy.findOne({ slug: subcategory }).lean()
   );
 
-  const collectionParams: any = { productType, category, page };
+  const collectionParams: any = { ...searchParamsAwaited, productType, category };
   
   let isOccasion = false;
   let isCollection = false;
