@@ -3,6 +3,7 @@ import Header from '@/components/layout/Header';
 import dynamic from 'next/dynamic';
 
 const Footer = dynamic(() => import('@/components/layout/Footer'));
+import MiniCart from '@/components/cart/MiniCart';
 
 export default function StorefrontLayout({
   children,
@@ -14,6 +15,7 @@ export default function StorefrontLayout({
       <Header />
       {children}
       <Footer />
+      <MiniCart />
     </>
   );
 }

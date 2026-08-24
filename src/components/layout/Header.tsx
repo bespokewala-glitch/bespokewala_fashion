@@ -47,7 +47,7 @@ export default function Header() {
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{ name: string, role: string } | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
-  const { cartCount } = useCart();
+  const { cartCount, openMiniCart } = useCart();
   const { wishlistCount } = useWishlist();
 
   useEffect(() => {
@@ -377,11 +377,12 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link
-              href="/cart"
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); openMiniCart(); }}
               className="touch-target"
               aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
-              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}
             >
               <ShoppingBag size={20} />
               {cartCount > 0 && (
@@ -389,7 +390,7 @@ export default function Header() {
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </a>
           </div>
 
 
@@ -430,14 +431,14 @@ export default function Header() {
                 </Link>
               </li>
               <li>
-                <Link href="/cart" aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
+                <a href="#" onClick={(e) => { e.preventDefault(); openMiniCart(); }} aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}>
                   <ShoppingBag size={20} />
                   {cartCount > 0 && (
                     <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                       {cartCount}
                     </span>
                   )}
-                </Link>
+                </a>
               </li>
             </ul>
           </nav>

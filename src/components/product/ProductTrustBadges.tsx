@@ -86,8 +86,8 @@ export default function ProductTrustBadges() {
           </svg>
         </div>
         <div className="trust-text">
-          <span className="trust-title">7-Day Returns</span>
-          Easy return & exchange
+          <span className="trust-title">Alterations</span>
+          Custom alteration available
         </div>
       </div>
 

@@ -18,7 +18,7 @@ interface ProductClientActionsProps {
 }
 
 export default function ProductClientActions({ product }: ProductClientActionsProps) {
-  const { addToCart } = useCart();
+  const { addToCart, openMiniCart } = useCart();
   const SIZES_ORDER = [
     'EU 35', 'EU 35½', 'EU 36', 'EU 36½', 'EU 37', 'EU 37½', 'EU 38', 'EU 38½', 'EU 39', 'EU 39½', 'EU 40', 'EU 40½', 'EU 41', 'EU 41½', 'EU 42', 'EU 42½', 'EU 43', 'EU 44', 'EU 45',
     'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'
@@ -53,7 +53,8 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
     
     setTimeout(() => {
       setIsAdding(false);
-    }, 500);
+      openMiniCart();
+    }, 100);
   };
 
   const sectionLabelStyle: React.CSSProperties = {

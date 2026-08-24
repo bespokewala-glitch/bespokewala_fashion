@@ -138,7 +138,7 @@ export default function ProductDetailsAccordion({
         </AccordionItem>
       )}
 
-      <AccordionItem title="Shipping, Packaging & Returns">
+      <AccordionItem title="Shipping, Packaging & Alteration">
         <div style={{ whiteSpace: 'pre-line', lineHeight: '1.8' }}>
           {isFootwear ? (
             <>
@@ -155,7 +155,7 @@ export default function ProductDetailsAccordion({
               • <strong>Standard Shipping:</strong> 5 to 7 business days.{"\n"}
             </>
           )}
-          • <strong>Returns:</strong> Accepted within 7 days of delivery for standard ready-to-wear items. Custom-made, footwear &amp; couture garments are non-refundable.
+          • <strong>Alterations:</strong> Alteration services are available. Custom-made, footwear &amp; couture garments are non-refundable.
         </div>
       </AccordionItem>
 

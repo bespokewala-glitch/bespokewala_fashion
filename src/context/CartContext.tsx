@@ -20,6 +20,9 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  isMiniCartOpen: boolean;
+  openMiniCart: () => void;
+  closeMiniCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -27,6 +30,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+
+  const openMiniCart = () => setIsMiniCartOpen(true);
+  const closeMiniCart = () => setIsMiniCartOpen(false);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -80,7 +87,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal }}>
+    <CartContext.Provider value={{ 
+      cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal,
+      isMiniCartOpen, openMiniCart, closeMiniCart
+    }}>
       {children}
     </CartContext.Provider>
   );
