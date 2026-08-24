@@ -119,6 +119,11 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           overflow: hidden;
           padding: 2rem 0 4rem 0;
         }
+        @media (max-width: 768px) {
+          .unified-carousel-wrapper {
+            padding: 1rem 0 1rem 0;
+          }
+        }
 
         .unified-product-rail {
           display: flex;

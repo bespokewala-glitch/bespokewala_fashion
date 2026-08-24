@@ -22,7 +22,7 @@ export default function WishlistPage() {
       <style dangerouslySetInnerHTML={{__html: `
         .wishlist-container {
           padding: 1rem 12px 3rem 12px;
-          max-width: 1400px;
+          max-width: 1600px;
           margin: 0 auto;
           min-height: 80vh;
           font-family: "Jost", "Inter", sans-serif;
@@ -30,6 +30,11 @@ export default function WishlistPage() {
         @media (min-width: 768px) {
           .wishlist-container {
             padding: 8rem 2rem 6rem 2rem;
+          }
+        }
+        @media (min-width: 1024px) {
+          .wishlist-container {
+            padding: 8rem 3rem 6rem 3rem;
           }
         }
         .wishlist-header {
@@ -73,8 +78,20 @@ export default function WishlistPage() {
         }
         @media (min-width: 768px) {
           .wishlist-grid {
-            gap: 2.5rem;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        @media (min-width: 1024px) {
+          .wishlist-grid {
+            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+        @media (min-width: 1440px) {
+          .wishlist-grid {
+            gap: 32px;
+            grid-template-columns: repeat(5, 1fr);
           }
         }
         .wishlist-card {

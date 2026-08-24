@@ -111,6 +111,9 @@ export default function CoutureProcess({ data }: { data?: any }) {
             .process-image-wrapper {
               padding-bottom: 100%; /* 1:1 on mobile */
             }
+            .process-btn-wrapper {
+              margin-top: 2.5rem !important;
+            }
           }
         `}</style>
 
@@ -129,7 +132,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
           ))}
         </div>
 
-        <div style={{ marginTop: '5rem', textAlign: 'center' }}>
+        <div className="process-btn-wrapper" style={{ marginTop: '5rem', textAlign: 'center' }}>
           <a 
             href="/contact" 
             className="btn-primary" 

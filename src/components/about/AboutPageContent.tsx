@@ -88,7 +88,7 @@ export default function AboutPageContent() {
   /* Team */
   const team = [
     { name: "Hemali Patil", role: "Head Designer & CMO", initial: "H", image: "/Hemali%20Patil.jpeg" },
-    { name: "Hemkumar Jayant", role: "Head Designer", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
+    { name: "Hemkumar Jain", role: "Head Designer", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
     { name: "Manish Verma", role: "Chief Technology Officer", initial: "M", image: "/Manish%20Verma.jpeg" },
     { name: "Savitri Verma", role: "Head OF Ecommerce", initial: "S", image: "/Savitri%20Verma.jpeg" },
   ];
@@ -246,7 +246,7 @@ export default function AboutPageContent() {
         {/* Portrait */}
         <div style={{ position: "relative" }}>
           <img
-            src="/founder-portrait.png"
+            src="/bespoken.png"
             alt="Founder of Bespokewala Fashion"
             style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
           />

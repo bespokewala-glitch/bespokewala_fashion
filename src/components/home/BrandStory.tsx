@@ -108,7 +108,7 @@ export default function BrandStory({ data }: { data?: any }) {
         }
         @media (max-width: 768px) {
           .brand-story-section {
-            padding: 4rem 1.5rem;
+            padding: 2rem 1.5rem;
           }
           .brand-story-image-wrapper {
             height: 400px;

@@ -28,8 +28,24 @@ export default function LookbookCarousel({ data }: { data?: any }) {
   };
 
   return (
-    <section style={{ padding: '6rem 2rem', backgroundColor: '#fafafa', textAlign: 'center', position: 'relative' }}>
-      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '4rem', fontStyle: 'italic' }}>
+    <section className="lookbook-carousel-section" style={{ backgroundColor: '#fafafa', textAlign: 'center', position: 'relative' }}>
+      <style>{`
+        .lookbook-carousel-section {
+          padding: 6rem 2rem;
+        }
+        .lookbook-subtitle {
+          margin-bottom: 4rem;
+        }
+        @media (max-width: 768px) {
+          .lookbook-carousel-section {
+            padding: 1rem 1rem 0 1rem;
+          }
+          .lookbook-subtitle {
+            margin-bottom: 2rem !important;
+          }
+        }
+      `}</style>
+      <p className="lookbook-subtitle" style={{ color: '#666', fontSize: '0.9rem', fontStyle: 'italic' }}>
         {subtitle}
       </p>
 

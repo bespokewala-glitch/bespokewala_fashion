@@ -210,7 +210,7 @@ export default async function Home() {
               
               @media (max-width: 767px) {
                 .featured-arrivals-section {
-                  padding: 5rem 0 3rem 0;
+                  padding: 3rem 0 1rem 0;
                 }
                 .featured-arrivals-h2 {
                   font-size: 1.7rem;
@@ -219,11 +219,11 @@ export default async function Home() {
                 }
                 .featured-arrivals-sub {
                   font-size: 0.75rem;
-                  margin-bottom: 2.5rem;
+                  margin-bottom: 1rem;
                   letter-spacing: 0.08em;
                 }
                 .featured-cta-container {
-                  margin-top: 30px;
+                  margin-top: 10px;
                 }
                 .featured-cta-btn {
                   font-size: 10px !important;
