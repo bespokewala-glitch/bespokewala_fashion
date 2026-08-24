@@ -40,33 +40,7 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
     Taxonomy.findOne({ slug: subcategory }).lean()
   );
 
-  const collectionParams: any = { ...searchParamsAwaited, productType, category };
-  
-  let isOccasion = false;
-  let isCollection = false;
-
-  if (taxonomy) {
-    if ((taxonomy as any).type === 'occasion') isOccasion = true;
-    else if ((taxonomy as any).type === 'collection') isCollection = true;
-  } else {
-    const productWithOccasion = await Product.findOne({ occasion: subcategory }).select('_id').lean();
-    if (productWithOccasion) {
-      isOccasion = true;
-    } else {
-      const productWithCollection = await Product.findOne({ collectionName: subcategory }).select('_id').lean();
-      if (productWithCollection) {
-        isCollection = true;
-      }
-    }
-  }
-
-  if (isOccasion) {
-    collectionParams.occasion = subcategory;
-  } else if (isCollection) {
-    collectionParams.collectionName = subcategory;
-  } else {
-    collectionParams.subcategory = subcategory;
-  }
+  const collectionParams: any = { ...searchParamsAwaited, productType, category, slug3: subcategory };
 
   console.log('RETURNING COLLECTION PAGE CONTENT'); return <CollectionPageContent params={collectionParams} />;
 }

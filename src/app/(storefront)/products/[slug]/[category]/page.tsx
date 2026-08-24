@@ -45,31 +45,7 @@ export default async function ProductCategoryPage({ params, searchParams }: Prop
     Taxonomy.findOne({ slug: category }).lean()
   );
 
-  const collectionParams: any = { ...searchParamsAwaited, productType };
-  
-  let isOccasion = false;
-  let isCollection = false;
-
-  if (taxonomy) {
-    if ((taxonomy as any).type === 'occasion') isOccasion = true;
-    else if ((taxonomy as any).type === 'collection') isCollection = true;
-  } else {
-    const productWithOccasion = await Product.findOne({ occasion: category }).select('_id').lean();
-    if (productWithOccasion) {
-      isOccasion = true;
-    } else {
-      const productWithCollection = await Product.findOne({ collectionName: category }).select('_id').lean();
-      if (productWithCollection) isCollection = true;
-    }
-  }
-
-  if (isOccasion) {
-    collectionParams.occasion = category;
-  } else if (isCollection) {
-    collectionParams.collectionName = category;
-  } else {
-    collectionParams.category = category;
-  }
+  const collectionParams: any = { ...searchParamsAwaited, productType, slug2: category };
 
   return <CollectionPageContent params={collectionParams} />;
 }

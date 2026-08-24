@@ -22,6 +22,8 @@ export interface CollectionPageParams {
   subcategory?: string;
   collectionName?: string;
   occasion?: string;
+  slug2?: string;
+  slug3?: string;
   page?: string;
   q?: string;
   minPrice?: string;
@@ -35,7 +37,7 @@ export interface CollectionPageParams {
 export async function CollectionPageContent({ params }: { params: CollectionPageParams }) { console.log('COLLECTION PAGE CONTENT START');
   await dbConnect();
 
-  const { productType, category, subcategory, collectionName, occasion, page, q, minPrice, maxPrice, colors, size, sort } = params;
+  const { productType, category, subcategory, collectionName, occasion, slug2, slug3, page, q, minPrice, maxPrice, colors, size, sort } = params;
   const currentPage = parseInt(page || '1', 10) || 1;
   const productsPerPage = 24;
   const skip = (currentPage - 1) * productsPerPage;
@@ -54,6 +56,38 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (subcategory) (productQuery as any).subcategory = buildInQuery(subcategory);
   if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
   if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
+  
+  if (slug2) {
+    const slug2Query = buildInQuery(slug2);
+    if (slug2Query) {
+      if (!(productQuery as any).$and) {
+        (productQuery as any).$and = [];
+      }
+      (productQuery as any).$and.push({
+        $or: [
+          { category: slug2Query },
+          { collectionName: slug2Query },
+          { occasion: slug2Query }
+        ]
+      });
+    }
+  }
+
+  if (slug3) {
+    const slug3Query = buildInQuery(slug3);
+    if (slug3Query) {
+      if (!(productQuery as any).$and) {
+        (productQuery as any).$and = [];
+      }
+      (productQuery as any).$and.push({
+        $or: [
+          { subcategory: slug3Query },
+          { collectionName: slug3Query },
+          { occasion: slug3Query }
+        ]
+      });
+    }
+  }
   if (q) {
     const words = q.trim().split(/\s+/).filter(Boolean);
     const regexPattern = words.map(w => `(?=.*${w})`).join('');
