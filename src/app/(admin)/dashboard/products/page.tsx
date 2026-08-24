@@ -306,8 +306,8 @@ function AdminProductsContent() {
     const payload = {
       name: formData.name,
       description: formData.description,
-      price: Number(formData.price),
-      originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
+      price: activeProductType === 'jewellery' ? 0 : Number(formData.price),
+      originalPrice: activeProductType === 'jewellery' ? undefined : (formData.originalPrice ? Number(formData.originalPrice) : undefined),
       productType: formData.productType,
       category: formData.category,
       subcategory: formData.subcategory,
@@ -601,33 +601,35 @@ function AdminProductsContent() {
               />
             </div>
 
-            <div className={styles.formRow}>
-              <div style={{ flex: 1 }}>
-                <label className={styles.formLabel}>Price ($)</label>
-                <input 
-                  type="number" 
-                  required 
-                  min="0"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={e => setFormData({...formData, price: e.target.value})}
-                  placeholder="0.00"
-                  className={styles.formInput}
-                />
+            {activeProductType !== 'jewellery' && (
+              <div className={styles.formRow}>
+                <div style={{ flex: 1 }}>
+                  <label className={styles.formLabel}>Price ($)</label>
+                  <input 
+                    type="number" 
+                    required 
+                    min="0"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={e => setFormData({...formData, price: e.target.value})}
+                    placeholder="0.00"
+                    className={styles.formInput}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className={styles.formLabel}>Original Price (Optional)</label>
+                  <input 
+                    type="number" 
+                    min="0"
+                    step="0.01"
+                    value={formData.originalPrice}
+                    onChange={e => setFormData({...formData, originalPrice: e.target.value})}
+                    placeholder="0.00"
+                    className={styles.formInput}
+                  />
+                </div>
               </div>
-              <div style={{ flex: 1 }}>
-                <label className={styles.formLabel}>Original Price (Optional)</label>
-                <input 
-                  type="number" 
-                  min="0"
-                  step="0.01"
-                  value={formData.originalPrice}
-                  onChange={e => setFormData({...formData, originalPrice: e.target.value})}
-                  placeholder="0.00"
-                  className={styles.formInput}
-                />
-              </div>
-            </div>
+            )}
 
             <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
               <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>2. Category & Collection</h3>

@@ -195,7 +195,9 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               {product.description}
             </div>
 
-            <ProductPriceDisplay price={product.price} />
+            {product.productType?.toLowerCase() !== 'jewellery' && (
+              <ProductPriceDisplay price={product.price} />
+            )}
 
             {product.colors && product.colors.length > 0 && (
               <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '0.5rem' }}>
@@ -243,6 +245,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
                 images: product.images,
                 colors: product.colors,
                 sizes: product.sizes,
+                productType: product.productType,
               }}
             />
 

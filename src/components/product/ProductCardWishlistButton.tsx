@@ -9,6 +9,7 @@ interface ProductCardWishlistButtonProps {
     name: string;
     price: number;
     primaryImage: string;
+    productType?: string;
   };
 }
 
@@ -27,6 +28,7 @@ export default function ProductCardWishlistButton({ product }: ProductCardWishli
         name: product.name,
         price: product.price,
         image: product.primaryImage,
+        productType: product.productType,
       });
     }
   };

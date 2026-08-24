@@ -102,7 +102,7 @@ export default function WishlistPage() {
                       {item.name}
                     </h3>
                     <div style={{ fontSize: '0.875rem', color: '#666' }}>
-                      {formatPrice(item.price)}
+                      {item.productType?.toLowerCase() === 'jewellery' ? 'Price on Request' : formatPrice(item.price)}
                     </div>
                   </div>
                 </Link>

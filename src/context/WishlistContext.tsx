@@ -7,6 +7,7 @@ export interface WishlistItem {
   name: string;
   price: number;
   image: string;
+  productType?: string;
 }
 
 interface WishlistContextType {

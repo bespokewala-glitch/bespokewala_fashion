@@ -235,12 +235,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      {plainCampaigns.length > 0 && (
-        <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
-          <HeroSection campaigns={plainCampaigns} />
-        </div>
-      )}
-      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${plainCampaigns.length > 0 ? 'desktop-pt-hero' : 'desktop-pt-no-hero mobile-content-top-pad'}`}>
+      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (

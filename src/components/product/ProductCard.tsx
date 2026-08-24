@@ -12,6 +12,7 @@ export interface ProductCardProps {
     price: number;
     images: string[];
     category: string;
+    productType?: string;
     referenceImages?: {
       front?: string;
       back?: string;
@@ -109,6 +110,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
             name: product.name,
             price: product.price,
             primaryImage: primaryImageRaw || '',
+            productType: product.productType,
           }}
         />
       </div>
@@ -126,7 +128,9 @@ export default function ProductCard({ product, variant = 'default', priority = f
         >
           {product.name}
         </h3>
-        <span style={{ fontSize: '0.875rem', color: '#666' }}>{formattedPrice}</span>
+        <span style={{ fontSize: '0.875rem', color: '#666' }}>
+          {product.productType?.toLowerCase() === 'jewellery' ? 'Price on Request' : formattedPrice}
+        </span>
       </div>
     </Link>
   );
