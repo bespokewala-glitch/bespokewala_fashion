@@ -203,7 +203,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     subtitle: c.subtitle,
     videoUrl: c.videoUrl,
     linkUrl: c.linkUrl,
+    mediaType: c.mediaType || (c.videoUrl?.match(/\.(mp4|webm|ogg)$/i) ? 'video' : 'image'),
+    category: c.category || 'general'
   }));
+
+  const finalHeroCampaigns = plainCampaigns.filter(
+    (c) => c.category === (productType || category) || c.category === 'general'
+  );
 
   const sectionMap: Record<string, any> = {};
   if (hpSections && Array.isArray(hpSections)) {
@@ -286,7 +292,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
+      {finalHeroCampaigns.length > 0 && <HeroSection campaigns={finalHeroCampaigns} />}
+      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${finalHeroCampaigns.length === 0 ? 'desktop-pt-no-hero' : ''} mobile-content-top-pad`}>
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (
