@@ -52,13 +52,14 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   };
 
   if (productType) (productQuery as any).productType = buildInQuery(productType);
-  if (category) (productQuery as any).category = buildInQuery(category);
-  if (subcategory) (productQuery as any).subcategory = buildInQuery(subcategory);
+  if (category && category.toLowerCase() !== 'all' && category.toLowerCase() !== 'all-products' && category.toLowerCase() !== 'all-collections') (productQuery as any).category = buildInQuery(category);
+  if (subcategory && subcategory.toLowerCase() !== 'all' && subcategory.toLowerCase() !== 'all-products' && subcategory.toLowerCase() !== 'all-collections') (productQuery as any).subcategory = buildInQuery(subcategory);
   if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
   if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
   
   if (slug2) {
-    const slug2Query = buildInQuery(slug2);
+    const isAll = slug2.toLowerCase() === 'all' || slug2.toLowerCase() === 'all-products' || slug2.toLowerCase() === 'all-collections';
+    const slug2Query = !isAll ? buildInQuery(slug2) : undefined;
     if (slug2Query) {
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
@@ -74,7 +75,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }
 
   if (slug3) {
-    const slug3Query = buildInQuery(slug3);
+    const isAll = slug3.toLowerCase() === 'all' || slug3.toLowerCase() === 'all-products' || slug3.toLowerCase() === 'all-collections';
+    const slug3Query = !isAll ? buildInQuery(slug3) : undefined;
     if (slug3Query) {
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
@@ -125,7 +127,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   if (sort === 'newest') sortQuery = { createdAt: -1 };
   if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
-  const pageId = subcategory || collectionName || category || productType || 'all-products';
+  const pageId = subcategory || slug3 || collectionName || category || slug2 || productType || 'all-products';
 
   const productCacheKey = `products:${JSON.stringify(params)}:p${currentPage}`;
   const totalProductsCacheKey = `products:total:${JSON.stringify(params)}`;
@@ -324,32 +326,31 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           )}
         </div>
 
-        {/* Product grid — shown when a category is selected, OR for top-level departments */}
-        {products.length === 0 ? (
+        {/* Product grid — shown ONLY when a category, subcategory, collection, or occasion is selected */}
+        {!isTopLevelDepartment && (
+          products.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem' }}>
               <p className="text-body">No products found in this category.</p>
             </div>
           ) : (
-            <>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                <ProductFilters
-                  totalCount={totalProducts}
-                  availableSubcategories={filterList}
-                  dynamicFilters={dynamicFilters}
-                />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              <ProductFilters
+                totalCount={totalProducts}
+                availableSubcategories={filterList}
+                dynamicFilters={dynamicFilters}
+              />
 
-                <div style={{ width: '100%' }}>
-                  <InfiniteProductGrid 
-                    key={JSON.stringify(params)}
-                    initialProducts={products}
-                    totalProducts={totalProducts}
-                    queryParams={params as Record<string, string | undefined>}
-                  />
-                </div>
+              <div style={{ width: '100%' }}>
+                <InfiniteProductGrid 
+                  key={JSON.stringify(params)}
+                  initialProducts={products}
+                  totalProducts={totalProducts}
+                  queryParams={params as Record<string, string | undefined>}
+                />
               </div>
-            </>
+            </div>
           )
-        }
+        )}
 
         {seoContent && (
           <div className="seo-content" style={{ marginTop: '6rem', paddingTop: '4rem', borderTop: '1px solid #eaeaea', color: '#555', lineHeight: '1.8', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: seoContent }} />

@@ -12,22 +12,28 @@ export default function CuratedGrid({ data }: { data?: any }) {
     {
       url: 'https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80',
       title: 'Fine Jewellery',
-      link: '/products/jewellery'
+      link: '/products/jewellery/all'
     },
     {
       url: 'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?auto=format&fit=crop&q=80',
       title: 'Footwear',
-      link: '/products/footwear'
+      link: '/products/footwear/all'
     }
   ];
 
   const title = data?.title || 'Curated This Season';
   const subtitle = data?.subtitle || 'A blend of classic silhouettes and our signature shine, embodied by enigmatic sequins.';
-  const images = (data?.items && data.items.length > 0) ? data.items.map((i: any) => ({
-    url: i.image || '',
-    title: i.title || '',
-    link: i.link || '#'
-  })).slice(0, 4) : defaultImages;
+  const images = (data?.items && data.items.length > 0) ? data.items.map((i: any) => {
+    let rawLink = i.link || '#';
+    if (rawLink === '/products/jewellery' || rawLink === '/products/couture' || rawLink === '/products/footwear') {
+      rawLink = `${rawLink}/all`;
+    }
+    return {
+      url: i.image || '',
+      title: i.title || '',
+      link: rawLink
+    };
+  }).slice(0, 4) : defaultImages;
 
   return (
     <section style={{ padding: '6rem 2rem 4rem 2rem', backgroundColor: '#fff', textAlign: 'center', overflow: 'hidden' }} className="mobile-section-py mobile-px-container">

@@ -6,7 +6,11 @@ export default function FeatureBanner({ data }: { data?: any }) {
   const image = data?.image || "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80";
   const title = data?.title || "High Jewellery";
   const subtitle = data?.subtitle || "Pair text with an image to focus on your chosen product.";
-  const link = data?.link || "/products/jewellery";
+  let link = data?.link || "/products/jewellery/all";
+  
+  if (link === '/products/jewellery' || link === '/products/couture' || link === '/products/footwear') {
+    link = `${link}/all`;
+  }
 
   return (
     <div style={{ padding: '6rem 2rem 6rem 2rem', backgroundColor: '#FAF9F6', display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="mobile-section-py mobile-px-container">
