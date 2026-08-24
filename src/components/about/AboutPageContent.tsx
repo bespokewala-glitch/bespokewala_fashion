@@ -287,10 +287,10 @@ export default function AboutPageContent() {
 
           <div>
             <p style={{ fontSize: "1rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#1c1c1c" }}>
-              Arjun Bespoke
+              Imran Shaikh
             </p>
             <p style={{ fontSize: "0.8rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#d2b48c", marginTop: "0.25rem" }}>
-              Founder & Creative Director
+              Founder & Managing Director
             </p>
           </div>
         </div>
