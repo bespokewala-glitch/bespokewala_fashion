@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function CoutureProcess({ data }: { data?: any }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   // Fallback data if none is provided via CMS
   const defaultSteps = [
     {
@@ -114,10 +115,44 @@ export default function CoutureProcess({ data }: { data?: any }) {
             .process-btn-wrapper {
               margin-top: 2.5rem !important;
             }
+            .process-step-card:not(:first-child) {
+              display: none;
+            }
+            .process-grid.expanded .process-step-card {
+              display: flex;
+            }
+            .expand-process-btn {
+              display: flex !important;
+            }
+          }
+
+          .expand-process-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 1.5rem;
+            background: none;
+            border: none;
+            border-top: 1px solid #eaeaea;
+            border-bottom: 1px solid #eaeaea;
+            color: #111;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 1rem;
+          }
+          .expand-process-btn svg {
+            transition: transform 0.3s ease;
+          }
+          .expand-process-btn.expanded svg {
+            transform: rotate(180deg);
           }
         `}</style>
 
-        <div className="process-grid">
+        <div className={`process-grid ${isExpanded ? 'expanded' : ''}`}>
           {steps.map((step: any, index: number) => (
             <div key={index} className="process-step-card">
               <div className="process-image-wrapper">
@@ -131,6 +166,16 @@ export default function CoutureProcess({ data }: { data?: any }) {
             </div>
           ))}
         </div>
+
+        <button 
+          className={`expand-process-btn ${isExpanded ? 'expanded' : ''}`}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? 'Show Less' : 'Read Full Process'}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
 
         <div className="process-btn-wrapper" style={{ marginTop: '5rem', textAlign: 'center' }}>
           <a 
