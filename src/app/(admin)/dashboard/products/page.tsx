@@ -738,42 +738,46 @@ function AdminProductsContent() {
               </div>
             </div>
 
-            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
-              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>3. Sizes</h3>
-            </div>
+            {activeProductType !== 'jewellery' && (
+              <>
+                <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
+                  <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>3. Sizes</h3>
+                </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Available Sizes</label>
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                {(activeProductType === 'footwear'
-                  ? (formData.category === 'womens'
-                      ? ['EU 35', 'EU 35½', 'EU 36', 'EU 37', 'EU 37½', 'EU 38', 'EU 39', 'EU 39½', 'EU 40', 'EU 41', 'EU 41½', 'EU 42']
-                      : ['EU 36', 'EU 37', 'EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'])
-                  : ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom']
-                ).map(size => (
-                  <label key={size} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '5px', 
-                    cursor: 'pointer',
-                    padding: '8px 12px',
-                    border: '1px solid #ccc',
-                    borderRadius: '8px',
-                    backgroundColor: formData.sizes.includes(size) ? '#000' : '#fff',
-                    color: formData.sizes.includes(size) ? '#fff' : '#000',
-                    fontSize: '0.875rem'
-                  }}>
-                    <input 
-                      type="checkbox"
-                      checked={formData.sizes.includes(size)}
-                      onChange={() => toggleSize(size)}
-                      style={{ display: 'none' }}
-                    />
-                    {size}
-                  </label>
-                ))}
-              </div>
-            </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Available Sizes</label>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {(activeProductType === 'footwear'
+                      ? (formData.category === 'womens'
+                          ? ['EU 35', 'EU 35½', 'EU 36', 'EU 37', 'EU 37½', 'EU 38', 'EU 39', 'EU 39½', 'EU 40', 'EU 41', 'EU 41½', 'EU 42']
+                          : ['EU 36', 'EU 37', 'EU 38', 'EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'])
+                      : ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom']
+                    ).map(size => (
+                      <label key={size} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '5px', 
+                        cursor: 'pointer',
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '8px',
+                        backgroundColor: formData.sizes.includes(size) ? '#000' : '#fff',
+                        color: formData.sizes.includes(size) ? '#fff' : '#000',
+                        fontSize: '0.875rem'
+                      }}>
+                        <input 
+                          type="checkbox"
+                          checked={formData.sizes.includes(size)}
+                          onChange={() => toggleSize(size)}
+                          style={{ display: 'none' }}
+                        />
+                        {size}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className={styles.formGroup} style={{ marginTop: '20px' }}>
               <label className={styles.formLabel}>Available Colors</label>
