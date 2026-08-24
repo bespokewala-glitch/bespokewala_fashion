@@ -68,5 +68,5 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
     collectionParams.subcategory = subcategory;
   }
 
-  return <CollectionPageContent params={collectionParams} />;
+  console.log('RETURNING COLLECTION PAGE CONTENT'); return <CollectionPageContent params={collectionParams} />;
 }

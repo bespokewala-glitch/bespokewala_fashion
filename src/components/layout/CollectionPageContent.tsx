@@ -32,7 +32,7 @@ export interface CollectionPageParams {
 }
 
 /** Shared data-fetching and rendering logic for all collection / category pages */
-export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
+export async function CollectionPageContent({ params }: { params: CollectionPageParams }) { console.log('COLLECTION PAGE CONTENT START');
   await dbConnect();
 
   const { productType, category, subcategory, collectionName, occasion, page, q, minPrice, maxPrice, colors, size, sort } = params;
