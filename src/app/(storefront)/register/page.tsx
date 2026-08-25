@@ -4,11 +4,19 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { Eye, EyeOff } from 'lucide-react';
+
 export default function RegisterPage() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -17,6 +25,14 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    const name = `${firstName} ${lastName}`.trim();
 
     try {
       const res = await fetch('/api/auth/register', {
@@ -41,183 +57,127 @@ export default function RegisterPage() {
     }
   };
 
-  const containerStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    paddingTop: '10rem',
-    paddingBottom: '4rem',
-    paddingLeft: '1rem',
-    paddingRight: '1rem',
-    backgroundColor: '#FAFAFA',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-
-  const cardStyle: React.CSSProperties = {
-    maxWidth: '28rem',
-    width: '100%',
-    backgroundColor: '#ffffff',
-    padding: '3rem 2rem',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-  };
-
-  const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '2.5rem',
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: '1.875rem',
-    fontWeight: 300,
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-    marginBottom: '0.5rem',
-    color: '#1c1c1c',
-  };
-
-  const subtitleStyle: React.CSSProperties = {
-    color: '#6b7280',
-    fontSize: '0.875rem',
-    letterSpacing: '0.05em',
-  };
-
-  const errorStyle: React.CSSProperties = {
-    backgroundColor: '#fef2f2',
-    color: '#dc2626',
-    padding: '1rem',
-    fontSize: '0.875rem',
-    marginBottom: '1.5rem',
-    border: '1px solid #fee2e2',
-  };
-
-  const formStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.5rem',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '0.75rem',
-    textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    color: '#374151',
-    marginBottom: '0.5rem',
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    border: 'none',
-    borderBottom: '1px solid #d1d5db',
-    padding: '0.5rem 0',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-    fontSize: '1rem',
-    backgroundColor: 'transparent',
-    color: '#1c1c1c',
-  };
-
-  const buttonStyle: React.CSSProperties = {
-    width: '100%',
-    backgroundColor: '#1c1c1c',
-    color: '#ffffff',
-    padding: '1rem 0',
-    fontSize: '0.875rem',
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-    border: 'none',
-    cursor: loading ? 'not-allowed' : 'pointer',
-    opacity: loading ? 0.7 : 1,
-    marginTop: '1rem',
-    transition: 'background-color 0.2s',
-  };
-
-  const linkStyle: React.CSSProperties = {
-    display: 'block',
-    textAlign: 'center',
-    marginTop: '1.5rem',
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    textDecoration: 'none',
-    letterSpacing: '0.05em',
-  };
-
   return (
-    <div style={containerStyle} className="mobile-p-4 mobile-pt-24">
-      <div style={cardStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>Register</h1>
-          <p style={subtitleStyle}>Create your account</p>
+    <div className="auth-page-wrapper">
+      <div className="auth-container">
+        
+        <div className="auth-header">
+          <div className="auth-brand">Bespokewala</div>
+          <h1 className="auth-title">Create an Account</h1>
+          <p className="auth-subtitle">Join the Bespokewala experience</p>
+          <div className="auth-divider"></div>
         </div>
 
         {error && (
-          <div style={errorStyle}>
+          <div style={{ backgroundColor: '#fef2f2', color: '#dc2626', padding: '1rem', fontSize: '0.875rem', marginBottom: '1.5rem', border: '1px solid #fee2e2' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleRegister} style={formStyle}>
-          <div>
-            <label style={labelStyle}>Full Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={inputStyle}
-              required
-              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-            />
+        <form onSubmit={handleRegister} className="auth-form">
+          
+          <div className="auth-form-row">
+            <div className="auth-form-col auth-input-group">
+              <label className="auth-label">First Name</label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="auth-input"
+                required
+              />
+            </div>
+            <div className="auth-form-col auth-input-group">
+              <label className="auth-label">Last Name</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="auth-input"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label style={labelStyle}>Email</label>
+
+          <div className="auth-input-group">
+            <label className="auth-label">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={inputStyle}
+              className="auth-input"
               required
-              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
             />
           </div>
-          <div>
-            <label style={labelStyle}>Mobile Number</label>
+
+          <div className="auth-input-group">
+            <label className="auth-label">Mobile Number</label>
             <input
               type="tel"
               value={mobileNumber}
               onChange={(e) => setMobileNumber(e.target.value)}
-              style={inputStyle}
+              className="auth-input"
               required
-              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
             />
           </div>
-          <div>
-            <label style={labelStyle}>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={inputStyle}
-              required
-              onFocus={(e) => e.target.style.borderBottomColor = '#1c1c1c'}
-              onBlur={(e) => e.target.style.borderBottomColor = '#d1d5db'}
-            />
+
+          <div className="auth-form-row">
+            <div className="auth-form-col auth-input-group">
+              <label className="auth-label">Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="auth-input"
+                  required
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#666', display: 'flex', alignItems: 'center' }}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+            
+            <div className="auth-form-col auth-input-group">
+              <label className="auth-label">Confirm Password</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="auth-input"
+                  required
+                  style={{ paddingRight: '2.5rem' }}
+                />
+                <button 
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#666', display: 'flex', alignItems: 'center' }}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
           </div>
+
           <button
             type="submit"
             disabled={loading}
-            style={buttonStyle}
-            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#374151')}
-            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1c1c1c')}
+            className="auth-button"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Creating Account...' : 'CREATE ACCOUNT'}
           </button>
         </form>
 
-        <Link href="/login" style={linkStyle}>
-          Already have an account? <span style={{ color: '#1c1c1c', borderBottom: '1px solid #1c1c1c' }}>Sign In</span>
+        <Link href="/login" className="auth-footer-link">
+          Already have an account? <span>Sign In</span>
         </Link>
       </div>
     </div>
