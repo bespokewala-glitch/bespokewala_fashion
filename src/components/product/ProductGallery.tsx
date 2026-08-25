@@ -18,6 +18,9 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
   // Track which images have been mounted into the DOM.
   // Initially, only the first image is mounted to prioritize LCP.
   const [mountedImages, setMountedImages] = useState<Set<number>>(new Set([0]));
+  
+  // Track if the main LCP image has loaded so we can delay thumbnails.
+  const [mainImageLoaded, setMainImageLoaded] = useState(false);
 
   // Ensure the explicitly clicked thumbnail is instantly mounted if the timeout hasn't fired
   useEffect(() => {
@@ -120,6 +123,11 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           {images.map((img, idx) => {
             if (!mountedImages.has(idx)) return null;
             
+            // Check if it's a proxy URL that supports ?v=thumbnail
+            const isProxy = img.url.includes('/api/media/');
+            // The image might already have query params
+            const thumbnailUrl = isProxy ? `${img.url}${img.url.includes('?') ? '&' : '?'}v=thumbnail` : img.url;
+
             return (
               <div key={idx} style={{
                   width: '100%',
@@ -130,6 +138,10 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   opacity: selectedIndex === idx ? 1 : 0,
                   transition: 'opacity 0.4s ease-in-out',
                   zIndex: selectedIndex === idx ? 2 : 1,
+                  // Use the already-loaded thumbnail as a background placeholder for instant switching
+                  backgroundImage: idx !== 0 ? `url(${thumbnailUrl})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
               }}>
                 <OptimizedImage
                   src={img.url}
@@ -139,6 +151,9 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   priority={idx === 0}
                   fetchPriority={idx === 0 ? "high" : "auto"}
                   variant="medium"
+                  onLoad={() => {
+                    if (idx === 0) setMainImageLoaded(true);
+                  }}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: 'cover', cursor: 'zoom-in' }}
                 />
@@ -147,9 +162,9 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           })}
         </div>
 
-        {/* Thumbnails (Right side on desktop, Top on mobile) */}
-        <div className="gallery-thumbnails visible">
-          {images.map((img, idx) => (
+        {/* Thumbnails (Right side on desktop, Top on mobile) - Only load progressively after main image */}
+        <div className={`gallery-thumbnails ${mainImageLoaded ? 'visible' : ''}`}>
+          {mainImageLoaded && images.map((img, idx) => (
             <button
               key={idx}
               onClick={() => setSelectedIndex(idx)}

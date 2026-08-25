@@ -280,8 +280,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
-  // The user requested to ONLY show the hero banner on the homepage, not on category pages.
-  const showHero = false;
+  // Show hero only on top-level pages. If couture, we will hide it on mobile below.
+  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
 
 
 
@@ -300,7 +300,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      {showHero && <HeroSection campaigns={finalHeroCampaigns} />}
+      {showHero && (
+        <div className={productType === 'couture' ? 'mobile-hide' : ''}>
+          <HeroSection campaigns={finalHeroCampaigns} />
+        </div>
+      )}
       <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${!showHero ? 'desktop-pt-no-hero' : ''} mobile-content-top-pad`}>
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
