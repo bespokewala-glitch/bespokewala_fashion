@@ -280,7 +280,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
-  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
+  // The user requested to ONLY show the hero banner on the homepage, not on category pages.
+  const showHero = false;
 
 
 
@@ -326,30 +327,28 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           )}
         </div>
 
-        {/* Product grid — shown ONLY when a category, subcategory, collection, or occasion is selected */}
-        {!isTopLevelDepartment && (
-          products.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem' }}>
-              <p className="text-body">No products found in this category.</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <ProductFilters
-                totalCount={totalProducts}
-                availableSubcategories={filterList}
-                dynamicFilters={dynamicFilters}
-              />
+        {/* Product grid */}
+        {products.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '4rem' }}>
+            <p className="text-body">No products found in this category.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <ProductFilters
+              totalCount={totalProducts}
+              availableSubcategories={filterList}
+              dynamicFilters={dynamicFilters}
+            />
 
-              <div style={{ width: '100%' }}>
-                <InfiniteProductGrid 
-                  key={JSON.stringify(params)}
-                  initialProducts={products}
-                  totalProducts={totalProducts}
-                  queryParams={params as Record<string, string | undefined>}
-                />
-              </div>
+            <div style={{ width: '100%' }}>
+              <InfiniteProductGrid 
+                key={JSON.stringify(params)}
+                initialProducts={products}
+                totalProducts={totalProducts}
+                queryParams={params as Record<string, string | undefined>}
+              />
             </div>
-          )
+          </div>
         )}
 
         {seoContent && (
