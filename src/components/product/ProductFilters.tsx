@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { X, Filter, ChevronDown, Check } from 'lucide-react';
+import { X, Filter, ChevronDown, ChevronUp, Check } from 'lucide-react';
 
 interface ProductFiltersProps {
   totalCount: number;
@@ -31,6 +31,31 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
     size: false,
     price: false,
   });
+
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isDesktopSortOpen, setIsDesktopSortOpen] = useState(false);
+  
+  const sortOptions = [
+    { label: 'FEATURED', value: 'featured' },
+    { label: 'NEW ARRIVALS', value: 'newest' },
+    { label: 'PRICE: LOW TO HIGH', value: 'price_asc' },
+    { label: 'PRICE: HIGH TO LOW', value: 'price_desc' }
+  ];
+
+  // Close sort dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.mobile-sort-dropdown') && isSortOpen) {
+        setIsSortOpen(false);
+      }
+      if (!target.closest('.desktop-sort-dropdown') && isDesktopSortOpen) {
+        setIsDesktopSortOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isSortOpen, isDesktopSortOpen]);
 
   // Close mobile filter on navigation
   useEffect(() => {
@@ -110,13 +135,13 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
 
   const getColorHex = (colorName: string) => {
     const map: Record<string, string> = {
-      black: '#000000', ivory: '#FFFFF0', white: '#FFFFFF', red: '#C41E3A', navy: '#000080', 
-      emerald: '#50C878', blush: '#DE5D83', gold: '#D4AF37', silver: '#C0C0C0', pink: '#FFC0CB', 
-      blue: '#0000FF', green: '#008000', grey: '#808080', gray: '#808080', brown: '#A52A2A', 
-      beige: '#F5F5DC', yellow: '#FFFF00', purple: '#800080', orange: '#FFA500', magenta: '#FF00FF', 
+      black: '#000000', ivory: '#FFFFF0', white: '#FFFFFF', red: '#C41E3A', navy: '#000080',
+      emerald: '#50C878', blush: '#DE5D83', gold: '#D4AF37', silver: '#C0C0C0', pink: '#FFC0CB',
+      blue: '#0000FF', green: '#008000', grey: '#808080', gray: '#808080', brown: '#A52A2A',
+      beige: '#F5F5DC', yellow: '#FFFF00', purple: '#800080', orange: '#FFA500', magenta: '#FF00FF',
       olive: '#808000', maroon: '#800000', burgundy: '#800020'
     };
-    return map[colorName.toLowerCase()] || '#cccccc'; 
+    return map[colorName.toLowerCase()] || '#cccccc';
   };
 
   return (
@@ -127,17 +152,36 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           <Filter size={16} strokeWidth={1.5} />
           <span>FILTER {activeFiltersCount > 0 && `(${activeFiltersCount})`}</span>
         </button>
-        <div className="mobile-sort-dropdown">
-          <select
-            value={activeSort}
-            onChange={(e) => updateFilter('sort', e.target.value)}
-            className="mobile-sort-select"
+        <div className="mobile-sort-dropdown" style={{ position: 'relative' }}>
+          <button 
+            className="mobile-sort-btn" 
+            onClick={() => setIsSortOpen(!isSortOpen)}
+            aria-expanded={isSortOpen}
+            aria-haspopup="listbox"
           >
-            <option value="featured">Featured</option>
-            <option value="newest">New Arrivals</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-          </select>
+            <span>{sortOptions.find(o => o.value === activeSort)?.label || 'FEATURED'}</span>
+            {isSortOpen ? <ChevronUp size={16} strokeWidth={1.5} /> : <ChevronDown size={16} strokeWidth={1.5} />}
+          </button>
+          
+          {isSortOpen && (
+            <div className="custom-sort-menu" role="listbox">
+              {sortOptions.map(option => (
+                <button
+                  key={option.value}
+                  className="custom-sort-option"
+                  role="option"
+                  aria-selected={activeSort === option.value}
+                  onClick={() => {
+                    updateFilter('sort', option.value);
+                    setIsSortOpen(false);
+                  }}
+                >
+                  <span className="sort-option-icon">{activeSort === option.value && <Check size={14} strokeWidth={2} />}</span>
+                  <span className="sort-option-label">{option.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -158,16 +202,37 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
             <div className="filter-section" style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: '2rem' }}>
               <div className="desktop-sort-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.875rem', color: '#666', letterSpacing: '0.05em' }}>{totalCount} PRODUCTS</span>
-                <select
-                  value={activeSort}
-                  onChange={(e) => updateFilter('sort', e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.875rem', textTransform: 'uppercase', cursor: 'pointer', letterSpacing: '0.05em' }}
-                >
-                  <option value="featured">Sort by: Featured</option>
-                  <option value="newest">New Arrivals</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                </select>
+                <div className="desktop-sort-dropdown" style={{ position: 'relative' }}>
+                  <button 
+                    className="desktop-sort-btn" 
+                    onClick={() => setIsDesktopSortOpen(!isDesktopSortOpen)}
+                    aria-expanded={isDesktopSortOpen}
+                    aria-haspopup="listbox"
+                  >
+                    <span>SORT BY: {sortOptions.find(o => o.value === activeSort)?.label || 'FEATURED'}</span>
+                    {isDesktopSortOpen ? <ChevronUp size={16} strokeWidth={1.5} /> : <ChevronDown size={16} strokeWidth={1.5} />}
+                  </button>
+                  
+                  {isDesktopSortOpen && (
+                    <div className="custom-sort-menu desktop-menu" role="listbox">
+                      {sortOptions.map(option => (
+                        <button
+                          key={option.value}
+                          className="custom-sort-option"
+                          role="option"
+                          aria-selected={activeSort === option.value}
+                          onClick={() => {
+                            updateFilter('sort', option.value);
+                            setIsDesktopSortOpen(false);
+                          }}
+                        >
+                          <span className="sort-option-icon">{activeSort === option.value && <Check size={14} strokeWidth={2} />}</span>
+                          <span className="sort-option-label">{option.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -264,10 +329,10 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                       const isActive = searchParams.get('productType') === line;
                       return (
                         <label key={line} className="filter-checkbox-label">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={isActive}
-                            onChange={(e) => updateFilter('productType', e.target.checked ? line : null)} 
+                            onChange={(e) => updateFilter('productType', e.target.checked ? line : null)}
                           />
                           <span className="checkbox-custom">
                             {isActive && <Check size={12} strokeWidth={3} />}
@@ -294,10 +359,10 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                       const isActive = searchParams.get('category') === gender;
                       return (
                         <label key={gender} className="filter-checkbox-label">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={isActive}
-                            onChange={(e) => updateFilter('category', e.target.checked ? gender : null)} 
+                            onChange={(e) => updateFilter('category', e.target.checked ? gender : null)}
                           />
                           <span className="checkbox-custom">
                             {isActive && <Check size={12} strokeWidth={3} />}
@@ -408,50 +473,97 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
         __html: `
         .mobile-filter-bar {
           display: flex;
+          justify-content: space-between;
           position: sticky;
           top: 60px;
           background: #fff;
           z-index: 90;
-          padding: 0.5rem 0;
+          padding: 0.5rem 1rem;
           align-items: center;
+          min-width: 0;
         }
         
-        .mobile-filter-btn, .mobile-sort-dropdown {
-          flex: 1;
+        .mobile-filter-btn {
           display: flex;
           align-items: center;
-          padding: 1rem 0;
+          gap: 0.5rem;
           background: none;
           border: none;
           font-family: inherit;
           font-size: 0.85rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-        }
-        
-        .mobile-filter-btn {
-          gap: 0.5rem;
-          justify-content: flex-start;
           cursor: pointer;
           color: #1c1c1c;
+          padding: 0.5rem 0;
         }
 
-        .mobile-sort-dropdown {
-          justify-content: flex-end;
+        .mobile-sort-btn, .desktop-sort-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          background: none;
+          border: none;
+          font-family: inherit;
+          font-size: 0.85rem;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          cursor: pointer;
+          color: #1c1c1c;
+          padding: 0.5rem 0;
         }
         
-        .mobile-sort-select {
-          width: auto;
+        .custom-sort-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          min-width: 220px;
+          max-width: calc(100vw - 32px);
+          background: #fff;
+          border: 1px solid #e5e5e5;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          z-index: 50;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .custom-sort-menu.desktop-menu {
+          max-width: 280px;
+        }
+
+        .custom-sort-option {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          text-align: left;
+          background: none;
           border: none;
-          background: transparent;
-          font-family: inherit;
-          font-size: 0.875rem;
-          text-align: right;
-          outline: none;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
+          min-height: 44px;
+          padding: 0.5rem 1rem;
           cursor: pointer;
-          direction: rtl; /* This aligns the select text nicely to the right */
+          font-family: inherit;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          font-weight: 500;
+          text-transform: uppercase;
+          color: #1c1c1c;
+          transition: background-color 0.2s ease;
+        }
+
+        .custom-sort-option:hover {
+          background-color: #f9f9f9;
+        }
+
+        .sort-option-icon {
+          width: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-shrink: 0;
+        }
+
+        .sort-option-label {
+          flex: 1;
         }
         
         .filter-container {
