@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import '@/models/User'; // Side-effect import to prevent tree-shaking
 
+export const revalidate = 60;
+
 export async function GET() {
   try {
     await dbConnect();

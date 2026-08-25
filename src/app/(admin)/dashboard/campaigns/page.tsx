@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { normalizeImageUrl } from '@/lib/imageUrl';
+import { ChevronDown, UploadCloud, FileVideo, FileImage } from 'lucide-react';
 import styles from './campaigns.module.css';
+
 export default function AdminCampaignsPage() {
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,121 +157,141 @@ export default function AdminCampaignsPage() {
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }} className="admin-page-container">
-      <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center' }} className={styles.header}>
-        <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', margin: 0 }}>Hero Campaigns Admin</h1>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Hero Campaigns</h1>
+        <p className={styles.description}>Manage homepage hero banners, videos and campaign destinations.</p>
       </div>
       
-      <div style={{ display: 'flex', alignItems: 'flex-start' }} className="admin-flex-row">
+      <div className={styles.layoutGrid}>
         {/* ADD NEW CAMPAIGN FORM */}
-        <div style={{ flex: 1, backgroundColor: '#f9f9f9', padding: '30px', borderRadius: '8px', width: '100%', boxSizing: 'border-box' }} className="admin-page-container">
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>{editingId ? 'Edit Campaign' : 'Add New Campaign'}</h2>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>{editingId ? 'Edit Campaign' : 'Add New Campaign'}</h2>
+          <p className={styles.cardSubtitle}>Create a campaign for homepage hero section</p>
+          
+          <form onSubmit={handleSubmit}>
             
-            <div style={{ width: '100%' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Title</label>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Title</label>
               <input 
                 type="text" 
                 value={formData.title}
                 onChange={e => setFormData({...formData, title: e.target.value})}
                 placeholder="e.g. INAYA SUMMER 2026"
-                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                className={styles.input}
               />
             </div>
 
-            <div style={{ width: '100%' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subtitle</label>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Subtitle</label>
               <input 
                 type="text" 
                 value={formData.subtitle}
                 onChange={e => setFormData({...formData, subtitle: e.target.value})}
                 placeholder="e.g. NEW COLLECTION"
-                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
+                className={styles.input}
               />
             </div>
 
-            <div style={{ width: '100%' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Button Destination Link</label>
-              <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem', color: '#666' }}>Where should the "Explore Now" button take the user?</p>
-              <select 
-                value={formData.linkUrl}
-                onChange={e => setFormData({...formData, linkUrl: e.target.value})}
-                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-              >
-                <option value="/products?productType=couture">Couture</option>
-                <option value="/products?productType=footwear">Footwear</option>
-                <option value="/products?productType=jewellery">Jewellery</option>
-              </select>
-            </div>
-
-            <div style={{ width: '100%' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Category</label>
-              <select 
-                value={formData.category}
-                onChange={e => setFormData({...formData, category: e.target.value})}
-                style={{ width: '100%', minHeight: '44px', boxSizing: 'border-box', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}
-              >
-                <option value="couture">Couture</option>
-                <option value="jewellery">Jewellery</option>
-                <option value="footwear">Footwear</option>
-                <option value="general">General</option>
-              </select>
-            </div>
-
-            {/* DRAG AND DROP ZONE */}
-            <div style={{ width: '100%' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Media File (Video or Image)</label>
-              <div 
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                style={{ 
-                  border: isDragging ? '2px dashed #000' : '2px dashed #ccc', 
-                  backgroundColor: isDragging ? '#e9e9e9' : '#fff',
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  textAlign: 'center',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                className="admin-page-container"
-              >
-                {uploading ? (
-                  <p>Uploading... please wait.</p>
-                ) : formData.videoUrl ? (
-                  <p style={{ color: 'green', fontWeight: 'bold' }}>File Uploaded: {formData.videoUrl.split('/').pop()}</p>
-                ) : (
-                  <p>Drag & Drop a video or image file here, or click to select</p>
-                )}
-                <input 
-                  type="file" 
-                  accept="video/*,image/*" 
-                  ref={fileInputRef} 
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }} 
-                />
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Button Destination</label>
+              <p className={styles.helperText}>Where should the "Explore Now" button take the user?</p>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={formData.linkUrl}
+                  onChange={e => setFormData({...formData, linkUrl: e.target.value})}
+                  className={styles.select}
+                >
+                  <option value="/products?productType=couture">Couture</option>
+                  <option value="/products?productType=footwear">Footwear</option>
+                  <option value="/products?productType=jewellery">Jewellery</option>
+                </select>
+                <ChevronDown className={styles.selectIcon} size={20} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Category</label>
+              <div className={styles.selectWrapper}>
+                <select 
+                  value={formData.category}
+                  onChange={e => setFormData({...formData, category: e.target.value})}
+                  className={styles.select}
+                >
+                  <option value="couture">Couture</option>
+                  <option value="jewellery">Jewellery</option>
+                  <option value="footwear">Footwear</option>
+                  <option value="general">General</option>
+                </select>
+                <ChevronDown className={styles.selectIcon} size={20} />
+              </div>
+            </div>
+
+            {/* DRAG AND DROP ZONE */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Media</label>
+              
+              {!formData.videoUrl ? (
+                <div 
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`${styles.uploadZone} ${isDragging ? styles.dragging : ''}`}
+                >
+                  {uploading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div className="admin-spinner" style={{ width: '24px', height: '24px', border: '2px solid #ccc', borderTopColor: '#000', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '10px' }} />
+                      <p className={styles.uploadTitle}>Uploading...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <UploadCloud className={styles.uploadIcon} size={32} />
+                      <p className={styles.uploadTitle}>Upload Campaign Media</p>
+                      <p className={styles.uploadSubtitle}>Drag & drop or Browse</p>
+                      <p className={styles.uploadSubtitle} style={{ marginTop: '4px' }}>JPG, PNG, WEBP, MP4</p>
+                    </>
+                  )}
+                  <input 
+                    type="file" 
+                    accept="video/*,image/*" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }} 
+                  />
+                </div>
+              ) : (
+                <div className={styles.uploadPreview}>
+                  {formData.mediaType === 'image' ? (
+                    <img src={normalizeImageUrl(formData.videoUrl)} className={styles.uploadPreviewThumb} alt="preview" />
+                  ) : (
+                    <div className={styles.uploadPreviewThumb} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <FileVideo size={24} color="#666" />
+                    </div>
+                  )}
+                  <div className={styles.uploadPreviewInfo}>
+                    <p className={styles.uploadPreviewName}>{formData.videoUrl.split('/').pop()}</p>
+                    <span 
+                      className={styles.uploadPreviewChange}
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, videoUrl: '', mediaType: 'image' }));
+                        if (fileInputRef.current) fileInputRef.current.value = '';
+                      }}
+                    >
+                      Remove/Change
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.btnGroup}>
               <button 
                 type="submit" 
                 disabled={uploading || !formData.videoUrl}
-                style={{ 
-                  flex: 1,
-                  minHeight: '44px',
-                  boxSizing: 'border-box',
-                  backgroundColor: '#000', 
-                  color: '#fff', 
-                  border: 'none', 
-                  borderRadius: '4px', 
-                  cursor: (uploading || !formData.videoUrl) ? 'not-allowed' : 'pointer',
-                  opacity: (uploading || !formData.videoUrl) ? 0.5 : 1
-                }}
+                className={styles.primaryBtn}
               >
-                {editingId ? 'Update Campaign' : 'Save Campaign'}
+                {uploading ? 'SAVING...' : editingId ? 'UPDATE CAMPAIGN' : 'SAVE CAMPAIGN'}
               </button>
               {editingId && (
                 <button 
@@ -278,18 +300,9 @@ export default function AdminCampaignsPage() {
                     setEditingId(null);
                     setFormData({ title: '', subtitle: '', linkUrl: '/products?productType=couture', videoUrl: '', category: 'couture', mediaType: 'image' });
                   }}
-                  style={{ 
-                    flex: 1,
-                    minHeight: '44px',
-                    boxSizing: 'border-box',
-                    backgroundColor: '#e0e0e0', 
-                    color: '#000', 
-                    border: 'none', 
-                    borderRadius: '4px', 
-                    cursor: 'pointer'
-                  }}
+                  className={styles.secondaryBtn}
                 >
-                  Cancel Edit
+                  CANCEL EDIT
                 </button>
               )}
             </div>
@@ -297,61 +310,57 @@ export default function AdminCampaignsPage() {
         </div>
 
         {/* LIST EXISTING CAMPAIGNS */}
-        <div style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Current Campaigns</h2>
-          {loading ? <p>Loading...</p> : campaigns.length === 0 ? <p>No campaigns found.</p> : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className={styles.card} style={{ backgroundColor: 'transparent', border: 'none', padding: 0, boxShadow: 'none' }}>
+          <h2 className={styles.cardTitle} style={{ marginBottom: '16px' }}>Current Campaigns</h2>
+          
+          {loading ? (
+            <p className={styles.description}>Loading campaigns...</p>
+          ) : campaigns.length === 0 ? (
+            <p className={styles.description}>No campaigns found.</p>
+          ) : (
+            <div className={styles.campaignList}>
               {campaigns.map((camp) => {
                 const isImage = camp.videoUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) != null;
                 return (
-                <div key={camp._id} style={{ border: '1px solid #eee', padding: '20px', borderRadius: '8px', display: 'flex', gap: '20px' }} className="admin-card-stack">
-                  {isImage ? (
-                    <img src={normalizeImageUrl(camp.videoUrl)} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} alt="campaign" />
-                  ) : (
-                    <video src={normalizeImageUrl(camp.videoUrl)} style={{ width: '150px', height: '100px', objectFit: 'cover', backgroundColor: '#000' }} muted playsInline />
-                  )}
-                  <div>
-                    <h3 style={{ fontSize: '1.2rem', margin: '0 0 5px 0' }}>{camp.title}</h3>
-                    <p style={{ margin: '0 0 10px 0', color: '#666', fontSize: '0.9rem' }}>{camp.subtitle}</p>
-                    <p style={{ margin: '0 0 5px 0', fontSize: '0.8rem' }}><strong>Category:</strong> <span style={{ textTransform: 'capitalize' }}>{camp.category || 'general'}</span> ({camp.mediaType || (isImage ? 'image' : 'video')})</p>
-                    <p style={{ margin: '0 0 15px 0', fontSize: '0.8rem' }}><strong>Link:</strong> {camp.linkUrl}</p>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                      <button 
-                        onClick={() => handleEdit(camp)}
-                        style={{ 
-                          padding: '6px 12px', 
-                          backgroundColor: '#1890ff', 
-                          color: 'white', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '0.8rem'
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(camp._id)}
-                        style={{ 
-                          padding: '6px 12px', 
-                          backgroundColor: '#ff4d4f', 
-                          color: 'white', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '0.8rem'
-                        }}
-                      >
-                        Delete
-                      </button>
+                  <div key={camp._id} className={styles.campaignCard}>
+                    {isImage ? (
+                      <img src={normalizeImageUrl(camp.videoUrl)} className={styles.campaignThumb} alt="campaign" />
+                    ) : (
+                      <video src={normalizeImageUrl(camp.videoUrl)} className={styles.campaignThumb} muted playsInline />
+                    )}
+                    
+                    <div className={styles.campaignInfo}>
+                      <h3 className={styles.campaignTitle}>{camp.title || 'Untitled Campaign'}</h3>
+                      <p className={styles.campaignSubtitle}>{camp.subtitle || 'No subtitle'}</p>
+                      
+                      <p className={styles.campaignMeta}>Category: <span>{camp.category || 'general'}</span></p>
+                      <p className={styles.campaignMeta}>Link: <span>{camp.linkUrl}</span></p>
+                      
+                      <div className={styles.campaignActions}>
+                        <button 
+                          onClick={() => handleEdit(camp)}
+                          className={`${styles.actionBtn} ${styles.editBtn}`}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(camp._id)}
+                          className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )})}
+                )
+              })}
             </div>
           )}
         </div>
       </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+      `}} />
     </div>
   );
 }

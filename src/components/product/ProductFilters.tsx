@@ -44,7 +44,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
 
   // Close sort dropdowns on outside click
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    function handleClickOutside(e: MouseEvent) {
       const target = e.target as HTMLElement;
       if (!target.closest('.mobile-sort-dropdown') && isSortOpen) {
         setIsSortOpen(false);
@@ -52,7 +52,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
       if (!target.closest('.desktop-sort-dropdown') && isDesktopSortOpen) {
         setIsDesktopSortOpen(false);
       }
-    };
+    }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isSortOpen, isDesktopSortOpen]);

@@ -38,7 +38,7 @@ export const PLACEHOLDER_IMAGE =
  */
 export function normalizeImageUrl(
   url: string | null | undefined,
-  variant?: 'thumbnail' | 'medium' | 'large',
+  variant?: 'micro' | 'thumbnail' | 'medium' | 'large',
 ): string {
   if (!url || typeof url !== 'string' || url.trim() === '') return '';
 
@@ -138,7 +138,7 @@ export function shouldBypassOptimizer(url: string | null | undefined): boolean {
  */
 export function getProductImageUrl(
   rawUrl: string | null | undefined,
-  size?: 'thumbnail' | 'medium' | 'large',
+  size?: 'micro' | 'thumbnail' | 'medium' | 'large',
 ): string {
   return normalizeImageUrl(rawUrl, size);
 }

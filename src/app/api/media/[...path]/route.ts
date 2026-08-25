@@ -32,6 +32,7 @@ function getMimeType(key: string, fallback = 'application/octet-stream'): string
 
 // ─── Thumbnail dimensions ─────────────────────────────────────────────────────
 const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
+  micro: { width: 120, quality: 70 },
   thumbnail: { width: 600, quality: 80 },
   medium: { width: 1000, quality: 85 },
   large: { width: 1600, quality: 85 },

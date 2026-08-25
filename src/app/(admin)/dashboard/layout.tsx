@@ -9,6 +9,12 @@ export default function AdminLayout({
 }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
+      {/* Overriding the global storefront body padding for the admin dashboard */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media (max-width: 768px) {
+          body { padding-top: 0 !important; }
+        }
+      `}} />
       <Suspense fallback={<div className="admin-desktop-sidebar" style={{ backgroundColor: '#0d0d0d' }} />}>
         <AdminSidebar />
       </Suspense>

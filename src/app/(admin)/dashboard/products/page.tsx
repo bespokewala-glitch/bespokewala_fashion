@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Package } from 'lucide-react';
-import { normalizeImageUrl } from '@/lib/imageUrl';
+import { normalizeImageUrl, getProductImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 import styles from './products.module.css';
 
 // We will fetch categories from the Taxonomy API dynamically now.
@@ -13,12 +14,14 @@ function AdminProductsContent() {
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [isFetchingProduct, setIsFetchingProduct] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isMegaMenuExpanded, setIsMegaMenuExpanded] = useState(false);
   const ITEMS_PER_PAGE = 20;
@@ -37,6 +40,7 @@ function AdminProductsContent() {
       setEditingId(null);
       setCurrentPage(1);
       setSearchQuery('');
+      setDebouncedSearchQuery('');
       setFormData({
         name: '',
         description: '',
@@ -171,6 +175,13 @@ function AdminProductsContent() {
   useEffect(() => {
     fetchProductsAndTaxonomies(activeProductType);
   }, [activeProductType]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   const fetchMenuImages = async () => {
     if (!activeProductType) return;
@@ -375,11 +386,13 @@ function AdminProductsContent() {
     }
   };
 
-  const handleEdit = (prod: any) => {
+  const handleEdit = async (prod: any) => {
+    setIsFetchingProduct(true);
     setEditingId(prod._id);
+    // Optimistically set the basic data, then fetch the full data
     setFormData({
       name: prod.name || '',
-      description: prod.description || '',
+      description: 'Loading details...',
       price: prod.price?.toString() || '',
       originalPrice: prod.originalPrice?.toString() || '',
       productType: prod.productType || activeProductType,
@@ -390,21 +403,62 @@ function AdminProductsContent() {
       imageUrl: (prod.images && prod.images[0]) ? prod.images[0] : '',
       referenceImages: prod.referenceImages || { front: '', back: '', left: '', right: '' },
       details: {
-        styleCode: prod.details?.styleCode || '',
-        commodityName: prod.details?.commodityName || '',
-        composition: prod.details?.composition || '',
-        componentsCount: prod.details?.componentsCount || '',
-        includes: prod.details?.includes || '',
-        shipping: prod.details?.shipping || '',
-        disclaimer: prod.details?.disclaimer || '',
-        legal: prod.details?.legal || '',
+        styleCode: '',
+        commodityName: '',
+        composition: '',
+        componentsCount: '',
+        includes: '',
+        shipping: '',
+        disclaimer: '',
+        legal: '',
       },
-      sizes: prod.sizes || [],
-      colors: prod.colors || [],
+      sizes: [],
+      colors: [],
       inventoryCount: prod.inventoryCount?.toString() || '10',
       isFeatured: prod.isFeatured || false,
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    try {
+      const res = await fetch(`/api/products/${prod._id}`);
+      if (res.ok) {
+        const fullProd = await res.json();
+        setFormData({
+          name: fullProd.name || '',
+          description: fullProd.description || '',
+          price: fullProd.price?.toString() || '',
+          originalPrice: fullProd.originalPrice?.toString() || '',
+          productType: fullProd.productType || activeProductType,
+          category: fullProd.category || 'womens',
+          subcategory: fullProd.subcategory || '',
+          collectionName: fullProd.collectionName || '',
+          occasion: fullProd.occasion || '',
+          imageUrl: (fullProd.images && fullProd.images[0]) ? fullProd.images[0] : '',
+          referenceImages: fullProd.referenceImages || { front: '', back: '', left: '', right: '' },
+          details: {
+            styleCode: fullProd.details?.styleCode || '',
+            commodityName: fullProd.details?.commodityName || '',
+            composition: fullProd.details?.composition || '',
+            componentsCount: fullProd.details?.componentsCount || '',
+            includes: fullProd.details?.includes || '',
+            shipping: fullProd.details?.shipping || '',
+            disclaimer: fullProd.details?.disclaimer || '',
+            legal: fullProd.details?.legal || '',
+          },
+          sizes: fullProd.sizes || [],
+          colors: fullProd.colors || [],
+          inventoryCount: fullProd.inventoryCount?.toString() || '10',
+          isFeatured: fullProd.isFeatured || false,
+        });
+      } else {
+        alert('Failed to load full product details for editing.');
+      }
+    } catch (e) {
+      console.error('Failed to fetch full product details:', e);
+      alert('Error loading full product details.');
+    } finally {
+      setIsFetchingProduct(false);
+    }
   };
 
   const handleMenuImageUpload = async (file: File, index: number) => {
@@ -573,8 +627,8 @@ function AdminProductsContent() {
           </h2>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
             
-            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', marginBottom: '15px', borderLeft: '4px solid #111' }}>
-              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>1. Product Information</h3>
+            <div className={styles.sectionHeader}>
+              <h3>1. Product Information</h3>
             </div>
 
             <div className={styles.formGroup}>
@@ -631,8 +685,8 @@ function AdminProductsContent() {
               </div>
             )}
 
-            <div style={{ backgroundColor: '#f9fafb', padding: '10px 15px', borderRadius: '6px', margin: '25px 0 15px', borderLeft: '4px solid #111' }}>
-              <h3 style={{ margin: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>2. Category & Collection</h3>
+            <div className={styles.sectionHeader}>
+              <h3>2. Category & Collection</h3>
             </div>
 
             <div className={styles.formRow}>
@@ -672,11 +726,11 @@ function AdminProductsContent() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <label className={styles.formLabel} style={{ marginBottom: 0 }}>Dynamic Category</label>
-                  <div style={{ display: 'flex', gap: '5px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     {formData.subcategory && (
-                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.subcategory, 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.subcategory, 'subcategory')} className={`${styles.badgeActionBtn} ${styles.delete}`}>− Delete</button>
                     )}
-                    <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('category', 'subcategory')} className={styles.badgeActionBtn}>+ Add</button>
                   </div>
                 </div>
                 <select 
@@ -695,13 +749,13 @@ function AdminProductsContent() {
 
             <div className={styles.formRow}>
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                  <label className={styles.formLabel} style={{ marginBottom: 0 }}>Collection (Optional)</label>
-                  <div style={{ display: 'flex', gap: '5px' }}>
+                <div className={styles.labelRow}>
+                  <label className={styles.formLabel}>Collection (Optional)</label>
+                  <div className={styles.badgeGroup}>
                     {formData.collectionName && (
-                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.collectionName, 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.collectionName, 'collectionName')} className={`${styles.badgeActionBtn} ${styles.delete}`}>− Delete</button>
                     )}
-                    <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('collection', 'collectionName')} className={styles.badgeActionBtn}>+ Add</button>
                   </div>
                 </div>
                 <select 
@@ -718,11 +772,11 @@ function AdminProductsContent() {
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <label className={styles.formLabel} style={{ marginBottom: 0 }}>Occasion (Optional)</label>
-                  <div style={{ display: 'flex', gap: '5px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
                     {formData.occasion && (
-                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.occasion, 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#ffecec', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '4px' }}>Delete</button>
+                      <button type="button" onClick={() => handleDeleteTaxonomy(formData.occasion, 'occasion')} className={`${styles.badgeActionBtn} ${styles.delete}`}>− Delete</button>
                     )}
-                    <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} style={{ fontSize: '0.8rem', padding: '2px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}>+ Add</button>
+                    <button type="button" onClick={() => handleQuickAddTaxonomy('occasion', 'occasion')} className={styles.badgeActionBtn}>+ Add</button>
                   </div>
                 </div>
                 <select 
@@ -975,11 +1029,24 @@ function AdminProductsContent() {
             />
           </div>
           
-          {loading ? <p>Loading...</p> : (() => {
+          {loading ? (
+            <div className={styles.skeletonList}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <div key={n} className={styles.skeletonCard}>
+                  <div className={styles.skeletonImg}></div>
+                  <div className={styles.skeletonInfo}>
+                    <div className={styles.skeletonTitle}></div>
+                    <div className={styles.skeletonPrice}></div>
+                    <div className={styles.skeletonCategory}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (() => {
             const typeProducts = products.filter(p => p.productType === activeProductType);
             const filteredProducts = typeProducts.filter(p => {
-              if (!searchQuery) return true;
-              const q = searchQuery.toLowerCase();
+              if (!debouncedSearchQuery) return true;
+              const q = debouncedSearchQuery.toLowerCase();
               return (
                 p.name?.toLowerCase().includes(q) ||
                 p.category?.toLowerCase().includes(q) ||
@@ -1005,7 +1072,16 @@ function AdminProductsContent() {
                         </span>
                       )}
                       {prod.images && prod.images[0] ? (
-                        <img src={normalizeImageUrl(prod.images[0])} alt={prod.name} />
+                        <div style={{ position: 'relative', width: '90px', height: '96px', flexShrink: 0 }}>
+                          <Image 
+                            src={getProductImageUrl(prod.images[0], 'micro')} 
+                            alt={prod.name} 
+                            fill
+                            sizes="90px"
+                            style={{ objectFit: 'cover', borderRadius: '8px' }}
+                            unoptimized={shouldBypassOptimizer(prod.images[0])}
+                          />
+                        </div>
                       ) : (
                         <div style={{ width: '90px', height: '96px', backgroundColor: '#f0f0f0', borderRadius: '8px', flexShrink: 0 }} />
                       )}
@@ -1024,8 +1100,9 @@ function AdminProductsContent() {
                           <button 
                             onClick={() => handleEdit(prod)}
                             className={styles.editBtn}
+                            disabled={isFetchingProduct}
                           >
-                            Edit
+                            {isFetchingProduct && editingId === prod._id ? 'Loading...' : 'Edit'}
                           </button>
                           <button 
                             onClick={() => handleDelete(prod._id)}

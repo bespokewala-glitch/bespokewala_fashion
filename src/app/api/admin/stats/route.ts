@@ -4,6 +4,8 @@ import Order from '@/models/Order';
 import Product from '@/models/Product';
 import User from '@/models/User';
 
+export const revalidate = 60;
+
 export async function GET() {
   try {
     await dbConnect();
