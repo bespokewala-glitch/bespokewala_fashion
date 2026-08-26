@@ -57,7 +57,7 @@ export default function ChatPanel({ messages, isLoading, onSend, onClose }: Chat
     <div className="chatbot-panel chatbot-panel-enter" role="dialog" aria-label="Bespokewala Style Concierge">
       {/* Header */}
       <div className="chatbot-header">
-        <div className="chatbot-avatar">DW</div>
+        <div className="chatbot-avatar">BW</div>
         <div className="chatbot-header-info">
           <div className="chatbot-header-title">Style Concierge</div>
           <div className="chatbot-header-status">
@@ -90,7 +90,7 @@ export default function ChatPanel({ messages, isLoading, onSend, onClose }: Chat
         {/* Typing indicator */}
         {isLoading && !messages.find((m) => m.isTyping) && (
           <div className="chatbot-typing">
-            <div className="chatbot-msg-avatar">DW</div>
+            <div className="chatbot-msg-avatar">BW</div>
             <div className="chatbot-typing-bubble">
               <span className="chatbot-typing-dot" />
               <span className="chatbot-typing-dot" />

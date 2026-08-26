@@ -90,7 +90,7 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
   if (isTyping) {
     return (
       <div className="chatbot-typing">
-        <div className="chatbot-msg-avatar">DW</div>
+        <div className="chatbot-msg-avatar">BW</div>
         <div className="chatbot-typing-bubble">
           <span className="chatbot-typing-dot" />
           <span className="chatbot-typing-dot" />
@@ -103,7 +103,7 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
   return (
     <div className={`chatbot-msg ${isUser ? 'chatbot-msg-user' : 'chatbot-msg-ai'}`}>
       {/* Avatar — only for AI */}
-      {!isUser && <div className="chatbot-msg-avatar">DW</div>}
+      {!isUser && <div className="chatbot-msg-avatar">BW</div>}
 
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Text bubble */}
