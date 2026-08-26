@@ -1,5 +1,5 @@
-export function detectCategory(text: string): { productType?: string; category?: string; occasion?: string; colors?: string } {
-  const result: { productType?: string; category?: string; occasion?: string; colors?: string } = {};
+export function detectCategory(text: string): { productType?: string; category?: string; subcategory?: string; occasion?: string; colors?: string } {
+  const result: { productType?: string; category?: string; subcategory?: string; occasion?: string; colors?: string } = {};
   const lower = text.toLowerCase();
 
   // 1. Detect Occasion
@@ -19,37 +19,42 @@ export function detectCategory(text: string): { productType?: string; category?:
 
   // 3. Detect Category & ProductType
   if (/lehnga|lehenga|ghagra|chaniya/.test(lower)) {
-    result.category = 'Lehenga';
+    result.subcategory = 'lehenga';
+    result.category = 'womens';
     result.productType = 'couture';
   } else if (/saree|sari|shari/.test(lower)) {
-    result.category = 'Saree';
+    result.subcategory = 'sarees';
+    result.category = 'womens';
     result.productType = 'couture';
   } else if (/gown|dress|maxi/.test(lower)) {
-    result.category = 'Gown';
+    result.subcategory = 'gowns';
+    result.category = 'womens';
     result.productType = 'couture';
   } else if (/suit|anarkali|salwar|kurta|kurti/.test(lower)) {
-    result.category = 'Suit';
+    result.subcategory = 'suits';
+    result.category = 'womens';
     result.productType = 'couture';
   } else if (/sharara|gharara/.test(lower)) {
-    result.category = 'Sharara';
+    result.subcategory = 'sharara';
+    result.category = 'womens';
     result.productType = 'couture';
   } else if (/heel|pump|stiletto|wedge/.test(lower)) {
-    result.category = 'Heels';
+    result.subcategory = 'heels';
     result.productType = 'footwear';
   } else if (/flat|sandal|jutti|mojari/.test(lower)) {
-    result.category = 'Flats';
+    result.subcategory = 'flats';
     result.productType = 'footwear';
   } else if (/necklace|choker|chain/.test(lower)) {
-    result.category = 'Necklace';
+    result.subcategory = 'necklace';
     result.productType = 'jewellery';
   } else if (/earring|jhumka|stud/.test(lower)) {
-    result.category = 'Earrings';
+    result.subcategory = 'earrings';
     result.productType = 'jewellery';
   } else if (/bangle|bracelet|kada/.test(lower)) {
-    result.category = 'Bangles';
+    result.subcategory = 'bangles';
     result.productType = 'jewellery';
   } else if (/ring/.test(lower)) {
-    result.category = 'Rings';
+    result.subcategory = 'rings';
     result.productType = 'jewellery';
   } else if (/footwear|shoe|heel|flat|sandal/i.test(lower)) {
     result.productType = 'footwear'; // Generic footwear
@@ -57,6 +62,13 @@ export function detectCategory(text: string): { productType?: string; category?:
     result.productType = 'jewellery'; // Generic jewellery
   } else if (/couture|clothes|clothing|outfit|\bwear\b/i.test(lower)) {
     result.productType = 'couture'; // Generic couture
+  }
+
+  // 4. Detect Gender/Category overrides
+  if (/\b(men|mens|male|boy|boys|sherwani)\b/i.test(lower)) {
+    result.category = 'mens';
+  } else if (/\b(women|womens|female|girl|girls)\b/i.test(lower)) {
+    result.category = 'womens';
   }
 
   return result;

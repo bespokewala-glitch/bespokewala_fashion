@@ -31,6 +31,7 @@ interface ProductContext {
 async function searchProducts(args: {
   productType?: string;
   category?: string;
+  subcategory?: string;
   occasion?: string;
   colors?: string;
   minPrice?: number;
@@ -44,6 +45,7 @@ async function searchProducts(args: {
 
   if (args.productType) query.productType = { $regex: new RegExp(args.productType, 'i') };
   if (args.category) query.category = { $regex: new RegExp(args.category, 'i') };
+  if (args.subcategory) query.subcategory = { $regex: new RegExp(args.subcategory, 'i') };
   if (args.occasion) query.occasion = { $regex: new RegExp(args.occasion, 'i') };
   if (args.colors) query.colors = { $regex: new RegExp(args.colors, 'i') };
   if (args.minPrice || args.maxPrice) {
@@ -416,7 +418,9 @@ export async function POST(req: NextRequest) {
       let navRoute = null;
       if (categoryFilters.productType === 'footwear') navRoute = '/products/footwear';
       else if (categoryFilters.productType === 'jewellery') navRoute = '/products/jewellery/all';
-      else if (categoryFilters.productType === 'couture' || categoryFilters.category) navRoute = '/products/couture';
+      else if (categoryFilters.category && categoryFilters.subcategory) navRoute = `/products/couture/${categoryFilters.category.toLowerCase()}/${categoryFilters.subcategory.toLowerCase()}`;
+      else if (categoryFilters.category) navRoute = `/products/couture/${categoryFilters.category.toLowerCase()}`;
+      else if (categoryFilters.productType === 'couture') navRoute = '/products/couture';
 
       if (navRoute) {
         console.log(`[CHATBOT] intent=CATEGORY_BROWSE ai=false time=${Date.now() - startTime}ms route=${navRoute}`);

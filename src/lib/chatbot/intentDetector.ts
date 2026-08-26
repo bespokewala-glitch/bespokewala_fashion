@@ -49,7 +49,7 @@ export function detectIntent(text: string): { intent: Intent; confidence: number
   const hasPrice = /rs|inr|₹|\d+\s*(k|lakh|l)\b/i.test(lower);
   const hasColor = /red|blue|green|black|white|yellow|pink|purple|gold|silver|lavender|pastel/i.test(lower);
   const hasOccasion = /wedding|bridal|party|festive/i.test(lower);
-  const hasCategory = /lehnga|lehenga|saree|gown|suit|anarkali|sharara|heel|flat|necklace|earring|bangle|ring|jewellery|jewelry|jwellery|jwellary|jewellary/i.test(lower);
+  const hasCategory = /lehnga|lehenga|saree|gown|suit|anarkali|sharara|heel|flat|necklace|earring|bangle|ring|jewellery|jewelry|jwellery|jwellary|jewellary|men|mens|male|boy|sherwani|women|womens|female|girl/i.test(lower);
 
   if (hasCategory && (hasPrice || hasColor || hasOccasion || /under|below|max|between/i.test(lower))) {
     return { intent: 'PRODUCT_SEARCH', confidence: 0.9 };
@@ -57,13 +57,16 @@ export function detectIntent(text: string): { intent: Intent; confidence: number
 
   // 8. Category Browse (Simple category request)
   if (
-    /^show (me )?(your )?(a )?(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear|heels|flats|bridal wear)$/i.test(lower.trim()) ||
-    /^i want to see (a )?(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim()) ||
-    /^(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim()) ||
-    hasCategory // Fallback to search if it just mentions a category
+    /^(show|shop) (me )?(your )?(a )?(couture|lehenga|lehengas|saree|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear|heels|flats|bridal wear|mens|men|menswear|sherwani)$/i.test(lower.trim()) ||
+    /^i want to see (a )?(couture|lehenga|lehengas|saree|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim()) ||
+    /^(couture|lehenga|lehengas|saree|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim())
   ) {
-    // Treat simple category mentions without complex filters as browse or search
-    return { intent: hasCategory && lower.split(' ').length > 4 ? 'PRODUCT_SEARCH' : 'CATEGORY_BROWSE', confidence: 0.7 };
+    return { intent: 'CATEGORY_BROWSE', confidence: 0.8 };
+  }
+
+  // Fallback to search if it just mentions a category (like "I am men")
+  if (hasCategory) {
+    return { intent: 'PRODUCT_SEARCH', confidence: 0.7 };
   }
 
   // Default to UNKNOWN (which will trigger AI fallback)
