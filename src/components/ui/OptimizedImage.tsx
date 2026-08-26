@@ -50,7 +50,8 @@ const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
     // These thresholds are deliberately conservative so mobile never gets
     // a variant larger than necessary.
     let v = 'large';
-    if (width <= 750) v = 'thumbnail';
+    if (width <= 400) v = 'small';
+    else if (width <= 750) v = 'thumbnail';
     else if (width <= 1200) v = 'medium';
 
     // IMPORTANT: We must include the requested Next.js width in the URL as a query param

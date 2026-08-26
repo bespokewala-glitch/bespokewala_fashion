@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       paymentStatus: "paid",
       razorpayOrderId,
       razorpayPaymentId,
-      orderStatus: "processing",
+      orderStatus: "confirmed",
       subtotal: calculatedSubtotal,
       shippingCost: calculatedShipping,
       total: calculatedTotal,

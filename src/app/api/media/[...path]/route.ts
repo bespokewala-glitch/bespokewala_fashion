@@ -33,6 +33,7 @@ function getMimeType(key: string, fallback = 'application/octet-stream'): string
 // ─── Thumbnail dimensions ─────────────────────────────────────────────────────
 const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
   micro: { width: 120, quality: 70 },
+  small: { width: 300, quality: 75 },
   thumbnail: { width: 600, quality: 80 },
   medium: { width: 1000, quality: 85 },
   large: { width: 1600, quality: 85 },
@@ -165,6 +166,7 @@ export async function GET(
       // rather than crashing the entire route module at startup.
       try {
         const sharp = (await import('sharp')).default;
+        sharp.concurrency(1); // Prevent event loop starvation when generating many variants at once
 
         const optimizedBuffer = await sharp(originalBuffer)
           .resize(variantCfg.width, null, { withoutEnlargement: true })

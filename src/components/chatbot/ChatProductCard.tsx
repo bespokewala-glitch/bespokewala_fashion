@@ -8,20 +8,21 @@ import { useWishlist } from '@/context/WishlistContext';
 interface ChatProductCardProps {
   product: ChatProduct;
   onShowSimilar?: () => void;
+  onClose?: () => void;
 }
 
 function formatImageUrl(url: string | undefined): string | null {
   if (!url) return null;
-  // If it's already a full URL or proxy path, use as-is with thumbnail variant
+  // If it's already a full URL or proxy path, use as-is with micro variant for chat
   if (url.startsWith('/api/media/')) {
-    return `${url}${url.includes('?') ? '&' : '?'}v=thumbnail`;
+    return `${url}${url.includes('?') ? '&' : '?'}v=micro`;
   }
   if (url.startsWith('http')) return url;
   // If it looks like a filename/path stored in DB, route through the media proxy
-  return `/api/media/${url}?v=thumbnail`;
+  return `/api/media/${url}?v=micro`;
 }
 
-export default function ChatProductCard({ product, onShowSimilar }: ChatProductCardProps) {
+export default function ChatProductCard({ product, onShowSimilar, onClose }: ChatProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.slug);
   const [wishlistAnimating, setWishlistAnimating] = useState(false);
@@ -50,7 +51,11 @@ export default function ChatProductCard({ product, onShowSimilar }: ChatProductC
 
   return (
     <div className="chatbot-product-card">
-      <Link href={productUrl} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <Link 
+        href={productUrl} 
+        onClick={onClose} 
+        style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', flex: 1 }}
+      >
         {/* Image */}
         <div style={{ position: 'relative' }}>
           {imageUrl ? (
@@ -132,7 +137,7 @@ export default function ChatProductCard({ product, onShowSimilar }: ChatProductC
       </Link>
 
       {/* View Product button */}
-      <Link href={productUrl} className="chatbot-product-view-btn">
+      <Link href={productUrl} onClick={onClose} className="chatbot-product-view-btn">
         View Product
       </Link>
     </div>

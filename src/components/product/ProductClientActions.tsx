@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
+import { getShippingEstimate } from '@/lib/shippingPolicy';
 
 interface ProductClientActionsProps {
   product: {
@@ -14,6 +16,8 @@ interface ProductClientActionsProps {
     colors?: string[];
     sizes?: string[];
     productType?: string;
+    category?: string;
+    subcategory?: string;
   };
 }
 
@@ -111,9 +115,12 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
     color: '#666',
   };
 
+  const isJewellery = product.productType?.toLowerCase() === 'jewellery';
+  const shippingEstimate = getShippingEstimate(product.productType, product.category, product.subcategory);
+
   return (
     <>
-      {product.productType?.toLowerCase() !== 'jewellery' && product.sizes && product.sizes.length > 0 && (
+      {!isJewellery && product.sizes && product.sizes.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={sectionLabelStyle}>Size</div>
@@ -136,11 +143,27 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
               CUSTOM SIZE
             </button>
           </div>
+          
+          {selectedSize === 'Custom' && (
+            <div style={{
+              marginTop: '0.5rem',
+              padding: '1rem',
+              background: '#f9f9f9',
+              border: '1px solid #eaeaea',
+              fontSize: '0.85rem',
+              lineHeight: '1.5',
+              color: '#555'
+            }}>
+              <strong>Bespoke Sizing:</strong> Our style concierge will contact you for precise measurements after your order is placed to ensure a perfect fit. 
+              <br/><br/>
+              Need help before ordering? <Link href="/consultation" style={{ textDecoration: 'underline', color: '#000' }}>Book a Consultation</Link>.
+            </div>
+          )}
         </div>
       )}
 
-      {product.productType?.toLowerCase() !== 'jewellery' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1rem' }}>
+      {!isJewellery && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1.5rem' }}>
           <div style={sectionLabelStyle}>Quantity</div>
           <div style={quantitySelectorStyle}>
             <button style={qtyBtnStyle} onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
@@ -149,12 +172,29 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
           </div>
         </div>
       )}
+      
+      {!isJewellery && (
+        <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="1" y="3" width="15" height="13"></rect>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+            <circle cx="5.5" cy="18.5" r="2.5"></circle>
+            <circle cx="18.5" cy="18.5" r="2.5"></circle>
+          </svg>
+          <span>Shipping Time: <strong>{shippingEstimate}</strong></span>
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
-        {product.productType?.toLowerCase() !== 'jewellery' ? (
-          <button style={primaryBtnStyle} onClick={handleAddToCart}>
-            {isAdding ? 'Adding...' : 'Add to Cart'}
-          </button>
+        {!isJewellery ? (
+          <>
+            <button style={primaryBtnStyle} onClick={handleAddToCart}>
+              {isAdding ? 'Adding...' : 'Add to Cart'}
+            </button>
+            <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>
+              Complimentary alterations within 7 days of delivery for bespoke items.
+            </div>
+          </>
         ) : (
           <a 
             href={`https://wa.me/919999999999?text=Hello%20Bespokewala,%20I'm%20interested%20in%20the%20${encodeURIComponent(product.name)}`}

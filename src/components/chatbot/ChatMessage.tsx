@@ -9,6 +9,7 @@ import { SUPPORT_CONTACTS } from '@/lib/chatbot/faqData';
 interface ChatMessageProps {
   message: ChatMessageType;
   onQuickReply: (text: string) => void;
+  onClose?: () => void;
 }
 
 function formatOrderStatus(status: string): string {
@@ -83,18 +84,20 @@ function RenderText({ text }: { text: string }) {
   );
 }
 
-export default function ChatMessage({ message, onQuickReply }: ChatMessageProps) {
+export default function ChatMessage({ message, onQuickReply, onClose }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const isTyping = message.isTyping;
 
   if (isTyping) {
     return (
-      <div className="chatbot-typing">
+      <div className="chatbot-msg chatbot-msg-ai">
         <div className="chatbot-msg-avatar">BW</div>
-        <div className="chatbot-typing-bubble">
-          <span className="chatbot-typing-dot" />
-          <span className="chatbot-typing-dot" />
-          <span className="chatbot-typing-dot" />
+        <div className="chatbot-typing">
+          <div className="chatbot-typing-bubble">
+            <span className="chatbot-typing-dot" />
+            <span className="chatbot-typing-dot" />
+            <span className="chatbot-typing-dot" />
+          </div>
         </div>
       </div>
     );
@@ -121,6 +124,7 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
                 key={product.id}
                 product={product}
                 onShowSimilar={() => onQuickReply(`Show me similar products to ${product.name}`)}
+                onClose={onClose}
               />
             ))}
           </div>

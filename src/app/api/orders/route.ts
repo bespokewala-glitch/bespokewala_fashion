@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       shippingDetails,
       paymentMethod: paymentMethod || 'card',
       paymentStatus: 'completed', // Simulated successful payment
-      orderStatus: 'processing',
+      orderStatus: 'confirmed',
       subtotal: calculatedSubtotal,
       shippingCost: calculatedShipping,
       total: calculatedTotal

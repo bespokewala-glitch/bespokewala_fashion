@@ -79,6 +79,7 @@ export default function ChatPanel({ messages, isLoading, onSend, onClose }: Chat
             key={msg.id}
             message={msg}
             onQuickReply={onSend}
+            onClose={onClose}
           />
         ))}
 

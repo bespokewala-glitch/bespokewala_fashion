@@ -39,10 +39,13 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
 
   const getStatusIndex = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'pending': return 0;
-      case 'processing': return 1;
-      case 'shipped': return 2;
-      case 'delivered': return 3;
+      case 'pending': return -1;
+      case 'confirmed': return 0;
+      case 'production': return 1;
+      case 'qc': return 2;
+      case 'dispatched': return 3;
+      case 'in_transit': return 4;
+      case 'delivered': return 5;
       case 'cancelled': return -1;
       default: return 0;
     }
@@ -50,11 +53,14 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
 
   const statusIdx = getStatusIndex(order.orderStatus);
   const isCancelled = order.orderStatus.toLowerCase() === 'cancelled';
+  const isPending = order.orderStatus.toLowerCase() === 'pending';
 
   const timelineSteps = [
-    { label: 'Placed', icon: Clock },
-    { label: 'Processing', icon: Package },
-    { label: 'Shipped', icon: Truck },
+    { label: 'Confirmed', icon: Clock },
+    { label: 'Production', icon: Package },
+    { label: 'QC', icon: CheckCircle },
+    { label: 'Dispatched', icon: Truck },
+    { label: 'In Transit', icon: Truck },
     { label: 'Delivered', icon: CheckCircle },
   ];
 

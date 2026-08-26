@@ -88,7 +88,7 @@ const CATEGORIES = [
       },
       {
         q: "Are custom orders returnable?",
-        a: "Custom and bespoke orders are non-returnable and non-refundable as they are crafted specifically for you. However, if there is a production defect or significant deviation from the agreed design, we will rectify it at no extra charge.",
+        a: "Custom and bespoke orders are non-returnable and non-refundable as they are crafted specifically for you. However, we offer complimentary alterations within 7 days of delivery for bespoke items to ensure a perfect fit.",
       },
       {
         q: "Do you offer bridal consultation services?",
@@ -103,7 +103,7 @@ const CATEGORIES = [
     faqs: [
       {
         q: "How long does delivery take?",
-        a: "Domestic (India): Standard 5–7 business days, Express 2–3 business days. Metro cities may receive orders faster. International orders: 7–18 business days depending on region. See our full Shipping page for zone-wise timelines.",
+        a: "Delivery timelines depend on the product category. Ready-to-wear garments and accessories dispatch within 7-14 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40-50 days. International delivery takes an additional 7-10 business days after dispatch.",
       },
       {
         q: "Do you offer free shipping?",
@@ -142,7 +142,7 @@ const CATEGORIES = [
       },
       {
         q: "What items cannot be returned?",
-        a: "The following are non-returnable: Custom / bespoke orders, altered garments, jewellery (for hygiene), sale items marked 'Final Sale', and items without original tags or packaging.",
+        a: "The following are non-returnable: Custom / bespoke orders (though they include complimentary alterations within 7 days), altered garments, jewellery (for hygiene), sale items marked 'Final Sale', and items without original tags or packaging.",
       },
       {
         q: "What if I received a damaged or wrong item?",
