@@ -161,6 +161,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
             src={currentCampaign?.videoUrl || ''}
             alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
             fill
+            sizes="100vw"
             style={{ objectFit: 'cover' }}
             priority={true}
             variant="large"

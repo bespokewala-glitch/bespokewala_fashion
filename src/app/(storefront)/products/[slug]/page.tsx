@@ -17,6 +17,7 @@ import ProductTrustBadges from '@/components/product/ProductTrustBadges';
 import { getOrFetch } from '@/lib/serverCache';
 
 const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
+import ProductChatContext from '@/components/chatbot/ProductChatContext';
 
 export const revalidate = 60;
 
@@ -258,6 +259,16 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
         <ProductReviews productId={product._id.toString()} deferFetch={true} />
       </div>
+      <ProductChatContext context={{
+        slug: product.slug,
+        name: product.name,
+        category: product.category,
+        productType: product.productType,
+        price: product.price,
+        colors: product.colors || [],
+        sizes: product.sizes || [],
+      }} />
     </>
   );
 }
+

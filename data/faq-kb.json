@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sizing_help",
+    "category": "sizing",
+    "question": "How do I find my size?",
+    "keywords": ["size", "sizing", "measurement", "measurements", "fit", "how to measure", "body size"],
+    "answer": "You can submit your measurements during checkout using our [size guide](/size-guide), or book a [virtual consultation](/consultation) and our stylist will guide you through measuring at home."
+  },
+  {
+    "id": "delivery_time",
+    "category": "delivery",
+    "question": "How long does delivery take?",
+    "keywords": ["delivery", "shipping", "how long", "when will i get", "arrive"],
+    "answer": "Bespoke pieces typically take 2-6 weeks to craft, plus standard shipping time based on your location."
+  },
+  {
+    "id": "returns_policy",
+    "category": "returns",
+    "question": "What is your return policy?",
+    "keywords": ["return", "returns", "refund", "refunds", "exchange", "money back"],
+    "answer": "[Insert actual return policy here - e.g., Due to the bespoke nature of our garments, we do not accept returns. We do offer free alterations if the fit is not right.]"
+  },
+  {
+    "id": "payment_methods",
+    "category": "payment",
+    "question": "What payment methods do you accept?",
+    "keywords": ["payment", "pay", "credit card", "debit card", "paypal", "installments", "emi"],
+    "answer": "[Insert actual payment methods here - e.g., We accept all major credit cards, PayPal, and offer EMI options on select orders.]"
+  }
+]
