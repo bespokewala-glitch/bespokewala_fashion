@@ -49,7 +49,7 @@ export function detectIntent(text: string): { intent: Intent; confidence: number
   const hasPrice = /rs|inr|₹|\d+\s*(k|lakh|l)\b/i.test(lower);
   const hasColor = /red|blue|green|black|white|yellow|pink|purple|gold|silver|lavender|pastel/i.test(lower);
   const hasOccasion = /wedding|bridal|party|festive/i.test(lower);
-  const hasCategory = /lehnga|lehenga|saree|gown|suit|anarkali|sharara|heel|flat|necklace|earring|bangle|ring/i.test(lower);
+  const hasCategory = /lehnga|lehenga|saree|gown|suit|anarkali|sharara|heel|flat|necklace|earring|bangle|ring|jewellery|jewelry|jwellery|jwellary|jewellary/i.test(lower);
 
   if (hasCategory && (hasPrice || hasColor || hasOccasion || /under|below|max|between/i.test(lower))) {
     return { intent: 'PRODUCT_SEARCH', confidence: 0.9 };
@@ -57,9 +57,9 @@ export function detectIntent(text: string): { intent: Intent; confidence: number
 
   // 8. Category Browse (Simple category request)
   if (
-    /^show (me )?(your )?(couture|lehengas|sarees|jewellery|jewelry|footwear|heels|flats|bridal wear)$/i.test(lower.trim()) ||
-    /^i want to see (couture|lehengas|sarees|jewellery|jewelry|footwear)$/i.test(lower.trim()) ||
-    /^(couture|lehengas|sarees|jewellery|jewelry|footwear)$/i.test(lower.trim()) ||
+    /^show (me )?(your )?(a )?(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear|heels|flats|bridal wear)$/i.test(lower.trim()) ||
+    /^i want to see (a )?(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim()) ||
+    /^(couture|lehengas|sarees|jewellery|jewelry|jwellery|jwellary|jewellary|footwear)$/i.test(lower.trim()) ||
     hasCategory // Fallback to search if it just mentions a category
   ) {
     // Treat simple category mentions without complex filters as browse or search

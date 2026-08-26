@@ -53,7 +53,7 @@ export function detectCategory(text: string): { productType?: string; category?:
     result.productType = 'jewellery';
   } else if (/footwear|shoe|heel|flat|sandal/i.test(lower)) {
     result.productType = 'footwear'; // Generic footwear
-  } else if (/jewellery|jewelry|jwellery|necklace|earring|bangle|ring/i.test(lower)) {
+  } else if (/jewellery|jewelry|jwellery|jwellary|jewellary|necklace|earring|bangle|ring/i.test(lower)) {
     result.productType = 'jewellery'; // Generic jewellery
   } else if (/couture|clothes|clothing|outfit|\bwear\b/i.test(lower)) {
     result.productType = 'couture'; // Generic couture

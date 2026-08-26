@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bucket } from '@/lib/gcs';
-import sharp from 'sharp';
 
 // ─── Thumbnail sizes generated eagerly at upload time ─────────────────────────
 // These match the variants checked by /api/media/[...path]/route.ts.
@@ -25,6 +24,7 @@ async function generateAndSaveVariant(
 ): Promise<void> {
   const variantPath = `_variants/${variantName}/${gcsKey}.webp`;
   try {
+    const sharp = (await import('sharp')).default;
     const optimized = await sharp(originalBuffer)
       .resize(width, null, { withoutEnlargement: true })
       .webp({ quality })

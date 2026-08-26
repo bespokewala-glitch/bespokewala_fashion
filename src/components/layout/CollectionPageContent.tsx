@@ -283,7 +283,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   // Show hero only on top-level pages. If couture, we will hide it on mobile below.
   const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
 
-
+  // The user specifically requested to NOT show the product grid on the jewellery home page,
+  // making it act purely as a curated landing page.
+  const hideProductGrid = isTopLevelDepartment && pageId === 'jewellery';
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
 
@@ -319,40 +321,45 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         )}
 
 
-        {/* Page heading */}
-        <div className="page-heading-container">
-          <h1 className="h1">{pageTitle}</h1>
-          {seoIntro ? (
-            <div className="seo-intro" dangerouslySetInnerHTML={{ __html: seoIntro }} />
-          ) : (
-            <p className="subtitle" style={{ color: '#555', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: 0, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              Discover our {pageTitle.toLowerCase()}.
-            </p>
-          )}
-        </div>
-
-        {/* Product grid */}
-        {products.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem' }}>
-            <p className="text-body">No products found in this category.</p>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <ProductFilters
-              totalCount={totalProducts}
-              availableSubcategories={filterList}
-              dynamicFilters={dynamicFilters}
-            />
-
-            <div style={{ width: '100%' }}>
-              <InfiniteProductGrid 
-                key={JSON.stringify(params)}
-                initialProducts={products}
-                totalProducts={totalProducts}
-                queryParams={params as Record<string, string | undefined>}
-              />
+        {/* Product grid and heading (hidden on curated landing pages) */}
+        {!hideProductGrid && (
+          <>
+            {/* Page heading */}
+            <div className="page-heading-container">
+              <h1 className="h1">{pageTitle}</h1>
+              {seoIntro ? (
+                <div className="seo-intro" dangerouslySetInnerHTML={{ __html: seoIntro }} />
+              ) : (
+                <p className="subtitle" style={{ color: '#555', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: 0, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  Discover our {pageTitle.toLowerCase()}.
+                </p>
+              )}
             </div>
-          </div>
+
+            {/* Product grid */}
+            {products.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '4rem' }}>
+                <p className="text-body">No products found in this category.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                <ProductFilters
+                  totalCount={totalProducts}
+                  availableSubcategories={filterList}
+                  dynamicFilters={dynamicFilters}
+                />
+
+                <div style={{ width: '100%' }}>
+                  <InfiniteProductGrid 
+                    key={JSON.stringify(params)}
+                    initialProducts={products}
+                    totalProducts={totalProducts}
+                    queryParams={params as Record<string, string | undefined>}
+                  />
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {seoContent && (

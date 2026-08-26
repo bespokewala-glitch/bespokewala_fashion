@@ -225,27 +225,9 @@ export default function ChatbotWidget({ pageContext: propPageContext }: ChatbotW
           onClick={handleOpen}
           aria-label="Open Style Concierge"
           id="chatbot-trigger-btn"
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            backgroundColor: '#3d352e',
-            zIndex: 99999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 24px rgba(61,53,46,0.35)',
-            border: 'none',
-            cursor: 'pointer'
-          }}
         >
-          {hasUnread && <span className="chatbot-badge" aria-hidden="true" style={{ position: 'absolute', top: 0, right: 0, width: '12px', height: '12px', backgroundColor: '#d4af37', borderRadius: '50%' }} />}
-          <svg className="chatbot-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-          </svg>
+          {hasUnread && <span className="chatbot-badge" aria-hidden="true" />}
+          <div className="chatbot-trigger-logo">BW</div>
         </button>
       )}
 
