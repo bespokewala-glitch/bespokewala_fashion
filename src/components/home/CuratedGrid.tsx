@@ -72,8 +72,8 @@ export default function CuratedGrid({ data }: { data?: any }) {
       </div>
 
       <div style={{ marginTop: '3rem', textAlign: 'center' }} className="mobile-section-mt">
-        <Link href="/products/couture" prefetch={false} className="btn-secondary mobile-label-clamp" aria-label="Explore all Bespokewala collections">
-          Explore Collections
+        <Link href={data?.buttonLink || '/products/couture'} prefetch={false} className="btn-secondary mobile-label-clamp" aria-label="Explore all Bespokewala collections">
+          {data?.buttonText || 'Explore Collections'}
         </Link>
       </div>
     </section>

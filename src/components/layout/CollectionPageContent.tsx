@@ -280,9 +280,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
-  // Show hero only on top-level pages. If couture, we will hide it on mobile below.
-  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
-
   // The user specifically requested to NOT show the product grid on the jewellery home page,
   // making it act purely as a curated landing page.
   const hideProductGrid = isTopLevelDepartment && pageId === 'jewellery';
@@ -302,17 +299,12 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      {showHero && (
-        <div className={productType === 'couture' ? 'mobile-hide' : ''}>
-          <HeroSection campaigns={finalHeroCampaigns} />
-        </div>
-      )}
-      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${!showHero ? 'desktop-pt-no-hero' : ''} mobile-content-top-pad`}>
+      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (
           <div className="desktop-mx-negative mobile-m-0">
-            {sectionMap.CuratedGrid && <CuratedGrid data={sectionMap.CuratedGrid} />}
+            {sectionMap.CuratedGrid && <CuratedGrid data={{...sectionMap.CuratedGrid, buttonLink: sectionMap.CuratedGrid.buttonLink || (productType ? `/products/${productType}/all` : '/products')}} />}
             {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
             {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
             {sectionMap.CoutureProcess && pageId !== 'jewellery' && <CoutureProcess data={sectionMap.CoutureProcess} />}
