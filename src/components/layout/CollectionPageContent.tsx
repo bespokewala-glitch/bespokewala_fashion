@@ -280,8 +280,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
-  // Show hero only on top-level pages. If couture, we will hide it on mobile below.
-  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
+  // Show hero only on top-level pages, EXCEPT for couture which should never have the banner.
+  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0 && productType !== 'couture';
 
   // The user specifically requested to NOT show the product grid on the jewellery home page,
   // making it act purely as a curated landing page.
