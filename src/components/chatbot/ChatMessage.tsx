@@ -179,6 +179,8 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
             </a>
             <a
               href={SUPPORT_CONTACTS.emailUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="chatbot-support-btn chatbot-support-email"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

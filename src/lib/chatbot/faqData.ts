@@ -19,7 +19,7 @@ export const SUPPORT_CONTACTS = {
   whatsapp: '+91 75067 67452',
   whatsappUrl: 'https://wa.me/917506767452',
   email: 'bespokewala@gmail.com',
-  emailUrl: 'mailto:bespokewala@gmail.com',
+  emailUrl: 'https://mail.google.com/mail/?view=cm&fs=1&to=bespokewala@gmail.com',
 };
 
 export const FAQ_CATEGORIES: FaqCategory[] = [
