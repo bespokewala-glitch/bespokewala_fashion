@@ -280,6 +280,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     !colors
   );
 
+  // Show hero only on top-level pages. If couture, we will hide it on mobile below.
+  const showHero = isTopLevelDepartment && finalHeroCampaigns.length > 0;
+
   // The user specifically requested to NOT show the product grid on the jewellery home page,
   // making it act purely as a curated landing page.
   const hideProductGrid = isTopLevelDepartment && pageId === 'jewellery';
@@ -299,7 +302,12 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      <main style={containerStyle} className="desktop-px-8 mobile-px-4 desktop-pt-no-hero mobile-content-top-pad">
+      {showHero && (
+        <div className={productType === 'couture' ? 'mobile-hide' : ''}>
+          <HeroSection campaigns={finalHeroCampaigns} />
+        </div>
+      )}
+      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${!showHero ? 'desktop-pt-no-hero' : ''} mobile-content-top-pad`}>
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (

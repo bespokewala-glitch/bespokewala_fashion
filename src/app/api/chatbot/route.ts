@@ -415,7 +415,7 @@ export async function POST(req: NextRequest) {
       // Map it to frontend routes
       let navRoute = null;
       if (categoryFilters.productType === 'footwear') navRoute = '/products/footwear';
-      else if (categoryFilters.productType === 'jewellery') navRoute = '/products/jewellery';
+      else if (categoryFilters.productType === 'jewellery') navRoute = '/products/jewellery/all';
       else if (categoryFilters.productType === 'couture' || categoryFilters.category) navRoute = '/products/couture';
 
       if (navRoute) {
