@@ -300,10 +300,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { messages, pageContext, userContext } = body as {
+    const { messages, pageContext, userContext, cart, wishlist } = body as {
       messages: ChatMessage[];
       pageContext?: ProductContext;
       userContext?: string | null;
+      cart?: any[];
+      wishlist?: any[];
     };
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -443,6 +445,7 @@ export async function POST(req: NextRequest) {
       const isAskingPrice = /price|how much|cost|total|amount/i.test(normalizedText);
 
       let text = 'To add items to your cart or wishlist, please use the buttons directly on the product cards or product pages. I can help you find products if you like!';
+      let productsToReturn: any[] = [];
       
       if (userContext) {
         if (isAskingAboutCart && userContext.includes('Cart items:')) {
@@ -450,7 +453,8 @@ export async function POST(req: NextRequest) {
           if (cartPart) {
             text = isAskingPrice 
               ? `Your cart contains: ${cartPart}. Proceed to checkout to see the final total including shipping.`
-              : `Here is what's in your cart right now: ${cartPart}.`;
+              : `Here are the items currently in your cart:`;
+            productsToReturn = cart || [];
           } else {
             text = "Your cart is currently empty.";
           }
@@ -459,7 +463,8 @@ export async function POST(req: NextRequest) {
           if (wishPart) {
             text = isAskingPrice
               ? `Here are the prices for the items in your wishlist: ${wishPart}.`
-              : `Your wishlist currently has: ${wishPart}.`;
+              : `Here are the items currently in your wishlist:`;
+            productsToReturn = wishlist || [];
           } else {
              text = "Your wishlist is currently empty.";
           }
@@ -473,9 +478,10 @@ export async function POST(req: NextRequest) {
          else if (isAskingAboutWishlist) text = "Your wishlist is currently empty.";
       }
 
+      // If returning products, limit to 4 for cleaner UI
       return NextResponse.json({
         text,
-        products: [],
+        products: productsToReturn.slice(0, 4),
         orderInfo: null,
         fallback: false,
       });

@@ -150,7 +150,9 @@ export default function ChatbotWidget({ pageContext: propPageContext }: ChatbotW
         body: JSON.stringify({
           messages: conversationRef.current,
           pageContext,
-          userContext: contextualMessage // Send separately
+          userContext: contextualMessage, // Send separately
+          cart,
+          wishlist
         }),
       });
 
