@@ -634,9 +634,10 @@
   .chatbot-trigger:hover,
   .chatbot-trigger:active,
   .chatbot-trigger:focus-within {
-    width: 115px;
+    width: 125px;
     padding: 0.5rem 0.85rem;
     gap: 0.4rem;
+    border-radius: 8px;
   }
 
   .chatbot-trigger svg {
@@ -646,9 +647,11 @@
   }
 
   .chatbot-trigger-text {
+    display: inline-block;
     max-width: 0;
     opacity: 0;
     white-space: nowrap;
+    overflow: hidden;
     transition: all 0.3s ease;
     font-size: 0.75rem;
   }
