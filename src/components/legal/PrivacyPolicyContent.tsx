@@ -195,9 +195,7 @@ export default function PrivacyPolicyContent() {
                 <p>We use cookies and similar technologies to enhance your browsing experience. Types of cookies we use:</p>
                 <ul>
                   <li><strong>Essential Cookies:</strong> Required for the website to function (e.g. shopping cart, login session). Cannot be disabled.</li>
-                  <li><strong>Analytics Cookies:</strong> Google Analytics — help us understand how visitors use our site. Data is anonymised.</li>
                   <li><strong>Preference Cookies:</strong> Remember your settings (e.g. currency, language).</li>
-                  <li><strong>Marketing Cookies:</strong> Used to show you relevant advertisements on third-party platforms (e.g. Instagram, Google Ads). Only active if you have accepted marketing cookies.</li>
                 </ul>
                 <p>You can control cookie preferences in your browser settings. Disabling essential cookies may affect website functionality.</p>
               </>

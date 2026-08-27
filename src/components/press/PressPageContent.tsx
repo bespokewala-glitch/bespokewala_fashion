@@ -3,14 +3,6 @@ import Link from 'next/link';
 
 const PRESS_COVERAGE = [
   {
-    publication: "Vogue India",
-    logo: "VOGUE",
-    quote: "Bespokewala is redefining contemporary Indian bridal wear — marrying heritage craftsmanship with modern silhouettes that feel entirely fresh.",
-    article: "Mumbai's Most Exciting New Bridal Labels to Watch in 2026",
-    date: "March 2026",
-    category: "Bridal",
-  },
-  {
     publication: "Harper's Bazaar India",
     logo: "BAZAAR",
     quote: "A label that understands the Indian woman of today — powerful, style-conscious, and deeply rooted in her cultural identity.",
@@ -27,22 +19,6 @@ const PRESS_COVERAGE = [
     category: "Lifestyle",
   },
   {
-    publication: "Grazia India",
-    logo: "GRAZIA",
-    quote: "Custom couture has a new address in Mumbai. Bespokewala's bespoke service is every bride's dream — personal, precise, and profoundly beautiful.",
-    article: "The Future of Custom Couture in India",
-    date: "November 2025",
-    category: "Bridal",
-  },
-  {
-    publication: "Elle India",
-    logo: "ELLE",
-    quote: "Their lehenga embroidery work is nothing short of art — the kind of detail you'd expect from a Parisian atelier, here in the heart of Mumbai.",
-    article: "India's Most Exquisite Embroidery Labels",
-    date: "October 2025",
-    category: "Fashion",
-  },
-  {
     publication: "Filmfare",
     logo: "FILMFARE",
     quote: "Bespokewala outfits have quietly become a favourite on the festival circuit — spotted on several leading actresses at recent premieres.",
@@ -56,17 +32,17 @@ const MEDIA_STATS = [
   { number: "50+",  label: "Press Features"       },
   { number: "12",   label: "Magazine Covers"       },
   { number: "200K+",label: "Customers"            },
-  { number: "6",    label: "Awards Won"            },
+  { number: "12",   label: "Awards Won"            },
   { number: "6",    label: "Films Costumed"       },
 ];
 
 const AWARDS = [
-  { year: "2026", award: "Best Emerging Bridal Label", body: "India Fashion Awards, Mumbai" },
-  { year: "2026", award: "Excellence in Handcraft",    body: "Craft Council of India" },
-  { year: "2025", award: "Most Loved Boutique Brand",  body: "Femina Fashion Awards" },
-  { year: "2025", award: "Top 10 Labels to Watch",     body: "Vogue India Business of Fashion" },
-  { year: "2025", award: "Sustainable Fashion Pioneer", body: "GreenThread India Awards" },
-  { year: "2024", award: "Best Custom Couture Studio", body: "Bridal Asia Exhibition, Delhi" },
+  { year: "2024", award: "Iconic Designer in Ethnic Wear", body: "Universal Eminence Awards Season 1" },
+  { year: "2024", award: "Designer of the Year (Bridal & Groom – Indian)", body: "Midday Retail and Lifestyle Icons" },
+  { year: "2024", award: "Face of India", body: "Asia Model Festival" },
+  { year: "2023", award: "Iconic Fashion Designer", body: "Midday Icons" },
+  { year: "2022", award: "Times Leading Icons", body: "The Times Group" },
+  { year: "2020", award: "Iconic Luxury Fashion Brand", body: "Midday Retail Icons" },
 ];
 
 export default function PressPageContent() {
@@ -206,7 +182,7 @@ export default function PressPageContent() {
             As Seen In
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "2.5rem 4rem" }}>
-            {["VOGUE", "BAZAAR", "ELLE", "GRAZIA", "FEMINA", "FILMFARE", "VERVE", "THE HINDU"].map(pub => (
+            {["BAZAAR", "FEMINA", "FILMFARE", "VERVE", "TIMES OF INDIA", "MID-DAY", "ANI", "PTI", "HINDUSTAN TIMES"].map(pub => (
               <span key={pub} style={{
                 fontSize: "0.95rem",
                 fontWeight: 800,
