@@ -229,7 +229,11 @@ export default function ChatbotWidget({ pageContext: propPageContext }: ChatbotW
           id="chatbot-trigger-btn"
         >
           {hasUnread && <span className="chatbot-badge" aria-hidden="true" />}
-          <div className="chatbot-trigger-logo">BW</div>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{color: '#fff'}}>
+            <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v5Z"></path>
+            <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path>
+          </svg>
+          <span className="chatbot-trigger-text">Live Chat</span>
         </button>
       )}
 
