@@ -55,8 +55,9 @@ const PRESS_COVERAGE = [
 const MEDIA_STATS = [
   { number: "50+",  label: "Press Features"       },
   { number: "12",   label: "Magazine Covers"       },
-  { number: "200K+",label: "Social Media Followers"},
+  { number: "200K+",label: "Customers"            },
   { number: "6",    label: "Awards Won"            },
+  { number: "6",    label: "Films Costumed"       },
 ];
 
 const AWARDS = [
@@ -137,7 +138,7 @@ export default function PressPageContent() {
         }
         .stat-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
         }
         .kit-grid {
           display: grid;
