@@ -18,8 +18,8 @@ export interface FaqCategory {
 export const SUPPORT_CONTACTS = {
   whatsapp: '+91 75067 67452',
   whatsappUrl: 'https://wa.me/917506767452',
-  email: 'bespokewala@gmail.com',
-  emailUrl: 'https://mail.google.com/mail/?view=cm&fs=1&to=bespokewala@gmail.com',
+  email: 'info@bespokewala.com',
+  emailUrl: 'https://mail.google.com/mail/?view=cm&fs=1&to=info@bespokewala.com',
 };
 
 export const FAQ_CATEGORIES: FaqCategory[] = [
@@ -44,7 +44,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'Can I modify or cancel my order?',
-        answer: 'Order modifications or cancellations are possible within 2 hours of placing the order. After that, the order enters our dispatch queue. Please email bespokewala@gmail.com or WhatsApp us immediately at +91 75067 67452 with your order number.',
+        answer: 'Order modifications or cancellations are possible within 2 hours of placing the order. After that, the order enters our dispatch queue. Please email info@bespokewala.com or WhatsApp us immediately at +91 75067 67452 with your order number.',
         keywords: ['cancel', 'modify', 'change order', 'cancel order'],
       },
       {
@@ -91,7 +91,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     entries: [
       {
         question: 'What is your return policy?',
-        answer: 'We accept returns within 7 days of delivery for unused, unworn items in their original condition with all tags intact. Custom and bespoke orders are non-returnable. To initiate a return, email bespokewala@gmail.com with your order number.',
+        answer: 'We accept returns within 7 days of delivery for unused, unworn items in their original condition with all tags intact. Custom and bespoke orders are non-returnable. To initiate a return, email info@bespokewala.com with your order number.',
         keywords: ['return', 'returns', 'return policy', 'send back', 'refund'],
       },
       {
@@ -101,7 +101,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'Can I exchange an item?',
-        answer: 'Yes, exchanges are available for size or colour within 7 days of delivery (subject to availability). Email us at bespokewala@gmail.com or WhatsApp +91 75067 67452 with your order number.',
+        answer: 'Yes, exchanges are available for size or colour within 7 days of delivery (subject to availability). Email us at info@bespokewala.com or WhatsApp +91 75067 67452 with your order number.',
         keywords: ['exchange', 'swap', 'different size', 'different colour'],
       },
     ],
@@ -127,7 +127,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'Can I request a fabric swatch?',
-        answer: 'Yes. For orders above ₹10,000, you may request up to 3 fabric swatches. Email bespokewala@gmail.com with the product names and your shipping address. Swatches are sent free of charge within India.',
+        answer: 'Yes. For orders above ₹10,000, you may request up to 3 fabric swatches. Email info@bespokewala.com with the product names and your shipping address. Swatches are sent free of charge within India.',
         keywords: ['swatch', 'fabric sample', 'colour sample', 'material sample'],
       },
     ],
@@ -159,7 +159,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     entries: [
       {
         question: 'How can I contact you?',
-        answer: 'You can reach us via WhatsApp at +91 75067 67452 (Mon–Sat, 10am–7pm IST) or email us at bespokewala@gmail.com. We aim to respond within 24 hours.',
+        answer: 'You can reach us via WhatsApp at +91 75067 67452 (Mon–Sat, 10am–7pm IST) or email us at info@bespokewala.com. We aim to respond within 24 hours.',
         keywords: ['contact', 'reach', 'call', 'phone', 'email', 'whatsapp', 'support', 'help'],
       },
     ],

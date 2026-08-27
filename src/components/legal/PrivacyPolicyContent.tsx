@@ -232,7 +232,7 @@ export default function PrivacyPolicyContent() {
                   <li><strong>Right to Withdraw Consent:</strong> Withdraw consent for marketing communications at any time.</li>
                   <li><strong>Right to Grievance Redressal:</strong> Raise a complaint with our Data Protection Officer.</li>
                 </ul>
-                <p>To exercise any of these rights, email us at <strong>bespokewala@gmail.com</strong> with the subject &ldquo;Data Rights Request&rdquo;. We will respond within 30 days.</p>
+                <p>To exercise any of these rights, email us at <strong>info@bespokewala.com</strong> with the subject &ldquo;Data Rights Request&rdquo;. We will respond within 30 days.</p>
               </>
             ),
           },
@@ -267,7 +267,7 @@ export default function PrivacyPolicyContent() {
             num: "09",
             title: "Children's Privacy",
             content: (
-              <p>Our website is not directed to individuals under the age of 18. We do not knowingly collect personal data from children. If we become aware that a child under 18 has provided us with personal data, we will delete it immediately. If you believe we have inadvertently collected such data, contact us at bespokewala@gmail.com.</p>
+              <p>Our website is not directed to individuals under the age of 18. We do not knowingly collect personal data from children. If we become aware that a child under 18 has provided us with personal data, we will delete it immediately. If you believe we have inadvertently collected such data, contact us at info@bespokewala.com.</p>
             ),
           },
           {
@@ -286,7 +286,7 @@ export default function PrivacyPolicyContent() {
               <>
                 <p>For any privacy-related queries, concerns, or to exercise your data rights, please contact our Data Protection Officer:</p>
                 <ul>
-                  <li><strong>Email:</strong> bespokewala@gmail.com</li>
+                  <li><strong>Email:</strong> info@bespokewala.com</li>
                   <li><strong>Phone / WhatsApp:</strong> +91 75067 67452</li>
                   <li><strong>Address:</strong> Lotus Arc One (Arc One) Building, Monginis Lane, Off New Link Road, Andheri West, Mumbai, Maharashtra – 400053</li>
                 </ul>
@@ -311,7 +311,7 @@ export default function PrivacyPolicyContent() {
             We&apos;re committed to being transparent about how we handle your data.
           </p>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <a href="mailto:bespokewala@gmail.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
+            <a href="mailto:info@bespokewala.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
             <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</Link>
           </div>
         </div>

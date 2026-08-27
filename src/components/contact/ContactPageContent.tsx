@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 ──────────────────────────────────────────────────────────────── */
 
 const INFO = {
-  email:            "bespokewala@gmail.com",
+  email:            "info@bespokewala.com",
   phone:            "+91 75067 67452",
   whatsapp:         "917506767452",
   whatsappDisplay:  "+91 75067 67452",

@@ -455,7 +455,7 @@ export default function AboutPageContent() {
       <p style={{ fontSize: "0.975rem", color: "#aaa", maxWidth: "480px", margin: "0 auto 2.5rem", lineHeight: 1.8 }}>
         Explore our latest collections or book a personal styling consultation at your nearest atelier.
       </p>
-      <div className="cta-buttons" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div className="cta-buttons" style={{ display: 'flex', justifyContent: 'center', marginBottom: "2.5rem" }}>
         <Link href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
           Discover Couture
         </Link>
@@ -463,6 +463,10 @@ export default function AboutPageContent() {
           Book an Appointment
         </Link>
       </div>
+
+      <p style={{ fontSize: "0.9rem", color: "#888" }}>
+        For sales-related inquiries, please email us at <a href="mailto:sales@bespokewala.com" style={{ color: "#d2b48c", textDecoration: "underline" }}>sales@bespokewala.com</a>
+      </p>
     </section>
   );
 

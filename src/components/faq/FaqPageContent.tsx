@@ -22,7 +22,7 @@ const CATEGORIES = [
       },
       {
         q: "Can I modify or cancel my order after placing it?",
-        a: "Order modifications or cancellations are possible within 2 hours of placing the order. After that, the order enters our dispatch queue. Please email bespokewala@gmail.com or WhatsApp us immediately at +91 75067 67452 with your order number.",
+        a: "Order modifications or cancellations are possible within 2 hours of placing the order. After that, the order enters our dispatch queue. Please email info@bespokewala.com or WhatsApp us immediately at +91 75067 67452 with your order number.",
       },
       {
         q: "Will I receive an invoice for my order?",
@@ -57,7 +57,7 @@ const CATEGORIES = [
       },
       {
         q: "Can I request a fabric swatch before ordering?",
-        a: "Yes. For orders above ₹10,000, you may request up to 3 fabric swatches. Email bespokewala@gmail.com with the product names and your shipping address. Swatches are sent free of charge within India.",
+        a: "Yes. For orders above ₹10,000, you may request up to 3 fabric swatches. Email info@bespokewala.com with the product names and your shipping address. Swatches are sent free of charge within India.",
       },
       {
         q: "Are the products in stock, or made to order?",
@@ -130,7 +130,7 @@ const CATEGORIES = [
     faqs: [
       {
         q: "What is your return policy?",
-        a: "Ready-to-wear items can be returned within 7 days of delivery, provided they are unused, unwashed, and in original condition with all tags attached. Initiate the return by emailing bespokewala@gmail.com with your order number.",
+        a: "Ready-to-wear items can be returned within 7 days of delivery, provided they are unused, unwashed, and in original condition with all tags attached. Initiate the return by emailing info@bespokewala.com with your order number.",
       },
       {
         q: "How long does it take to get a refund?",
@@ -146,7 +146,7 @@ const CATEGORIES = [
       },
       {
         q: "What if I received a damaged or wrong item?",
-        a: "We sincerely apologise. Please email bespokewala@gmail.com within 48 hours of delivery with photos of the issue and your order number. We will arrange a complimentary pickup and send a replacement or full refund within 5–7 business days.",
+        a: "We sincerely apologise. Please email info@bespokewala.com within 48 hours of delivery with photos of the issue and your order number. We will arrange a complimentary pickup and send a replacement or full refund within 5–7 business days.",
       },
     ],
   },
@@ -403,7 +403,7 @@ export default function FaqPageContent() {
 
         <div className="faq-contact-strip">
           <a
-            href="mailto:bespokewala@gmail.com"
+            href="mailto:info@bespokewala.com"
             className="btn-primary"
           >
             ✉ Email Us

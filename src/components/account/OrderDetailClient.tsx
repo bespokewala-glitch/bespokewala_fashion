@@ -259,7 +259,7 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
             <p style={{ fontSize: '0.85rem', color: '#666', lineHeight: 1.6, marginBottom: '1.5rem' }}>
               Our Maison Concierge is available 24/7 to assist with your order.
             </p>
-            <a href="mailto:bespokewala@gmail.com" style={{ 
+            <a href="mailto:info@bespokewala.com" style={{ 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center', 

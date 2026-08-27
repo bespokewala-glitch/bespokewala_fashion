@@ -298,10 +298,10 @@ export default function TrackOrderContent() {
                 </p>
                 <p style={{ fontSize: "0.85rem", color: "#555", lineHeight: 1.75 }}>
                   Can&apos;t find your order ID? Check your inbox for an email from{" "}
-                  <strong>bespokewala@gmail.com</strong> with the subject &ldquo;Your Bespokewala Order Confirmation&rdquo;.
+                  <strong>info@bespokewala.com</strong> with the subject &ldquo;Your Bespokewala Order Confirmation&rdquo;.
                 </p>
                 <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginTop: "1rem" }}>
-                  <a href="mailto:bespokewala@gmail.com" style={{ fontSize: "0.78rem", color: "#d2b48c", textDecoration: "none", letterSpacing: "0.05em" }}>
+                  <a href="mailto:info@bespokewala.com" style={{ fontSize: "0.78rem", color: "#d2b48c", textDecoration: "none", letterSpacing: "0.05em" }}>
                     ✉ Email Support
                   </a>
                   <a href="https://wa.me/917506767452" target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.78rem", color: "#25D366", textDecoration: "none", letterSpacing: "0.05em" }}>

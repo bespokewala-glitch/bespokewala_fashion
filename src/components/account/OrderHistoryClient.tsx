@@ -242,7 +242,7 @@ export default function OrderHistoryClient({ orders }: { orders: OrderData[] }) 
                     <Link href={`/account/orders/${order._id}`} className="action-btn">
                       View Details
                     </Link>
-                    <a href="mailto:bespokewala@gmail.com" className="action-btn cancel-btn">
+                    <a href="mailto:info@bespokewala.com" className="action-btn cancel-btn">
                       Contact Concierge
                     </a>
                   </div>

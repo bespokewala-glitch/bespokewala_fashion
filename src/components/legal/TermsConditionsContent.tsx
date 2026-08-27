@@ -149,7 +149,7 @@ export default function TermsConditionsContent() {
                   <li>You are legally capable of entering into binding contracts under the Indian Contract Act, 1872.</li>
                   <li>The information you provide is accurate, current, and complete.</li>
                 </ul>
-                <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities conducted through your account. Notify us immediately at bespokewala@gmail.com of any unauthorised use.</p>
+                <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities conducted through your account. Notify us immediately at info@bespokewala.com of any unauthorised use.</p>
                 <p>We reserve the right to suspend or terminate accounts that violate these Terms or engage in fraudulent, abusive, or illegal activity.</p>
               </>
             ),
@@ -200,7 +200,7 @@ export default function TermsConditionsContent() {
                   <li>Suspicious or fraudulent activity.</li>
                   <li>Non-delivery of payment.</li>
                 </ul>
-                <p><strong>Customer Cancellations:</strong> You may cancel an order within <strong>2 hours</strong> of placement by emailing bespokewala@gmail.com with your order number. After this window, the order enters production/dispatch and cannot be cancelled. Custom orders cannot be cancelled once confirmed.</p>
+                <p><strong>Customer Cancellations:</strong> You may cancel an order within <strong>2 hours</strong> of placement by emailing info@bespokewala.com with your order number. After this window, the order enters production/dispatch and cannot be cancelled. Custom orders cannot be cancelled once confirmed.</p>
                 <p>Approved cancellations will receive a full refund to the original payment method within 7–10 business days.</p>
               </>
             ),
@@ -328,7 +328,7 @@ export default function TermsConditionsContent() {
                 <p>These Terms are governed by and construed in accordance with the laws of India, including the Consumer Protection Act, 2019, the Information Technology Act, 2000, and the Sale of Goods Act, 1930.</p>
                 <p><strong>Dispute Resolution:</strong></p>
                 <ol>
-                  <li><strong>Informal Resolution:</strong> Please contact us at bespokewala@gmail.com before initiating formal proceedings. We aim to resolve disputes within 15 business days.</li>
+                  <li><strong>Informal Resolution:</strong> Please contact us at info@bespokewala.com before initiating formal proceedings. We aim to resolve disputes within 15 business days.</li>
                   <li><strong>Consumer Forum:</strong> If informal resolution fails, you may approach the Consumer Disputes Redressal Forum applicable to your jurisdiction under the Consumer Protection Act, 2019.</li>
                   <li><strong>Jurisdiction:</strong> For any dispute not resolved through the above, both parties agree to the exclusive jurisdiction of the courts located in <strong>Mumbai, Maharashtra, India</strong>.</li>
                 </ol>
@@ -351,7 +351,7 @@ export default function TermsConditionsContent() {
               <>
                 <p>If you have any questions about these Terms &amp; Conditions, please reach us at:</p>
                 <ul>
-                  <li><strong>Email:</strong> bespokewala@gmail.com</li>
+                  <li><strong>Email:</strong> info@bespokewala.com</li>
                   <li><strong>Phone / WhatsApp:</strong> +91 75067 67452</li>
                   <li><strong>Address:</strong> Lotus Arc One (Arc One) Building, Monginis Lane, Off New Link Road, Andheri West, Mumbai, Maharashtra – 400053</li>
                   <li><strong>Business Hours:</strong> Monday to Saturday, 10:00 AM – 8:00 PM IST</li>
@@ -376,7 +376,7 @@ export default function TermsConditionsContent() {
             Our team is happy to clarify any part of these terms.
           </p>
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <a href="mailto:bespokewala@gmail.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
+            <a href="mailto:info@bespokewala.com" className="btn-primary" style={{ fontSize: "0.8rem" }}>Email Us</a>
             <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff", fontSize: "0.8rem" }}>Contact Page →</Link>
           </div>
         </div>

@@ -332,7 +332,7 @@ export default function PressPageContent() {
             ].map(({ icon, title, desc }) => (
               <a
                 key={title}
-                href="mailto:bespokewala@gmail.com?subject=Media Kit Request&body=Hello, I am requesting the Bespokewala media kit for editorial use."
+                href="mailto:info@bespokewala.com?subject=Media Kit Request&body=Hello, I am requesting the Bespokewala media kit for editorial use."
                 className="kit-item"
               >
                 <span style={{ fontSize: "2rem", display: "block", marginBottom: "0.75rem" }}>{icon}</span>
@@ -348,7 +348,7 @@ export default function PressPageContent() {
           </div>
 
           <p style={{ textAlign: "center", fontSize: "0.78rem", color: "#bbb", marginTop: "1.5rem" }}>
-            Email <a href="mailto:bespokewala@gmail.com" style={{ color: "#d2b48c" }}>bespokewala@gmail.com</a> with subject &ldquo;Media Kit Request&rdquo; and we&apos;ll send you the full kit within 24 hours.
+            Email <a href="mailto:info@bespokewala.com" style={{ color: "#d2b48c" }}>info@bespokewala.com</a> with subject &ldquo;Media Kit Request&rdquo; and we&apos;ll send you the full kit within 24 hours.
           </p>
         </div>
       </section>
@@ -371,7 +371,7 @@ export default function PressPageContent() {
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
                 {[
-                  { icon: "✉",  label: "Press Email",    value: "bespokewala@gmail.com",      href: "mailto:bespokewala@gmail.com?subject=Press Enquiry" },
+                  { icon: "✉",  label: "Press Email",    value: "info@bespokewala.com",      href: "mailto:info@bespokewala.com?subject=Press Enquiry" },
                   { icon: "📱", label: "PR WhatsApp",    value: "+91 75067 67452",             href: "https://wa.me/917506767452?text=Hello%2C%20I%20have%20a%20press%20enquiry%20for%20Bespokewala." },
                   { icon: "📍", label: "Studio Address", value: "Lotus Arc One, Andheri West, Mumbai – 400053", href: "#" },
                   { icon: "📸", label: "Instagram",      value: "@bespokewala",                href: "https://www.instagram.com/bespokewala?igsh=Y3Zud3V3OHd6OTIz" },
@@ -405,7 +405,7 @@ export default function PressPageContent() {
                 </div>
               ))}
               <div style={{ marginTop: "1.75rem" }}>
-                <a href="mailto:bespokewala@gmail.com?subject=Press Enquiry" className="btn-primary" style={{ fontSize: "0.8rem" }}>
+                <a href="mailto:info@bespokewala.com?subject=Press Enquiry" className="btn-primary" style={{ fontSize: "0.8rem" }}>
                   Send Press Enquiry
                 </a>
               </div>

@@ -425,7 +425,7 @@ export default function ShippingPageContent() {
                 How to Initiate a Return
               </h3>
               {[
-                { num: "1", text: "Email us at bespokewala@gmail.com with your order number and reason for return within 7 days." },
+                { num: "1", text: "Email us at info@bespokewala.com with your order number and reason for return within 7 days." },
                 { num: "2", text: "Our team will review and send a Return Authorisation (RA) number within 24 hours." },
                 { num: "3", text: "Pack the item securely in its original packaging with all tags attached. Write the RA number on the parcel." },
                 { num: "4", text: "Ship the package to our Mumbai address. We recommend using a tracked courier." },
@@ -489,7 +489,7 @@ export default function ShippingPageContent() {
           </div>
           <p style={{ fontSize: "0.8rem", color: "#aaa", marginTop: "1.5rem" }}>
             Can&apos;t find your tracking number? Email us at&nbsp;
-            <a href="mailto:bespokewala@gmail.com" style={{ color: "#d2b48c" }}>bespokewala@gmail.com</a>
+            <a href="mailto:info@bespokewala.com" style={{ color: "#d2b48c" }}>info@bespokewala.com</a>
           </p>
         </div>
       </section>
@@ -514,7 +514,7 @@ export default function ShippingPageContent() {
             },
             {
               q: "Can I change my delivery address after placing an order?",
-              a: "Address changes can be made within 2 hours of placing the order. Please email bespokewala@gmail.com immediately with your order number and the new address. After dispatch, we cannot change the delivery address.",
+              a: "Address changes can be made within 2 hours of placing the order. Please email info@bespokewala.com immediately with your order number and the new address. After dispatch, we cannot change the delivery address.",
             },
             {
               q: "Do you ship to PO Box addresses?",
