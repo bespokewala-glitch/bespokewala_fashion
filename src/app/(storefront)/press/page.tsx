@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import PressPageContent from "@/components/press/PressPageContent";
-import { Suspense } from "react";
+import { generateStaticPageMetadata } from '@/lib/seo';
+import PressPageContent from '@/components/press/PressPageContent';
+import { Suspense } from 'react';
 
-export const metadata: Metadata = {
-  title: "Press & Media",
-  description:
-    "Bespokewala Fashion press coverage, media kit, brand assets, and enquiry contacts. Read what the media is saying about Bespokewala.",
-};
+export const metadata = generateStaticPageMetadata(
+  'Press & Media',
+  'Bespokewala Fashion press coverage, media kit, brand assets, and enquiry contacts. Read what the media is saying about Bespokewala.',
+  '/press'
+);
 
 export default function PressPage() {
   return (

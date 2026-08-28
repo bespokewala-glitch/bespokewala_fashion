@@ -15,7 +15,6 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: productType, category, subcategory } = await params;
-  console.log(`[SUBCATEGORY] generateMetadata called for ${productType}/${category}/${subcategory}`);
   
   try {
     await dbConnect();
@@ -33,7 +32,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductSubcategoryPage({ params, searchParams }: Props) {
   const { slug: productType, category, subcategory } = await params;
   const searchParamsAwaited = await searchParams;
-  console.log(`[SUBCATEGORY] page render called for ${productType}/${category}/${subcategory}`);
   
   await dbConnect();
   const taxonomy = await getOrFetch(`taxonomy:meta:${subcategory}`, 600, () => 
@@ -42,5 +40,5 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
 
   const collectionParams: any = { ...searchParamsAwaited, productType, category, slug3: subcategory };
 
-  console.log('RETURNING COLLECTION PAGE CONTENT'); return <CollectionPageContent params={collectionParams} />;
+  return <CollectionPageContent params={collectionParams} />;
 }

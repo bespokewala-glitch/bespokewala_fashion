@@ -18,6 +18,7 @@ import {
   Briefcase,
   Menu,
   X,
+  Tags,
 } from "lucide-react";
 
 const navItems = [
@@ -34,6 +35,7 @@ const navItems = [
     ],
   },
   { name: "Users", path: "/dashboard/users", icon: Users },
+  { name: "Taxonomies", path: "/dashboard/taxonomies", icon: Tags },
   { name: "Campaigns", path: "/dashboard/campaigns", icon: ImageIcon },
   { name: "Homepage Sections", path: "/dashboard/homepage", icon: LayoutTemplate },
 ];

@@ -34,7 +34,7 @@ export interface CollectionPageParams {
 }
 
 /** Shared data-fetching and rendering logic for all collection / category pages */
-export async function CollectionPageContent({ params }: { params: CollectionPageParams }) { console.log('COLLECTION PAGE CONTENT START');
+export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
   await dbConnect();
 
   const { productType, category, subcategory, collectionName, occasion, slug2, slug3, page, q, minPrice, maxPrice, colors, size, sort } = params;
@@ -235,7 +235,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const breadcrumbs: { label: string; href: string }[] = [{ label: 'Home', href: '/' }];
   if (productType) {
     const pt = productType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    breadcrumbs.push({ label: pt, href: `/products?productType=${productType}` });
+    breadcrumbs.push({ label: pt, href: `/products/${productType}` });
   }
   if (category) {
     const cat = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');

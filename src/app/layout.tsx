@@ -24,15 +24,17 @@ export const metadata: Metadata = {
     template: '%s | Bespokewala',
     default: 'Bespokewala | Luxury Indian Fashion',
   },
-  description: "Discover Bespokewala's luxury couture, footwear and jewellery collections.",
+  description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
   openGraph: {
     title: 'Bespokewala | Luxury Indian Fashion',
-    description: "Discover Bespokewala's luxury couture, footwear and jewellery collections.",
+    description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
     siteName: 'Bespokewala',
     type: 'website',
+    images: [{ url: '/bespoken-transparent.png', width: 1200, height: 630, alt: 'Bespokewala — Luxury Indian Fashion' }],
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@bespokewala',
   }
 };
 
@@ -43,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={josefinSans.variable}>
+    <html lang="en-IN" className={josefinSans.variable}>
       <body>
         <CurrencyProvider>
           <WishlistProvider>

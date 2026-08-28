@@ -73,6 +73,16 @@ export default function Footer() {
         </div>
 
         <div style={columnStyle}>
+          <h4 style={headingStyle}>Shop</h4>
+          <ul style={listStyle}>
+            <li><Link href="/products/couture">Couture</Link></li>
+            <li><Link href="/products/jewellery">Jewellery</Link></li>
+            <li><Link href="/products/footwear">Footwear</Link></li>
+            <li><Link href="/products/beauty">Beauty</Link></li>
+          </ul>
+        </div>
+
+        <div style={columnStyle}>
           <h4 style={headingStyle}>Legal</h4>
           <ul style={listStyle}>
             <li><Link href="/privacy-policy">Privacy Policy</Link></li>

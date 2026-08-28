@@ -145,7 +145,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
-    { label: product.productType ? product.productType.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Products', href: `/products?productType=${product.productType}` }
+    { label: product.productType ? product.productType.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Products', href: `/products/${product.productType || ''}` }
   ];
   if (product.category) {
     breadcrumbs.push({ label: product.category.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '), href: `/products/${product.productType}/${product.category}` });

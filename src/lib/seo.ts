@@ -4,6 +4,9 @@ import { normalizeImageUrl } from './imageUrl';
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
 export const SITE_NAME = 'Bespokewala';
 
+// Default OG image — shown when no product/category image is available
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/bespoken-transparent.png`;
+
 export interface SEOFields {
   title?: string;
   description?: string;
@@ -45,6 +48,7 @@ export function getCanonicalUrl(path: string): string {
 
 /**
  * Generate Next.js Metadata based on provided SEO overrides or fallbacks.
+ * Automatically includes canonical URL, OpenGraph, and Twitter metadata.
  */
 export function generatePageMetadata(
   fallbackTitle: string,
@@ -70,7 +74,12 @@ export function generatePageMetadata(
     imageUrl = `${SITE_URL}${imageUrl}`;
   }
 
-  const twitterImageUrl = imageUrl ? `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}twitter=1` : undefined;
+  // Fall back to the site default OG image if no specific image is available
+  const finalImageUrl = imageUrl || DEFAULT_OG_IMAGE;
+
+  const twitterImageUrl = finalImageUrl
+    ? `${finalImageUrl}${finalImageUrl.includes('?') ? '&' : '?'}twitter=1`
+    : undefined;
 
   const metadata: Metadata = {
     title,
@@ -84,7 +93,7 @@ export function generatePageMetadata(
       url,
       siteName: SITE_NAME,
       type: 'website',
-      images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630 }] : undefined,
+      images: [{ url: finalImageUrl, width: 1200, height: 630, alt: `${title} | ${SITE_NAME}` }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -106,6 +115,19 @@ export function generatePageMetadata(
   }
 
   return metadata;
+}
+
+/**
+ * Generate metadata for static informational pages (About, Contact, FAQ, etc.)
+ * This is a convenience wrapper that ensures OG, Twitter, and canonical are always set.
+ */
+export function generateStaticPageMetadata(
+  title: string,
+  description: string,
+  path: string,
+  opts?: { keywords?: string; image?: string; noIndex?: boolean }
+): Metadata {
+  return generatePageMetadata(title, description, path, opts);
 }
 
 export function generateCategoryHeading(
@@ -170,7 +192,7 @@ export function generateCategoryMetadata(
     const gender = cat.toLowerCase() === 'womens' ? 'Women' : cat.toLowerCase() === 'mens' ? 'Men' : cat;
     const pluralSub = sub.endsWith('s') ? sub : `${sub}s`;
     title = `Luxury Designer ${pluralSub} for ${gender}`;
-    description = `Explore our exclusive collection of luxury designer ${pluralSub.toLowerCase()} for ${gender.toLowerCase()} at ${SITE_NAME}.`;
+    description = `Explore our exclusive collection of luxury designer ${pluralSub.toLowerCase()} for ${gender.toLowerCase()} at ${SITE_NAME}. Shop handcrafted Indian fashion with timeless elegance.`;
     path = `${path}/${category}/${subcategory}`;
   } else if (category) {
     const cat = capitalize(category);
@@ -179,25 +201,23 @@ export function generateCategoryMetadata(
     
     if (isGender) {
       title = `Luxury ${gender} ${pt}`;
-      description = `Discover luxury ${gender.toLowerCase()} ${pt.toLowerCase()} at ${SITE_NAME}.`;
+      description = `Discover luxury ${gender.toLowerCase()} ${pt.toLowerCase()} at ${SITE_NAME}. Handcrafted Indian fashion for every occasion.`;
     } else {
       title = `Luxury ${cat} – ${pt}`;
-      description = `Explore the ${cat} collection from our ${pt.toLowerCase()} range at ${SITE_NAME}.`;
+      description = `Explore the ${cat} collection from our ${pt.toLowerCase()} range at ${SITE_NAME}. Timeless Indian luxury fashion.`;
     }
     path = `${path}/${category}`;
   } else {
     title = `Luxury ${pt} Collection`;
-    description = `Shop our luxury ${pt.toLowerCase()} collection at ${SITE_NAME}.`;
+    description = `Shop our luxury ${pt.toLowerCase()} collection at ${SITE_NAME}. Discover handcrafted Indian fashion with exceptional design and quality.`;
   }
   
-  // Use a default category image if none provided
-  const finalFallbackImage = fallbackImage || `/images/categories/${productType}-default.jpg`;
-  
-  return generatePageMetadata(title, description, path, seoOverrides, finalFallbackImage);
+  return generatePageMetadata(title, description, path, seoOverrides, fallbackImage);
 }
 
 /**
- * Dynamically generate product metadata
+ * Dynamically generate product metadata using actual product data from MongoDB.
+ * Builds a rich, unique title and description from the product's attributes.
  */
 export function generateProductMetadata(
   product: any,
@@ -205,24 +225,64 @@ export function generateProductMetadata(
   fallbackImage?: string
 ): Metadata {
   const path = `/products/${product.slug}`;
+  const capitalize = (str: string) =>
+    str ? str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '';
 
-  // Build a rich description using available product attributes if a custom one isn't provided
-  let fallbackDesc = product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}.`;
-  if (!product.seo?.description && !seoOverrides?.description) {
-    const details = [];
-    if (product.colors && product.colors.length > 0) details.push(`Color: ${product.colors.join(', ')}.`);
-    if (product.details?.material || product.details?.composition || product.fabric) details.push(`Fabric: ${product.details?.material || product.details?.composition || product.fabric}.`);
-    if (product.productType) details.push(`Style: ${product.productType}.`);
-    
-    if (details.length > 0) {
-      fallbackDesc = `Shop the ${product.name}${product.category ? ` from our ${product.category} collection` : ''}. ${details.join(' ')} Explore luxury fashion at ${SITE_NAME}.`;
-    }
+  // ── Build a rich, unique SEO title ──────────────────────────────────────────
+  // Pattern: {Product Name} | Designer {Category} | Bespokewala
+  // (the root layout template appends "| Bespokewala" so we just provide the first two parts)
+  let formattedTitle: string;
+  if (product.category) {
+    formattedTitle = `${product.name} | Designer ${capitalize(product.category)}`;
+  } else if (product.productType) {
+    formattedTitle = `${product.name} | Designer ${capitalize(product.productType)}`;
+  } else {
+    formattedTitle = product.name;
   }
 
-  const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  const formattedTitle = product.category 
-    ? `${product.name} | ${capitalize(product.category)}` 
-    : product.name;
+  // ── Build a rich, unique meta description from real product attributes ──────
+  // Only use attributes that actually exist — never invent data.
+  let fallbackDesc = '';
+  if (!seoOverrides?.description && !product.seo?.description) {
+    const parts: string[] = [];
+
+    // Lead with the product name + category context
+    const categoryLabel = product.category ? capitalize(product.category) : capitalize(product.productType);
+    parts.push(`Shop the ${product.name}${categoryLabel ? ` — a luxury designer ${categoryLabel.toLowerCase()}` : ''} from Bespokewala.`);
+
+    // Colour
+    if (product.colors && product.colors.length > 0) {
+      parts.push(`Available in ${product.colors.join(', ')}.`);
+    }
+
+    // Fabric / Composition — check both top-level (legacy) and details sub-object
+    const fabric = product.fabric || product.details?.composition || product.details?.commodityName;
+    if (fabric) {
+      parts.push(`Crafted in ${fabric}.`);
+    }
+
+    // Occasion
+    if (product.occasion) {
+      parts.push(`Perfect for ${capitalize(product.occasion)}.`);
+    }
+
+    // Subcategory / Collection context (e.g. "Bridal Lehenga", "Wedding Collection")
+    if (product.subcategory && product.subcategory !== product.category) {
+      parts.push(`Part of our ${capitalize(product.subcategory)} range.`);
+    } else if (product.collectionName) {
+      parts.push(`From the ${capitalize(product.collectionName)} collection.`);
+    }
+
+    // Fallback: use the first 140 chars of the product description if we have nothing else
+    if (parts.length === 1 && product.description) {
+      parts.push(product.description.slice(0, 140).trimEnd());
+    }
+
+    fallbackDesc = parts.join(' ');
+  } else {
+    // Use the custom description from DB or seoOverrides, but trim to avoid >160 chars in SERP
+    fallbackDesc = seoOverrides?.description || product.seo?.description || product.description?.slice(0, 160) || `Buy ${product.name} at ${SITE_NAME}.`;
+  }
 
   return generatePageMetadata(
     formattedTitle,
@@ -241,7 +301,16 @@ export function generateOrganizationSchema() {
     "@type": "Organization",
     "name": SITE_NAME,
     "url": SITE_URL,
-    "logo": `${SITE_URL}/logo.png`,
+    // Uses the correct public-facing logo file (PNG, available in /public)
+    "logo": `${SITE_URL}/bespoken-transparent.png`,
+    "sameAs": [
+      "https://www.instagram.com/bespokewala",
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "availableLanguage": "English"
+    }
   };
 }
 
@@ -251,17 +320,29 @@ export function generateWebSiteSchema() {
     "@type": "WebSite",
     "name": SITE_NAME,
     "url": SITE_URL,
+    // SearchAction enables Google Sitelinks Search Box in SERP
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": `${SITE_URL}/products?q={search_term_string}`
+      },
+      "query-input": "required name=search_term_string"
+    }
   };
 }
 
-export function generateProductSchema(product: any, allImages: { url: string }[]) {
+export function generateProductSchema(product: any, allImages: { url: string; alt?: string }[]) {
+  // Prefer a real style code as SKU; fall back to the URL slug
+  const sku = product.details?.styleCode || product.slug;
+
   const schema: any = {
     "@context": "https://schema.org/",
     "@type": "Product",
     "name": product.name,
     "image": allImages.map(img => img.url),
     "description": product.seo?.description || product.description,
-    "sku": product.slug,
+    "sku": sku,
     "brand": {
       "@type": "Brand",
       "name": SITE_NAME
@@ -278,6 +359,7 @@ export function generateProductSchema(product: any, allImages: { url: string }[]
     }
   };
   
+  // Only add aggregateRating if there are real reviews — never fabricate ratings
   if (product.reviews && product.reviews.length > 0) {
     const sum = product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
     schema.aggregateRating = {
@@ -323,6 +405,26 @@ export function generateItemListSchema(products: any[], listUrl: string) {
         "name": product.name,
         "url": getCanonicalUrl(`/products/${product.slug}`),
         "image": product.images?.[0] ? normalizeImageUrl(product.images[0]) : undefined
+      }
+    }))
+  };
+}
+
+/**
+ * Generate FAQPage structured data for the FAQ page.
+ * Enables FAQ rich results (accordion) in Google SERP.
+ * Pass an array of { question, answer } objects derived from your FAQ content.
+ */
+export function generateFAQSchema(faqs: { question: string; answer: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
       }
     }))
   };
