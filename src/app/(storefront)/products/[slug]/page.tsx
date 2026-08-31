@@ -15,13 +15,15 @@ import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
 import ProductTrustBadges from '@/components/product/ProductTrustBadges';
 import { getOrFetch } from '@/lib/serverCache';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+import RelatedProducts from '@/components/product/RelatedProducts';
+import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
 
 const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
 import ProductChatContext from '@/components/chatbot/ProductChatContext';
 
 export const revalidate = 60;
 
-import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
 
 // Known product types — used to distinguish /products/jewellery (listing)
 // from /products/the-pink-diamond-ring (product detail)
@@ -53,7 +55,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ) as any;
   if (!product) notFound();
   
-  const imageUrl = product.images && product.images.length > 0 ? product.images[0] : undefined;
+  // Normalize the OG image to a proxy URL. Social crawlers (Facebook, Twitter, Google)
+  // cannot follow our private GCS proxy without normalization, and a relative URL like
+  // /api/media/... won't work in OG tags — generatePageMetadata prepends SITE_URL for us.
+  const rawImageUrl = product.images && product.images.length > 0 ? product.images[0] : undefined;
+  const imageUrl = rawImageUrl ? normalizeImageUrl(rawImageUrl) : undefined;
   
   return generateProductMetadata(product, product.seo, imageUrl);
 }
@@ -89,29 +95,52 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
     notFound();
   }
 
+  // Helper to capitalize slug-formatted strings
+  const capitalize = (s: string) =>
+    s ? s.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '';
+
   // Combine main images and reference images
   const allImages: { url: string; alt: string }[] = [];
 
   // Normalize all image URLs from MongoDB to browser-safe proxy URLs.
   // Handles: legacy ?file= format, stale GCS CDN URLs, correct proxy URLs.
   // See src/lib/imageUrl.ts for full normalization logic.
+  //
+  // Alt text pattern:
+  //   Main image[0]  → "{Product Name} — front view"
+  //   Main image[1+] → "{Product Name} — {category} detail view {n}"
+  //   Reference front/back/left/right → "{Product Name} — {angle} view"
+  // This provides keyword-rich, unique alt text for every image without
+  // keyword stuffing or generic "image 1" patterns.
 
   if (product.images && Array.isArray(product.images)) {
     product.images.forEach((img: string, idx: number) => {
       const url = normalizeImageUrl(img);
-      if (url) allImages.push({ url, alt: `${product.name} - View ${idx + 1}` });
+      if (!url) return;
+      let altText: string;
+      if (idx === 0) {
+        altText = `${product.name} — front view`;
+      } else {
+        const categoryLabel = product.subcategory
+          ? capitalize(product.subcategory)
+          : product.category
+          ? capitalize(product.category)
+          : '';
+        altText = `${product.name}${categoryLabel ? ` ${categoryLabel}` : ''} — detail view ${idx + 1}`;
+      }
+      allImages.push({ url, alt: altText });
     });
   }
 
   if (product.referenceImages) {
     const addRef = (img: string | undefined, label: string) => {
       const url = normalizeImageUrl(img);
-      if (url) allImages.push({ url, alt: `${product.name} - ${label}` });
+      if (url) allImages.push({ url, alt: `${product.name} — ${label}` });
     };
-    addRef(product.referenceImages.front, 'Front View');
-    addRef(product.referenceImages.back, 'Back View');
-    addRef(product.referenceImages.left, 'Left View');
-    addRef(product.referenceImages.right, 'Right View');
+    addRef(product.referenceImages.front, 'front view');
+    addRef(product.referenceImages.back, 'back view');
+    addRef(product.referenceImages.left, 'left side view');
+    addRef(product.referenceImages.right, 'right side view');
   }
 
   if (allImages.length > 0) {
@@ -143,16 +172,29 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
 
   const productSchema = generateProductSchema(product, allImages);
 
-  const breadcrumbs = [
+  // Build breadcrumb items — used for both JSON-LD and visible HTML nav
+  const breadcrumbItems = [
     { label: 'Home', href: '/' },
-    { label: product.productType ? product.productType.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Products', href: `/products/${product.productType || ''}` }
+    {
+      label: product.productType ? capitalize(product.productType) : 'Products',
+      href: `/products/${product.productType || ''}`,
+    },
   ];
   if (product.category) {
-    breadcrumbs.push({ label: product.category.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '), href: `/products/${product.productType}/${product.category}` });
+    breadcrumbItems.push({
+      label: capitalize(product.category),
+      href: `/products/${product.productType}/${product.category}`,
+    });
   }
-  breadcrumbs.push({ label: product.name, href: `/products/${product.slug}` });
+  breadcrumbItems.push({ label: product.name, href: `/products/${product.slug}` });
 
-  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
+  const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
+
+  // Build crawlable product attributes — only include attributes that exist,
+  // never invent or assume data. These are rendered as HTML text for crawlers.
+  const fabric = product.details?.composition || product.details?.commodityName;
+  const occasion = product.occasion;
+  const collectionName = product.collectionName;
 
   return (
     <>
@@ -164,7 +206,18 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-20 mobile-pb-4">
+      {/* ── Breadcrumb navigation (visible HTML links for crawlers + users) ── */}
+      <div
+        style={{
+          maxWidth: '1600px',
+          margin: '0 auto',
+          padding: '6rem 4rem 0',
+        }}
+        className="mobile-px-4 mobile-pt-20"
+      >
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
+      <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-4 mobile-pb-4">
         <div>
           {(() => {
             const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';
@@ -206,6 +259,54 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               </div>
             )}
 
+            {/* ── Crawlable product attributes ─────────────────────────────────
+                Only rendered when the data actually exists in MongoDB.
+                These provide meaningful context to search engines about the
+                product without keyword stuffing or hidden text.
+            ────────────────────────────────────────────────────────────────── */}
+            {(fabric || occasion || collectionName) && (
+              <dl
+                style={{
+                  fontSize: '0.82rem',
+                  color: '#888',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.3rem',
+                  margin: 0,
+                  padding: '0.75rem 0',
+                  borderTop: '1px solid #f0f0f0',
+                  borderBottom: '1px solid #f0f0f0',
+                }}
+              >
+                {fabric && (
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <dt style={{ textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '80px' }}>Fabric</dt>
+                    <dd style={{ margin: 0 }}>{fabric}</dd>
+                  </div>
+                )}
+                {occasion && (
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <dt style={{ textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '80px' }}>Occasion</dt>
+                    <dd style={{ margin: 0 }}>{capitalize(occasion)}</dd>
+                  </div>
+                )}
+                {collectionName && (
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <dt style={{ textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '80px' }}>Collection</dt>
+                    <dd style={{ margin: 0 }}>
+                      {/* Link to the collection page for internal linking */}
+                      <a
+                        href={`/products/${product.productType}/${collectionName}`}
+                        style={{ color: '#888', textDecoration: 'underline', textDecorationColor: '#ddd' }}
+                      >
+                        {capitalize(collectionName)}
+                      </a>
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            )}
+
             <ProductClientActions
               product={{
                 slug: product.slug,
@@ -229,6 +330,19 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
         <ProductReviews productId={product._id.toString()} deferFetch={true} />
       </div>
+
+      {/* ── Related Products ──────────────────────────────────────────────────
+          Server-rendered section with crawlable <a> links. Fetches products
+          from same subcategory so Google can discover the full catalogue via
+          internal links from every product page.
+      ─────────────────────────────────────────────────────────────────────── */}
+      <RelatedProducts
+        currentProductId={product._id.toString()}
+        subcategory={product.subcategory || ''}
+        productType={product.productType || ''}
+        category={product.category}
+      />
+
       <ProductChatContext context={{
         slug: product.slug,
         name: product.name,

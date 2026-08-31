@@ -58,6 +58,7 @@ function AdminProductsContent() {
         colors: [],
         inventoryCount: '10',
         isFeatured: false,
+        seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
       });
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -80,6 +81,7 @@ function AdminProductsContent() {
     colors: [] as string[],
     inventoryCount: '10',
     isFeatured: false,
+    seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
   });
 
   const fetchProductsAndTaxonomies = async (type?: string) => {
@@ -314,6 +316,9 @@ function AdminProductsContent() {
       return;
     }
 
+    // Only include SEO fields if at least one has been filled in by the admin.
+    // This avoids persisting an empty seo object that would shadow fallback generation.
+    const hasSeoData = formData.seo.title || formData.seo.description || formData.seo.keywords || formData.seo.canonicalUrl || formData.seo.noIndex;
     const payload = {
       name: formData.name,
       description: formData.description,
@@ -331,6 +336,7 @@ function AdminProductsContent() {
       colors: formData.colors,
       inventoryCount: Number(formData.inventoryCount),
       isFeatured: formData.isFeatured,
+      ...(hasSeoData ? { seo: formData.seo } : {}),
     };
 
     try {
@@ -351,7 +357,8 @@ function AdminProductsContent() {
           details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
           sizes: [],
           colors: [],
-          inventoryCount: '10', isFeatured: false 
+          inventoryCount: '10', isFeatured: false,
+          seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
         });
         setEditingId(null);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -416,6 +423,8 @@ function AdminProductsContent() {
       colors: [],
       inventoryCount: prod.inventoryCount?.toString() || '10',
       isFeatured: prod.isFeatured || false,
+      // Optimistic placeholder — will be overwritten by full product fetch below
+      seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
@@ -449,6 +458,13 @@ function AdminProductsContent() {
           colors: fullProd.colors || [],
           inventoryCount: fullProd.inventoryCount?.toString() || '10',
           isFeatured: fullProd.isFeatured || false,
+          seo: {
+            title: fullProd.seo?.title || '',
+            description: fullProd.seo?.description || '',
+            keywords: fullProd.seo?.keywords || '',
+            canonicalUrl: fullProd.seo?.canonicalUrl || '',
+            noIndex: fullProd.seo?.noIndex || false,
+          },
         });
       } else {
         alert('Failed to load full product details for editing.');
@@ -617,7 +633,7 @@ function AdminProductsContent() {
                 type="button" 
                 onClick={() => {
                   setEditingId(null);
-                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], colors: [], inventoryCount: '10', isFeatured: false });
+                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], colors: [], inventoryCount: '10', isFeatured: false, seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false } });
                 }}
                 style={{ fontSize: '0.8rem', marginLeft: '15px', padding: '4px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}
               >
@@ -1005,6 +1021,120 @@ function AdminProductsContent() {
               </div>
             </div>
 
+            {/* ── SEO Section ───────────────────────────────────────────────────
+                Optional manual SEO overrides. If left blank, metadata is auto-
+                generated from the product name, description, category, etc.
+                These fields are saved to product.seo in MongoDB.
+            ────────────────────────────────────────────────────────────────── */}
+            <div style={{ marginTop: '24px', border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+              <div style={{ background: '#f8f8f8', padding: '12px 16px', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '1rem' }}>🔍</span>
+                <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#333', letterSpacing: '0.03em' }}>SEO — Search Engine Optimisation</h3>
+                <span style={{ fontSize: '0.75rem', color: '#888', marginLeft: 'auto' }}>Optional — auto-generated if left blank</span>
+              </div>
+              <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+                {/* SEO Title */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#444' }}>SEO Title</label>
+                    <span style={{ fontSize: '0.75rem', color: (formData.seo.title.length > 60 || (formData.seo.title.length > 0 && formData.seo.title.length < 50)) ? '#e07000' : '#888' }}>
+                      {formData.seo.title.length}/60 chars {formData.seo.title.length > 0 && formData.seo.title.length < 50 ? '(too short)' : formData.seo.title.length > 60 ? '(too long)' : formData.seo.title.length >= 50 ? '✓' : ''}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.seo.title}
+                    onChange={e => setFormData({ ...formData, seo: { ...formData.seo, title: e.target.value } })}
+                    placeholder={`${formData.name || 'Product Name'} | Bespokewala`}
+                    maxLength={80}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+                  />
+                  <p style={{ fontSize: '0.73rem', color: '#999', margin: '4px 0 0' }}>50–60 characters recommended. Appears in browser tab and Google results. Leave blank to auto-generate.</p>
+                </div>
+
+                {/* Meta Description */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#444' }}>Meta Description</label>
+                    <span style={{ fontSize: '0.75rem', color: (formData.seo.description.length > 160 || (formData.seo.description.length > 0 && formData.seo.description.length < 100)) ? '#e07000' : '#888' }}>
+                      {formData.seo.description.length}/160 chars {formData.seo.description.length > 0 && formData.seo.description.length < 100 ? '(too short)' : formData.seo.description.length > 160 ? '(too long)' : formData.seo.description.length >= 100 ? '✓' : ''}
+                    </span>
+                  </div>
+                  <textarea
+                    value={formData.seo.description}
+                    onChange={e => setFormData({ ...formData, seo: { ...formData.seo, description: e.target.value } })}
+                    placeholder={formData.description ? formData.description.substring(0, 140) + '…' : 'Enter a compelling meta description for search results'}
+                    maxLength={200}
+                    rows={3}
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.9rem', resize: 'vertical', boxSizing: 'border-box' }}
+                  />
+                  <p style={{ fontSize: '0.73rem', color: '#999', margin: '4px 0 0' }}>140–160 characters recommended. Shown in Google snippets. Leave blank to auto-generate from product description.</p>
+                </div>
+
+                {/* Keywords */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', fontWeight: 'bold', color: '#444' }}>Keywords</label>
+                  <input
+                    type="text"
+                    value={formData.seo.keywords}
+                    onChange={e => setFormData({ ...formData, seo: { ...formData.seo, keywords: e.target.value } })}
+                    placeholder="e.g. bridal lehenga, wedding lehenga, red bridal outfit"
+                    style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+                  />
+                  <p style={{ fontSize: '0.73rem', color: '#999', margin: '4px 0 0' }}>Comma-separated. Used for meta keywords tag.</p>
+                </div>
+
+                {/* Canonical URL + No-Index row */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '16px', alignItems: 'end' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', fontWeight: 'bold', color: '#444' }}>Canonical URL</label>
+                    <input
+                      type="text"
+                      value={formData.seo.canonicalUrl}
+                      onChange={e => setFormData({ ...formData, seo: { ...formData.seo, canonicalUrl: e.target.value } })}
+                      placeholder={`https://www.bespokewala.com/products/${formData.name?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}`}
+                      style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+                    />
+                    <p style={{ fontSize: '0.73rem', color: '#999', margin: '4px 0 0' }}>Leave blank unless this product has a duplicate URL that needs canonicalisation.</p>
+                  </div>
+                  <div style={{ paddingBottom: '24px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      <input
+                        type="checkbox"
+                        checked={formData.seo.noIndex}
+                        onChange={e => setFormData({ ...formData, seo: { ...formData.seo, noIndex: e.target.checked } })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                      />
+                      <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#c0392b' }}>No-Index</span>
+                    </label>
+                    <p style={{ fontSize: '0.73rem', color: '#999', margin: '4px 0 0', paddingLeft: '24px' }}>Hides from Google</p>
+                  </div>
+                </div>
+
+                {/* Google Search Preview */}
+                {(formData.seo.title || formData.name) && (
+                  <div>
+                    <p style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#555', marginBottom: '8px' }}>🔍 Google Search Preview</p>
+                    <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '16px', background: '#fff', fontFamily: 'Arial, sans-serif', maxWidth: '600px' }}>
+                      {/* URL line */}
+                      <div style={{ fontSize: '0.8rem', color: '#006621', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        https://www.bespokewala.com/products/{formData.name?.toLowerCase().replace(/\s+/g, '-') || 'product-slug'}
+                      </div>
+                      {/* Title */}
+                      <div style={{ fontSize: '1.05rem', color: '#1a0dab', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: '1.3', cursor: 'pointer' }}>
+                        {formData.seo.title || `${formData.name}${formData.name ? ' | Bespokewala' : ''}`}
+                      </div>
+                      {/* Description */}
+                      <div style={{ fontSize: '0.85rem', color: '#545454', lineHeight: '1.4', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {formData.seo.description || formData.description || 'No meta description set — Google will pick a snippet from the page content.'}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <button 
               type="submit" 
               disabled={uploading || (!formData.imageUrl && !editingId)}
@@ -1014,6 +1144,7 @@ function AdminProductsContent() {
               {editingId ? 'Update Product' : 'Save Product'}
             </button>
           </form>
+
         </div>
 
         {/* LIST EXISTING PRODUCTS */}

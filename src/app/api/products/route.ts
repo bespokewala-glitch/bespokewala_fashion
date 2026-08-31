@@ -110,6 +110,17 @@ export async function POST(req: NextRequest) {
       isFeatured: Boolean(body.isFeatured),
       referenceImages: body.referenceImages || undefined,
       details: body.details || undefined,
+      // Persist SEO fields if provided on creation.
+      seo: body.seo
+        ? {
+            title: body.seo.title || undefined,
+            description: body.seo.description || undefined,
+            keywords: body.seo.keywords || undefined,
+            canonicalUrl: body.seo.canonicalUrl || undefined,
+            noIndex: Boolean(body.seo.noIndex),
+            image: body.seo.image || undefined,
+          }
+        : undefined,
     };
 
     const product = await Product.create(productData);

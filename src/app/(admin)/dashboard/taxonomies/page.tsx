@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Tag, Plus, Pencil, Trash2, ChevronDown, ChevronRight, Save, X, ToggleLeft, ToggleRight, Globe } from "lucide-react";
+import { Tag, Plus, Pencil, Trash2, ChevronDown, ChevronRight, Save, X, ToggleLeft, ToggleRight, Globe, Search } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface TaxonomySEO {
@@ -66,6 +66,7 @@ export default function TaxonomiesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterType, setFilterType] = useState<TaxonomyType | "all">("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Form state
   const [form, setForm] = useState(emptyForm());
@@ -210,7 +211,11 @@ export default function TaxonomiesPage() {
   };
 
   // ── Filter ─────────────────────────────────────────────────────────────────
-  const filtered = filterType === "all" ? taxonomies : taxonomies.filter((t) => t.type === filterType);
+  const filtered = taxonomies.filter((t) => {
+    const matchesType = filterType === "all" || t.type === filterType;
+    const matchesSearch = !searchQuery || t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.slug.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesType && matchesSearch;
+  });
   const grouped: Record<string, Taxonomy[]> = {};
   TAX_TYPES.forEach((t) => { grouped[t] = filtered.filter((tx) => tx.type === t); });
 
@@ -230,28 +235,41 @@ export default function TaxonomiesPage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-        {(["all", ...TAX_TYPES] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setFilterType(t)}
-            style={{
-              padding: "6px 16px",
-              borderRadius: "20px",
-              border: "1px solid",
-              borderColor: filterType === t ? "#111" : "#ddd",
-              backgroundColor: filterType === t ? "#111" : "#fff",
-              color: filterType === t ? "#fff" : "#555",
-              fontSize: "0.8rem",
-              fontWeight: filterType === t ? 600 : 400,
-              cursor: "pointer",
-              textTransform: "capitalize",
-            }}
-          >
-            {t === "all" ? `All (${taxonomies.length})` : `${t} (${taxonomies.filter((tx) => tx.type === t).length})`}
-          </button>
-        ))}
+      {/* Filter tabs & Search */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          {(["all", ...TAX_TYPES] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setFilterType(t)}
+              style={{
+                padding: "6px 16px",
+                borderRadius: "20px",
+                border: "1px solid",
+                borderColor: filterType === t ? "#111" : "#ddd",
+                backgroundColor: filterType === t ? "#111" : "#fff",
+                color: filterType === t ? "#fff" : "#555",
+                fontSize: "0.8rem",
+                fontWeight: filterType === t ? 600 : 400,
+                cursor: "pointer",
+                textTransform: "capitalize",
+              }}
+            >
+              {t === "all" ? `All (${taxonomies.length})` : `${t} (${taxonomies.filter((tx) => tx.type === t).length})`}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", background: "#fff", border: "1px solid #ddd", borderRadius: "20px", padding: "4px 12px", width: "100%", maxWidth: "300px" }}>
+          <Search size={16} color="#888" />
+          <input
+            type="text"
+            placeholder="Search taxonomies..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ border: "none", outline: "none", background: "transparent", padding: "6px 8px", fontSize: "0.85rem", width: "100%" }}
+          />
+        </div>
       </div>
 
       {/* Loading / Error */}

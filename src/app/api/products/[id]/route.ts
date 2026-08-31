@@ -56,6 +56,18 @@ export async function PUT(
       isFeatured: Boolean(body.isFeatured),
       referenceImages: body.referenceImages || undefined,
       details: body.details || undefined,
+      // Persist SEO fields explicitly so admin overrides are saved to MongoDB.
+      // If body.seo is undefined (old clients), this is a no-op.
+      seo: body.seo
+        ? {
+            title: body.seo.title || undefined,
+            description: body.seo.description || undefined,
+            keywords: body.seo.keywords || undefined,
+            canonicalUrl: body.seo.canonicalUrl || undefined,
+            noIndex: Boolean(body.seo.noIndex),
+            image: body.seo.image || undefined,
+          }
+        : undefined,
     };
 
     const updatedProduct = await Product.findByIdAndUpdate(
