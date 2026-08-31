@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import { generateCategoryMetadata, generatePageMetadata } from '@/lib/seo';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   searchParams,

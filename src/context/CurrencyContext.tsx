@@ -65,11 +65,24 @@ function writePref(pref: CurrencyPreference) {
   } catch (_) { /* ignore */ }
 }
 
-/** Attempt a browser locale fallback when IP detection fails */
 function getCurrencyFromBrowserLocale(): string {
   try {
+    // 1. Try Timezone first (more accurate than language)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) {
+      if (tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta') return 'INR';
+      if (tz === 'Europe/London') return 'GBP';
+      if (tz.startsWith('Australia/')) return 'AUD';
+      if (tz.startsWith('America/Toronto') || tz.startsWith('America/Vancouver')) return 'CAD';
+      if (tz.startsWith('Asia/Dubai')) return 'AED';
+      if (tz === 'Asia/Singapore') return 'SGD';
+      // Basic timezone checks for EUR
+      if (['Europe/Paris', 'Europe/Berlin', 'Europe/Madrid', 'Europe/Rome', 'Europe/Amsterdam'].includes(tz)) return 'EUR';
+    }
+
+    // 2. Fallback to language
     const lang = navigator.language || '';
-    if (lang.startsWith('en-IN')) return 'INR';
+    if (lang.startsWith('en-IN') || lang.startsWith('hi')) return 'INR';
     if (lang.startsWith('en-GB')) return 'GBP';
     if (lang.startsWith('en-US')) return 'USD';
     if (lang.startsWith('en-CA')) return 'CAD';
@@ -130,6 +143,13 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
 
             if (geoRes.ok && isMounted) {
               const geoData = await geoRes.json();
+              
+              if (geoData.fallback) {
+                // If backend used its default fallback (e.g. API rate limit),
+                // throw to use our smarter client-side timezone fallback instead.
+                throw new Error('Backend geolocation failed');
+              }
+
               const detectedCurrency = geoData.currency;
               const finalCurrency =
                 detectedCurrency && SUPPORTED_CURRENCIES[detectedCurrency]
@@ -137,13 +157,15 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
                   : DEFAULT_FALLBACK_CURRENCY;
               setCurrencyState(finalCurrency);
               writePref({ currency: finalCurrency, source: 'auto' });
+            } else {
+              throw new Error('Geolocation request failed');
             }
           } catch {
-            // Browser locale fallback
+            // Browser locale/timezone fallback
             if (isMounted) {
               const fallbackCurrency = getCurrencyFromBrowserLocale();
-              // Only overwrite if we didn't already have a valid pref
-              if (!pref) {
+              // Overwrite if it was auto (fixes stuck bad cached values)
+              if (!pref || pref.source === 'auto') {
                 setCurrencyState(fallbackCurrency);
                 writePref({ currency: fallbackCurrency, source: 'auto' });
               }

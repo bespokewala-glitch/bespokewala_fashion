@@ -8,7 +8,7 @@ import { CollectionPageContent } from '@/components/layout/CollectionPageContent
 import { Metadata } from 'next';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 import ReactDOM from 'react-dom';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import FootwearGallery from '@/components/product/FootwearGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
@@ -19,10 +19,10 @@ import Breadcrumb from '@/components/ui/Breadcrumb';
 import RelatedProducts from '@/components/product/RelatedProducts';
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
 
-const ProductReviews = dynamic(() => import('@/components/product/reviews/ProductReviews'));
+const ProductReviews = nextDynamic(() => import('@/components/product/reviews/ProductReviews'));
 import ProductChatContext from '@/components/chatbot/ProductChatContext';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 
 // Known product types — used to distinguish /products/jewellery (listing)

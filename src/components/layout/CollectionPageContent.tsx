@@ -171,10 +171,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       const fullRoutePath = canonicalPath.replace(/^\/products\//, '');
       if (fullRoutePath && fullRoutePath !== pageId) {
         const exactMatch = await mongoose.models.Taxonomy?.findOne({ slug: fullRoutePath }).select('seo').lean();
-        if (exactMatch) return exactMatch;
+        if (exactMatch) return { ...exactMatch, isExactMatch: true };
       }
       
-      return mongoose.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null;
+      const fallback = await mongoose.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean();
+      return fallback ? { ...fallback, isExactMatch: false } : null;
     }),
     // Fetch distinct child categories/subcategories for the filter bar
     getOrFetch(`filters:${productCacheKey}`, 60, async () => {
@@ -244,9 +245,21 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
    * Use reusable title logic to produce meaningful H1s 
    * (e.g. "Luxury Women's Lehengas", "Luxury Footwear Collection")
    */
-  const generatedTitle = generateCategoryHeading(productType, category, subcategory, collectionName);
+  // If we're relying on a fallback taxonomy (e.g. 'cocktail'), we shouldn't use its generic seoH1 for a specific page.
+  // Instead, pass it as the 'contextName' so generateCategoryHeading outputs e.g. "Luxury Women's Couture Cocktail".
+  const isExactMatch = (rawTaxonomy as any)?.isExactMatch;
+  const isRootTaxonomy = pageId === (canonicalPath.replace(/^\/products\//, '') || pageId);
+  
+  // We only use the context parameter if there isn't an explicit subcategory and we're relying on slug2/slug3/occasion
+  const contextName = !subcategory ? (slug3 || occasion || slug2) : undefined;
+  
+  const generatedTitle = generateCategoryHeading(productType, category, subcategory, collectionName, contextName);
   const taxonomySeo = (rawTaxonomy as any)?.seo || {};
-  const pageTitle = taxonomySeo.seoH1 || generatedTitle;
+  
+  // Use the taxonomy's H1 if we matched exactly OR if it's a top-level department
+  const useTaxonomyH1 = taxonomySeo.seoH1 && (isExactMatch || isRootTaxonomy);
+  
+  const pageTitle = useTaxonomyH1 ? taxonomySeo.seoH1 : generatedTitle;
   const seoIntro = taxonomySeo.seoIntro;
   const seoContent = taxonomySeo.seoContent;
 

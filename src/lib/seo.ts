@@ -134,10 +134,13 @@ export function generateCategoryHeading(
   productType?: string,
   category?: string,
   subcategory?: string,
-  collectionName?: string
+  collectionName?: string,
+  contextName?: string
 ): string {
   const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   
+  const ctx = contextName ? `${capitalize(contextName)} ` : '';
+
   if (collectionName) {
     return `${capitalize(collectionName)} Collection`;
   }
@@ -150,22 +153,22 @@ export function generateCategoryHeading(
     const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
     // Handle basic pluralization
     const pluralSub = sub.endsWith('s') ? sub : `${sub}s`;
-    return `Luxury ${gender} ${pluralSub}`;
+    return `Luxury ${gender} ${ctx}${pluralSub}`;
   } else if (category && productType) {
     const cat = capitalize(category);
     const isGender = cat.toLowerCase() === 'womens' || cat.toLowerCase() === 'mens';
     const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
     
     if (isGender) {
-      return `Luxury ${gender} ${pt}`;
+      return `Luxury ${gender} ${ctx}${pt}`;
     } else {
-      return `Luxury ${cat} – ${pt}`;
+      return `Luxury ${cat} – ${ctx}${pt}`;
     }
   } else if (productType) {
-    return `Luxury ${pt} Collection`;
+    return `Luxury ${ctx}${pt} Collection`;
   }
   
-  return 'All Products';
+  return contextName ? `${capitalize(contextName)} Collection` : 'All Products';
 }
 
 /**

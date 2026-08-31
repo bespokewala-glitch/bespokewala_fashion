@@ -6,7 +6,7 @@ import Taxonomy from '@/models/Taxonomy';
 import Product from '@/models/Product';
 import { getOrFetch } from '@/lib/serverCache';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 interface Props {
   params: Promise<{ slug: string; category: string; subcategory: string }>;

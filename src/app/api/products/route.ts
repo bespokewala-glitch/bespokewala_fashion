@@ -108,8 +108,7 @@ export async function GET(req: NextRequest) {
       
     return NextResponse.json(products, {
       headers: {
-        // Cache at the CDN edge: fresh for 60s, serve stale for 30s while revalidating
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+        'Cache-Control': 'no-store, max-age=0',
       },
     });
   } catch (error) {
