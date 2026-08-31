@@ -29,17 +29,58 @@ export async function GET(req: NextRequest) {
     if (collectionName) query.collectionName = collectionName;
     if (occasion) query.occasion = occasion;
     
+    // Support wildcard slug2 and slug3 from CollectionPageContent
+    const slug2 = searchParams.get('slug2');
+    const slug3 = searchParams.get('slug3');
+
+    const buildInQuery = (val: string) => {
+      const arr = val.split(',').map(v => v.trim()).filter(Boolean);
+      if (arr.length === 0) return undefined;
+      return { $in: arr.map(item => new RegExp(`^${item.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')) };
+    };
+
+    if (slug2 && slug2.toLowerCase() !== 'all' && slug2.toLowerCase() !== 'all-products' && slug2.toLowerCase() !== 'all-collections') {
+      const slug2Query = buildInQuery(slug2);
+      if (slug2Query) {
+        if (!query.$and) query.$and = [];
+        query.$and.push({
+          $or: [
+            { category: slug2Query },
+            { collectionName: slug2Query },
+            { occasion: slug2Query }
+          ]
+        });
+      }
+    }
+
+    if (slug3 && slug3.toLowerCase() !== 'all' && slug3.toLowerCase() !== 'all-products' && slug3.toLowerCase() !== 'all-collections') {
+      const slug3Query = buildInQuery(slug3);
+      if (slug3Query) {
+        if (!query.$and) query.$and = [];
+        query.$and.push({
+          $or: [
+            { subcategory: slug3Query },
+            { collectionName: slug3Query },
+            { occasion: slug3Query }
+          ]
+        });
+      }
+    }
+
     if (q) {
       const words = q.trim().split(/\s+/).filter(Boolean);
       const regexPattern = words.map(w => `(?=.*${w})`).join('');
       const regexString = `^${regexPattern}`;
 
-      query.$or = [
-        { name: { $regex: regexString, $options: 'i' } },
-        { category: { $regex: regexString, $options: 'i' } },
-        { subcategory: { $regex: regexString, $options: 'i' } },
-        { collectionName: { $regex: regexString, $options: 'i' } }
-      ];
+      if (!query.$and) query.$and = [];
+      query.$and.push({
+        $or: [
+          { name: { $regex: regexString, $options: 'i' } },
+          { category: { $regex: regexString, $options: 'i' } },
+          { subcategory: { $regex: regexString, $options: 'i' } },
+          { collectionName: { $regex: regexString, $options: 'i' } }
+        ]
+      });
     }
 
     if (minPrice || maxPrice) {

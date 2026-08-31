@@ -13,6 +13,7 @@ import FeatureBanner from '@/components/home/FeatureBanner';
 import SplitShowcase from '@/components/home/SplitShowcase';
 import CoutureProcess from '@/components/home/CoutureProcess';
 import JewelleryProcess from '@/components/home/JewelleryProcess';
+import SeoAccordion from '@/components/ui/SeoAccordion';
 import { getOrFetch } from '@/lib/serverCache';
 import { generateBreadcrumbSchema, generateItemListSchema, generateCategoryHeading } from '@/lib/seo';
 
@@ -374,7 +375,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         )}
 
         {seoContent && (
-          <div className="seo-content" style={{ marginTop: '6rem', paddingTop: '4rem', borderTop: '1px solid #eaeaea', color: '#555', lineHeight: '1.8', fontSize: '0.95rem' }} dangerouslySetInnerHTML={{ __html: seoContent }} />
+          <SeoAccordion content={seoContent} />
         )}
       </main>
     </>
