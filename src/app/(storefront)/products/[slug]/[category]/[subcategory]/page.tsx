@@ -18,9 +18,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   try {
     await dbConnect();
-    const taxonomy = await getOrFetch(`taxonomy:meta:${subcategory}`, 600, () => 
-      Taxonomy.findOne({ slug: subcategory }).lean()
+    const fullRoutePath = `${productType}/${category}/${subcategory}`;
+    
+    // 1. Check exact route match (e.g., 'couture/womens/cocktail')
+    let taxonomy = await getOrFetch(`taxonomy:meta:${fullRoutePath}`, 600, () => 
+      Taxonomy.findOne({ slug: fullRoutePath }).lean()
     );
+    
+    // 2. Fall back to generic slug (e.g., 'cocktail')
+    if (!taxonomy) {
+      taxonomy = await getOrFetch(`taxonomy:meta:${subcategory}`, 600, () => 
+        Taxonomy.findOne({ slug: subcategory }).lean()
+      );
+    }
+
     if (taxonomy && (taxonomy as any).seo) {
       return generateCategoryMetadata(productType, category, subcategory, (taxonomy as any).seo);
     }
@@ -33,11 +44,9 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
   const { slug: productType, category, subcategory } = await params;
   const searchParamsAwaited = await searchParams;
   
-  await dbConnect();
-  const taxonomy = await getOrFetch(`taxonomy:meta:${subcategory}`, 600, () => 
-    Taxonomy.findOne({ slug: subcategory }).lean()
-  );
-
+  // We no longer need to prefetch taxonomy here since CollectionPageContent will fetch it,
+  // and CollectionPageContent now handles the fullRoutePath matching logic.
+  
   const collectionParams: any = { ...searchParamsAwaited, productType, category, slug3: subcategory };
 
   return <CollectionPageContent params={collectionParams} />;

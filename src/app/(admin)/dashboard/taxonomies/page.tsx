@@ -341,8 +341,11 @@ export default function TaxonomiesPage() {
 
               <div style={fieldGroup}>
                 <label style={labelStyle}>Slug * <span style={{ color: "#999", fontSize: "0.75rem" }}>(auto-generated, editable)</span></label>
-                <input value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} style={inputStyle} placeholder="e.g. lehenga" />
-                <p style={hintStyle}>URL segment used in /products/couture/<strong>{form.slug || "lehenga"}</strong></p>
+                <input value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} style={inputStyle} placeholder="e.g. lehenga or couture/womens/lehenga" />
+                <p style={hintStyle}>
+                  Leave as single word for default SEO across all categories (e.g. <strong>lehenga</strong>). 
+                  To override SEO for a specific path, enter the exact path (e.g. <strong>couture/womens/lehenga</strong>).
+                </p>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>

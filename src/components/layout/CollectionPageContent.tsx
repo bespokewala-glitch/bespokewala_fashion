@@ -129,6 +129,16 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const pageId = subcategory || slug3 || collectionName || category || slug2 || productType || 'all-products';
 
+  // Construct canonical path for ItemList and Route-Specific SEO
+  let canonicalPath = '/products';
+  if (productType) canonicalPath += `/${productType}`;
+  if (category) canonicalPath += `/${category}`;
+  else if (slug2) canonicalPath += `/${slug2}`;
+  if (subcategory) canonicalPath += `/${subcategory}`;
+  else if (slug3) canonicalPath += `/${slug3}`; // Ensure slug3 (e.g. cocktail) is appended if subcategory is undefined
+  else if (collectionName) canonicalPath += `/${collectionName}`; // Fallback if it's a collection page
+
+
   const productCacheKey = `products:${JSON.stringify(params)}:p${currentPage}`;
   const totalProductsCacheKey = `products:total:${JSON.stringify(params)}`;
   const sectionCacheKey = `sections:${pageId}`;
@@ -153,9 +163,17 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       if (!campCategory) return Promise.resolve([]);
       return HeroCampaign.find({ category: campCategory }).sort({ order: 1, _id: -1 }).lean();
     }),
-    getOrFetch(`taxonomy:${pageId}`, 60, () => {
+    getOrFetch(`taxonomy:${pageId}:${canonicalPath}`, 60, async () => {
       import('@/models/Taxonomy');
-      return import('mongoose').then(m => m.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null);
+      const mongoose = await import('mongoose');
+      
+      const fullRoutePath = canonicalPath.replace(/^\/products\//, '');
+      if (fullRoutePath && fullRoutePath !== pageId) {
+        const exactMatch = await mongoose.models.Taxonomy?.findOne({ slug: fullRoutePath }).select('seo').lean();
+        if (exactMatch) return exactMatch;
+      }
+      
+      return mongoose.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean() || null;
     }),
     // Fetch distinct child categories/subcategories for the filter bar
     getOrFetch(`filters:${productCacheKey}`, 60, async () => {
@@ -288,13 +306,6 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const hideProductGrid = isTopLevelDepartment && pageId === 'jewellery';
 
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
-
-  // Construct canonical path for ItemList
-  let canonicalPath = '/products';
-  if (productType) canonicalPath += `/${productType}`;
-  if (category) canonicalPath += `/${category}`;
-  if (subcategory) canonicalPath += `/${subcategory}`;
-  else if (collectionName) canonicalPath += `/${collectionName}`; // Fallback if it's a collection page
 
   const itemListSchema = generateItemListSchema(products, canonicalPath);
 
