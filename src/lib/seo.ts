@@ -21,11 +21,11 @@ export interface SEOFields {
  */
 export function getCanonicalUrl(path: string): string {
   let baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
-  
+
   // Force production domain for canonicals if baseUrl is localhost, ngrok, or vercel preview
   if (
-    baseUrl.includes('localhost') || 
-    baseUrl.includes('ngrok') || 
+    baseUrl.includes('localhost') ||
+    baseUrl.includes('ngrok') ||
     baseUrl.includes('vercel.app')
   ) {
     baseUrl = 'https://www.bespokewala.com';
@@ -36,12 +36,12 @@ export function getCanonicalUrl(path: string): string {
 
   // Strip query string and remove trailing slashes from path
   let cleanPath = path.split('?')[0].replace(/\/+$/, '');
-  
+
   // Handle root vs nested paths
   if (cleanPath === '') {
     return `${baseUrl}/`; // Root domain canonical usually has trailing slash
   }
-  
+
   const pathWithSlash = cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`;
   return `${baseUrl}${pathWithSlash}`;
 }
@@ -58,18 +58,18 @@ export function generatePageMetadata(
   fallbackImage?: string
 ): Metadata {
   let title = seoOverrides?.title || fallbackTitle;
-  
+
   // Strip ALL existing " | Bespokewala" occurrences from database overrides so the Next.js 
   // global template in layout.tsx can append it exactly once without duplication.
   title = title.replace(new RegExp(`(?:\\s*\\|\\s*${SITE_NAME})+`, 'gi'), '');
 
   const description = seoOverrides?.description || fallbackDescription;
-  
+
   const url = seoOverrides?.canonicalUrl || getCanonicalUrl(path);
-  
+
   const rawImage = seoOverrides?.image || fallbackImage;
   let imageUrl = rawImage ? normalizeImageUrl(rawImage) : undefined;
-  
+
   if (imageUrl && imageUrl.startsWith('/')) {
     imageUrl = `${SITE_URL}${imageUrl}`;
   }
@@ -138,7 +138,7 @@ export function generateCategoryHeading(
   contextName?: string
 ): string {
   const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  
+
   const ctx = contextName ? `${capitalize(contextName)} ` : '';
 
   if (collectionName) {
@@ -146,7 +146,7 @@ export function generateCategoryHeading(
   }
 
   const pt = productType ? capitalize(productType) : 'Products';
-  
+
   if (subcategory && category) {
     const sub = capitalize(subcategory);
     const cat = capitalize(category);
@@ -158,7 +158,7 @@ export function generateCategoryHeading(
     const cat = capitalize(category);
     const isGender = cat.toLowerCase() === 'womens' || cat.toLowerCase() === 'mens';
     const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
-    
+
     if (isGender) {
       return `Luxury ${gender} ${ctx}${pt}`;
     } else {
@@ -167,7 +167,7 @@ export function generateCategoryHeading(
   } else if (productType) {
     return `Luxury ${ctx}${pt} Collection`;
   }
-  
+
   return contextName ? `${capitalize(contextName)} Collection` : 'All Products';
 }
 
@@ -182,13 +182,13 @@ export function generateCategoryMetadata(
   fallbackImage?: string
 ): Metadata {
   const capitalize = (str: string) => str.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-  
+
   let title = '';
   let description = '';
   let path = `/products/${productType}`;
-  
+
   const pt = capitalize(productType);
-  
+
   if (subcategory && category) {
     const sub = capitalize(subcategory);
     const cat = capitalize(category);
@@ -201,7 +201,7 @@ export function generateCategoryMetadata(
     const cat = capitalize(category);
     const isGender = cat.toLowerCase() === 'womens' || cat.toLowerCase() === 'mens';
     const gender = cat.toLowerCase() === 'womens' ? "Women's" : cat.toLowerCase() === 'mens' ? "Men's" : cat;
-    
+
     if (isGender) {
       title = `Luxury ${gender} ${pt}`;
       description = `Discover luxury ${gender.toLowerCase()} ${pt.toLowerCase()} at ${SITE_NAME}. Handcrafted Indian fashion for every occasion.`;
@@ -214,7 +214,7 @@ export function generateCategoryMetadata(
     title = `Luxury ${pt} Collection`;
     description = `Shop our luxury ${pt.toLowerCase()} collection at ${SITE_NAME}. Discover handcrafted Indian fashion with exceptional design and quality.`;
   }
-  
+
   return generatePageMetadata(title, description, path, seoOverrides, fallbackImage);
 }
 
@@ -356,12 +356,12 @@ export function generateProductSchema(product: any, allImages: { url: string; al
       "priceCurrency": "INR",
       "price": product.price,
       "itemCondition": "https://schema.org/NewCondition",
-      "availability": (product.inventoryCount ?? 1) > 0 
-        ? "https://schema.org/InStock" 
+      "availability": (product.inventoryCount ?? 1) > 0
+        ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock"
     }
   };
-  
+
   // Only add aggregateRating if there are real reviews — never fabricate ratings
   if (product.reviews && product.reviews.length > 0) {
     const sum = product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
@@ -371,7 +371,7 @@ export function generateProductSchema(product: any, allImages: { url: string; al
       "reviewCount": product.reviews.length
     };
   }
-  
+
   return schema;
 }
 

@@ -9,7 +9,7 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
    * The raw image URL from the database or CMS.
    */
   src: string | null | undefined;
-  
+
   /**
    * The variant of the image to request from the server.
    * 'thumbnail' (~600px) is best for grids and cards.
@@ -17,7 +17,7 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
    * undefined (original) should only be used if absolute maximum quality is required.
    */
   variant?: 'micro' | 'thumbnail' | 'medium' | 'large';
-  
+
   /**
    * By default, images load lazily. Set to true for above-the-fold hero images.
    */
@@ -70,18 +70,18 @@ const gcsLoader = ({ src, width }: import('next/image').ImageLoaderProps) => {
  * 3. Graceful fallback on error (Target Variant → Placeholder).
  * 4. Default lazy loading for performance.
  */
-export default function OptimizedImage({ 
-  src, 
-  variant, 
-  priority = false, 
-  alt, 
-  ...rest 
+export default function OptimizedImage({
+  src,
+  variant,
+  priority = false,
+  alt,
+  ...rest
 }: OptimizedImageProps) {
   // 1. Resolve URLs
   const targetSrc = normalizeImageUrl(src, variant);
   const originalSrc = normalizeImageUrl(src);
   const resolvedSrc = targetSrc || originalSrc || PLACEHOLDER_IMAGE;
-  
+
   // 2. Track error state
   const [hasError, setHasError] = useState(false);
 

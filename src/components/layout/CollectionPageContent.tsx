@@ -198,7 +198,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             sizes:        [{ $unwind: '$sizes' },        { $group: { _id: '$sizes' } },        { $sort: { _id: 1 } }],
             categories:   [{ $group: { _id: '$category' } },   { $sort: { _id: 1 } }],
             productTypes: [{ $group: { _id: '$productType' } }, { $sort: { _id: 1 } }],
-            occasions:    [{ $match: { occasion: { $exists: true, $ne: null, $ne: '' } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
+            occasions:    [{ $match: { occasion: { $exists: true, $nin: [null, ''] } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
           },
         },
       ]);
