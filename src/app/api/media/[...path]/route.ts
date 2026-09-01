@@ -113,19 +113,25 @@ export async function GET(
 
       if (variantExists) {
         // ✅ Fast path: variant already generated — stream it directly
-        const [fileBuffer] = await variantFile.download();
+        // Use stream instead of buffer for much faster TTFB (Time To First Byte)
+        const { Readable } = await import('stream');
+        const nodeStream = variantFile.createReadStream();
+        const webStream = Readable.toWeb(nodeStream);
+
+        const [metadata] = await variantFile.getMetadata();
+        const contentLength = metadata.size || 0;
 
         console.log(
           `[media] 200 variant ${variantPath}` +
-          ` — ${fileBuffer.length} bytes, image/webp (${Date.now() - startMs}ms)`,
+          ` — ${contentLength} bytes, image/webp (${Date.now() - startMs}ms)`,
         );
 
-        return new NextResponse(fileBuffer as unknown as BodyInit, {
+        return new NextResponse(webStream as unknown as BodyInit, {
           status: 200,
           headers: {
             'Content-Type': 'image/webp',
-            'Content-Length': String(fileBuffer.length),
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Content-Length': String(contentLength),
+            'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable',
             'ETag': etag,
             'Vary': 'Accept-Encoding',
             'Content-Disposition': 'inline',
@@ -193,7 +199,7 @@ export async function GET(
           headers: {
             'Content-Type': 'image/webp',
             'Content-Length': String(optimizedBuffer.length),
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable',
             'ETag': variantEtag,
             'Vary': 'Accept-Encoding',
             'Content-Disposition': 'inline',
@@ -242,30 +248,35 @@ export async function GET(
       });
     }
 
-    // Detect content-type from GCS metadata first, then fall back to extension
     let contentType: string;
+    let contentLength: number;
     try {
       const [metadata] = await gcsFile.getMetadata();
       contentType = (metadata.contentType as string) || getMimeType(fileParam);
+      contentLength = parseInt(metadata.size as string, 10) || 0;
     } catch {
       contentType = getMimeType(fileParam);
+      contentLength = 0;
     }
 
     // Download the original from GCS
-    const [fileBuffer] = await gcsFile.download();
+    // Use Web Streams instead of downloading the whole file into RAM
+    const { Readable } = await import('stream');
+    const nodeStream = gcsFile.createReadStream();
+    const webStream = Readable.toWeb(nodeStream);
 
     console.log(
       `[media] 200 original "${fileParam}"` +
-      ` — ${fileBuffer.length} bytes, ${contentType} (${Date.now() - startMs}ms)`,
+      ` — ${contentLength} bytes, ${contentType} (${Date.now() - startMs}ms)`,
     );
 
-    return new NextResponse(fileBuffer as unknown as BodyInit, {
+    return new NextResponse(webStream as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Content-Length': String(fileBuffer.length),
+        'Content-Length': String(contentLength),
         // Immutable: file content never changes for a given key
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable',
         'ETag': etagOrig,
         'Vary': 'Accept-Encoding',
         'Content-Disposition': 'inline',
