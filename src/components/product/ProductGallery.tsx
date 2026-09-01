@@ -186,7 +186,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   alt={img.alt}
                   fill
                   variant="thumbnail"
-                  loading={idx < 4 ? "eager" : "lazy"}
+                  loading="lazy"
                   sizes="100px"
                   style={{ objectFit: 'cover' }}
                 />

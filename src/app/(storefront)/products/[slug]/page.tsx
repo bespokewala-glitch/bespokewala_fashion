@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { cache } from 'react';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import ProductGallery from '@/components/product/ProductGallery';
@@ -13,14 +13,20 @@ import FootwearGallery from '@/components/product/FootwearGallery';
 import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
-import ProductTrustBadges from '@/components/product/ProductTrustBadges';
 import { getOrFetch } from '@/lib/serverCache';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import RelatedProducts from '@/components/product/RelatedProducts';
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
-
+const ProductTrustBadges = nextDynamic(() => import('@/components/product/ProductTrustBadges'));
+const RelatedProducts = nextDynamic(() => import('@/components/product/RelatedProducts'));
 const ProductReviews = nextDynamic(() => import('@/components/product/reviews/ProductReviews'));
 import ProductChatContext from '@/components/chatbot/ProductChatContext';
+
+const getProductBySlug = cache(async (slug: string) => {
+  await dbConnect();
+  return getOrFetch(`product:detail:${slug}`, 300, () =>
+    Product.findOne({ slug }).lean()
+  );
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Otherwise treat as product slug — use server cache to avoid a second DB call
   // when the page render immediately follows (revalidate=60 means ISR handles staleness)
-  await dbConnect();
-  const product = await getOrFetch(`product:meta:${slug}`, 300, () =>
-    Product.findOne({ slug }).select('name slug description images seo productType category subcategory colors details fabric').lean()
-  ) as any;
+  const product = await getProductBySlug(slug) as any;
   if (!product) notFound();
   
   // Normalize the OG image to a proxy URL. Social crawlers (Facebook, Twitter, Google)
@@ -85,10 +88,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
   // ── Case 3: Individual product detail ────────────────────────────────────
   // Use server cache (5-min TTL) so navigating back to the same product
   // within a session doesn't trigger a second DB round-trip.
-  await dbConnect();
-  const rawProduct = await getOrFetch(`product:detail:${slug}`, 300, () =>
-    Product.findOne({ slug }).lean()
-  );
+  const rawProduct = await getProductBySlug(slug);
   const product = JSON.parse(JSON.stringify(rawProduct));
 
   if (!product) {
@@ -144,11 +144,8 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
   }
 
   if (allImages.length > 0) {
-    const mainImg = allImages[0].url;
-    const preloadUrl = mainImg.includes('/api/media/') 
-      ? `${mainImg}${mainImg.includes('?') ? '&' : '?'}v=medium` 
-      : mainImg;
-    ReactDOM.preload(preloadUrl, { as: 'image', fetchPriority: 'high' });
+    // next/image priority=true handles the preload injection automatically 
+    // based on the correct srcset sizes. We don't need manual ReactDOM.preload here.
   }
 
   const containerStyle: React.CSSProperties = {
