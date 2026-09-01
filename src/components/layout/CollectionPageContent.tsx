@@ -145,7 +145,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const sectionCacheKey = `sections:${pageId}`;
 
   const [rawProducts, totalProducts, hpSections, rawCampaigns, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
-    getOrFetch(productCacheKey, 60, () =>
+    getOrFetch(productCacheKey, 120, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
         .sort(sortQuery)
@@ -153,18 +153,18 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         .limit(productsPerPage)
         .lean()
     ),
-    getOrFetch(totalProductsCacheKey, 60, () =>
+    getOrFetch(totalProductsCacheKey, 120, () =>
       Product.countDocuments(productQuery)
     ),
-    getOrFetch(sectionCacheKey, 60, () =>
+    getOrFetch(sectionCacheKey, 300, () =>
       HomepageSection.find({ page: pageId }).lean()
     ),
-    getOrFetch(`campaigns:${productType || category || 'none'}`, 60, () => {
+    getOrFetch(`campaigns:${productType || category || 'none'}`, 300, () => {
       const campCategory = productType || category;
       if (!campCategory) return Promise.resolve([]);
       return HeroCampaign.find({ category: campCategory }).sort({ order: 1, _id: -1 }).lean();
     }),
-    getOrFetch(`taxonomy:${pageId}:${canonicalPath}`, 60, async () => {
+    getOrFetch(`taxonomy:${pageId}:${canonicalPath}`, 300, async () => {
       import('@/models/Taxonomy');
       const mongoose = await import('mongoose');
       
@@ -178,7 +178,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       return fallback ? { ...fallback, isExactMatch: false } : null;
     }),
     // Fetch distinct child categories/subcategories for the filter bar
-    getOrFetch(`filters:${productCacheKey}`, 60, async () => {
+    getOrFetch(`filters:${productCacheKey}`, 300, async () => {
       if (subcategory || collectionName || occasion) return []; // Too deep
       if (category) {
         return Product.distinct('subcategory', { productType, category });
@@ -188,15 +188,28 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       }
       return [];
     }),
-    getOrFetch(`dynamicFilters:${JSON.stringify(productQuery)}`, 60, async () => {
-      const [colors, sizes, categories, productTypes, occasions] = await Promise.all([
-        Product.distinct('colors', productQuery),
-        Product.distinct('sizes', productQuery),
-        Product.distinct('category', productQuery),
-        Product.distinct('productType', productQuery),
-        Product.distinct('occasion', productQuery)
+    // Single $facet aggregation replaces 5 separate distinct() calls — 1 DB round-trip vs 5
+    getOrFetch(`dynamicFilters:${JSON.stringify(productQuery)}`, 300, async () => {
+      const facetResult = await Product.aggregate([
+        { $match: productQuery },
+        {
+          $facet: {
+            colors:       [{ $unwind: '$colors' },       { $group: { _id: '$colors' } },       { $sort: { _id: 1 } }],
+            sizes:        [{ $unwind: '$sizes' },        { $group: { _id: '$sizes' } },        { $sort: { _id: 1 } }],
+            categories:   [{ $group: { _id: '$category' } },   { $sort: { _id: 1 } }],
+            productTypes: [{ $group: { _id: '$productType' } }, { $sort: { _id: 1 } }],
+            occasions:    [{ $match: { occasion: { $exists: true, $ne: null, $ne: '' } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
+          },
+        },
       ]);
-      return { colors, sizes, categories, productTypes, occasions: occasions.filter(Boolean) };
+      const f = facetResult[0] || {};
+      return {
+        colors:       (f.colors       || []).map((d: any) => d._id).filter(Boolean),
+        sizes:        (f.sizes        || []).map((d: any) => d._id).filter(Boolean),
+        categories:   (f.categories   || []).map((d: any) => d._id).filter(Boolean),
+        productTypes: (f.productTypes || []).map((d: any) => d._id).filter(Boolean),
+        occasions:    (f.occasions    || []).map((d: any) => d._id).filter(Boolean),
+      };
     }),
   ]);
 

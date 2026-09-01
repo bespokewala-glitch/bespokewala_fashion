@@ -52,6 +52,16 @@ productSchema.index({ category: 1, subcategory: 1, productType: 1 });
 productSchema.index({ productType: 1, createdAt: -1 });
 productSchema.index({ category: 1, createdAt: -1 });
 productSchema.index({ isFeatured: -1, createdAt: -1 });
+// Compound indexes for primary listing-page query patterns:
+// /products/footwear/womens → { productType, category } filtered + createdAt sorted
+productSchema.index({ productType: 1, category: 1, createdAt: -1 });
+// Price sort queries: price_asc and price_desc
+productSchema.index({ productType: 1, category: 1, price: 1 });
+productSchema.index({ productType: 1, category: 1, price: -1 });
+// "Popular" sort (isFeatured desc, createdAt desc)
+productSchema.index({ productType: 1, category: 1, isFeatured: -1, createdAt: -1 });
+// Subcategory level (e.g. /products/footwear/womens/kitten-heels)
+productSchema.index({ productType: 1, category: 1, subcategory: 1, createdAt: -1 });
 productSchema.index({ 
   name: 'text', 
   category: 'text', 

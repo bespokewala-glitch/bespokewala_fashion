@@ -90,11 +90,34 @@ export default function Header() {
     };
     window.addEventListener('scroll', handleScroll);
 
-    // Retry once on transient failure (e.g. dev server still starting up)
+    // Cache auth state in sessionStorage to avoid re-fetching on every navigation.
+    // - Authenticated user: cached for 5 minutes (300s)
+    // - Unauthenticated (401): cached for 60s so anonymous browsing doesn't hammer the API
+    const AUTH_CACHE_KEY = 'bw_auth_me';
+    const AUTH_TTL_AUTH = 300_000;   // 5 min for logged-in users
+    const AUTH_TTL_ANON = 60_000;    // 60 s for anonymous (avoids repeated 401s)
+
     const fetchMe = async (attempt = 0) => {
+      try {
+        // Check sessionStorage cache first
+        const cached = sessionStorage.getItem(AUTH_CACHE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          const ttl = parsed.user ? AUTH_TTL_AUTH : AUTH_TTL_ANON;
+          if (Date.now() - parsed.ts < ttl) {
+            if (parsed.user) setUser(parsed.user);
+            return; // Serve from cache — no network request
+          }
+        }
+      } catch { /* ignore parse errors */ }
+
       try {
         const res = await fetch('/api/auth/me', { signal: controller.signal });
         const data = await res.json();
+        // Cache both authenticated and unauthenticated results
+        try {
+          sessionStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ user: data.user || null, ts: Date.now() }));
+        } catch { /* ignore storage errors */ }
         if (data.user) setUser(data.user);
       } catch (e: any) {
         if (e?.name === 'AbortError') return;

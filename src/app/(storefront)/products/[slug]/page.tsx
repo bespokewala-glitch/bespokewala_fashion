@@ -28,8 +28,10 @@ const getProductBySlug = cache(async (slug: string) => {
   );
 });
 
-export const dynamic = 'force-dynamic';
-
+// ISR: cache this page at the Vercel edge for 60 seconds.
+// Product listing pages are fully public — auth/cart/wishlist state is managed client-side.
+// This reduces TTFB from ~500ms (SSR cold start) to ~50ms (edge cache hit).
+export const revalidate = 60;
 
 // Known product types — used to distinguish /products/jewellery (listing)
 // from /products/the-pink-diamond-ring (product detail)

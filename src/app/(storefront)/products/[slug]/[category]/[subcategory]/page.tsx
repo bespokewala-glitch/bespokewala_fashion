@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 import { CollectionPageContent } from '@/components/layout/CollectionPageContent';
-import { generatePageMetadata, generateCategoryMetadata } from '@/lib/seo';
+import { generateCategoryMetadata } from '@/lib/seo';
 import dbConnect from '@/lib/mongoose';
 import Taxonomy from '@/models/Taxonomy';
-import Product from '@/models/Product';
 import { getOrFetch } from '@/lib/serverCache';
 
-export const dynamic = 'force-dynamic';
+// ISR: cache subcategory pages for 60s at the Vercel edge.
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string; category: string; subcategory: string }>;

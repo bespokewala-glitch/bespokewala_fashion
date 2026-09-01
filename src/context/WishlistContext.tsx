@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 export interface WishlistItem {
   slug: string;
@@ -45,25 +45,27 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [wishlist, isLoaded]);
 
-  const addToWishlist = (newItem: WishlistItem) => {
+  // useCallback prevents the function references from changing on every render,
+  // which would cause all subscribed ProductCardWishlistButton components to re-render.
+  const addToWishlist = useCallback((newItem: WishlistItem) => {
     setWishlist(prev => {
       const exists = prev.some(item => item.slug === newItem.slug);
       if (exists) return prev;
       return [...prev, newItem];
     });
-  };
+  }, []);
 
-  const removeFromWishlist = (slug: string) => {
+  const removeFromWishlist = useCallback((slug: string) => {
     setWishlist(prev => prev.filter(item => item.slug !== slug));
-  };
+  }, []);
 
-  const clearWishlist = () => {
+  const clearWishlist = useCallback(() => {
     setWishlist([]);
-  };
+  }, []);
 
-  const isInWishlist = (slug: string) => {
+  const isInWishlist = useCallback((slug: string) => {
     return wishlist.some(item => item.slug === slug);
-  };
+  }, [wishlist]);
 
   const wishlistCount = wishlist.length;
 

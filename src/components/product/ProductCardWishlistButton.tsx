@@ -13,7 +13,10 @@ interface ProductCardWishlistButtonProps {
   };
 }
 
-export default function ProductCardWishlistButton({ product }: ProductCardWishlistButtonProps) {
+// React.memo prevents this button from re-rendering when parent (ProductCard) re-renders
+// due to unrelated state changes. On a listing page with 24 cards, adding one wishlist item
+// without memo would re-render all 24 buttons — with memo, only the changed button updates.
+const ProductCardWishlistButton = React.memo(function ProductCardWishlistButton({ product }: ProductCardWishlistButtonProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const isWishlisted = isInWishlist(product.slug);
 
@@ -67,4 +70,6 @@ export default function ProductCardWishlistButton({ product }: ProductCardWishli
       </svg>
     </button>
   );
-}
+});
+
+export default ProductCardWishlistButton;

@@ -108,7 +108,10 @@ export async function GET(req: NextRequest) {
       
     return NextResponse.json(products, {
       headers: {
-        'Cache-Control': 'no-store, max-age=0',
+        // Allow Vercel Edge to cache product lists for 60s; stale-while-revalidate extends
+        // freshness to 5 min so subsequent requests are served from CDN without hitting MongoDB.
+        // Product catalogue data doesn't change second-to-second — this is safe.
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     });
   } catch (error) {

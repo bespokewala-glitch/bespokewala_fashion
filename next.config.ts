@@ -87,8 +87,9 @@ const nextConfig: NextConfig = {
     // WebP has ~30% better compression than JPEG/PNG
     formats: ['image/webp'],
 
-    // Cache optimized images for 60 seconds minimum
-    minimumCacheTTL: 60,
+    // Cache optimized images for 24 hours — product images are immutable between uploads.
+    // This prevents repeated re-processing of the same images on every page visit.
+    minimumCacheTTL: 86400,
   },
 
   // ── HTTP Caching Headers ────────────────────────────────────────────────────
