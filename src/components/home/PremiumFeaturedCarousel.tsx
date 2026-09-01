@@ -77,17 +77,25 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
     }
   }, []);
 
+  const activeIndexRef = useRef(activeIndex);
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
   // Auto-swipe functionality
   useEffect(() => {
     if (isHovered || !products || products.length <= 1) return;
 
     const interval = setInterval(() => {
-      const nextIndex = (activeIndex + 1) % products.length;
+      // Use the ref so we don't clear and restart the interval on every single scroll step
+      const nextIndex = (activeIndexRef.current + 1) % products.length;
       scrollToIndex(nextIndex);
     }, 2500); // Normal, faster transition (2.5s)
 
     return () => clearInterval(interval);
-  }, [activeIndex, isHovered, products, scrollToIndex]);
+  }, [isHovered, products, scrollToIndex]);
 
   const scrollLeft = () => {
     const prevIndex = (activeIndex - 1 + products.length) % products.length;
@@ -109,6 +117,9 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => {
         // Short delay before resuming auto-swipe after touch
+        setTimeout(() => setIsHovered(false), 2000);
+      }}
+      onTouchCancel={() => {
         setTimeout(() => setIsHovered(false), 2000);
       }}
     >
