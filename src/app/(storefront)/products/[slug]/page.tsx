@@ -1,4 +1,4 @@
-import React, { cache } from 'react';
+import React, { cache, Suspense } from 'react';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import ProductGallery from '@/components/product/ProductGallery';
@@ -333,12 +333,14 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           from same subcategory so Google can discover the full catalogue via
           internal links from every product page.
       ─────────────────────────────────────────────────────────────────────── */}
-      <RelatedProducts
-        currentProductId={product._id.toString()}
-        subcategory={product.subcategory || ''}
-        productType={product.productType || ''}
-        category={product.category}
-      />
+      <Suspense fallback={<div style={{ height: '400px' }} />}>
+        <RelatedProducts
+          currentProductId={product._id.toString()}
+          subcategory={product.subcategory || ''}
+          productType={product.productType || ''}
+          category={product.category}
+        />
+      </Suspense>
 
       <ProductChatContext context={{
         slug: product.slug,

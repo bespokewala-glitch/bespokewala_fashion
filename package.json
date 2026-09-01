@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "node -e \"const fs = require('fs'); fs.rmSync('.next', { recursive: true, force: true });\"",
-    "dev": "npm run clean && next dev",
+    "dev": "next dev",
     "dev:turbo": "npm run clean && next dev --turbo",
     "build": "node --max-old-space-size=8192 node_modules/next/dist/bin/next build",
     "start": "next start",
@@ -42,7 +42,8 @@
   },
   "optionalDependencies": {
     "@img/sharp-linux-musl-x64": "^0.33.5",
-    "@img/sharp-linux-x64": "^0.33.5"
+    "@img/sharp-linux-x64": "^0.33.5",
+    "@img/sharp-win32-x64": "^0.33.5"
   },
   "allowScripts": {
     "protobufjs@7.6.5": true,

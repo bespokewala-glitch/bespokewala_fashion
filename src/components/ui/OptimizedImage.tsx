@@ -16,7 +16,7 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
    * 'medium' (~1000px) is best for heroes, banners, and PDP main image.
    * undefined (original) should only be used if absolute maximum quality is required.
    */
-  variant?: 'thumbnail' | 'medium' | 'large';
+  variant?: 'micro' | 'thumbnail' | 'medium' | 'large';
   
   /**
    * By default, images load lazily. Set to true for above-the-fold hero images.
@@ -110,7 +110,7 @@ export default function OptimizedImage({
       src={currentSrc}
       alt={alt || "Bespokewala Image"}
       priority={priority}
-      unoptimized={false}
+      unoptimized={rest.unoptimized || false}
       loader={isProxyUrl ? gcsLoader : undefined}
       onError={handleError}
     />

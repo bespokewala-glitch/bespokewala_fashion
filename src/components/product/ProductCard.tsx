@@ -48,7 +48,6 @@ export default function ProductCard({ product, variant = 'default', priority = f
   return (
     <Link
       href={`/products/${product.slug}`}
-      prefetch={false}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{

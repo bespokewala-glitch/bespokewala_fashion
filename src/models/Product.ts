@@ -49,6 +49,9 @@ const productSchema = new Schema<IProduct>(
 );
 
 productSchema.index({ category: 1, subcategory: 1, productType: 1 });
+productSchema.index({ productType: 1, createdAt: -1 });
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ isFeatured: -1, createdAt: -1 });
 productSchema.index({ 
   name: 'text', 
   category: 'text', 

@@ -113,22 +113,36 @@ export default function Header() {
 
   useEffect(() => {
     if (hoveredNav && hoveredCategory) {
+      const cacheKey = `menu-images-${hoveredNav}-${hoveredCategory}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (parsed && Date.now() - parsed.ts < 600_000) {
+             setMegaMenuImages(parsed.images);
+             return;
+          }
+        } catch { /* ignore parse errors */ }
+      }
+
       const controller = new AbortController();
       // Debounce menu-image fetch to 200ms — avoids firing on accidental mouse-overs
       const timer = setTimeout(() => {
         fetch(`/api/menu-images?productType=${hoveredNav}&category=${hoveredCategory}`, { signal: controller.signal })
           .then(res => res.json())
           .then(data => {
+            let newImages = ['', '', ''];
             if (data && data.length > 0 && data[0].images) {
               const fetched = data[0].images;
-              setMegaMenuImages([
+              newImages = [
                 normalizeImageUrl(fetched[0] || ''),
                 normalizeImageUrl(fetched[1] || ''),
                 normalizeImageUrl(fetched[2] || ''),
-              ]);
-            } else {
-              setMegaMenuImages(['', '', '']);
+              ];
             }
+            setMegaMenuImages(newImages);
+            sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), images: newImages }));
           })
           .catch((e: any) => { if (e?.name !== 'AbortError') console.error(e); });
       }, 200);
@@ -316,7 +330,7 @@ export default function Header() {
               aria-label="Open navigation menu"
               style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
             >
-              <Menu size={22} />
+              <Menu size={22} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
             </button>
           </div>
 
@@ -324,13 +338,13 @@ export default function Header() {
           <nav className="mobile-hide" style={{ flex: 1 }}>
             <ul style={{ ...menuStyle, paddingBottom: '2rem', marginBottom: '-2rem' }} onMouseLeave={handleMouseLeaveMenu}>
               <li onMouseEnter={() => handleMouseEnterMenu('couture')}>
-                <Link prefetch={false} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
+                <Link prefetch={true} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
               <li onMouseEnter={() => handleMouseEnterMenu('footwear')}>
-                <Link prefetch={false} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }}>Footwear</Link>
+                <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }}>Footwear</Link>
               </li>
               <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}>
-                <Link prefetch={false} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }}>Jewellery</Link>
+                <Link prefetch={true} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }}>Jewellery</Link>
               </li>
             </ul>
           </nav>
@@ -362,7 +376,7 @@ export default function Header() {
               aria-label="Search"
               style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0', display: 'flex', alignItems: 'center', marginRight: '4px' }}
             >
-              <Search size={20} />
+              <Search size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
             </button>
             <Link
               href="/wishlist"
@@ -370,7 +384,7 @@ export default function Header() {
               aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`}
               style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}
             >
-              <Heart size={20} />
+              <Heart size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
               {wishlistCount > 0 && (
                 <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {wishlistCount}
@@ -384,7 +398,7 @@ export default function Header() {
               aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
               style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}
             >
-              <ShoppingBag size={20} />
+              <ShoppingBag size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
               {cartCount > 0 && (
                 <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {cartCount}
@@ -412,17 +426,17 @@ export default function Header() {
               {/* Icons */}
               <li>
                 <button onClick={() => setIsSearchOpen(true)} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }} aria-label="Search">
-                  <Search size={20} />
+                  <Search size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                 </button>
               </li>
               <li>
                 <Link href={user ? "/account" : "/login"} aria-label={user ? "Account" : "Login"} style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
-                  <User size={20} />
+                  <User size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                 </Link>
               </li>
               <li>
                 <Link href="/wishlist" aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}>
-                  <Heart size={20} />
+                  <Heart size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                   {wishlistCount > 0 && (
                     <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                       {wishlistCount}
@@ -432,7 +446,7 @@ export default function Header() {
               </li>
               <li>
                 <a href="#" onClick={(e) => { e.preventDefault(); openMiniCart(); }} aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}>
-                  <ShoppingBag size={20} />
+                  <ShoppingBag size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                   {cartCount > 0 && (
                     <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                       {cartCount}
@@ -461,7 +475,7 @@ export default function Header() {
                   position: 'relative'
                 }}
               >
-                <Link prefetch={false} href={item.href} onClick={() => { setHoveredNav(null); setHoveredCategory(null); }} className="menu-link-hover">
+                <Link prefetch={true} href={item.href} onClick={() => { setHoveredNav(null); setHoveredCategory(null); }} className="menu-link-hover">
                   {item.label}
                 </Link>
 

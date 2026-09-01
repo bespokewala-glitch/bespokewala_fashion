@@ -185,7 +185,8 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
                   src={img.url}
                   alt={img.alt}
                   fill
-                  variant="thumbnail"
+                  variant="micro"
+                  unoptimized={true}
                   loading="lazy"
                   sizes="100px"
                   style={{ objectFit: 'cover' }}
