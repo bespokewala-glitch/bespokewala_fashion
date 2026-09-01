@@ -330,7 +330,7 @@ export default function Header() {
               aria-label="Open navigation menu"
               style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}
             >
-              <Menu size={22} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
+              <Menu size={22} color="#1c1c1c" />
             </button>
           </div>
 
@@ -376,7 +376,7 @@ export default function Header() {
               aria-label="Search"
               style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', padding: '0', display: 'flex', alignItems: 'center', marginRight: '4px' }}
             >
-              <Search size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
+              <Search size={20} color="#1c1c1c" />
             </button>
             <Link
               href="/wishlist"
@@ -384,7 +384,7 @@ export default function Header() {
               aria-label={`Wishlist${wishlistCount > 0 ? ` (${wishlistCount})` : ''}`}
               style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit' }}
             >
-              <Heart size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
+              <Heart size={20} color="#1c1c1c" />
               {wishlistCount > 0 && (
                 <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {wishlistCount}
@@ -398,7 +398,7 @@ export default function Header() {
               aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
               style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}
             >
-              <ShoppingBag size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
+              <ShoppingBag size={20} color="#1c1c1c" />
               {cartCount > 0 && (
                 <span style={{ position: 'absolute', top: '4px', right: '-4px', background: '#000', color: '#fff', fontSize: '9px', borderRadius: '50%', width: '15px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                   {cartCount}
