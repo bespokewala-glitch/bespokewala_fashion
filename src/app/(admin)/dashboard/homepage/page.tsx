@@ -140,6 +140,26 @@ export default function HomepageCMS() {
   const carouselItems = sections.LookbookCarousel?.items || [{}, {}, {}, {}, {}];
   const coutureSteps = sections.CoutureProcess?.steps || [];
 
+  const addMuse = () => {
+    setSections((prev: any) => {
+      const updated = { ...prev };
+      if (!updated.LookbookCarousel) updated.LookbookCarousel = {};
+      if (!updated.LookbookCarousel.items) updated.LookbookCarousel.items = [{}, {}, {}, {}, {}];
+      updated.LookbookCarousel.items.push({});
+      return updated;
+    });
+  };
+
+  const removeMuse = (index: number) => {
+    setSections((prev: any) => {
+      const updated = { ...prev };
+      if (updated.LookbookCarousel?.items) {
+        updated.LookbookCarousel.items = updated.LookbookCarousel.items.filter((_: any, i: number) => i !== index);
+      }
+      return updated;
+    });
+  };
+
   const addCoutureStep = () => {
     setSections((prev: any) => {
       const updated = { ...prev };
@@ -339,16 +359,21 @@ export default function HomepageCMS() {
         <input placeholder="Subtitle (e.g. Where dreams are draped...)" value={sections.LookbookCarousel?.subtitle || ''} onChange={e => handleTextChange('LookbookCarousel', 'subtitle', e.target.value)} style={{ padding: '10px', width: '100%', marginBottom: '20px' }} />
         
         <div style={{ display: 'flex', overflowX: 'auto', gap: '15px', paddingBottom: '10px' }}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} style={{ minWidth: '150px', border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
+          {carouselItems.map((item: any, i: number) => (
+            <div key={i} style={{ minWidth: '150px', position: 'relative', border: '1px solid #eee', padding: '10px', borderRadius: '4px' }}>
+              <button 
+                onClick={() => removeMuse(i)}
+                style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Remove Muse"
+              >✕</button>
               <div style={{ position: 'relative', height: '120px', marginBottom: '10px' }}>
                 <div 
                   onClick={() => handleFileUploadClick('LookbookCarousel', 'items', i)}
                   style={{ height: '120px', backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', overflow: 'hidden' }}
                 >
-                  {carouselItems[i]?.image ? <MediaPreview src={carouselItems[i].image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Image'}
+                  {item.image ? <MediaPreview src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'Upload Image'}
                 </div>
-                {carouselItems[i]?.image && (
+                {item.image && (
                   <button 
                     onClick={() => handleTextChange('LookbookCarousel', 'items', '', i, 'image')}
                     className={styles.removeButton}
@@ -358,11 +383,14 @@ export default function HomepageCMS() {
                   </button>
                 )}
               </div>
-              <input placeholder="Muse Name" value={carouselItems[i]?.name || ''} onChange={e => handleTextChange('LookbookCarousel', 'items', e.target.value, i, 'name')} style={{ width: '100%', padding: '5px' }} />
+              <input placeholder="Muse Name" value={item.name || ''} onChange={e => handleTextChange('LookbookCarousel', 'items', e.target.value, i, 'name')} style={{ width: '100%', padding: '5px' }} />
             </div>
           ))}
         </div>
-        <button disabled={saving} onClick={() => saveSection('LookbookCarousel', sections.LookbookCarousel)} style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Lookbook</button>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          <button disabled={saving} onClick={() => saveSection('LookbookCarousel', sections.LookbookCarousel)} style={{ padding: '10px 20px', backgroundColor: '#000', color: '#fff', border: 'none', cursor: 'pointer' }}>Save Lookbook</button>
+          <button onClick={addMuse} style={{ padding: '10px 20px', backgroundColor: '#f5f5f5', color: '#333', border: '1px solid #ccc', cursor: 'pointer' }}>+ Add Muse</button>
+        </div>
       </div>
 
       {page !== 'jewellery' && (
