@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import { useCurrency } from '@/context/CurrencyContext';
 import ProductCardWishlistButton from './ProductCardWishlistButton';
 
 export interface ProductCardProps {
@@ -26,6 +27,7 @@ export interface ProductCardProps {
 
 export default function ProductCard({ product, variant = 'default', priority = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { formatPrice } = useCurrency();
   const primaryImageRaw = product.images?.[0];
   const hoverImageRaw =
     product.images?.[1] ||
@@ -34,11 +36,7 @@ export default function ProductCard({ product, variant = 'default', priority = f
     product.referenceImages?.left ||
     product.referenceImages?.right;
 
-  const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(product.price);
+  const formattedPrice = formatPrice(product.price);
 
   const sharedImgStyle: React.CSSProperties = {
     objectFit: 'cover',
