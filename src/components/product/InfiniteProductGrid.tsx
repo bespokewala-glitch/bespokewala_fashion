@@ -3,19 +3,36 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ProductCard from '@/components/product/ProductCard';
 
+// Increment this whenever a data migration runs (e.g. bucket migration).
+// This busts ALL browser sessionStorage caches so users don't see stale/duplicate products.
+const CACHE_VERSION = 2;
+
 interface InfiniteProductGridProps {
   initialProducts: any[];
   totalProducts: number;
   queryParams: Record<string, string | undefined>;
 }
 
-export default function InfiniteProductGrid({ initialProducts, totalProducts, queryParams }: InfiniteProductGridProps) {
-  const cacheKey = typeof window !== 'undefined' ? `infinite_scroll_${window.location.pathname}${window.location.search}` : '';
+/** Remove duplicate products by _id, keeping the first occurrence */
+function dedupeById(arr: any[]): any[] {
+  const seen = new Set<string>();
+  return arr.filter(p => {
+    if (seen.has(p._id)) return false;
+    seen.add(p._id);
+    return true;
+  });
+}
 
-  const [products, setProducts] = useState(initialProducts);
+export default function InfiniteProductGrid({ initialProducts, totalProducts, queryParams }: InfiniteProductGridProps) {
+  const cacheKey = typeof window !== 'undefined' ? `infinite_scroll_v${CACHE_VERSION}_${window.location.pathname}${window.location.search}` : '';
+
+  // Deduplicate initial products from server to guard against DB-level duplicates
+  const dedupedInitial = dedupeById(initialProducts);
+
+  const [products, setProducts] = useState(dedupedInitial);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(initialProducts.length < totalProducts);
+  const [hasMore, setHasMore] = useState(dedupedInitial.length < totalProducts);
   const observerTarget = useRef<HTMLDivElement>(null);
   
   // Use isomorphic layout effect to restore state synchronously before paint if possible
@@ -27,10 +44,19 @@ export default function InfiniteProductGrid({ initialProducts, totalProducts, qu
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (parsed.products && parsed.products.length > initialProducts.length && parsed.products[0]?._id === initialProducts[0]?._id) {
-          setProducts(parsed.products);
+        // Only restore cache if:
+        //  1. It has more products than the server-rendered first page (i.e. user had scrolled)
+        //  2. The first product ID still matches the server data (same query/page)
+        //  3. Cache version matches (prevents stale data after migrations)
+        const firstIdMatch = parsed.products?.[0]?._id === dedupedInitial[0]?._id;
+        const cacheHasMore = parsed.products?.length > dedupedInitial.length;
+        const versionMatch = parsed.version === CACHE_VERSION;
+        if (parsed.products && cacheHasMore && firstIdMatch && versionMatch) {
+          // Deduplicate cached products too, in case of any corruption
+          const dedupedCache = dedupeById(parsed.products);
+          setProducts(dedupedCache);
           setPage(parsed.page);
-          setHasMore(parsed.products.length < totalProducts);
+          setHasMore(dedupedCache.length < totalProducts);
           if (parsed.scrollY) {
             // Wait for next tick to ensure DOM has updated
             requestAnimationFrame(() => {
@@ -43,14 +69,15 @@ export default function InfiniteProductGrid({ initialProducts, totalProducts, qu
         }
       }
     } catch (e) {}
-  }, [cacheKey, initialProducts, totalProducts]);
+  }, [cacheKey, dedupedInitial, totalProducts]);
 
   const handleGridClickCapture = () => {
     if (typeof window !== 'undefined') {
       sessionStorage.setItem(cacheKey, JSON.stringify({
         products,
         page,
-        scrollY: window.scrollY
+        scrollY: window.scrollY,
+        version: CACHE_VERSION,
       }));
     }
   };
