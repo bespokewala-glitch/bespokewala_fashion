@@ -1,9 +1,9 @@
 /* reviews.module.css */
 
 .container {
-  margin: 3rem auto;
+  margin: 1.5rem auto;
   border-top: 1px solid #eaeaea;
-  padding-top: 3rem;
+  padding-top: 1.5rem;
   font-family: 'Jost', 'Inter', sans-serif;
   width: 100%;
   max-width: 1200px;
@@ -12,8 +12,9 @@
 
 @media (min-width: 768px) {
   .container {
-    margin-top: 4rem;
-    padding-top: 4rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -21,15 +22,15 @@
   font-size: 1.375rem;
   font-weight: 400;
   letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
   text-align: center;
   text-transform: uppercase;
 }
 
 @media (min-width: 768px) {
   .title {
-    font-size: 1.75rem;
-    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -39,7 +40,7 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin: 0 auto 4rem auto;
+  margin: 0 auto 1.5rem auto;
   color: #666;
   padding: 0 1rem;
   max-width: 650px;
@@ -49,12 +50,12 @@
   color: #d4af37;
   font-size: 1.5rem;
   letter-spacing: 0.2em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   opacity: 0.8;
 }
 
 .emptyState p {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   font-size: 0.9rem;
   color: #555;
 }

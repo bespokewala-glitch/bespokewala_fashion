@@ -3,6 +3,7 @@ import Link from 'next/link';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import ProductCard from '@/components/product/ProductCard';
+import ProductCarousel from '@/components/product/ProductCarousel';
 
 interface RelatedProductsProps {
   currentProductId: string;
@@ -50,7 +51,7 @@ export default async function RelatedProducts({
         'seo.noIndex': { $ne: true },
       })
         .select('_id name slug price images referenceImages category productType')
-        .limit(4)
+        .limit(12)
         .lean();
     }
 
@@ -65,7 +66,7 @@ export default async function RelatedProducts({
 
       relatedProducts = await Product.find(fallbackQuery)
         .select('_id name slug price images referenceImages category productType')
-        .limit(4)
+        .limit(12)
         .lean();
     }
 
@@ -87,7 +88,7 @@ export default async function RelatedProducts({
           width: '100%',
           maxWidth: '1600px',
           margin: '0 auto',
-          padding: '4rem 4rem 2rem',
+          padding: '2rem 4rem',
         }}
         className="mobile-px-4"
         aria-label={heading}
@@ -100,7 +101,7 @@ export default async function RelatedProducts({
             gap: '0.5rem',
             marginBottom: '2rem',
             borderTop: '1px solid #eaeaea',
-            paddingTop: '3rem',
+            paddingTop: '2rem',
           }}
         >
           <h2
@@ -130,24 +131,8 @@ export default async function RelatedProducts({
           )}
         </div>
 
-        {/* Product grid — uses existing ProductCard which has crawlable <a> links */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '2rem',
-          }}
-          className="mobile-grid-2"
-        >
-          {products.map((product: any, index: number) => (
-            <ProductCard
-              key={product._id}
-              product={product}
-              variant="default"
-              priority={false}
-            />
-          ))}
-        </div>
+        {/* Auto-swiping Product Carousel */}
+        <ProductCarousel products={products} />
       </section>
     );
   } catch (err) {

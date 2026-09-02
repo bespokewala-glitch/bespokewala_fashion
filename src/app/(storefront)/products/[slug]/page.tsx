@@ -151,7 +151,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
   }
 
   const containerStyle: React.CSSProperties = {
-    padding: '6rem 4rem 0 4rem',
+    padding: '3rem 4rem 0 4rem',
     maxWidth: '1600px',
     margin: '0 auto',
     display: 'grid',
