@@ -7,12 +7,12 @@ export default function ProductTrustBadges() {
     <div className="product-trust-badges">
       <style>{`
         .product-trust-badges {
-          margin-top: 2rem;
-          padding-top: 1.5rem;
+          margin-top: 1rem;
+          padding-top: 1rem;
           border-top: 1px solid #eaeaea;
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 1rem 0.5rem;
+          gap: 0.75rem 0.5rem;
         }
         .trust-badge {
           display: flex;

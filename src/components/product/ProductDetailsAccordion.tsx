@@ -58,7 +58,7 @@ const AccordionItem = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div style={{ borderBottom: '1px solid #e0e0e0', padding: '1.25rem 0' }}>
+    <div style={{ borderBottom: '1px solid #e0e0e0', padding: '0.85rem 0' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -97,7 +97,7 @@ const AccordionItem = ({
       >
         <div
           style={{
-            paddingTop: '1.25rem',
+            paddingTop: '0.85rem',
             color: '#555',
             fontSize: '0.9rem',
             lineHeight: '1.8',
@@ -125,9 +125,9 @@ export default function ProductDetailsAccordion({
     productType?.toLowerCase() === 'couture' || category?.toLowerCase() === 'couture';
 
   return (
-    <div style={{ width: '100%', marginTop: '2rem' }}>
+    <div style={{ width: '100%', marginTop: '1rem' }}>
       {hasProductDetails && (
-        <AccordionItem title="Product Details" defaultOpen={true}>
+        <AccordionItem title="Product Details" defaultOpen={false}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {d.styleCode && <div><strong>Style Code:</strong> {d.styleCode}</div>}
             {d.commodityName && <div><strong>Name of Commodity:</strong> {d.commodityName}</div>}

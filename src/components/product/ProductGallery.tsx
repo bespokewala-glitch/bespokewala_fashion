@@ -62,6 +62,11 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           gap: 1.5rem;
           flex-direction: row;
         }
+        @media (min-width: 769px) {
+          .gallery-container {
+            align-items: flex-start;
+          }
+        }
         .gallery-thumbnails {
           display: flex;
           flex-direction: column;
@@ -116,7 +121,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         {/* ADDED aspect-ratio to prevent layout shift and gallery-skeleton for shimmering effect */}
         <div
           className="gallery-skeleton"
-          style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}
+          style={{ flex: 1, aspectRatio: '2/3', position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa' }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >

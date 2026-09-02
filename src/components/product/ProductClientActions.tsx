@@ -62,19 +62,19 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   };
 
   const sectionLabelStyle: React.CSSProperties = {
-    fontSize: '0.85rem',
+    fontSize: '0.75rem',
     letterSpacing: '0.1em',
     textTransform: 'uppercase',
     color: '#333',
   };
 
   const optionBtnStyle: React.CSSProperties = {
-    padding: '0.75rem 1rem',
+    padding: '0.5rem 0.75rem',
     border: '1px solid #ddd',
     background: 'transparent',
     cursor: 'pointer',
-    fontSize: '0.85rem',
-    minWidth: '3rem',
+    fontSize: '0.75rem',
+    minWidth: '2.5rem',
     textAlign: 'center',
     transition: 'all 0.2s',
   };
@@ -110,9 +110,10 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const qtyBtnStyle: React.CSSProperties = {
     background: 'none',
     border: 'none',
-    fontSize: '1.2rem',
+    fontSize: '1rem',
     cursor: 'pointer',
     color: '#666',
+    padding: '0 0.5rem',
   };
 
   const isJewellery = product.productType?.toLowerCase() === 'jewellery';
@@ -121,7 +122,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   return (
     <>
       {!isJewellery && product.sizes && product.sizes.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={sectionLabelStyle}>Size</div>
             <SizeGuide />
@@ -163,18 +164,18 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       )}
 
       {!isJewellery && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1rem' }}>
           <div style={sectionLabelStyle}>Quantity</div>
           <div style={quantitySelectorStyle}>
             <button style={qtyBtnStyle} onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-            <span style={{ fontSize: '1rem' }}>{quantity}</span>
+            <span style={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '0.5rem 1rem' }}>{quantity}</span>
             <button style={qtyBtnStyle} onClick={() => setQuantity(quantity + 1)}>+</button>
           </div>
         </div>
       )}
       
       {!isJewellery && (
-        <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ fontSize: '0.85rem', color: '#444', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="1" y="3" width="15" height="13"></rect>
             <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
@@ -185,7 +186,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
         {!isJewellery ? (
           <>
             <button style={primaryBtnStyle} onClick={handleAddToCart}>

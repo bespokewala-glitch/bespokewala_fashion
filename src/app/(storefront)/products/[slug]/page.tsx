@@ -14,7 +14,7 @@ import ProductActions from '@/components/product/ProductActions';
 import ProductClientActions from '@/components/product/ProductClientActions';
 import ProductDetailsAccordionWrapper from '@/components/product/ProductDetailsAccordionWrapper';
 import { getOrFetch } from '@/lib/serverCache';
-import Breadcrumb from '@/components/ui/Breadcrumb';
+
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema, generateCategoryMetadata, generateProductMetadata } from '@/lib/seo';
 const ProductTrustBadges = nextDynamic(() => import('@/components/product/ProductTrustBadges'));
 const RelatedProducts = nextDynamic(() => import('@/components/product/RelatedProducts'));
@@ -151,12 +151,12 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
   }
 
   const containerStyle: React.CSSProperties = {
-    padding: '8rem 4rem 0 4rem',
+    padding: '6rem 4rem 0 4rem',
     maxWidth: '1600px',
     margin: '0 auto',
     display: 'grid',
-    gridTemplateColumns: '1.2fr 1fr',
-    gap: '6rem',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '4rem',
     fontFamily: '"Jost", "Inter", sans-serif',
   };
 
@@ -164,9 +164,11 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
     position: 'sticky',
     top: '8rem',
     height: 'fit-content',
+    maxHeight: 'calc(100vh - 10rem)',
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.5rem',
+    gap: '0.75rem',
   };
 
   const productSchema = generateProductSchema(product, allImages);
@@ -205,17 +207,16 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      {/* ── Breadcrumb navigation (visible HTML links for crawlers + users) ── */}
-      <div
-        style={{
-          maxWidth: '1600px',
-          margin: '0 auto',
-          padding: '6rem 4rem 0',
-        }}
-        className="mobile-px-4 mobile-pt-20"
-      >
-        <Breadcrumb items={breadcrumbItems} />
-      </div>
+      <style>{`
+        .details-scroll-container::-webkit-scrollbar {
+          display: none;
+        }
+        .details-scroll-container {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+        }
+      `}</style>
+
       <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-4 mobile-pb-4">
         <div>
           {(() => {
@@ -229,7 +230,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         </div>
 
         <div style={{ position: 'relative' }}>
-          <div style={detailsContainerStyle}>
+          <div style={detailsContainerStyle} className="details-scroll-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '-0.5rem' }}>
               {product.category ? (
                 <div style={{ fontSize: '0.85rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -240,11 +241,11 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               <ProductActions product={product} />
             </div>
 
-            <h1 style={{ fontSize: '2rem', fontWeight: 400, color: '#222', lineHeight: '1.2' }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: '#222', lineHeight: '1.4', letterSpacing: '0.02em' }}>
               {product.name}
             </h1>
 
-            <div style={{ lineHeight: '1.6', color: '#666', fontSize: '0.95rem' }}>
+            <div style={{ lineHeight: '1.5', color: '#777', fontSize: '0.85rem' }}>
               {product.description}
             </div>
 
@@ -253,7 +254,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
             )}
 
             {product.colors && product.colors.length > 0 && (
-              <div style={{ fontSize: '0.95rem', color: '#444', marginTop: '0.5rem' }}>
+              <div style={{ fontSize: '0.85rem', color: '#444', marginTop: '0.25rem' }}>
                 Colour: {product.colors.join(', ')}
               </div>
             )}
@@ -266,13 +267,13 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
             {(fabric || occasion || collectionName) && (
               <dl
                 style={{
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   color: '#888',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.3rem',
+                  gap: '0.25rem',
                   margin: 0,
-                  padding: '0.75rem 0',
+                  padding: '0.5rem 0',
                   borderTop: '1px solid #f0f0f0',
                   borderBottom: '1px solid #f0f0f0',
                 }}
@@ -328,6 +329,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           </div>
         </div>
       </main>
+
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
         <Suspense fallback={<div style={{ height: '200px' }} />}>
           <ProductReviews productId={product._id.toString()} deferFetch={true} />

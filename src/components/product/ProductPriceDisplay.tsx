@@ -8,7 +8,7 @@ export default function ProductPriceDisplay({ price }: { price: number }) {
 
   return (
     <div>
-      <div style={{ fontSize: '1.25rem', fontWeight: 500, color: '#000', marginTop: '0.5rem' }}>
+      <div style={{ fontSize: '1.15rem', fontWeight: 500, color: '#000', marginTop: '0.25rem' }}>
         MRP: {formatPrice(price)}
       </div>
       <div style={{ fontSize: '0.825rem', color: '#888', marginTop: '0.15rem' }}>
