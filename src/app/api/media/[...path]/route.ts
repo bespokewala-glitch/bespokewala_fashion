@@ -113,13 +113,16 @@ export async function GET(
 
       if (variantExists) {
         // ✅ Fast path: variant already generated — stream it directly
-        // Use stream instead of buffer for much faster TTFB (Time To First Byte)
+        // Get metadata and stream in one operation to reduce GCS round-trips
         const { Readable } = await import('stream');
+        let contentLength = 0;
+        try {
+          const [metadata] = await variantFile.getMetadata();
+          contentLength = parseInt(String(metadata.size || '0'), 10);
+        } catch { /* non-fatal — serve without Content-Length */ }
+
         const nodeStream = variantFile.createReadStream();
         const webStream = Readable.toWeb(nodeStream);
-
-        const [metadata] = await variantFile.getMetadata();
-        const contentLength = metadata.size || 0;
 
         console.log(
           `[media] 200 variant ${variantPath}` +
@@ -230,14 +233,18 @@ export async function GET(
       return new NextResponse(null, { status: 304 });
     }
 
+    // Skip the separate exists() call — attempt to get metadata directly.
+    // If the file is missing, getMetadata() throws and we catch it below.
     const gcsFile = bucket.file(fileParam);
-    const [exists] = await gcsFile.exists();
-
-    if (!exists) {
+    let contentType: string;
+    let contentLength: number;
+    try {
+      const [metadata] = await gcsFile.getMetadata();
+      contentType = (metadata.contentType as string) || getMimeType(fileParam);
+      contentLength = parseInt(String(metadata.size || '0'), 10);
+    } catch {
+      // File not found or metadata error — return placeholder
       console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-
-      // Return a transparent 1×1 PNG placeholder — prevents broken-image browser icon.
-      // Status 404 so the browser doesn't cache it as "found".
       return new NextResponse(PLACEHOLDER_PNG, {
         status: 404,
         headers: {
@@ -246,17 +253,6 @@ export async function GET(
           'X-Media-Miss': fileParam,
         },
       });
-    }
-
-    let contentType: string;
-    let contentLength: number;
-    try {
-      const [metadata] = await gcsFile.getMetadata();
-      contentType = (metadata.contentType as string) || getMimeType(fileParam);
-      contentLength = parseInt(metadata.size as string, 10) || 0;
-    } catch {
-      contentType = getMimeType(fileParam);
-      contentLength = 0;
     }
 
     // Download the original from GCS

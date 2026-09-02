@@ -320,14 +320,18 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
               }}
             />
 
-            <ProductTrustBadges />
+            <Suspense fallback={<div style={{ height: '80px' }} />}>
+              <ProductTrustBadges />
+            </Suspense>
 
             <ProductDetailsAccordionWrapper details={product.details} productType={product.productType} category={product.category} />
           </div>
         </div>
       </main>
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
-        <ProductReviews productId={product._id.toString()} deferFetch={true} />
+        <Suspense fallback={<div style={{ height: '200px' }} />}>
+          <ProductReviews productId={product._id.toString()} deferFetch={true} />
+        </Suspense>
       </div>
 
       {/* ── Related Products ──────────────────────────────────────────────────

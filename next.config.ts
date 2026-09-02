@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Compress HTTP responses
+  // Compress HTTP responses (gzip/Brotli)
   compress: true,
 
   // Ensure sharp's native binaries are included in the serverless function bundle on Vercel
@@ -41,18 +41,12 @@ const nextConfig: NextConfig = {
   //   All product images are served through /api/media/<gcs-key>.
   //   Because the Vercel image optimizer cannot make a recursive call back into
   //   the same serverless deployment, every <Image> that receives a /api/media/
-  //   URL MUST use:
-  //
-  //     unoptimized={shouldBypassOptimizer(src)}   // from @/lib/imageUrl
-  //
-  //   This is enforced component-by-component — NOT globally — so that external
-  //   images (Unsplash, public CDN) still benefit from Next.js optimization.
+  //   URL MUST use a custom loader (gcsLoader in OptimizedImage.tsx).
   //
   images: {
     remotePatterns: [
       {
         // Allow Next.js to optimize images from public GCS CDN URLs
-        // (these only appear as fallbacks — primary images go via /api/media/)
         protocol: 'https',
         hostname: 'storage.googleapis.com',
         pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-storage'}/**`,
@@ -66,10 +60,6 @@ const nextConfig: NextConfig = {
     ],
 
     // Allow /api/media/ and /uploads/ as valid <Image> src values.
-    // NOTE: We intentionally DO NOT set `search: ''` here — that would block
-    //       URLs with query params like /api/media/uploads/file.png?v=thumbnail.
-    //       Since we already use unoptimized={true} for all /api/media/ URLs,
-    //       Next.js will never actually try to optimize these paths.
     localPatterns: [
       {
         pathname: '/api/media/**',
@@ -80,30 +70,34 @@ const nextConfig: NextConfig = {
       },
     ],
 
-    // Serve images at these breakpoints only (fewer variants = faster CDN processing)
-    deviceSizes: [640, 1080, 1920],
-    imageSizes: [320, 480, 640],
+    // Granular breakpoints so mobile (390px) and tablet (768px) get correctly sized images.
+    // Fewer entries = fewer variants = faster CDN.
+    deviceSizes: [390, 640, 750, 1080, 1920],
+    imageSizes: [128, 256, 384, 640],
 
-    // WebP has ~30% better compression than JPEG/PNG
-    formats: ['image/webp'],
+    // AVIF is ~50% smaller than WebP for photographic content.
+    // WebP is the fallback for browsers that don't support AVIF.
+    formats: ['image/avif', 'image/webp'],
 
-    // Cache optimized images for 24 hours — product images are immutable between uploads.
-    // This prevents repeated re-processing of the same images on every page visit.
-    minimumCacheTTL: 86400,
+    // Cache optimized images for 7 days — product images are immutable between uploads.
+    // Increased from 1 day to reduce repeated re-processing on Vercel's image optimizer.
+    minimumCacheTTL: 604800, // 7 days
   },
 
-  // ── HTTP Caching Headers ────────────────────────────────────────────────────
+  // ── HTTP Caching & Security Headers ─────────────────────────────────────────
   async headers() {
     return [
       {
-        // Cache /api/media responses at the CDN layer.
-        // Individual responses also set Cache-Control: public, max-age=31536000, immutable
-        // so Vercel's Edge Network caches them aggressively.
+        // Cache /api/media responses at the CDN layer for 1 year (immutable files)
         source: "/api/media/:path*",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable",
+          },
+          {
+            key: "Vary",
+            value: "Accept-Encoding",
           },
         ],
       },
@@ -118,12 +112,30 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Cache public static assets (logo, icons, fonts) for 1 day
+        // Cache public static assets (logo, icons, fonts) for 1 week
         source: "/:path*(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=3600",
+            value: "public, max-age=604800, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        // Add security headers to all HTML pages
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
           },
         ],
       },
@@ -132,3 +144,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

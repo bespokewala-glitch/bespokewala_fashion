@@ -145,7 +145,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const sectionCacheKey = `sections:${pageId}`;
 
   const [rawProducts, totalProducts, hpSections, rawCampaigns, rawTaxonomy, rawFilters, rawDynamicFilters] = await Promise.all([
-    getOrFetch(productCacheKey, 120, () =>
+    getOrFetch(productCacheKey, 300, () =>
       Product.find(productQuery)
         .select('_id name slug price originalPrice images referenceImages productType category subcategory collectionName isFeatured inventoryCount')
         .sort(sortQuery)
@@ -153,7 +153,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         .limit(productsPerPage)
         .lean()
     ),
-    getOrFetch(totalProductsCacheKey, 120, () =>
+    getOrFetch(totalProductsCacheKey, 300, () =>
       Product.countDocuments(productQuery)
     ),
     getOrFetch(sectionCacheKey, 300, () =>

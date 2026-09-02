@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { IProduct } from '@/types/product';
+import { preWarmMany } from '@/lib/preWarmVariants';
 
 export async function GET(req: NextRequest) {
   try {
@@ -108,10 +109,12 @@ export async function GET(req: NextRequest) {
       
     return NextResponse.json(products, {
       headers: {
-        // Allow Vercel Edge to cache product lists for 60s; stale-while-revalidate extends
-        // freshness to 5 min so subsequent requests are served from CDN without hitting MongoDB.
-        // Product catalogue data doesn't change second-to-second — this is safe.
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        // s-maxage: CDN edge caches the response for 60s.
+        // stale-while-revalidate: extends freshness to 10 min for subsequent requests.
+        // Vary: required so CDN caches gzip and Brotli variants separately.
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=600',
+        'Vary': 'Accept-Encoding',
+        'X-Content-Type-Options': 'nosniff',
       },
     });
   } catch (error) {
@@ -167,7 +170,19 @@ export async function POST(req: NextRequest) {
     };
 
     const product = await Product.create(productData);
-    
+
+    // Fire-and-forget: pre-warm variants for the new product's images
+    const newImageUrls: string[] = [
+      ...(Array.isArray(body.images) ? body.images : []),
+      body.referenceImages?.front,
+      body.referenceImages?.back,
+      body.referenceImages?.left,
+      body.referenceImages?.right,
+    ].filter(Boolean) as string[];
+    if (newImageUrls.length > 0) {
+      preWarmMany(newImageUrls).catch(() => {});
+    }
+
     return NextResponse.json(product, { status: 201 });
   } catch (error: any) {
     console.error('Error creating product:', error);

@@ -5,10 +5,12 @@ import { bucket } from '@/lib/gcs';
 // These match the variants checked by /api/media/[...path]/route.ts.
 // Pre-generating them here means the storefront NEVER has to generate them
 // on-demand inside a cold Vercel function — which was the root cause of the
-// recurring broken-image problem every time new products were uploaded.
+// 2–2.4 second TTFB per image on the storefront.
 const THUMBNAIL_VARIANTS = [
+  { name: 'micro',     width: 120,  quality: 70  },
   { name: 'thumbnail', width: 600,  quality: 80  },
   { name: 'medium',    width: 1000, quality: 85  },
+  { name: 'large',     width: 1600, quality: 85  },
 ] as const;
 
 /**

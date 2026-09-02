@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { IProduct } from '@/types/product';
+import { preWarmGcsKey } from '@/lib/preWarmVariants';
+
 
 export async function GET(
   req: NextRequest,
@@ -79,7 +81,21 @@ export async function PUT(
     if (!updatedProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
-    
+
+    // Fire-and-forget: pre-warm all image variants for the updated product.
+    // This runs in the background without blocking the admin response.
+    const allImageUrls: string[] = [
+      ...(Array.isArray(body.images) ? body.images : []),
+      body.referenceImages?.front,
+      body.referenceImages?.back,
+      body.referenceImages?.left,
+      body.referenceImages?.right,
+    ].filter(Boolean) as string[];
+
+    if (allImageUrls.length > 0) {
+      Promise.allSettled(allImageUrls.map(url => preWarmGcsKey(url))).catch(() => {});
+    }
+
     return NextResponse.json(updatedProduct);
   } catch (error: any) {
     console.error('Error updating product:', error);
