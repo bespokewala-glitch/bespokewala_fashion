@@ -78,7 +78,6 @@ export default function Footer() {
             <li><Link href="/products/couture">Couture</Link></li>
             <li><Link href="/products/jewellery">Jewellery</Link></li>
             <li><Link href="/products/footwear">Footwear</Link></li>
-            <li><Link href="/products/beauty">Beauty</Link></li>
           </ul>
         </div>
 
