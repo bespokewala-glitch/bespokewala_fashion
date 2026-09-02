@@ -20,7 +20,7 @@
  * Contains NO secrets and NO GCS credentials.
  */
 
-const GCS_BUCKET = 'bespokewala-storage';
+const GCS_BUCKET = process.env.NEXT_PUBLIC_BUCKET_NAME || 'bespokewala-public-product-images';
 const GCS_BASE = `https://storage.googleapis.com/${GCS_BUCKET}/`;
 
 // Transparent 1×1 pixel PNG data URI — used as the final image fallback
@@ -43,64 +43,42 @@ export function normalizeImageUrl(
   if (!url || typeof url !== 'string' || url.trim() === '') return '';
 
   const trimmed = url.trim();
-  let proxyUrl = '';
+  let baseKey = '';
 
-  // 1. Already a correct proxy URL: /api/media/...
+  // Extract the raw GCS key from various formats
   if (trimmed.startsWith('/api/media/')) {
-    proxyUrl = trimmed;
-  }
-  // 2. Legacy query-param proxy: /api/media?file=uploads/foo.png
-  //    → /api/media/uploads/foo.png
-  else if (trimmed.startsWith('/api/media?file=')) {
-    const key = trimmed.replace('/api/media?file=', '');
-    proxyUrl = `/api/media/${key}`;
-  }
-  // 3. Stale direct GCS CDN URL (private bucket):
-  //    https://storage.googleapis.com/bespokewala-storage/uploads/foo.png
-  //    → /api/media/uploads/foo.png
-  else if (trimmed.startsWith(GCS_BASE)) {
-    const gcsKey = trimmed.slice(GCS_BASE.length);
-    // Guard: never create /api/media/https://... garbage
-    if (gcsKey && !gcsKey.startsWith('http')) {
-      proxyUrl = `/api/media/${gcsKey}`;
-    }
-  }
-  // 4. Bare /uploads/ path (missing /api/media prefix) — old jewellery products
-  //    /uploads/filename.png → /api/media/uploads/filename.png
-  else if (trimmed.startsWith('/uploads/')) {
-    proxyUrl = `/api/media${trimmed}`;
-  }
-  // 5. Bare path without leading slash: uploads/filename.png
-  //    → /api/media/uploads/filename.png
-  else if (trimmed.startsWith('uploads/')) {
-    proxyUrl = `/api/media/${trimmed}`;
-  }
-  // 6. Public external URL (Unsplash, CDN, etc.) — pass through unchanged
-  //    Do NOT append a variant query string to external URLs.
-  else if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
-    return trimmed;
-  }
-  // 7. Other relative paths that start with /
-  else if (trimmed.startsWith('/')) {
-    proxyUrl = trimmed;
+    baseKey = trimmed.replace('/api/media/', '');
+  } else if (trimmed.startsWith('/api/media?file=')) {
+    baseKey = trimmed.replace('/api/media?file=', '');
+  } else if (trimmed.startsWith(GCS_BASE)) {
+    baseKey = trimmed.slice(GCS_BASE.length);
+  } else if (trimmed.startsWith('https://storage.googleapis.com/bespokewala-storage/')) {
+    baseKey = trimmed.replace('https://storage.googleapis.com/bespokewala-storage/', '');
+  } else if (trimmed.startsWith('/uploads/')) {
+    baseKey = trimmed.slice(1);
+  } else if (trimmed.startsWith('uploads/')) {
+    baseKey = trimmed;
+  } else if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed; // Public external URL
+  } else if (trimmed.startsWith('/')) {
+    baseKey = trimmed.slice(1);
   }
 
-  if (!proxyUrl) {
-    // Unrecognised / malformed — return empty so callers can show a fallback
-    return '';
-  }
+  if (!baseKey) return '';
 
-  // Strip any existing ?v= variant param before re-appending to avoid duplication
-  const baseUrl = proxyUrl.includes('?v=')
-    ? proxyUrl.slice(0, proxyUrl.indexOf('?v='))
-    : proxyUrl;
+  // Strip query strings if present
+  if (baseKey.includes('?')) {
+    baseKey = baseKey.split('?')[0];
+  }
 
   if (variant) {
-    // Append variant alongside any existing query string
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    return `${baseUrl}${separator}v=${variant}`;
+    // If a variant is requested, point directly to the pre-warmed GCS path
+    // e.g. https://storage.googleapis.com/bucket/_variants/thumbnail/uploads/file.png.webp
+    return `${GCS_BASE}_variants/${variant}/${baseKey}.webp`;
   }
-  return baseUrl;
+  
+  // Return direct public URL for original image
+  return `${GCS_BASE}${baseKey}`;
 }
 
 /**
@@ -117,8 +95,7 @@ export function normalizeImageUrl(
  * External URLs (Unsplash, CDN) can be optimized normally.
  */
 export function shouldBypassOptimizer(url: string | null | undefined): boolean {
-  if (!url) return false;
-  return url.startsWith('/api/') || url.includes('/api/media/');
+  return true; // We use pre-warmed variants from GCS, no need for Vercel optimization
 }
 
 /**

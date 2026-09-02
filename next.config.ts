@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
         // Allow Next.js to optimize images from public GCS CDN URLs
         protocol: 'https',
         hostname: 'storage.googleapis.com',
-        pathname: `/${process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-storage'}/**`,
+        pathname: `/${process.env.NEW_PUBLIC_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-storage'}/**`,
       },
       {
         // Allow Unsplash images (used in homepage CMS sections)

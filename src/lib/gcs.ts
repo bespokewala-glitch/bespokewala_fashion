@@ -93,7 +93,7 @@ if (jsonCredentials) {
 export { storage };
 
 // ── Public bucket — product images, banners, etc. ────────────────────────────
-export const bucketName = process.env.GOOGLE_CLOUD_BUCKET_NAME || '';
+export const bucketName = process.env.NEW_PUBLIC_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET_NAME || '';
 export const bucket = storage.bucket(bucketName || 'dummy-bucket-name-for-build');
 
 // ── Private bucket — invoices, bills, documents (no public access) ────────────
