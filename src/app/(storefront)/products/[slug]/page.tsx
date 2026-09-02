@@ -330,12 +330,6 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
         </div>
       </main>
 
-      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
-        <Suspense fallback={<div style={{ height: '200px' }} />}>
-          <ProductReviews productId={product._id.toString()} deferFetch={true} />
-        </Suspense>
-      </div>
-
       {/* ── Related Products ──────────────────────────────────────────────────
           Server-rendered section with crawlable <a> links. Fetches products
           from same subcategory so Google can discover the full catalogue via
@@ -349,6 +343,12 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           category={product.category}
         />
       </Suspense>
+
+      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-8">
+        <Suspense fallback={<div style={{ height: '200px' }} />}>
+          <ProductReviews productId={product._id.toString()} deferFetch={true} />
+        </Suspense>
+      </div>
 
       <ProductChatContext context={{
         slug: product.slug,

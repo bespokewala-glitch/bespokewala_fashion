@@ -88,7 +88,7 @@ export default async function RelatedProducts({
           width: '100%',
           maxWidth: '1600px',
           margin: '0 auto',
-          padding: '2rem 4rem',
+          padding: '3rem 4rem 1rem 4rem',
         }}
         className="mobile-px-4"
         aria-label={heading}
@@ -98,10 +98,12 @@ export default async function RelatedProducts({
           style={{
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
             gap: '0.5rem',
-            marginBottom: '2rem',
+            marginBottom: '1.5rem',
             borderTop: '1px solid #eaeaea',
-            paddingTop: '2rem',
+            paddingTop: '1.5rem',
           }}
         >
           <h2
