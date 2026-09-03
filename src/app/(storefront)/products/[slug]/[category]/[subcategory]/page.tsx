@@ -47,7 +47,8 @@ export default async function ProductSubcategoryPage({ params, searchParams }: P
   // We no longer need to prefetch taxonomy here since CollectionPageContent will fetch it,
   // and CollectionPageContent now handles the fullRoutePath matching logic.
   
-  const collectionParams: any = { ...searchParamsAwaited, productType, category, slug3: subcategory };
+  const collectionParams: any = { ...searchParamsAwaited, productType, slug2: category, slug3: subcategory };
+
 
   return <CollectionPageContent params={collectionParams} />;
 }
