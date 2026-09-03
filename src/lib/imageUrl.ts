@@ -2,10 +2,9 @@
  * imageUrl.ts — Shared image URL utilities
  *
  * Architecture:
- *   GCS bucket is PRIVATE.
- *   All product/admin images are served through the authenticated proxy:
- *     /api/media/<gcs-key>
- *   The browser NEVER talks to GCS directly.
+ *   GCS bucket is PUBLIC.
+ *   All product images are served directly from the public GCS URL.
+ *   Next.js Image Optimizer natively handles resizing and caching.
  *
  * URL formats that may exist in MongoDB or localStorage:
  *   1. (current)  /api/media/uploads/filename.png
@@ -26,15 +25,15 @@ const GCS_BASE = `https://storage.googleapis.com/${GCS_BUCKET}/`;
 // Transparent 1×1 pixel PNG data URI — used as the final image fallback
 // when both the original and its thumbnail are unavailable.
 export const PLACEHOLDER_IMAGE =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 /**
  * Normalize any image URL to a browser-safe proxy URL.
  *
  * Returns:
- *  - /api/media/<key>  for private GCS images (served by the authenticated proxy)
- *  - the original URL  for public images (Unsplash, etc.)
- *  - ''                for null / undefined / empty / malformed
+ *  - The direct public GCS URL for images
+ *  - the original URL for public images (Unsplash, etc.)
+ *  - '' for null / undefined / empty / malformed
  */
 export function normalizeImageUrl(
   url: string | null | undefined,
@@ -71,13 +70,8 @@ export function normalizeImageUrl(
     baseKey = baseKey.split('?')[0];
   }
 
-  if (variant) {
-    // If a variant is requested, point directly to the pre-warmed GCS path
-    // e.g. https://storage.googleapis.com/bucket/_variants/thumbnail/uploads/file.png.webp
-    return `${GCS_BASE}_variants/${variant}/${baseKey}.webp`;
-  }
-  
-  // Return direct public URL for original image
+  // With a public bucket, we no longer need to proxy through /api/media.
+  // Next.js <Image> will optimize this public URL directly and apply its own sizing and variants natively.
   return `${GCS_BASE}${baseKey}`;
 }
 
@@ -90,12 +84,9 @@ export function normalizeImageUrl(
  *
  * Usage:
  *   <Image src={src} unoptimized={shouldBypassOptimizer(src)} ... />
- *
- * Rule: any URL served by our own application (/api/...) must bypass optimization.
- * External URLs (Unsplash, CDN) can be optimized normally.
  */
 export function shouldBypassOptimizer(url: string | null | undefined): boolean {
-  return true; // We use pre-warmed variants from GCS, no need for Vercel optimization
+  return false; // Let Next.js optimize the public GCS URLs natively
 }
 
 /**
@@ -103,15 +94,12 @@ export function shouldBypassOptimizer(url: string | null | undefined): boolean {
  *
  * @param rawUrl   - Raw image path from MongoDB (any legacy or current format)
  * @param size     - 'thumbnail' for product cards/grids, 'medium' for PDP, undefined for original
- * @returns        - Browser-safe /api/media/... URL with variant query if applicable,
+ * @returns        - Browser-safe public GCS URL
  *                   or '' if the URL is empty/invalid
  *
  * Example:
- *   getProductImageUrl('/uploads/file.png', 'thumbnail')
- *   → '/api/media/uploads/file.png?v=thumbnail'
- *
  *   getProductImageUrl('uploads/file.png')
- *   → '/api/media/uploads/file.png'
+ *   → 'https://storage.googleapis.com/bucket-name/uploads/file.png'
  */
 export function getProductImageUrl(
   rawUrl: string | null | undefined,

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import Image, { ImageProps } from 'next/image';
-import { normalizeImageUrl, shouldBypassOptimizer, PLACEHOLDER_IMAGE } from '@/lib/imageUrl';
+import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 
 export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
   /**
@@ -24,58 +24,90 @@ export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
   priority?: boolean;
 }
 
-// We no longer need the custom gcsLoader because imageUrl.ts now returns
-// direct public GCS URLs that point exactly to the pre-warmed variants.
+/** Styled "No Image" placeholder shown when the GCS file is missing. */
+function NoImagePlaceholder({ style }: { style?: React.CSSProperties }) {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#f0f0f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: '0.5rem',
+        color: '#bbb',
+        fontSize: '0.7rem',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        fontFamily: 'inherit',
+        ...style,
+      }}
+      aria-hidden="true"
+    >
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+      <span>No Image</span>
+    </div>
+  );
+}
 
 /**
  * A global, reusable Image component that handles:
  * 1. Automatic GCS variant requesting (thumbnail vs medium vs large).
- * 2. Next.js image optimizer recursion prevention via custom loader.
- * 3. Graceful fallback on error (Target Variant → Placeholder).
+ * 2. Next.js image optimizer recursion prevention.
+ * 3. Graceful fallback on load error — shows styled "No Image" placeholder.
  * 4. Default lazy loading for performance.
+ *
+ * NOTE: No secondary fetch() is performed. The proxy at /api/media/[...path]
+ * returns HTTP 410 Gone for missing GCS files, which triggers Next.js <Image>
+ * onError correctly — no double-request overhead on listing pages.
  */
 export default function OptimizedImage({
   src,
   variant,
   priority = false,
   alt,
+  style,
   ...rest
 }: OptimizedImageProps) {
-  // 1. Resolve URLs
-  const targetSrc = normalizeImageUrl(src, variant);
-  const originalSrc = normalizeImageUrl(src);
-  const resolvedSrc = targetSrc || originalSrc || PLACEHOLDER_IMAGE;
-
-  // 2. Track error state
   const [hasError, setHasError] = useState(false);
 
-  // 3. Fallback logic
   const handleError = useCallback(() => {
     setHasError(true);
   }, []);
 
-  // Reset error state if src changes (e.g. carousel slide change)
-  React.useEffect(() => {
-    setHasError(false);
-  }, [src]);
-
-  const currentSrc = hasError ? PLACEHOLDER_IMAGE : resolvedSrc;
-
-  if (!currentSrc) {
-    return <div style={{ width: '100%', height: '100%', backgroundColor: '#f5f5f5' }} aria-hidden="true" />;
+  // Reset error state whenever src changes (e.g. carousel slide change)
+  const prevSrc = React.useRef(src);
+  if (prevSrc.current !== src) {
+    prevSrc.current = src;
+    if (hasError) setHasError(false);
   }
 
-  // Since imageUrl.ts now gives us the exact public GCS URL of the variant
-  // (e.g. storage.googleapis.com/.../_variants/thumbnail/...), we bypass Next.js
-  // Image Optimization entirely to save on Vercel limits and latency.
+  // No src at all → show placeholder immediately (no network request)
+  const resolvedSrc = normalizeImageUrl(src, variant) || normalizeImageUrl(src);
+  if (!resolvedSrc) {
+    return <NoImagePlaceholder style={style as React.CSSProperties} />;
+  }
+
+  // Image failed to load → show placeholder
+  if (hasError) {
+    return <NoImagePlaceholder style={style as React.CSSProperties} />;
+  }
+
   return (
     <Image
       {...rest}
-      src={currentSrc}
-      alt={alt || "Bespokewala Image"}
+      src={resolvedSrc}
+      alt={alt || 'Bespokewala Image'}
       priority={priority}
-      unoptimized={shouldBypassOptimizer(currentSrc)}
+      unoptimized={shouldBypassOptimizer(resolvedSrc)}
       onError={handleError}
+      style={style}
     />
   );
 }

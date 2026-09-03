@@ -39,11 +39,18 @@ const VARIANT_CONFIG: Record<string, { width: number; quality: number }> = {
   large: { width: 1600, quality: 85 },
 };
 
-// Transparent 1×1 PNG — used as a controlled fallback for missing files.
-const PLACEHOLDER_PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-  'base64',
-);
+// Missing-file response — 410 Gone so Next.js <Image> onError fires correctly.
+// We do NOT return a PNG body here; a real image body on a non-2xx status
+// confuses the browser and prevents the React onError handler from triggering.
+function missingFileResponse(fileParam: string): NextResponse {
+  return new NextResponse(null, {
+    status: 410,
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+      'X-Media-Miss': fileParam,
+    },
+  });
+}
 
 // ─── Route Handler ────────────────────────────────────────────────────────────
 // NOTE: `sharp` is intentionally NOT imported at the top level.
@@ -157,14 +164,7 @@ export async function GET(
 
       if (!exists) {
         console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-        return new NextResponse(PLACEHOLDER_PNG, {
-          status: 404,
-          headers: {
-            'Content-Type': 'image/png',
-            'Cache-Control': 'no-store, max-age=0',
-            'X-Media-Miss': fileParam,
-          },
-        });
+        return missingFileResponse(fileParam);
       }
 
       const [originalBuffer] = await gcsFile.download();
@@ -243,16 +243,9 @@ export async function GET(
       contentType = (metadata.contentType as string) || getMimeType(fileParam);
       contentLength = parseInt(String(metadata.size || '0'), 10);
     } catch {
-      // File not found or metadata error — return placeholder
+      // File not found or metadata error — return 410 so onError fires in the browser
       console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-      return new NextResponse(PLACEHOLDER_PNG, {
-        status: 404,
-        headers: {
-          'Content-Type': 'image/png',
-          'Cache-Control': 'no-store, max-age=0',
-          'X-Media-Miss': fileParam,
-        },
-      });
+      return missingFileResponse(fileParam);
     }
 
     // Download the original from GCS
