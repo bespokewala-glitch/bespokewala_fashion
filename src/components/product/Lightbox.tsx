@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
-import { normalizeImageUrl } from '@/lib/imageUrl';
+import { getProductImageUrl } from '@/lib/imageUrl';
 
 interface LightboxProps {
   images: { url: string; alt: string }[];
@@ -208,7 +208,7 @@ export default function Lightbox({ images, initialIndex, isOpen, onClose }: Ligh
           >
             <motion.img
               key={currentIndex}
-              src={normalizeImageUrl(images[currentIndex].url, 'large')}
+              src={getProductImageUrl(images[currentIndex].url, 'large')}
               alt={images[currentIndex].alt}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: scale }}
