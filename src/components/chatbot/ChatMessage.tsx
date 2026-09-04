@@ -40,7 +40,7 @@ function needsSupportButtons(text: string): boolean {
     lower.includes('support team') ||
     lower.includes('contact us') ||
     lower.includes('+91 75067') ||
-    lower.includes('bespokewala@gmail')
+    lower.includes('info@bespokewala.com')
   );
 }
 
