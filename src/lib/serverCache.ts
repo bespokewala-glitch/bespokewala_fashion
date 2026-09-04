@@ -55,3 +55,8 @@ export function invalidateCachePrefix(prefix: string) {
     }
   }
 }
+
+/** Invalidate the entire server-side cache (use after major query logic changes). */
+export function invalidateAll() {
+  cache.clear();
+}

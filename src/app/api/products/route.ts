@@ -44,13 +44,19 @@ export async function GET(req: NextRequest) {
       const slug2Query = buildInQuery(slug2);
       if (slug2Query) {
         if (!query.$and) query.$and = [];
-        query.$and.push({
-          $or: [
-            { category: slug2Query },
-            { collectionName: slug2Query },
-            { occasion: slug2Query }
-          ]
-        });
+        // When slug3 is also present (3-segment URL), slug2 unambiguously = category.
+        // When slug3 is absent (2-segment URL), keep the broad $or for collection pages.
+        if (slug3 && slug3.toLowerCase() !== 'all' && slug3.toLowerCase() !== 'all-products' && slug3.toLowerCase() !== 'all-collections') {
+          query.$and.push({ category: slug2Query });
+        } else {
+          query.$and.push({
+            $or: [
+              { category: slug2Query },
+              { collectionName: slug2Query },
+              { occasion: slug2Query }
+            ]
+          });
+        }
       }
     }
 
@@ -58,13 +64,11 @@ export async function GET(req: NextRequest) {
       const slug3Query = buildInQuery(slug3);
       if (slug3Query) {
         if (!query.$and) query.$and = [];
-        query.$and.push({
-          $or: [
-            { subcategory: slug3Query },
-            { collectionName: slug3Query },
-            { occasion: slug3Query }
-          ]
-        });
+        // slug3 is always the 3rd URL segment, unambiguously = subcategory.
+        // The previous broad $or (subcategory OR collectionName OR occasion) caused products
+        // with collectionName='lehenga' to appear on the subcategory page alongside products
+        // with subcategory='lehenga', creating visible duplicates.
+        query.$and.push({ subcategory: slug3Query });
       }
     }
 
@@ -100,12 +104,23 @@ export async function GET(req: NextRequest) {
     if (sort === 'newest') sortQuery = { createdAt: -1 };
     if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
-    const products = await Product.find(query)
+    const rawProducts = await Product.find(query)
       .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType isFeatured')
       .sort(sortQuery)
       .skip(skip)
       .limit(limit > 1000 ? 1000 : limit)
       .lean();
+
+    // Backend deduplication safety net: guarantee each _id appears only once.
+    // This handles any future edge case where a complex $or/$and query might
+    // match the same document via two different conditions.
+    const seenIds = new Map<string, boolean>();
+    const products = rawProducts.filter((p: any) => {
+      const id = p._id.toString();
+      if (seenIds.has(id)) return false;
+      seenIds.set(id, true);
+      return true;
+    });
       
     return NextResponse.json(products, {
       headers: {

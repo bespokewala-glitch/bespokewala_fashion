@@ -65,13 +65,23 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
       }
-      (productQuery as any).$and.push({
-        $or: [
-          { category: slug2Query },
-          { collectionName: slug2Query },
-          { occasion: slug2Query }
-        ]
-      });
+      // When slug3 is also present (3-segment URL: /products/[type]/[category]/[subcategory]),
+      // slug2 unambiguously means `category`. When slug3 is absent (2-segment URL:
+      // /products/[type]/[collection-or-category]), we keep the broad $or so that
+      // collection pages like /products/couture/bridal-collection still work.
+      if (slug3) {
+        // 3-segment URL: slug2 = category
+        (productQuery as any).$and.push({ category: slug2Query });
+      } else {
+        // 2-segment URL: ambiguous — could be category, collectionName, or occasion
+        (productQuery as any).$and.push({
+          $or: [
+            { category: slug2Query },
+            { collectionName: slug2Query },
+            { occasion: slug2Query }
+          ]
+        });
+      }
     }
   }
 
@@ -82,13 +92,11 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
       }
-      (productQuery as any).$and.push({
-        $or: [
-          { subcategory: slug3Query },
-          { collectionName: slug3Query },
-          { occasion: slug3Query }
-        ]
-      });
+      // slug3 is always the 3rd URL segment, unambiguously = subcategory.
+      // Using a broad $or here (subcategory OR collectionName OR occasion) caused
+      // lehenga products with collectionName='lehenga' to appear on the subcategory
+      // page alongside products that have subcategory='lehenga', creating visible duplicates.
+      (productQuery as any).$and.push({ subcategory: slug3Query });
     }
   }
   if (q) {
