@@ -259,14 +259,15 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
    * (e.g. "Luxury Women's Lehengas", "Luxury Footwear Collection")
    */
   // If we're relying on a fallback taxonomy (e.g. 'cocktail'), we shouldn't use its generic seoH1 for a specific page.
-  // Instead, pass it as the 'contextName' so generateCategoryHeading outputs e.g. "Luxury Women's Couture Cocktail".
   const isExactMatch = (rawTaxonomy as any)?.isExactMatch;
   const isRootTaxonomy = pageId === (canonicalPath.replace(/^\/products\//, '') || pageId);
-  
-  // We only use the context parameter if there isn't an explicit subcategory and we're relying on slug2/slug3/occasion
-  const contextName = !subcategory ? (slug3 || occasion || slug2) : undefined;
-  
-  const generatedTitle = generateCategoryHeading(productType, category, subcategory, collectionName, contextName);
+
+  // Use slug2/slug3 as category/subcategory fallbacks so the heading is correct
+  // (e.g. /products/couture/womens/lehenga → "Luxury Women's Lehengas")
+  const effectiveCategory = category || slug2;
+  const effectiveSubcategory = subcategory || slug3;
+
+  const generatedTitle = generateCategoryHeading(productType, effectiveCategory, effectiveSubcategory, collectionName);
   const taxonomySeo = (rawTaxonomy as any)?.seo || {};
   
   // Use the taxonomy's H1 if we matched exactly OR if it's a top-level department
@@ -282,22 +283,22 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     const pt = productType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     breadcrumbs.push({ label: pt, href: `/products/${productType}` });
   }
-  if (category) {
-    const cat = category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  if (effectiveCategory) {
+    const cat = effectiveCategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     breadcrumbs.push({
       label: cat,
       href: productType
-        ? `/products/${productType}/${category}`
-        : `/products?category=${category}`,
+        ? `/products/${productType}/${effectiveCategory}`
+        : `/products?category=${effectiveCategory}`,
     });
   }
-  if (subcategory) {
-    const sub = subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  if (effectiveSubcategory) {
+    const sub = effectiveSubcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     breadcrumbs.push({
       label: sub,
-      href: productType && category
-        ? `/products/${productType}/${category}/${subcategory}`
-        : `/products?subcategory=${subcategory}`,
+      href: productType && effectiveCategory
+        ? `/products/${productType}/${effectiveCategory}/${effectiveSubcategory}`
+        : `/products?subcategory=${effectiveSubcategory}`,
     });
   }
 
