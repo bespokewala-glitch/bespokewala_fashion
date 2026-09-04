@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { normalizeImageUrl } from '@/lib/imageUrl';
+import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
@@ -247,11 +248,13 @@ export default function WishlistPage() {
                   style={{ display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none', color: 'inherit' }}
                 >
                   <div className="wishlist-image-container">
-                    <img 
-                      src={normalizeImageUrl(item.image) || item.image} 
+                    <OptimizedImage 
+                      src={item.image} 
                       alt={item.name} 
                       className="wishlist-image"
-                      loading="lazy"
+                      variant="thumbnail"
+                      width={750}
+                      height={1000}
                     />
                     <button
                       onClick={(e) => {
