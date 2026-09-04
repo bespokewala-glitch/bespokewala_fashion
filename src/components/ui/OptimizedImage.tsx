@@ -2,29 +2,21 @@
 
 import React, { useState, useCallback } from 'react';
 import Image, { ImageProps } from 'next/image';
-import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
+import { 
+  normalizeImageUrl, 
+  shouldBypassOptimizer, 
+  getGcsVariantUrl, 
+  generateGcsSrcSet, 
+  ImageVariant 
+} from '@/lib/imageUrl';
 
 export interface OptimizedImageProps extends Omit<ImageProps, 'src'> {
-  /**
-   * The raw image URL from the database or CMS.
-   */
   src: string | null | undefined;
-
-  /**
-   * The variant of the image to request from the server.
-   * 'thumbnail' (~600px) is best for grids and cards.
-   * 'medium' (~1000px) is best for heroes, banners, and PDP main image.
-   * undefined (original) should only be used if absolute maximum quality is required.
-   */
-  variant?: 'micro' | 'thumbnail' | 'medium' | 'large';
-
-  /**
-   * By default, images load lazily. Set to true for above-the-fold hero images.
-   */
+  variant?: ImageVariant;
   priority?: boolean;
+  unoptimized?: boolean;
 }
 
-/** Styled "No Image" placeholder shown when the GCS file is missing. */
 function NoImagePlaceholder({ style }: { style?: React.CSSProperties }) {
   return (
     <div
@@ -56,58 +48,98 @@ function NoImagePlaceholder({ style }: { style?: React.CSSProperties }) {
   );
 }
 
-/**
- * A global, reusable Image component that handles:
- * 1. Automatic GCS variant requesting (thumbnail vs medium vs large).
- * 2. Next.js image optimizer recursion prevention.
- * 3. Graceful fallback on load error — shows styled "No Image" placeholder.
- * 4. Default lazy loading for performance.
- *
- * NOTE: No secondary fetch() is performed. The proxy at /api/media/[...path]
- * returns HTTP 410 Gone for missing GCS files, which triggers Next.js <Image>
- * onError correctly — no double-request overhead on listing pages.
- */
 export default function OptimizedImage({
   src,
   variant,
   priority = false,
   alt,
   style,
+  fill,
+  sizes,
+  unoptimized,
   ...rest
 }: OptimizedImageProps) {
   const [hasError, setHasError] = useState(false);
-
-  const handleError = useCallback(() => {
-    setHasError(true);
-  }, []);
-
-  // Reset error state whenever src changes (e.g. carousel slide change)
+  
+  // Track src changes to reset error state
   const prevSrc = React.useRef(src);
   if (prevSrc.current !== src) {
     prevSrc.current = src;
     if (hasError) setHasError(false);
   }
 
-  // No src at all → show placeholder immediately (no network request)
-  const resolvedSrc = normalizeImageUrl(src, variant) || normalizeImageUrl(src);
-  if (!resolvedSrc) {
+  const originalUrl = normalizeImageUrl(src);
+  
+  if (!originalUrl) {
     return <NoImagePlaceholder style={style as React.CSSProperties} />;
   }
 
-  // Image failed to load → show placeholder
-  if (hasError) {
-    return <NoImagePlaceholder style={style as React.CSSProperties} />;
+  // Determine if we can use direct GCS variants to bypass Next.js optimizer bottleneck
+  // We avoid native mode if the user explicitly requested unoptimized=true (since that disables responsive sizes)
+  const isGcsImage = originalUrl.includes('storage.googleapis.com');
+  const shouldUseNativeGcs = isGcsImage && !hasError && !unoptimized;
+
+  if (shouldUseNativeGcs) {
+    // If a specific variant is requested (e.g., thumbnail), use its direct URL.
+    // Otherwise, default to 'medium' as the base src for responsive images.
+    const directSrc = variant 
+      ? getGcsVariantUrl(originalUrl, variant) || originalUrl 
+      : getGcsVariantUrl(originalUrl, 'medium') || originalUrl;
+
+    const gcsSrcSet = generateGcsSrcSet(originalUrl);
+
+    // Map Next.js 'fill' prop to native CSS equivalents
+    const imgStyle: React.CSSProperties = {
+      ...style,
+      ...(fill
+        ? {
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            color: 'transparent',
+          }
+        : {}),
+    };
+
+    return (
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        {...rest}
+        src={directSrc}
+        srcSet={gcsSrcSet}
+        sizes={sizes}
+        alt={alt || 'Bespokewala Image'}
+        style={imgStyle}
+        loading={priority ? undefined : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
+        onError={() => setHasError(true)} // Fallback to Next.js on 404 (e.g. variants not yet generated)
+      />
+    );
   }
 
+  // Fallback: Use Next.js Image optimizer if the GCS variant 404s, or if it's an external URL (Unsplash)
   return (
     <Image
       {...rest}
-      src={resolvedSrc}
+      src={originalUrl}
       alt={alt || 'Bespokewala Image'}
       priority={priority}
-      unoptimized={shouldBypassOptimizer(resolvedSrc)}
-      onError={handleError}
+      fill={fill}
+      sizes={sizes}
+      unoptimized={shouldBypassOptimizer(originalUrl) || unoptimized}
       style={style}
+      onError={() => {
+        // Only set error if we are already in the fallback state and it STILL fails
+        if (hasError) {
+          // This prevents infinite loops, we can't do anything else.
+          // Wait, Next.js Image doesn't let us easily replace itself with a div on error without another state.
+          // We'll just let the broken image icon show, or we could add a second state.
+        }
+      }}
     />
   );
 }

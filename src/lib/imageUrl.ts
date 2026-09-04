@@ -3,48 +3,28 @@
  *
  * Architecture:
  *   GCS bucket is PUBLIC.
- *   All product images are served directly from the public GCS URL.
- *   Next.js Image Optimizer natively handles resizing and caching.
- *
- * URL formats that may exist in MongoDB or localStorage:
- *   1. (current)  /api/media/uploads/filename.png
- *   2. (legacy)   /api/media?file=uploads/filename.png
- *   3. (stale)    https://storage.googleapis.com/bespokewala-storage/uploads/filename.png
- *                 created by a temporary bad commit — rewritten to proxy URL
- *   4. (bare)     /uploads/filename.png                   — missing /api/media prefix
- *   5. (bare2)    uploads/filename.png                    — no leading slash either
- *   6. (public)   https://images.unsplash.com/...         — kept as-is
- *
- * Safe to import in both server and client components.
- * Contains NO secrets and NO GCS credentials.
+ *   Product images are served directly from the public GCS URL.
+ *   Pre-generated WebP variants (_variants/medium/...) are used to bypass Next.js image optimization bottlenecks.
  */
 
 const GCS_BUCKET = process.env.NEXT_PUBLIC_BUCKET_NAME || 'bespokewala-public-product-images';
 const GCS_BASE = `https://storage.googleapis.com/${GCS_BUCKET}/`;
 
-// Transparent 1×1 pixel PNG data URI — used as the final image fallback
-// when both the original and its thumbnail are unavailable.
 export const PLACEHOLDER_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
+export type ImageVariant = 'micro' | 'small' | 'thumbnail' | 'medium' | 'large';
+
 /**
  * Normalize any image URL to a browser-safe proxy URL.
- *
- * Returns:
- *  - The direct public GCS URL for images
- *  - the original URL for public images (Unsplash, etc.)
- *  - '' for null / undefined / empty / malformed
+ * Returns the direct public GCS URL for images, or the original URL for external images.
  */
-export function normalizeImageUrl(
-  url: string | null | undefined,
-  variant?: 'micro' | 'thumbnail' | 'medium' | 'large',
-): string {
+export function normalizeImageUrl(url: string | null | undefined): string {
   if (!url || typeof url !== 'string' || url.trim() === '') return '';
 
   const trimmed = url.trim();
   let baseKey = '';
 
-  // Extract the raw GCS key from various formats
   if (trimmed.startsWith('/api/media/')) {
     baseKey = trimmed.replace('/api/media/', '');
   } else if (trimmed.startsWith('/api/media?file=')) {
@@ -58,52 +38,70 @@ export function normalizeImageUrl(
   } else if (trimmed.startsWith('uploads/')) {
     baseKey = trimmed;
   } else if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
-    return trimmed; // Public external URL
+    return trimmed; 
   } else if (trimmed.startsWith('/')) {
     baseKey = trimmed.slice(1);
   }
 
   if (!baseKey) return '';
+  if (baseKey.includes('?')) baseKey = baseKey.split('?')[0];
 
-  // Strip query strings if present
-  if (baseKey.includes('?')) {
-    baseKey = baseKey.split('?')[0];
-  }
-
-  // With a public bucket, we no longer need to proxy through /api/media.
-  // Next.js <Image> will optimize this public URL directly and apply its own sizing and variants natively.
   return `${GCS_BASE}${baseKey}`;
 }
 
 /**
- * Returns true when the URL must bypass Next.js Image Optimization.
- *
- * The Vercel image optimizer cannot recursively call back into the same
- * serverless deployment (/api/media/...). Pass this as the `unoptimized`
- * prop on every <Image> that may receive a proxy URL.
- *
- * Usage:
- *   <Image src={src} unoptimized={shouldBypassOptimizer(src)} ... />
+ * Gets the direct GCS URL for a specific pre-generated WebP variant.
  */
-export function shouldBypassOptimizer(url: string | null | undefined): boolean {
-  return false; // Let Next.js optimize the public GCS URLs natively
+export function getGcsVariantUrl(
+  url: string | null | undefined,
+  variant: ImageVariant
+): string | null {
+  const normalized = normalizeImageUrl(url);
+  if (!normalized) return null;
+  
+  if (normalized.startsWith(GCS_BASE)) {
+    const key = normalized.slice(GCS_BASE.length);
+    if (/\.(jpg|jpeg|png|webp|avif)$/i.test(key)) {
+      return `${GCS_BASE}_variants/${variant}/${key}.webp`;
+    }
+  }
+  return null;
 }
 
 /**
- * Build the canonical product image URL for a given context.
- *
- * @param rawUrl   - Raw image path from MongoDB (any legacy or current format)
- * @param size     - 'thumbnail' for product cards/grids, 'medium' for PDP, undefined for original
- * @returns        - Browser-safe public GCS URL
- *                   or '' if the URL is empty/invalid
- *
- * Example:
- *   getProductImageUrl('uploads/file.png')
- *   → 'https://storage.googleapis.com/bucket-name/uploads/file.png'
+ * Generates a native HTML srcSet string containing all available WebP variants.
+ * This allows the browser to natively select the optimal size without Next.js processing.
  */
+export function generateGcsSrcSet(url: string | null | undefined): string | undefined {
+  const normalized = normalizeImageUrl(url);
+  if (!normalized) return undefined;
+
+  if (normalized.startsWith(GCS_BASE)) {
+    const key = normalized.slice(GCS_BASE.length);
+    if (/\.(jpg|jpeg|png|webp|avif)$/i.test(key)) {
+      return `
+        ${GCS_BASE}_variants/small/${key}.webp 300w,
+        ${GCS_BASE}_variants/thumbnail/${key}.webp 600w,
+        ${GCS_BASE}_variants/medium/${key}.webp 1000w,
+        ${GCS_BASE}_variants/large/${key}.webp 1600w
+      `.trim();
+    }
+  }
+  return undefined;
+}
+
+export function shouldBypassOptimizer(url: string | null | undefined): boolean {
+  return false; 
+}
+
 export function getProductImageUrl(
   rawUrl: string | null | undefined,
-  size?: 'micro' | 'thumbnail' | 'medium' | 'large',
+  size?: ImageVariant,
 ): string {
-  return normalizeImageUrl(rawUrl, size);
+  // If size requested, try to return variant URL first
+  if (size) {
+    const variantUrl = getGcsVariantUrl(rawUrl, size);
+    if (variantUrl) return variantUrl;
+  }
+  return normalizeImageUrl(rawUrl);
 }
