@@ -110,7 +110,7 @@ export default function AboutPageContent() {
         color: "#fff", textAlign: "center", padding: "2rem",
       }}>
         <p style={{ fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "1.25rem" }}>
-          Started 2002 · Incorporated 2020 · Mumbai, India
+          Started & Incorporated 2002 · Mumbai, India
         </p>
         <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 300, letterSpacing: "0.12em", textTransform: "uppercase", lineHeight: 1.1, marginBottom: "1.5rem" }}>
           The Art of<br />Bespokewala Fashion
@@ -203,7 +203,7 @@ export default function AboutPageContent() {
           </h2>
           <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "1.5rem 0" }} />
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
-            Our journey began in 2002 with a 400 sq ft studio in Bandra, Mumbai — a dream, a sewing machine, and an unshakeable belief that Indian couture deserved a global pedestal. While officially incorporated in 2020, the roots were firmly planted decades ago when the founder stitched the very first lehenga by hand.
+            Our journey began and was officially incorporated in 2002 with a 400 sq ft studio in Bandra, Mumbai — a dream, a sewing machine, and an unshakeable belief that Indian couture deserved a global pedestal. The roots were firmly planted when the founder stitched the very first lehenga by hand.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
             Word spread quietly at first — a bride here, a celebrity there. By 2008, Bespokewala had dressed its first Bollywood star for a major awards ceremony, and the fashion world took notice. What began as a solo endeavour grew into a collective of over 200 master craftsmen, weavers, and embroiderers.
@@ -216,11 +216,10 @@ export default function AboutPageContent() {
         {/* Timeline */}
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
           {[
-            { year: "2002", event: "Began our journey in Bandra, Mumbai with a single studio and a team of three." },
+            { year: "2002", event: "Officially incorporated in Bandra, Mumbai with a single studio and a team of three." },
             { year: "2006", event: "Opened our first flagship atelier and launched the signature bridal collection." },
             { year: "2010", event: "International debut at London Fashion Week; global recognition begins." },
             { year: "2016", event: "Expanded to Delhi & Dubai; launched Bespokewala Jewellery." },
-            { year: "2020", event: "Officially incorporated as a registered company, marking a new chapter of growth." },
             { year: "2022", event: "Celebrating 20 years — 500+ craftsmen, 5 studios, clients in 40+ countries." },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>

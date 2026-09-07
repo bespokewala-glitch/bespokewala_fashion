@@ -293,7 +293,7 @@ export default function PressPageContent() {
 
           <div style={{ display: "flex", gap: "2.5rem", flexWrap: "wrap", marginTop: "2rem", borderTop: "1px solid #333", paddingTop: "2rem" }}>
             {[
-              { label: "Founded",   value: "2020" },
+              { label: "Founded",   value: "2002" },
               { label: "Location",  value: "Mumbai, India" },
               { label: "Speciality",value: "Bridal & Bespoke Couture" },
               { label: "Artisans",  value: "50+ Skilled Craftspeople" },
