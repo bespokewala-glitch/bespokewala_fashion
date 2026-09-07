@@ -29,9 +29,9 @@ export default async function CheckoutPage() {
 
   return (
     <>
-            <main style={{ minHeight: '80vh', paddingTop: '6rem', paddingBottom: '6rem' }}>
+      <main style={{ minHeight: '80vh', paddingTop: '2rem', paddingBottom: '4rem' }}>
         <CheckoutClient />
       </main>
-          </>
+    </>
   );
 }

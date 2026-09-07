@@ -209,7 +209,7 @@ export default function CheckoutClient() {
         </div>
       )}
 
-      <form onSubmit={handlePayWithRazorpay} style={{ display: "flex", flexWrap: "wrap", gap: "4rem", alignItems: "flex-start" }}>
+      <form onSubmit={handlePayWithRazorpay} style={{ display: "flex", flexWrap: "wrap", gap: "2rem 4rem", alignItems: "flex-start" }}>
         {/* Shipping Form */}
         <div style={{ flex: "1 1 400px", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 400, letterSpacing: "0.1em", marginBottom: "2rem", textTransform: "uppercase", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
@@ -245,7 +245,7 @@ export default function CheckoutClient() {
             </select>
           </div>
 
-          <div style={{ marginBottom: "2rem" }}>
+          <div style={{ marginBottom: 0 }}>
             <input required type="tel" name="phone" placeholder="Phone Number" value={shippingDetails.phone} onChange={handleChange} style={inputStyle} />
           </div>
 
