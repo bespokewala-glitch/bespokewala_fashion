@@ -128,7 +128,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           position: relative;
           width: 100%;
           overflow: hidden;
-          padding: 2rem 0 4rem 0;
+          padding: 2rem 0;
         }
         @media (max-width: 768px) {
           .unified-carousel-wrapper {

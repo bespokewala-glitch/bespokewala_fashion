@@ -17,7 +17,7 @@ export default function BrandStory({ data }: { data?: any }) {
     <section className="brand-story-section">
       <style>{`
         .brand-story-section {
-          padding: 8rem 4rem;
+          padding: 3rem 4rem 8rem;
           background-color: #fcfcfc;
           display: flex;
           align-items: center;
@@ -86,7 +86,7 @@ export default function BrandStory({ data }: { data?: any }) {
         }
         @media (max-width: 1024px) {
           .brand-story-section {
-            padding: 6rem 2rem;
+            padding: 3rem 2rem 6rem;
           }
           .brand-story-container {
             flex-direction: column;

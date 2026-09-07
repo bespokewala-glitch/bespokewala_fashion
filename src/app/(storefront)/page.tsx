@@ -178,7 +178,7 @@ export default async function Home() {
           <section className="featured-arrivals-section">
             <style>{`
               .featured-arrivals-section {
-                padding: 8rem 0;
+                padding: 8rem 0 2rem 0;
                 text-align: center;
                 width: 100%;
                 overflow: hidden;
@@ -204,7 +204,7 @@ export default async function Home() {
                 line-height: 1.6;
               }
               .featured-cta-container {
-                margin-top: 4rem;
+                margin-top: 2rem;
               }
               
               @media (max-width: 767px) {

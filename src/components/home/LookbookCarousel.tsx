@@ -31,7 +31,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
     <section className="lookbook-carousel-section" style={{ backgroundColor: '#fafafa', textAlign: 'center', position: 'relative' }}>
       <style>{`
         .lookbook-carousel-section {
-          padding: 6rem 2rem;
+          padding: 6rem 2rem 1rem;
         }
         .lookbook-subtitle {
           margin-bottom: 4rem;
