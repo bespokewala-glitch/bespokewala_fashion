@@ -51,9 +51,9 @@ export default function ChatProductCard({ product, onShowSimilar, onClose }: Cha
 
   return (
     <div className="chatbot-product-card">
-      <Link 
-        href={productUrl} 
-        onClick={onClose} 
+      <Link
+        href={productUrl}
+        onClick={onClose}
         style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', flex: 1 }}
       >
         {/* Image */}

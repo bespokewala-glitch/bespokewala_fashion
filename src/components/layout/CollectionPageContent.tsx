@@ -52,9 +52,34 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     return { $in: arr.map(item => new RegExp(`^${item.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i')) };
   };
 
+  const KNOWN_OCCASIONS = ['bridal', 'cocktail', 'mehendi', 'reception', 'sangeet', 'pooja', 'festive', 'groom', 'mehandi', 'party', 'wedding'];
+
   if (productType) (productQuery as any).productType = buildInQuery(productType);
-  if (category && category.toLowerCase() !== 'all' && category.toLowerCase() !== 'all-products' && category.toLowerCase() !== 'all-collections') (productQuery as any).category = buildInQuery(category);
-  if (subcategory && subcategory.toLowerCase() !== 'all' && subcategory.toLowerCase() !== 'all-products' && subcategory.toLowerCase() !== 'all-collections') (productQuery as any).subcategory = buildInQuery(subcategory);
+
+  if (category && category.toLowerCase() !== 'all' && category.toLowerCase() !== 'all-products' && category.toLowerCase() !== 'all-collections') {
+    const isOccasion = KNOWN_OCCASIONS.includes(category.toLowerCase());
+    const isCollection = category.toLowerCase().includes('collection');
+    if (isOccasion) {
+      (productQuery as any).occasion = buildInQuery(category);
+    } else if (isCollection) {
+      (productQuery as any).collectionName = buildInQuery(category);
+    } else {
+      (productQuery as any).category = buildInQuery(category);
+    }
+  }
+
+  if (subcategory && subcategory.toLowerCase() !== 'all' && subcategory.toLowerCase() !== 'all-products' && subcategory.toLowerCase() !== 'all-collections') {
+    const isOccasion = KNOWN_OCCASIONS.includes(subcategory.toLowerCase());
+    const isCollection = subcategory.toLowerCase().includes('collection');
+    if (isOccasion) {
+      (productQuery as any).occasion = buildInQuery(subcategory);
+    } else if (isCollection) {
+      (productQuery as any).collectionName = buildInQuery(subcategory);
+    } else {
+      (productQuery as any).subcategory = buildInQuery(subcategory);
+    }
+  }
+
   if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
   if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
   
@@ -92,11 +117,22 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
       }
-      // slug3 is always the 3rd URL segment, unambiguously = subcategory.
-      // Using a broad $or here (subcategory OR collectionName OR occasion) caused
-      // lehenga products with collectionName='lehenga' to appear on the subcategory
-      // page alongside products that have subcategory='lehenga', creating visible duplicates.
-      (productQuery as any).$and.push({ subcategory: slug3Query });
+      
+      const KNOWN_OCCASIONS = [
+        'bridal', 'cocktail', 'mehendi', 'reception', 'sangeet', 'pooja',
+        'festive', 'groom', 'mehandi', 'party', 'wedding'
+      ];
+      
+      const isOccasion = KNOWN_OCCASIONS.includes(slug3.toLowerCase());
+      const isCollection = slug3.toLowerCase().includes('collection');
+
+      if (isOccasion) {
+        (productQuery as any).$and.push({ occasion: slug3Query });
+      } else if (isCollection) {
+        (productQuery as any).$and.push({ collectionName: slug3Query });
+      } else {
+        (productQuery as any).$and.push({ subcategory: slug3Query });
+      }
     }
   }
   if (q) {

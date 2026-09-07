@@ -26,13 +26,13 @@ export default async function AccountDashboardPage() {
   }
 
   await dbConnect();
-  
+
   // Fetch only the 2 most recent orders for the dashboard preview
   const recentOrders = await Order.find({ user: user.userId })
     .sort({ createdAt: -1 })
     .limit(2)
     .lean();
-    
+
   const totalOrders = await Order.countDocuments({ user: user.userId });
 
   // Fetch some random products for "Curated For You" and "Recently Viewed"
@@ -115,11 +115,11 @@ export default async function AccountDashboardPage() {
           border-color: #000 !important;
         }
       `}</style>
-      
+
       {/* Premium Profile Banner */}
-      <div style={{ 
-        backgroundColor: '#fff', 
-        padding: '2.5rem', 
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '2.5rem',
         border: '1px solid #eaeaea',
         marginBottom: '2.5rem',
         display: 'flex',
@@ -129,11 +129,11 @@ export default async function AccountDashboardPage() {
         gap: '1.5rem'
       }} className="luxury-card account-profile-banner">
         <div>
-          <h1 style={{ 
-            fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', 
-            fontWeight: 300, 
-            letterSpacing: '0.12em', 
-            textTransform: 'uppercase', 
+          <h1 style={{
+            fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
+            fontWeight: 300,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
             color: '#000',
             marginBottom: '0.35rem'
           }} className="account-profile-title">
@@ -162,10 +162,10 @@ export default async function AccountDashboardPage() {
       </div>
 
       {/* Exclusive Member Benefits Banner */}
-      <div style={{ 
-        backgroundColor: '#000', 
+      <div style={{
+        backgroundColor: '#000',
         color: '#fff',
-        padding: '1.75rem 2.5rem', 
+        padding: '1.75rem 2.5rem',
         marginBottom: '3rem',
         display: 'flex',
         justifyContent: 'space-between',
@@ -190,9 +190,9 @@ export default async function AccountDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
         gap: '1.5rem',
         marginBottom: '4rem'
       }} className="account-stats-grid">
@@ -222,27 +222,27 @@ export default async function AccountDashboardPage() {
 
       {/* Recent Orders Preview */}
       <div style={{ marginBottom: '6rem' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'baseline',
           borderBottom: '1px solid #eaeaea',
           paddingBottom: '1rem',
           marginBottom: '3rem'
         }}>
-          <h2 style={{ 
-            fontSize: '1.25rem', 
-            fontWeight: 400, 
-            letterSpacing: '0.1em', 
-            textTransform: 'uppercase', 
-            color: '#000' 
+          <h2 style={{
+            fontSize: '1.25rem',
+            fontWeight: 400,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: '#000'
           }}>
             Recent Orders
           </h2>
-          <Link href="/account/orders" style={{ 
-            fontSize: '0.8rem', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.1em', 
+          <Link href="/account/orders" style={{
+            fontSize: '0.8rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
             color: '#888',
             textDecoration: 'none',
             display: 'flex',
@@ -255,11 +255,11 @@ export default async function AccountDashboardPage() {
         </div>
 
         {recentOrders.length === 0 ? (
-          <div style={{ 
-            backgroundColor: '#fff', 
-            padding: '5rem 2rem', 
-            textAlign: 'center', 
-            border: '1px solid #eee' 
+          <div style={{
+            backgroundColor: '#fff',
+            padding: '5rem 2rem',
+            textAlign: 'center',
+            border: '1px solid #eee'
           }}>
             <p style={{ color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem' }}>
               You haven't placed any orders yet.
@@ -270,11 +270,11 @@ export default async function AccountDashboardPage() {
             {recentOrders.map((order: any) => {
               const statusIdx = getStatusIndex(order.orderStatus);
               const isCancelled = order.orderStatus.toLowerCase() === 'cancelled';
-              
+
               return (
-                <div key={order._id.toString()} style={{ 
-                  border: '1px solid #eee', 
-                  padding: '2.5rem', 
+                <div key={order._id.toString()} style={{
+                  border: '1px solid #eee',
+                  padding: '2.5rem',
                   backgroundColor: '#fff'
                 }} className="luxury-card mobile-p-4">
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '2rem', marginBottom: '2rem', flexWrap: 'wrap', gap: '2rem' }}>
@@ -308,7 +308,7 @@ export default async function AccountDashboardPage() {
                       </Link>
                     </div>
                   </div>
-                  
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }} className="mobile-grid-1">
                     {/* Items Preview */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem' }}>
@@ -317,9 +317,9 @@ export default async function AccountDashboardPage() {
                           <div style={{ width: '70px', height: '95px', backgroundColor: '#fafafa', flexShrink: 0 }}>
                             {item.image && (
                               <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                <OptimizedImage 
-                                  src={item.image} 
-                                  alt={item.name} 
+                                <OptimizedImage
+                                  src={item.image}
+                                  alt={item.name}
                                   fill
                                   style={{ objectFit: 'cover' }}
                                 />
@@ -348,19 +348,19 @@ export default async function AccountDashboardPage() {
                         <div style={{ position: 'absolute', top: '12px', left: '1rem', right: '1rem', height: '1px', backgroundColor: '#eee', zIndex: 0 }}></div>
                         {/* Progress Line */}
                         <div style={{ position: 'absolute', top: '12px', left: '1rem', width: `${(statusIdx / 3) * 100}%`, height: '1px', backgroundColor: '#D4AF37', zIndex: 1, transition: 'width 1s ease' }}></div>
-                        
+
                         {timelineSteps.map((step, idx) => {
                           const isCompleted = statusIdx >= idx;
                           const isCurrent = statusIdx === idx;
                           const StepIcon = step.icon;
-                          
+
                           return (
                             <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', zIndex: 2 }}>
-                              <div style={{ 
-                                width: '24px', 
-                                height: '24px', 
-                                borderRadius: '50%', 
-                                backgroundColor: isCompleted ? '#000' : '#fff', 
+                              <div style={{
+                                width: '24px',
+                                height: '24px',
+                                borderRadius: '50%',
+                                backgroundColor: isCompleted ? '#000' : '#fff',
                                 border: isCompleted ? '1px solid #000' : '1px solid #ddd',
                                 display: 'flex',
                                 alignItems: 'center',
@@ -369,10 +369,10 @@ export default async function AccountDashboardPage() {
                               }}>
                                 {isCompleted && <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#D4AF37' }}></div>}
                               </div>
-                              <span style={{ 
-                                fontSize: '0.7rem', 
-                                textTransform: 'uppercase', 
-                                letterSpacing: '0.1em', 
+                              <span style={{
+                                fontSize: '0.7rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
                                 color: isCurrent ? '#000' : '#888',
                                 fontWeight: isCurrent ? 500 : 400
                               }}>
@@ -398,17 +398,17 @@ export default async function AccountDashboardPage() {
       {/* Curated For You */}
       {serializedRecommended.length > 0 && (
         <div style={{ marginBottom: '6rem' }}>
-          <div style={{ 
+          <div style={{
             borderBottom: '1px solid #eaeaea',
             paddingBottom: '1rem',
             marginBottom: '3rem'
           }}>
-            <h2 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: 400, 
-              letterSpacing: '0.1em', 
-              textTransform: 'uppercase', 
-              color: '#000' 
+            <h2 style={{
+              fontSize: '1.25rem',
+              fontWeight: 400,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#000'
             }}>
               Curated For You
             </h2>
@@ -424,17 +424,17 @@ export default async function AccountDashboardPage() {
       {/* Recently Viewed */}
       {serializedRecentlyViewed.length > 0 && (
         <div style={{ marginBottom: '4rem' }}>
-          <div style={{ 
+          <div style={{
             borderBottom: '1px solid #eaeaea',
             paddingBottom: '1rem',
             marginBottom: '3rem'
           }}>
-            <h2 style={{ 
-              fontSize: '1.25rem', 
-              fontWeight: 400, 
-              letterSpacing: '0.1em', 
-              textTransform: 'uppercase', 
-              color: '#000' 
+            <h2 style={{
+              fontSize: '1.25rem',
+              fontWeight: 400,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#000'
             }}>
               Recently Viewed
             </h2>

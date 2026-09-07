@@ -34,7 +34,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
 
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDesktopSortOpen, setIsDesktopSortOpen] = useState(false);
-  
+
   const sortOptions = [
     { label: 'FEATURED', value: 'featured' },
     { label: 'NEW ARRIVALS', value: 'newest' },
@@ -153,8 +153,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
           <span>FILTER {activeFiltersCount > 0 && `(${activeFiltersCount})`}</span>
         </button>
         <div className="mobile-sort-dropdown" style={{ position: 'relative' }}>
-          <button 
-            className="mobile-sort-btn" 
+          <button
+            className="mobile-sort-btn"
             onClick={() => setIsSortOpen(!isSortOpen)}
             aria-expanded={isSortOpen}
             aria-haspopup="listbox"
@@ -162,7 +162,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
             <span>{sortOptions.find(o => o.value === activeSort)?.label || 'FEATURED'}</span>
             {isSortOpen ? <ChevronUp size={16} strokeWidth={1.5} /> : <ChevronDown size={16} strokeWidth={1.5} />}
           </button>
-          
+
           {isSortOpen && (
             <div className="custom-sort-menu" role="listbox">
               {sortOptions.map(option => (
@@ -203,8 +203,8 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
               <div className="desktop-sort-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.875rem', color: '#666', letterSpacing: '0.05em' }}>{totalCount} PRODUCTS</span>
                 <div className="desktop-sort-dropdown" style={{ position: 'relative' }}>
-                  <button 
-                    className="desktop-sort-btn" 
+                  <button
+                    className="desktop-sort-btn"
                     onClick={() => setIsDesktopSortOpen(!isDesktopSortOpen)}
                     aria-expanded={isDesktopSortOpen}
                     aria-haspopup="listbox"
@@ -212,7 +212,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                     <span>SORT BY: {sortOptions.find(o => o.value === activeSort)?.label || 'FEATURED'}</span>
                     {isDesktopSortOpen ? <ChevronUp size={16} strokeWidth={1.5} /> : <ChevronDown size={16} strokeWidth={1.5} />}
                   </button>
-                  
+
                   {isDesktopSortOpen && (
                     <div className="custom-sort-menu desktop-menu" role="listbox">
                       {sortOptions.map(option => (
