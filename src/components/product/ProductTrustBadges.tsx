@@ -89,7 +89,7 @@ export default function ProductTrustBadges() {
         </div>
         <div className="trust-text">
           <span className="trust-title">Secure Payments</span>
-          Online Payment & COD Available
+          Online Payments Accepted
         </div>
       </div>
     </div>

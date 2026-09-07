@@ -34,8 +34,8 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'What payment methods do you accept?',
-        answer: 'We accept all major Credit & Debit Cards (Visa, Mastercard, Amex, RuPay), Net Banking, UPI (GPay, PhonePe, Paytm), EMI options via select banks, and Cash on Delivery (COD) for orders within India below ₹50,000.',
-        keywords: ['payment', 'pay', 'credit card', 'debit card', 'upi', 'cod', 'cash on delivery', 'emi', 'net banking'],
+        answer: 'We accept all major Credit & Debit Cards (Visa, Mastercard, Amex, RuPay), Net Banking, UPI (GPay, PhonePe, Paytm), and EMI options via select banks.',
+        keywords: ['payment', 'pay', 'credit card', 'debit card', 'upi', 'emi', 'net banking'],
       },
       {
         question: 'Is it safe to pay on your website?',

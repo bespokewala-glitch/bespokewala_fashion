@@ -178,8 +178,7 @@ export default function TermsConditionsContent() {
             content: (
               <>
                 <p><strong>Pricing:</strong> All prices are listed in Indian Rupees (INR) and are inclusive of applicable GST unless stated otherwise. Prices are subject to change without notice; however, the price at the time of your order confirmation will apply to your order.</p>
-                <p><strong>Payment:</strong> We accept Credit/Debit Cards, Net Banking, UPI, EMI, and Cash on Delivery (COD, within India, for eligible orders). All payments are processed securely via our payment gateway. We do not store card details on our servers.</p>
-                <p><strong>COD:</strong> Cash on Delivery is available for orders below ₹50,000 within India. A COD convenience fee of ₹50 may apply. COD is not available for custom or bespoke orders.</p>
+                <p><strong>Payment:</strong> We accept Credit/Debit Cards, Net Banking, UPI, and EMI. All payments are processed securely via our payment gateway. We do not store card details on our servers.</p>
                 <p><strong>International:</strong> International orders are processed in INR at the prevailing exchange rate. Your bank may charge foreign transaction fees.</p>
                 <div className="legal-highlight">
                   💳 If payment is declined or reversed after dispatch, we reserve the right to take legal action for recovery of dues including shipping and product costs.
