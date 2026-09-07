@@ -249,23 +249,7 @@ export default function CheckoutClient() {
             <input required type="tel" name="phone" placeholder="Phone Number" value={shippingDetails.phone} onChange={handleChange} style={inputStyle} />
           </div>
 
-          {/* Payment Section */}
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 400, letterSpacing: "0.1em", marginBottom: "2rem", textTransform: "uppercase", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
-            Payment
-          </h2>
 
-          <div style={{ padding: "1.5rem", border: "1px solid #e0e0e0", backgroundColor: "#fafafa", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="6" fill="#072654"/>
-              <path d="M17.5 8L10 18h7l-2.5 6L22 14h-7l2.5-6z" fill="#3395FF"/>
-            </svg>
-            <div>
-              <div style={{ fontWeight: 500, fontSize: "0.95rem", letterSpacing: "0.05em" }}>Pay with Razorpay</div>
-              <div style={{ color: "#666", fontSize: "0.8rem", marginTop: "0.2rem" }}>
-                Cards, UPI, Net Banking, Wallets &amp; more — Secure &amp; encrypted
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Order Summary Sidebar */}
