@@ -35,7 +35,7 @@ export default async function Home() {
   // so warm requests within 5 minutes are served instantly with zero DB round-trips.
   const [rawFeaturedProducts, campaigns, hpSections] = await Promise.all([
     getOrFetch('home:featuredProducts', 300, () =>
-      Product.find({ isFeatured: true })
+      Product.find({ isFeatured: true, productType: { $regex: /^couture$/i } })
         .sort({ _id: -1 })
         .select('name slug price images category referenceImages')
         .limit(10)

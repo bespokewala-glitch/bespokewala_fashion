@@ -8,7 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 import { Menu, X, ShoppingBag, User, Heart, Search } from 'lucide-react';
-import CurrencySelector from '@/components/layout/CurrencySelector';
+
 import SearchOverlay from '@/components/layout/SearchOverlay';
 
 export default function Header() {
@@ -435,9 +435,7 @@ export default function Header() {
           {/* Desktop Right Nav */}
           <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <ul style={{ ...menuStyle, alignItems: 'center', gap: '1.5rem' }}>
-              <li style={{ display: 'flex', alignItems: 'center' }}>
-                <CurrencySelector isDarkHeader={isLightHeader} />
-              </li>
+
               
               {/* Text Links */}
               {user && user.role === 'admin' && (
@@ -779,10 +777,6 @@ export default function Header() {
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login / Register</Link>
             )}
             <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)}>Wishlist ({wishlistCount})</Link>
-            <div style={{ paddingTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Currency:</span>
-              <CurrencySelector isDarkHeader={true} />
-            </div>
           </div>
         </div>
       </header>
