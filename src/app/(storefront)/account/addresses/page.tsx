@@ -1,0 +1,46 @@
+import React from 'react';
+import { Metadata } from 'next';
+import AddressManager from '@/components/account/AddressManager';
+
+export const metadata: Metadata = {
+  title: 'My Addresses | Bespokewala',
+  description: 'Manage your shipping and billing addresses.',
+};
+
+export default function AddressesPage() {
+  return (
+    <div className="account-page-content">
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '2.5rem',
+        border: '1px solid #eaeaea',
+        marginBottom: '2.5rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1.5rem'
+      }} className="luxury-card account-profile-banner">
+        <div>
+          <h1 style={{
+            fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
+            fontWeight: 300,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: '#000',
+            marginBottom: '0.35rem'
+          }}>
+            My Addresses
+          </h1>
+          <p style={{ color: '#888', letterSpacing: '0.08em', fontSize: '0.85rem', textTransform: 'uppercase', margin: 0 }}>
+            Manage your shipping and billing destinations
+          </p>
+        </div>
+      </div>
+
+      <div style={{ padding: '0 1rem' }}>
+        <AddressManager />
+      </div>
+    </div>
+  );
+}
