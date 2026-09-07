@@ -64,7 +64,7 @@ export default function FloatingWhatsApp() {
       
       <div className="whatsapp-button" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexDirection: 'row-reverse' }}>
         <a 
-          href="https://wa.me/919999999999?text=Hello%20Bespokewala,%20I%20would%20like%20to%20connect%20with%20a%20stylist."
+          href="https://wa.me/917506767452?text=Hello%20Bespokewala,%20I%20would%20like%20to%20connect%20with%20a%20stylist."
           target="_blank"
           rel="noopener noreferrer"
           style={{

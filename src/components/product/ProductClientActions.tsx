@@ -198,7 +198,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
           </>
         ) : (
           <a 
-            href={`https://wa.me/919999999999?text=Hello%20Bespokewala,%20I'm%20interested%20in%20the%20${encodeURIComponent(product.name)}`}
+            href={`https://wa.me/917506767452?text=Hello%20Bespokewala,%20I'm%20interested%20in%20the%20${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
