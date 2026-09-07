@@ -32,16 +32,25 @@ export default function CheckoutClient() {
   const router = useRouter();
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
+  // Address Book State
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  const [isFetchingAddresses, setIsFetchingAddresses] = useState(true);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+
   const [shippingDetails, setShippingDetails] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: "", // Used for razorpay prefill
     address: "",
     city: "",
     state: "",
     zipCode: "",
     country: "India",
     phone: "",
+    isDefault: false
   });
 
   const [loading, setLoading] = useState(false);
@@ -56,14 +65,145 @@ export default function CheckoutClient() {
     loadRazorpayScript().then(setScriptLoaded);
   }, []);
 
+  // Fetch saved addresses on mount
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const res = await fetch('/api/account/addresses');
+        if (res.ok) {
+          const data = await res.json();
+          const addrs = data.addresses || [];
+          setSavedAddresses(addrs);
+          
+          if (addrs.length > 0) {
+            const defaultAddr = addrs.find((a: any) => a.isDefault) || addrs[0];
+            setSelectedAddressId(defaultAddr._id);
+          } else {
+            setShowAddressForm(true);
+          }
+        } else {
+          setShowAddressForm(true);
+        }
+      } catch (err) {
+        console.error(err);
+        setShowAddressForm(true);
+      } finally {
+        setIsFetchingAddresses(false);
+      }
+    };
+    fetchAddresses();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setShippingDetails((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+        const checked = (e.target as HTMLInputElement).checked;
+        setShippingDetails((prev) => ({ ...prev, [name]: checked }));
+    } else {
+        setShippingDetails((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSaveAddress = async () => {
+    if (!shippingDetails.firstName || !shippingDetails.lastName || !shippingDetails.address || !shippingDetails.city || !shippingDetails.state || !shippingDetails.zipCode || !shippingDetails.phone) {
+      setError("Please fill out all required address fields.");
+      return;
+    }
+
+    setIsSavingAddress(true);
+    setError(null);
+    try {
+      const url = editingAddressId 
+        ? `/api/account/addresses/${editingAddressId}`
+        : `/api/account/addresses`;
+      const method = editingAddressId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(shippingDetails)
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || "Failed to save address");
+      
+      setSavedAddresses(data.addresses);
+      
+      if (!editingAddressId && data.addresses.length > 0) {
+          const newAddr = data.addresses[data.addresses.length - 1];
+          setSelectedAddressId(newAddr._id);
+      } else if (editingAddressId) {
+          setSelectedAddressId(editingAddressId);
+      }
+
+      setShowAddressForm(false);
+      setEditingAddressId(null);
+      setShippingDetails({
+        firstName: "", lastName: "", email: "", address: "", city: "", state: "", zipCode: "", country: "India", phone: "", isDefault: false
+      });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
+
+  const handleEditAddress = (addr: any) => {
+    setShippingDetails({
+      firstName: addr.firstName || "",
+      lastName: addr.lastName || "",
+      email: addr.email || "", 
+      address: addr.address || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      zipCode: addr.zipCode || "",
+      country: addr.country || "India",
+      phone: addr.phone || "",
+      isDefault: addr.isDefault || false
+    });
+    setEditingAddressId(addr._id);
+    setShowAddressForm(true);
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this address?")) return;
+    try {
+      const res = await fetch(`/api/account/addresses/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        const data = await res.json();
+        setSavedAddresses(data.addresses);
+        if (selectedAddressId === id) {
+          const newDefault = data.addresses.find((a: any) => a.isDefault) || data.addresses[0];
+          setSelectedAddressId(newDefault ? newDefault._id : null);
+          if (data.addresses.length === 0) setShowAddressForm(true);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handlePayWithRazorpay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) { setError("Your cart is empty"); return; }
+    
+    let finalShippingDetails = shippingDetails;
+    
+    if (showAddressForm) {
+      setError("Please save your shipping address first.");
+      return;
+    }
+    
+    if (savedAddresses.length > 0) {
+      const selectedAddr = savedAddresses.find(a => a._id === selectedAddressId);
+      if (!selectedAddr) {
+        setError("Please select a shipping address.");
+        return;
+      }
+      finalShippingDetails = { ...selectedAddr, email: shippingDetails.email || "" };
+    }
+
     if (!scriptLoaded || !window.Razorpay) {
       setError("Payment gateway is loading, please try again in a moment.");
       return;
@@ -95,12 +235,12 @@ export default function CheckoutClient() {
           image: "/bespoken-transparent.png",
           order_id: razorpayOrderId,
           prefill: {
-            name: `${shippingDetails.firstName} ${shippingDetails.lastName}`.trim(),
-            email: shippingDetails.email,
-            contact: shippingDetails.phone,
+            name: `${finalShippingDetails.firstName} ${finalShippingDetails.lastName}`.trim(),
+            email: finalShippingDetails.email, // Can be empty, Razorpay will ask
+            contact: finalShippingDetails.phone,
           },
           notes: {
-            address: shippingDetails.address,
+            address: finalShippingDetails.address,
           },
           theme: { color: "#000000" },
           handler: async (response: {
@@ -125,7 +265,7 @@ export default function CheckoutClient() {
                     image: item.image,
                     size: item.size,
                   })),
-                  shippingDetails,
+                  shippingDetails: finalShippingDetails,
                 }),
               });
               const verifyData = await verifyRes.json();
@@ -210,46 +350,144 @@ export default function CheckoutClient() {
       )}
 
       <form onSubmit={handlePayWithRazorpay} style={{ display: "flex", flexWrap: "wrap", gap: "2rem 4rem", alignItems: "flex-start" }}>
-        {/* Shipping Form */}
+        {/* Shipping Form / Address Book */}
         <div style={{ flex: "1 1 400px", minWidth: 0 }}>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 400, letterSpacing: "0.1em", marginBottom: "2rem", textTransform: "uppercase", borderBottom: "1px solid #eee", paddingBottom: "1rem" }}>
-            Shipping Details
+            Shipping Address
           </h2>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
-            <input required type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
-            <input required type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
-          </div>
+          {isFetchingAddresses ? (
+            <p style={{ color: "#888", fontSize: "0.9rem" }}>Loading addresses...</p>
+          ) : (
+            <>
+              {!showAddressForm && savedAddresses.length > 0 && (
+                <div style={{ marginBottom: "2rem" }}>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 500, marginBottom: "1.5rem" }}>Saved Addresses</h3>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                    {savedAddresses.map(addr => (
+                      <div 
+                        key={addr._id}
+                        onClick={() => setSelectedAddressId(addr._id)}
+                        style={{
+                          padding: "1.5rem",
+                          border: selectedAddressId === addr._id ? "2px solid #000" : "1px solid #e0e0e0",
+                          backgroundColor: selectedAddressId === addr._id ? "#fafafa" : "#fff",
+                          cursor: "pointer",
+                          position: "relative",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        {addr.isDefault && (
+                          <span style={{ position: "absolute", top: "1.5rem", right: "1.5rem", fontSize: "0.7rem", backgroundColor: "#000", color: "#fff", padding: "0.2rem 0.6rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Default</span>
+                        )}
+                        <div style={{ fontWeight: 500, marginBottom: "0.5rem", fontSize: "1.1rem" }}>{addr.firstName} {addr.lastName}</div>
+                        <div style={{ color: "#555", fontSize: "0.9rem", lineHeight: 1.6 }}>
+                          {addr.address}<br/>
+                          {addr.city}, {addr.state} {addr.zipCode}<br/>
+                          {addr.country}<br/>
+                          Phone: {addr.phone}
+                        </div>
+                        
+                        <div style={{ marginTop: "1rem", display: "flex", gap: "1.5rem" }}>
+                           <button type="button" onClick={(e) => { e.stopPropagation(); handleEditAddress(addr); }} style={{ background: "none", border: "none", padding: 0, color: "#666", textDecoration: "underline", cursor: "pointer", fontSize: "0.85rem" }}>Edit</button>
+                           <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr._id); }} style={{ background: "none", border: "none", padding: 0, color: "#c62828", textDecoration: "underline", cursor: "pointer", fontSize: "0.85rem" }}>Delete</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setEditingAddressId(null);
+                      setShippingDetails({ firstName: "", lastName: "", email: "", address: "", city: "", state: "", zipCode: "", country: "India", phone: "", isDefault: false });
+                      setShowAddressForm(true);
+                    }}
+                    style={{ marginTop: "2rem", background: "none", border: "1px solid #000", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", width: "100%", transition: "background 0.2s" }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#f9f9f9")}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                  >
+                    + Add New Address
+                  </button>
+                </div>
+              )}
 
-          <div style={{ marginBottom: "1.5rem" }}>
-            <input required type="email" name="email" placeholder="Email Address" value={shippingDetails.email} onChange={handleChange} style={inputStyle} />
-          </div>
+              {(showAddressForm || savedAddresses.length === 0) && (
+                <div style={{ padding: savedAddresses.length > 0 ? "2rem" : "0", backgroundColor: savedAddresses.length > 0 ? "#fafafa" : "transparent", border: savedAddresses.length > 0 ? "1px solid #eee" : "none" }}>
+                  <h3 style={{ fontSize: "1.1rem", fontWeight: 400, marginBottom: "1.5rem", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    {editingAddressId ? "Edit Address" : "Add New Address"}
+                  </h3>
+                  
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+                    <input type="text" name="firstName" placeholder="First Name" value={shippingDetails.firstName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+                    <input type="text" name="lastName" placeholder="Last Name" value={shippingDetails.lastName} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+                  </div>
 
-          <div style={{ marginBottom: "1.5rem" }}>
-            <input required type="text" name="address" placeholder="Address (Street, Apartment, Suite)" value={shippingDetails.address} onChange={handleChange} style={inputStyle} />
-          </div>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <input type="text" name="address" placeholder="Address (Street, Apartment, Suite)" value={shippingDetails.address} onChange={handleChange} style={inputStyle} />
+                  </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
-            <input required type="text" name="city" placeholder="City" value={shippingDetails.city} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
-            <input required type="text" name="state" placeholder="State / Province" value={shippingDetails.state} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
-          </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+                    <input type="text" name="city" placeholder="City" value={shippingDetails.city} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+                    <input type="text" name="state" placeholder="State / Province" value={shippingDetails.state} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+                  </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
-            <input required type="text" name="zipCode" placeholder="Postal Code / ZIP" value={shippingDetails.zipCode} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
-            <select name="country" value={shippingDetails.country} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }}>
-              <option value="India">India</option>
-              <option value="United States">United States</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="Australia">Australia</option>
-              <option value="Canada">Canada</option>
-            </select>
-          </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", marginBottom: "1.5rem" }}>
+                    <input type="text" name="zipCode" placeholder="Postal Code / ZIP" value={shippingDetails.zipCode} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }} />
+                    <select name="country" value={shippingDetails.country} onChange={handleChange} style={{ ...inputStyle, flex: "1 1 200px" }}>
+                      <option value="India">India</option>
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Australia">Australia</option>
+                      <option value="Canada">Canada</option>
+                    </select>
+                  </div>
 
-          <div style={{ marginBottom: 0 }}>
-            <input required type="tel" name="phone" placeholder="Phone Number" value={shippingDetails.phone} onChange={handleChange} style={inputStyle} />
-          </div>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <input type="tel" name="phone" placeholder="Phone Number" value={shippingDetails.phone} onChange={handleChange} style={inputStyle} />
+                  </div>
+                  
+                  {/* Keep email for Razorpay if no addresses exist or they want to fill it, though it's optional */}
+                  {savedAddresses.length === 0 && (
+                    <div style={{ marginBottom: "1.5rem" }}>
+                      <input type="email" name="email" placeholder="Email Address (Optional)" value={shippingDetails.email} onChange={handleChange} style={inputStyle} />
+                    </div>
+                  )}
 
+                  <div style={{ marginBottom: "2rem" }}>
+                     <label style={{ display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", fontSize: "0.9rem", color: "#555" }}>
+                       <input type="checkbox" name="isDefault" checked={shippingDetails.isDefault} onChange={handleChange} style={{ width: "1.2rem", height: "1.2rem", cursor: "pointer" }} />
+                       Set as default address
+                     </label>
+                  </div>
 
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <button 
+                      type="button" 
+                      onClick={handleSaveAddress}
+                      disabled={isSavingAddress}
+                      style={{ backgroundColor: "#000", color: "#fff", border: "none", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
+                    >
+                      {isSavingAddress ? "Saving..." : "Save Address"}
+                    </button>
+                    
+                    {savedAddresses.length > 0 && (
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                           setShowAddressForm(false);
+                           setEditingAddressId(null);
+                        }}
+                        style={{ backgroundColor: "transparent", color: "#000", border: "1px solid #ccc", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Order Summary Sidebar */}
@@ -299,7 +537,7 @@ export default function CheckoutClient() {
 
           <button
             type="submit"
-            disabled={loading || !scriptLoaded}
+            disabled={loading || !scriptLoaded || isFetchingAddresses}
             style={{
               width: "100%",
               padding: "1.2rem",
@@ -309,8 +547,8 @@ export default function CheckoutClient() {
               textTransform: "uppercase",
               letterSpacing: "0.1em",
               fontSize: "0.9rem",
-              cursor: loading || !scriptLoaded ? "not-allowed" : "pointer",
-              opacity: loading || !scriptLoaded ? 0.7 : 1,
+              cursor: loading || !scriptLoaded || isFetchingAddresses ? "not-allowed" : "pointer",
+              opacity: loading || !scriptLoaded || isFetchingAddresses ? 0.7 : 1,
               transition: "opacity 0.2s",
             }}
           >

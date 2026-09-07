@@ -79,8 +79,15 @@ export async function POST(request: Request) {
     const calculatedShipping = calculatedSubtotal > 10000 ? 0 : 500;
     const calculatedTotal = calculatedSubtotal + calculatedShipping;
 
+    let userId = (user as any).userId || (user as any).id;
+    if (userId && typeof userId === 'object' && userId.buffer) {
+      userId = Buffer.from(Object.values(userId.buffer)).toString('hex');
+    } else if (userId) {
+      userId = userId.toString();
+    }
+
     const newOrder = await Order.create({
-      user: (user as any).userId || null,
+      user: userId || null,
       items: finalItems,
       shippingDetails,
       paymentMethod: "razorpay",
