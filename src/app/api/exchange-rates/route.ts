@@ -19,7 +19,7 @@ const globalRef = global as any;
 if (!globalRef.__exchangeRateCache) globalRef.__exchangeRateCache = null;
 
 const CACHE_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
-const FETCH_TIMEOUT_MS = 2000;             // 2s — was 4s
+const FETCH_TIMEOUT_MS = 5000;             // 5s to prevent AbortError
 
 export async function GET() {
   const now = Date.now();
