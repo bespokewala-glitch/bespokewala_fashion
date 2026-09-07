@@ -20,7 +20,7 @@ async function getUserId() {
   return userId || null;
 }
 
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getUserId();
     if (!userId) {
@@ -67,7 +67,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   }
 }
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getUserId();
     if (!userId) {
