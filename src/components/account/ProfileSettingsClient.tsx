@@ -170,7 +170,7 @@ export default function ProfileSettingsClient() {
             </div>
           </div>
           
-          <div style={{ flex: '1 1 250px' }}>
+          <div style={{ width: '100%' }}>
             <label style={labelStyle}>Mobile Number</label>
             <input type="tel" name="mobileNumber" value={profile.mobileNumber} onChange={handleProfileChange} style={inputStyle} />
           </div>

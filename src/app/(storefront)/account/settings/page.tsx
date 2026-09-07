@@ -23,7 +23,7 @@ export default function ProfileSettingsPage() {
       }} className="luxury-card account-profile-banner">
         <div>
           <h1 style={{
-            fontSize: 'clamp(1.5rem, 5vw, 2.5rem)',
+            fontSize: 'clamp(1.1rem, 5vw, 2.5rem)',
             fontWeight: 300,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
