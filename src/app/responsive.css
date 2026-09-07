@@ -1353,6 +1353,9 @@
   footer[class*="mobile"] {
     padding: 20px 12px 16px 12px !important;
   }
+}
+
+@media (max-width: 1023px) {
 
   /* ═══════════════════════════════════════════════════════════════════════════
      MY ACCOUNT & ORDER HISTORY — MOBILE RESPONSIVENESS (320px–1023px)

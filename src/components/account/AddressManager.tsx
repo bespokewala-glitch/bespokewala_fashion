@@ -168,7 +168,7 @@ export default function AddressManager() {
       </div>
 
       {isEditing ? (
-        <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card">
+        <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card mobile-p-4">
           <h3 style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '2rem' }}>
             {currentAddress._id ? 'Edit Address' : 'Add New Address'}
           </h3>
@@ -284,12 +284,12 @@ export default function AddressManager() {
       ) : (
         <>
           {addresses.length === 0 ? (
-             <div style={{
+            <div style={{
               backgroundColor: '#fff',
               padding: '5rem 2rem',
               textAlign: 'center',
               border: '1px solid #eee'
-            }}>
+            }} className="mobile-p-4 mobile-py-8">
               <MapPin size={32} color="#ddd" style={{ margin: '0 auto 1rem auto' }} />
               <p style={{ color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
                 You haven't saved any addresses yet.
@@ -323,7 +323,7 @@ export default function AddressManager() {
                     display: 'flex',
                     flexDirection: 'column'
                   }}
-                  className="luxury-card"
+                  className="luxury-card mobile-p-4"
                 >
                   {address.isDefault && (
                     <div style={{

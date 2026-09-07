@@ -141,7 +141,7 @@ export default function ProfileSettingsClient() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
       
       {/* Personal Information Form */}
-      <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card">
+      <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card mobile-p-4">
         <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#000', marginBottom: '2rem', borderBottom: '1px solid #eaeaea', paddingBottom: '1rem' }}>
           Personal Information
         </h2>
@@ -170,7 +170,7 @@ export default function ProfileSettingsClient() {
             </div>
           </div>
           
-          <div style={{ maxWidth: 'calc(50% - 0.75rem)', minWidth: '250px' }}>
+          <div style={{ flex: '1 1 250px' }}>
             <label style={labelStyle}>Mobile Number</label>
             <input type="tel" name="mobileNumber" value={profile.mobileNumber} onChange={handleProfileChange} style={inputStyle} />
           </div>
@@ -188,7 +188,7 @@ export default function ProfileSettingsClient() {
       </div>
 
       {/* Password Management Form */}
-      <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card">
+      <div style={{ backgroundColor: '#fff', padding: '2.5rem', border: '1px solid #eaeaea' }} className="luxury-card mobile-p-4">
         <h2 style={{ fontSize: '1.1rem', fontWeight: 400, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#000', marginBottom: '2rem', borderBottom: '1px solid #eaeaea', paddingBottom: '1rem' }}>
           Change Password
         </h2>
