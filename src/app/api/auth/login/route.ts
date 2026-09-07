@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     // Generate token
     const token = await signToken({
-      id: user._id,
+      id: user._id.toString(),
       email: user.email,
       role: user.role,
       name: user.name,

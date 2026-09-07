@@ -40,8 +40,7 @@ function LoginContent() {
         ? redirectPath
         : (data.user.role === 'admin' ? '/dashboard/campaigns' : '/account');
 
-      router.push(destination);
-      router.refresh();
+      window.location.href = destination;
 
     } catch (err: any) {
       setError(err.message);

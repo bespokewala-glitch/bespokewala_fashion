@@ -47,7 +47,7 @@ export default function Header() {
   const [megaMenuImages, setMegaMenuImages] = useState<string[]>(['', '', '']);
   const [user, setUser] = useState<{ name: string, role: string } | null>(null);
   const [taxonomies, setTaxonomies] = useState<any[]>([]);
-  const { cartCount, openMiniCart } = useCart();
+  const { cartCount, openMiniCart, resetCartState } = useCart();
   const { wishlistCount } = useWishlist();
 
   useEffect(() => {
@@ -177,6 +177,7 @@ export default function Header() {
     e.preventDefault();
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
+    resetCartState();
     window.location.href = '/login';
   };
 

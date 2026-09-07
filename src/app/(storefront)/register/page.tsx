@@ -47,8 +47,7 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      router.push('/account');
-      router.refresh();
+      window.location.href = '/account';
       
     } catch (err: any) {
       setError(err.message);

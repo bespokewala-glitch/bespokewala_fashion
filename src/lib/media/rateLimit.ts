@@ -17,13 +17,15 @@ interface RateLimitConfig {
   maxRequests: number;
 }
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const LIMITS: Record<string, RateLimitConfig> = {
-  uploader:       { windowMs: 60_000,         maxRequests: 20 },   // 20/min per user  (upload)
-  ip:             { windowMs: 60_000,         maxRequests: 40 },   // 40/min per IP    (upload)
-  uploaderEntity: { windowMs: 60 * 60_000,    maxRequests: 30 },   // 30/hr per user+type (upload)
+  uploader:       { windowMs: 60_000,         maxRequests: isDev ? 1000 : 20 },   // 20/min per user  (upload)
+  ip:             { windowMs: 60_000,         maxRequests: isDev ? 1000 : 40 },   // 40/min per IP    (upload)
+  uploaderEntity: { windowMs: 60 * 60_000,    maxRequests: isDev ? 1000 : 30 },   // 30/hr per user+type (upload)
   // Private file serving — tighter window to prevent abuse and excessive GCS costs
-  serve:          { windowMs: 60_000,         maxRequests: 30 },   // 30/min per user  (serve)
-  auth:           { windowMs: 15 * 60_000,    maxRequests: 5 },    // 5/15min per IP   (auth)
+  serve:          { windowMs: 60_000,         maxRequests: isDev ? 1000 : 30 },   // 30/min per user  (serve)
+  auth:           { windowMs: 15 * 60_000,    maxRequests: isDev ? 1000 : 5 },    // 5/15min per IP   (auth)
 };
 
 export interface RateLimitResult {
