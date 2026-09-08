@@ -7,9 +7,11 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import Link from 'next/link';
 import { Package, Heart, MapPin, CalendarDays, ArrowRight, Truck, CheckCircle, Clock } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
+import WishlistStatCard from '@/components/account/WishlistStatCard';
 
 export default async function AccountDashboardPage() {
   const cookieStore = await cookies();
@@ -34,6 +36,12 @@ export default async function AccountDashboardPage() {
     .lean();
 
   const totalOrders = await Order.countDocuments({ user: user.userId });
+
+  const userRecord = await User.findById(user.userId).lean();
+  const addressCount = userRecord?.addresses?.length || 0;
+  const memberSinceDate = userRecord?.createdAt 
+    ? new Date(userRecord.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
   // Fetch some random products for "Curated For You" and "Recently Viewed"
   // In a real app, this would be based on user history.
@@ -201,20 +209,16 @@ export default async function AccountDashboardPage() {
           <div style={statValueStyle}>{totalOrders}</div>
           <div style={statLabelStyle}>Total Orders</div>
         </div>
-        <div style={statCardStyle} className="luxury-card account-stat-card">
-          <Heart size={22} color="#D4AF37" strokeWidth={1.5} />
-          <div style={statValueStyle}>3</div>
-          <div style={statLabelStyle}>Wishlist Items</div>
-        </div>
+        <WishlistStatCard />
         <div style={statCardStyle} className="luxury-card account-stat-card">
           <MapPin size={22} color="#D4AF37" strokeWidth={1.5} />
-          <div style={statValueStyle}>2</div>
+          <div style={statValueStyle}>{addressCount}</div>
           <div style={statLabelStyle}>Saved Addresses</div>
         </div>
         <div style={statCardStyle} className="luxury-card account-stat-card">
           <CalendarDays size={22} color="#D4AF37" strokeWidth={1.5} />
           <div style={{ ...statValueStyle, fontSize: '1.1rem', marginTop: 'auto', paddingBottom: '4px' }}>
-            {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            {memberSinceDate}
           </div>
           <div style={statLabelStyle}>Member Since</div>
         </div>
