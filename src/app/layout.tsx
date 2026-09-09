@@ -5,6 +5,7 @@ import "./responsive.css";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import MetaPixel from "@/components/MetaPixel";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en-IN" className={josefinSans.variable}>
       <body>
+        <MetaPixel />
         <CurrencyProvider>
           <WishlistProvider>
             <CartProvider>

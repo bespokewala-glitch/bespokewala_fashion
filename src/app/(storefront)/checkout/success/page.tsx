@@ -4,11 +4,39 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
+import { event as fbEvent } from '@/components/MetaPixel';
 
 function SuccessClient() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const router = useRouter();
+
+  useEffect(() => {
+    if (!orderId) return;
+
+    // Track Purchase Event
+    const trackPurchase = async () => {
+      try {
+        const res = await fetch(`/api/orders/track/${orderId}`);
+        if (res.ok) {
+          const order = await res.json();
+          const eventId = `purchase_${orderId}`;
+
+          fbEvent('Purchase', {
+            content_ids: order.items.map((item: any) => item.slug),
+            content_type: 'product',
+            value: order.total,
+            currency: 'INR',
+            num_items: order.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+          }, { eventID: eventId });
+        }
+      } catch (err) {
+        console.error('Failed to track purchase', err);
+      }
+    };
+
+    trackPurchase();
+  }, [orderId]);
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', padding: '4rem 2rem' }}>

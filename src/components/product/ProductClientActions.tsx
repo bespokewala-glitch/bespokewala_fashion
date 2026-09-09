@@ -6,6 +6,8 @@ import { useCart } from '@/context/CartContext';
 import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 import { getShippingEstimate } from '@/lib/shippingPolicy';
+import { event as fbEvent } from '@/components/MetaPixel';
+import VirtualTryOnModal from '@/components/product/VirtualTryOnModal';
 
 interface ProductClientActionsProps {
   product: {
@@ -42,6 +44,13 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const [selectedSize, setSelectedSize] = useState<string | null>(filteredSizes[0] || 'Custom');
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [isVirtualTryOnOpen, setIsVirtualTryOnOpen] = useState(false);
+
+  const productUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const isCouture = product.productType?.toLowerCase() === 'couture';
+  const whatsappNumber = '91750676986';
+  const whatsappMessage = encodeURIComponent(`Hi, I would like to know more about this product.\n\nProduct: ${product.name}\nProduct URL: ${productUrl}`);
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   const handleAddToCart = () => {
     setIsAdding(true);
@@ -53,6 +62,16 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       image: normalizeImageUrl(product.images?.[0] || ''),
       quantity,
       size: selectedSize || undefined,
+    });
+    
+    // Track AddToCart event
+    fbEvent('AddToCart', {
+      content_ids: [product.slug],
+      content_name: product.name,
+      content_type: 'product',
+      value: product.price,
+      currency: 'INR',
+      quantity: quantity
     });
     
     setTimeout(() => {
@@ -99,6 +118,24 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
     marginTop: '1rem',
     opacity: isAdding ? 0.7 : 1,
     transition: 'opacity 0.2s',
+  };
+
+  const secondaryBtnStyle: React.CSSProperties = {
+    flex: 1,
+    padding: '1rem',
+    backgroundColor: 'transparent',
+    color: '#000',
+    border: '1px solid #000',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    fontSize: '0.9rem',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'opacity 0.2s',
+    textDecoration: 'none',
+    textAlign: 'center'
   };
 
   const quantitySelectorStyle: React.CSSProperties = {
@@ -186,38 +223,56 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
+        
+        {/* Secondary Buttons Row */}
+        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+          {isCouture && (
+            <button 
+              style={secondaryBtnStyle} 
+              onClick={() => setIsVirtualTryOnOpen(true)}
+            >
+              Virtual Try On
+            </button>
+          )}
+          
+          <a 
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={secondaryBtnStyle}
+          >
+            Chat with Stylist
+          </a>
+        </div>
+
+        {/* Primary Button */}
         {!isJewellery ? (
-          <>
-            <button style={primaryBtnStyle} onClick={handleAddToCart}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <button style={{ ...primaryBtnStyle, marginTop: 0 }} onClick={handleAddToCart}>
               {isAdding ? 'Adding...' : 'Add to Cart'}
             </button>
-            <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666', marginTop: '0.25rem' }}>
+            <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666' }}>
               Complimentary alterations within 7 days of delivery for bespoke items.
             </div>
-          </>
+          </div>
         ) : (
           <a 
             href={`https://wa.me/917506767452?text=Hello%20Bespokewala,%20I'm%20interested%20in%20the%20${encodeURIComponent(product.name)}`}
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              ...primaryBtnStyle,
-              backgroundColor: '#000',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              marginTop: '0',
-              textDecoration: 'none',
-              textTransform: 'uppercase'
-            }}
+            style={{ ...primaryBtnStyle, marginTop: 0, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             Ask for Price
           </a>
         )}
       </div>
+
+      <VirtualTryOnModal 
+        isOpen={isVirtualTryOnOpen} 
+        onClose={() => setIsVirtualTryOnOpen(false)} 
+        productImage={normalizeImageUrl(product.images?.[0] || '')} 
+      />
     </>
   );
 }

@@ -5,6 +5,7 @@ import { verifyToken } from "@/lib/auth";
 import dbConnect from "@/lib/mongoose";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
+import { sendMetaEvent } from "@/lib/metaConversions";
 
 export async function POST(request: Request) {
   try {
@@ -99,6 +100,34 @@ export async function POST(request: Request) {
       shippingCost: calculatedShipping,
       total: calculatedTotal,
     });
+
+    // --- META CONVERSIONS API: Purchase Event ---
+    const eventId = `purchase_${newOrder._id.toString()}`;
+    await sendMetaEvent({
+      eventName: "Purchase",
+      eventId,
+      sourceUrl: request.headers.get("referer") || "",
+      clientIp: request.headers.get("x-forwarded-for") || undefined,
+      clientUserAgent: request.headers.get("user-agent") || undefined,
+      userData: {
+        email: shippingDetails?.email,
+        phone: shippingDetails?.phone,
+        firstName: shippingDetails?.firstName,
+        lastName: shippingDetails?.lastName,
+        city: shippingDetails?.city,
+        state: shippingDetails?.state,
+        zipCode: shippingDetails?.zipCode,
+        country: shippingDetails?.country || "India",
+      },
+      customData: {
+        value: calculatedTotal,
+        currency: "INR",
+        content_ids: items.map((i: any) => i.productSlug),
+        content_type: "product",
+        num_items: items.reduce((sum: number, i: any) => sum + i.quantity, 0),
+      },
+    });
+    // ---------------------------------------------
 
     return NextResponse.json(
       { success: true, orderId: newOrder._id.toString(), message: "Payment verified and order placed" },

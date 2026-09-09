@@ -5,6 +5,7 @@ import { useCart, CartItem } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useRouter } from "next/navigation";
 import OptimizedImage from "@/components/ui/OptimizedImage";
+import { event as fbEvent } from "@/components/MetaPixel";
 
 declare global {
   interface Window {
@@ -63,7 +64,18 @@ export default function CheckoutClient() {
 
   useEffect(() => {
     loadRazorpayScript().then(setScriptLoaded);
-  }, []);
+    
+    // Track InitiateCheckout
+    if (cart.length > 0) {
+      fbEvent("InitiateCheckout", {
+        content_ids: cart.map(item => item.productSlug),
+        content_type: "product",
+        value: total,
+        currency: "INR",
+        num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
+      });
+    }
+  }, [cart, total]);
 
   // Fetch saved addresses on mount
   useEffect(() => {
@@ -211,6 +223,14 @@ export default function CheckoutClient() {
 
     setLoading(true);
     setError(null);
+
+    // Track AddPaymentInfo (user submitted details and proceeded to payment)
+    fbEvent("AddPaymentInfo", {
+      content_ids: cart.map(item => item.productSlug),
+      content_type: "product",
+      value: total,
+      currency: "INR"
+    });
 
     try {
       // Step 1: Create Razorpay order on server
@@ -531,7 +551,7 @@ export default function CheckoutClient() {
           <div style={{ padding: "1rem", backgroundColor: "#fff", border: "1px solid #e0e0e0", borderLeft: "3px solid #d2b48c", marginBottom: "1.5rem", fontSize: "0.78rem", color: "#555", lineHeight: 1.6 }}>
             <div style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.3rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>⏱️ Estimated Delivery Timelines:</div>
             • <strong>Footwear Collection:</strong> 15 to 20 Days<br />
-            • <strong>Couture &amp; Bespoke:</strong> 40 to 45 Days<br />
+            • <strong>Couture &amp; Bespoke:</strong> 40 to 50 Days<br />
             • <strong>Standard Ready-to-Wear:</strong> 5 to 7 Business Days
           </div>
 

@@ -20,6 +20,7 @@ const ProductTrustBadges = nextDynamic(() => import('@/components/product/Produc
 const RelatedProducts = nextDynamic(() => import('@/components/product/RelatedProducts'));
 const ProductReviews = nextDynamic(() => import('@/components/product/reviews/ProductReviews'));
 import ProductChatContext from '@/components/chatbot/ProductChatContext';
+import ProductViewTracker from '@/components/product/ProductViewTracker';
 
 const getProductBySlug = cache(async (slug: string) => {
   await dbConnect();
@@ -216,6 +217,8 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
           scrollbar-width: none;  /* Firefox */
         }
       `}</style>
+      
+      <ProductViewTracker product={product} />
 
       <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-4 mobile-pb-4">
         <div>
@@ -322,7 +325,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
             />
 
             <Suspense fallback={<div style={{ height: '80px' }} />}>
-              <ProductTrustBadges />
+              <ProductTrustBadges productType={product.productType} category={product.category} subcategory={product.subcategory} />
             </Suspense>
 
             <ProductDetailsAccordionWrapper details={product.details} productType={product.productType} category={product.category} />

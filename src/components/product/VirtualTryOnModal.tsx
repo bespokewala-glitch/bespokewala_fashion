@@ -1,216 +1,395 @@
-"use client";
+'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface VirtualTryOnModalProps {
   isOpen: boolean;
   onClose: () => void;
-  garmentImageUrl: string;
+  productImage: string;
 }
 
-export default function VirtualTryOnModal({ isOpen, onClose, garmentImageUrl }: VirtualTryOnModalProps) {
-  const [userImageBase64, setUserImageBase64] = useState<string | null>(null);
-  const [category, setCategory] = useState<string>('dresses');
-  const [loading, setLoading] = useState(false);
-  const [resultImage, setResultImage] = useState<string | null>(null);
+export default function VirtualTryOnModal({ isOpen, onClose, productImage }: VirtualTryOnModalProps) {
+  const [userImage, setUserImage] = useState<string | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      setUserImage(null);
+      setGeneratedImage(null);
+      setError(null);
+      setIsLoading(false);
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserImageBase64(reader.result as string);
-        setResultImage(null); // Reset result if new image is uploaded
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload a valid image file.');
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image is too large. Please upload an image smaller than 5MB.');
+      return;
+    }
+
+    setError(null);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUserImage(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleTryOn = async () => {
-    if (!userImageBase64) return;
-    
-    setLoading(true);
+    if (!userImage) {
+      setError('Please upload your photo first.');
+      return;
+    }
+
+    setIsLoading(true);
     setError(null);
-    
+
     try {
-      const res = await fetch('/api/try-on', {
+      const response = await fetch('/api/virtual-try-on', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userImageBase64,
-          garmentImageUrl,
-          category
-        })
+          userImageBase64: userImage,
+          productImageUrl: productImage,
+        }),
       });
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to generate image');
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to start try-on process.');
       }
-      
-      setResultImage(data.resultImageUrl);
+
+      const jobId = data.id;
+      if (!jobId) {
+        throw new Error('Invalid response from server.');
+      }
+
+      let isCompleted = false;
+      while (!isCompleted) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        const pollResponse = await fetch('/api/virtual-try-on', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jobId }),
+        });
+
+        const pollData = await pollResponse.json();
+
+        if (!pollResponse.ok) {
+          throw new Error(pollData.error || 'Failed to check status.');
+        }
+
+        if (pollData.status === 'completed') {
+          isCompleted = true;
+          const outputUrl = pollData.outputs?.[0] || pollData.output_image_url || pollData.output;
+          if (outputUrl) {
+            setGeneratedImage(outputUrl);
+          } else {
+            throw new Error('Failed to retrieve the generated image.');
+          }
+        } else if (pollData.status === 'failed') {
+          isCompleted = true;
+          throw new Error(pollData.error?.message || 'Virtual Try-On failed.');
+        }
+      }
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999
-    }}>
-      <div style={{
-        background: '#fff',
-        padding: '2rem',
-        borderRadius: '8px',
-        width: '90%',
-        maxWidth: '800px',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        fontFamily: '"Jost", sans-serif'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 500, color: '#000' }}>Virtual Try-On</h2>
-          <button 
-            onClick={onClose} 
-            style={{ background: '#f5f5f5', border: 'none', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#000' }}
-            aria-label="Close"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+  const handleTryAgain = () => {
+    setGeneratedImage(null);
+    setUserImage(null);
+    setError(null);
+  };
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '1rem', fontWeight: 500 }}>1. Upload Your Photo</h3>
-            <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '1rem' }}>
-              For best results, upload a clear, front-facing photo showing your body (arms down).
-            </p>
-            
-            <input 
-              type="file" 
-              accept="image/*" 
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                border: '2px dashed #ccc',
-                padding: '2rem',
-                textAlign: 'center',
-                cursor: 'pointer',
-                borderRadius: '4px',
-                marginBottom: '1rem',
-                background: '#fafafa'
-              }}
-            >
-              {userImageBase64 ? (
-                <img src={userImageBase64} alt="User upload" style={{ maxHeight: '250px', objectFit: 'contain' }} />
-              ) : (
-                <div style={{ color: '#888' }}>Click to upload your photo</div>
-              )}
+  if (!mounted || !isOpen) return null;
+
+  const modalContent = (
+    <>
+      <style>{`
+        .vto-overlay {
+          position: fixed !important;
+          inset: 0 !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          background-color: rgba(0, 0, 0, 0.75) !important;
+          z-index: 99999 !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 16px !important;
+          box-sizing: border-box !important;
+        }
+        .vto-box {
+          background: #fff;
+          width: 100%;
+          max-width: 560px;
+          max-height: 90vh;
+          overflow-y: auto;
+          border-radius: 8px;
+          padding: 28px;
+          box-sizing: border-box;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          position: relative;
+        }
+        .vto-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+        .vto-title {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 400;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #111;
+        }
+        .vto-x {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #111;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+        .vto-x:hover { opacity: 0.6; }
+        .vto-cols {
+          display: flex;
+          gap: 20px;
+          flex-direction: column;
+          margin-bottom: 20px;
+        }
+        @media (min-width: 480px) {
+          .vto-cols { flex-direction: row; }
+        }
+        .vto-col { flex: 1; }
+        .vto-label {
+          font-size: 0.7rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #888;
+          margin-bottom: 8px;
+          display: block;
+        }
+        .vto-img-wrap {
+          aspect-ratio: 3/4;
+          background: #f5f5f5;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .vto-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        .vto-upload {
+          aspect-ratio: 3/4;
+          background: #f5f5f5;
+          border: 1.5px dashed #ccc;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          overflow: hidden;
+          transition: border-color 0.2s;
+        }
+        .vto-upload:hover { border-color: #111; }
+        .vto-upload-inner {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: #555;
+          padding: 16px;
+          text-align: center;
+          gap: 10px;
+        }
+        .vto-upload-inner span {
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .vto-cta {
+          width: 100%;
+          padding: 15px 20px;
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          border: none;
+          color: #fff;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+        .vto-cta:not(:disabled) { background: #111; }
+        .vto-cta:not(:disabled):hover { opacity: 0.85; }
+        .vto-cta:disabled { background: #ddd; color: #999; cursor: not-allowed; }
+        .vto-hint {
+          font-size: 0.72rem;
+          color: #999;
+          text-align: center;
+          margin: 10px 0 0 0;
+        }
+        .vto-error {
+          padding: 10px 14px;
+          background: #fff0f0;
+          color: #c00;
+          border-radius: 4px;
+          font-size: 0.82rem;
+          margin-bottom: 16px;
+        }
+        @keyframes vto-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        .vto-spinner {
+          width: 36px;
+          height: 36px;
+          border: 3px solid #eee;
+          border-top-color: #111;
+          border-radius: 50%;
+          animation: vto-spin 0.8s linear infinite;
+        }
+      `}</style>
+
+      <div className="vto-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+        <div className="vto-box">
+          {/* Header */}
+          <div className="vto-head">
+            <h2 className="vto-title">Virtual Try-On</h2>
+            <button className="vto-x" onClick={onClose} aria-label="Close">&#x2715;</button>
+          </div>
+
+          {/* Error */}
+          {error && <div className="vto-error">{error}</div>}
+
+          {/* Loading */}
+          {isLoading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', gap: '16px' }}>
+              <div className="vto-spinner" />
+              <p style={{ margin: 0, color: '#666', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Creating your look...
+              </p>
             </div>
-
-            {userImageBase64 && (
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Garment Type</label>
-                <select 
-                  value={category} 
-                  onChange={(e) => setCategory(e.target.value)}
-                  style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd' }}
+          ) : generatedImage ? (
+            /* Result State */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <img
+                src={generatedImage}
+                alt="Virtual Try-On Result"
+                style={{ width: '100%', borderRadius: '4px', objectFit: 'cover', display: 'block' }}
+              />
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={handleTryAgain}
+                  style={{
+                    flex: 1, padding: '13px', background: '#fff', color: '#111', border: '1px solid #111',
+                    cursor: 'pointer', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '0.05em'
+                  }}
                 >
-                  <option value="dresses">Dress / Full Body</option>
-                  <option value="upper_body">Upper Body / Tops</option>
-                  <option value="lower_body">Lower Body / Bottoms</option>
-                </select>
+                  Try Another
+                </button>
+                <a
+                  href={generatedImage}
+                  download="virtual-try-on.jpg"
+                  style={{
+                    flex: 1, padding: '13px', background: '#111', color: '#fff', border: 'none',
+                    textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '0.05em',
+                    textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  }}
+                >
+                  Save Photo
+                </a>
               </div>
-            )}
-            
-            <button 
-              onClick={handleTryOn}
-              disabled={!userImageBase64 || loading}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                backgroundColor: userImageBase64 && !loading ? '#000' : '#ccc',
-                color: '#fff',
-                border: 'none',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                cursor: userImageBase64 && !loading ? 'pointer' : 'not-allowed',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              {loading ? (
-                <>Generating... Please wait</>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path>
-                    <path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.35 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path>
-                  </svg>
-                  Generate Try-On
-                </>
-              )}
-            </button>
-
-            {error && (
-              <div style={{ color: 'red', fontSize: '0.85rem', marginTop: '1rem', padding: '1rem', background: '#fee' }}>
-                {error}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h3 style={{ fontSize: '1rem', marginBottom: '1rem', fontWeight: 500 }}>2. Result</h3>
-            <div style={{
-                border: '1px solid #eee',
-                height: '500px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: '#f9f9f9'
-              }}>
-              {loading ? (
-                <div style={{ textAlign: 'center' }}>
-                  <div className="spinner" style={{ border: '4px solid #f3f3f3', borderTop: '4px solid #000', borderRadius: '50%', width: '40px', height: '40px', animation: 'spin 1s linear infinite', margin: '0 auto 1rem auto' }}></div>
-                  <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                  <p style={{ color: '#666', fontSize: '0.9rem' }}>AI is rendering your fit...<br/>This can take up to 30 seconds.</p>
-                </div>
-              ) : resultImage ? (
-                <img src={resultImage} alt="Virtual Try On Result" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              ) : (
-                <div style={{ color: '#888', textAlign: 'center', padding: '2rem' }}>
-                  Your generated image will appear here.
-                </div>
-              )}
             </div>
-          </div>
+          ) : (
+            /* Default / Upload State */
+            <>
+              <div className="vto-cols">
+                {/* Garment */}
+                <div className="vto-col">
+                  <span className="vto-label">Garment</span>
+                  <div className="vto-img-wrap">
+                    <img src={productImage} alt="Product" />
+                  </div>
+                </div>
+
+                {/* Upload */}
+                <div className="vto-col">
+                  <span className="vto-label">Your Photo</span>
+                  <div className="vto-upload" onClick={() => fileInputRef.current?.click()}>
+                    {userImage ? (
+                      <img src={userImage} alt="Your photo" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div className="vto-upload-inner">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17 8 12 3 7 8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        <span>Upload Photo</span>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/jpeg,image/png,image/webp"
+                    style={{ display: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <button className="vto-cta" onClick={handleTryOn} disabled={!userImage}>
+                See the Look
+              </button>
+              <p className="vto-hint">For best results, upload a full-body photo facing the camera.</p>
+            </>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
+
+  return createPortal(modalContent, document.body);
 }

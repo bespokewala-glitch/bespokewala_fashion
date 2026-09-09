@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Search, X, ArrowRight } from 'lucide-react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import { event as fbEvent } from '@/components/MetaPixel';
 
 const ALL_SUGGESTIONS = [
   'lehenga', 'bridal lehenga', 'red bridal lehenga', 'designer lehenga', 'wedding lehenga', 'lehenga set', 'lehengas',
@@ -66,6 +67,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       if (res.ok) {
         const data = await res.json();
         setResults(data.products || []);
+        if (data.products && data.products.length > 0) {
+          fbEvent('Search', { search_string: searchQuery });
+        }
       }
     } catch (error) {
       console.error('Search error:', error);
