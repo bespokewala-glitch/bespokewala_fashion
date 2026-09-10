@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
 import { event as fbEvent } from '@/components/MetaPixel';
+import { trackPurchase as trackGA4Purchase } from '@/lib/gtag';
 
 function SuccessClient() {
   const searchParams = useSearchParams();
@@ -22,6 +23,7 @@ function SuccessClient() {
           const order = await res.json();
           const eventId = `purchase_${orderId}`;
 
+          // Meta Pixel Purchase
           fbEvent('Purchase', {
             content_ids: order.items.map((item: any) => item.slug),
             content_type: 'product',
@@ -29,6 +31,18 @@ function SuccessClient() {
             currency: 'INR',
             num_items: order.items.reduce((sum: number, item: any) => sum + item.quantity, 0)
           }, { eventID: eventId });
+
+          // GA4 purchase — duplicate guard inside trackGA4Purchase via sessionStorage
+          trackGA4Purchase(
+            {
+              items: order.items,
+              total: order.total,
+              shipping: order.shipping ?? 0,
+              tax: order.tax ?? 0,
+              coupon: order.coupon,
+            },
+            orderId
+          );
         }
       } catch (err) {
         console.error('Failed to track purchase', err);

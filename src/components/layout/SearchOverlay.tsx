@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Search, X, ArrowRight } from 'lucide-react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { event as fbEvent } from '@/components/MetaPixel';
+import { trackSearch } from '@/lib/gtag';
 
 const ALL_SUGGESTIONS = [
   'lehenga', 'bridal lehenga', 'red bridal lehenga', 'designer lehenga', 'wedding lehenga', 'lehenga set', 'lehengas',
@@ -20,7 +21,7 @@ interface SearchOverlayProps {
   onClose: () => void;
 }
 
-export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
+function SearchOverlayInner({ isOpen, onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -69,6 +70,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         setResults(data.products || []);
         if (data.products && data.products.length > 0) {
           fbEvent('Search', { search_string: searchQuery });
+          trackSearch(searchQuery);
         }
       }
     } catch (error) {
@@ -228,5 +230,13 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         </div>
       </div>
     </>
+  );
+}
+
+export default function SearchOverlay(props: SearchOverlayProps) {
+  return (
+    <React.Suspense fallback={null}>
+      <SearchOverlayInner {...props} />
+    </React.Suspense>
   );
 }

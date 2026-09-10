@@ -241,7 +241,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
                 </div>
               ) : <div />}
 
-              <ProductActions product={product} />
+              <ProductActions product={{ ...product, images: product.images || [] }} />
             </div>
 
             <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: '#222', lineHeight: '1.4', letterSpacing: '0.02em' }}>

@@ -7,6 +7,7 @@ import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 import { getShippingEstimate } from '@/lib/shippingPolicy';
 import { event as fbEvent } from '@/components/MetaPixel';
+import { trackAddToCart, trackChatWithStylist, trackSizeSelection } from '@/lib/gtag';
 import VirtualTryOnModal from '@/components/product/VirtualTryOnModal';
 
 interface ProductClientActionsProps {
@@ -64,7 +65,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       size: selectedSize || undefined,
     });
     
-    // Track AddToCart event
+    // Track AddToCart event (Meta Pixel)
     fbEvent('AddToCart', {
       content_ids: [product.slug],
       content_name: product.name,
@@ -72,6 +73,16 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       value: product.price,
       currency: 'INR',
       quantity: quantity
+    });
+
+    // GA4 add_to_cart
+    trackAddToCart({
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      productType: product.productType,
+      quantity,
     });
     
     setTimeout(() => {
@@ -168,7 +179,10 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             {filteredSizes.map((size: string) => (
               <button 
                 key={size} 
-                onClick={() => setSelectedSize(size)}
+                onClick={() => {
+                  setSelectedSize(size);
+                  trackSizeSelection({ slug: product.slug, name: product.name }, size);
+                }}
                 style={selectedSize === size ? activeOptionBtnStyle : optionBtnStyle}
               >
                 {size}
@@ -241,6 +255,12 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             target="_blank"
             rel="noopener noreferrer"
             style={secondaryBtnStyle}
+            onClick={() => trackChatWithStylist({
+              slug: product.slug,
+              name: product.name,
+              category: product.category,
+              productType: product.productType,
+            })}
           >
             Chat with Stylist
           </a>
@@ -272,6 +292,10 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         isOpen={isVirtualTryOnOpen} 
         onClose={() => setIsVirtualTryOnOpen(false)} 
         productImage={normalizeImageUrl(product.images?.[0] || '')} 
+        productId={product.slug}
+        productName={product.name}
+        productCategory={product.productType || product.category}
+        productPrice={product.price}
       />
     </>
   );

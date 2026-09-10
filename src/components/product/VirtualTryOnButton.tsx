@@ -39,7 +39,7 @@ export default function VirtualTryOnButton({ garmentImageUrl }: VirtualTryOnButt
       <VirtualTryOnModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        garmentImageUrl={garmentImageUrl}
+        productImage={garmentImageUrl}
       />
     </>
   );

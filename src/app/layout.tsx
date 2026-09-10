@@ -6,6 +6,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import MetaPixel from "@/components/MetaPixel";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -49,6 +50,7 @@ export default function RootLayout({
     <html lang="en-IN" className={josefinSans.variable}>
       <body>
         <MetaPixel />
+        <GoogleAnalytics />
         <CurrencyProvider>
           <WishlistProvider>
             <CartProvider>

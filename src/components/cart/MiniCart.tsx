@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { Trash2, X } from 'lucide-react';
+import { trackRemoveFromCart } from '@/lib/gtag';
 
 export default function MiniCart() {
   const { cart, updateQuantity, removeFromCart, cartTotal, cartCount, isMiniCartOpen, closeMiniCart } = useCart();
@@ -152,7 +153,15 @@ export default function MiniCart() {
                       </div>
                       
                       <button 
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => {
+                          trackRemoveFromCart({
+                            productSlug: item.productSlug,
+                            name: item.name,
+                            price: item.price,
+                            quantity: item.quantity,
+                          });
+                          removeFromCart(item.id);
+                        }}
                         style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         aria-label="Remove item"
                       >

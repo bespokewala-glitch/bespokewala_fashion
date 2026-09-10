@@ -6,6 +6,7 @@ import { useCurrency } from "@/context/CurrencyContext";
 import { useRouter } from "next/navigation";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { event as fbEvent } from "@/components/MetaPixel";
+import { trackBeginCheckout, trackAddShippingInfo, trackAddPaymentInfo } from "@/lib/gtag";
 
 declare global {
   interface Window {
@@ -65,7 +66,7 @@ export default function CheckoutClient() {
   useEffect(() => {
     loadRazorpayScript().then(setScriptLoaded);
     
-    // Track InitiateCheckout
+    // Track InitiateCheckout (Meta Pixel)
     if (cart.length > 0) {
       fbEvent("InitiateCheckout", {
         content_ids: cart.map(item => item.productSlug),
@@ -74,8 +75,11 @@ export default function CheckoutClient() {
         currency: "INR",
         num_items: cart.reduce((sum, item) => sum + item.quantity, 0)
       });
+
+      // GA4 begin_checkout
+      trackBeginCheckout(cart, total);
     }
-  }, [cart, total]);
+  }, []);
 
   // Fetch saved addresses on mount
   useEffect(() => {
@@ -154,6 +158,9 @@ export default function CheckoutClient() {
       setShippingDetails({
         firstName: "", lastName: "", email: "", address: "", city: "", state: "", zipCode: "", country: "India", phone: "", isDefault: false
       });
+
+      // GA4 add_shipping_info — fires after user successfully saves/confirms a shipping address
+      trackAddShippingInfo(cart, total);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -231,6 +238,9 @@ export default function CheckoutClient() {
       value: total,
       currency: "INR"
     });
+
+    // GA4 add_payment_info
+    trackAddPaymentInfo(cart, total, 'Razorpay');
 
     try {
       // Step 1: Create Razorpay order on server

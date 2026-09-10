@@ -2,14 +2,20 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { trackVirtualTryOn } from '@/lib/gtag';
 
 interface VirtualTryOnModalProps {
   isOpen: boolean;
   onClose: () => void;
   productImage: string;
+  // Optional product context for GA4 analytics (personal data must NOT be passed)
+  productId?: string;
+  productName?: string;
+  productCategory?: string;
+  productPrice?: number;
 }
 
-export default function VirtualTryOnModal({ isOpen, onClose, productImage }: VirtualTryOnModalProps) {
+export default function VirtualTryOnModal({ isOpen, onClose, productImage, productId, productName, productCategory, productPrice }: VirtualTryOnModalProps) {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -108,6 +114,14 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage }: Vir
           const outputUrl = pollData.outputs?.[0] || pollData.output_image_url || pollData.output;
           if (outputUrl) {
             setGeneratedImage(outputUrl);
+            // GA4 virtual_try_on — fires only after successful result.
+            // NOTE: user photo (base64) is intentionally NOT passed.
+            trackVirtualTryOn({
+              productId,
+              productName,
+              productCategory,
+              productPrice,
+            });
           } else {
             throw new Error('Failed to retrieve the generated image.');
           }

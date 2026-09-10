@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 
@@ -31,7 +31,7 @@ export const event = (name: string, options = {}, eventIdData?: { eventID: strin
   }
 };
 
-export default function MetaPixel() {
+function MetaPixelInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loaded, setLoaded] = useState(false);
@@ -71,5 +71,13 @@ export default function MetaPixel() {
         onLoad={() => setLoaded(true)}
       />
     </>
+  );
+}
+
+export default function MetaPixel() {
+  return (
+    <Suspense fallback={null}>
+      <MetaPixelInner />
+    </Suspense>
   );
 }

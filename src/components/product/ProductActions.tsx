@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { trackAddToWishlist } from '@/lib/gtag';
 
 import { useWishlist } from '@/context/WishlistContext';
 
@@ -10,6 +11,8 @@ interface ProductActionsProps {
     name: string;
     price: number;
     images: string[];
+    category?: string;
+    productType?: string;
   };
 }
 
@@ -43,6 +46,14 @@ export default function ProductActions({ product }: ProductActionsProps) {
         name: product.name,
         price: product.price,
         image: product.images?.[0] || '',
+      });
+      // GA4 add_to_wishlist
+      trackAddToWishlist({
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        category: product.category,
+        productType: product.productType,
       });
     }
   };

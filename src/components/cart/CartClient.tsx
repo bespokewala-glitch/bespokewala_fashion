@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import { trackRemoveFromCart } from '@/lib/gtag';
 
 export default function CartClient() {
   const { cart, updateQuantity, removeFromCart, cartTotal } = useCart();
@@ -67,7 +68,15 @@ export default function CartClient() {
                     <div style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>{formatPrice(item.price)}</div>
                     {item.size && <div style={{ fontSize: '0.85rem', color: '#888' }}>Size: {item.size}</div>}
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => {
+                        trackRemoveFromCart({
+                          productSlug: item.productSlug,
+                          name: item.name,
+                          price: item.price,
+                          quantity: item.quantity,
+                        });
+                        removeFromCart(item.id);
+                      }}
                       style={{ background: 'none', border: 'none', color: '#999', fontSize: '0.8rem', padding: 0, marginTop: '1rem', cursor: 'pointer', textDecoration: 'underline' }}
                     >
                       Remove
