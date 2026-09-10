@@ -20,11 +20,13 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get('maxPrice');
     const colors = searchParams.get('colors');
     const sort = searchParams.get('sort');
+    const isNewArrival = searchParams.get('isNewArrival');
     
     const skip = (page - 1) * limit;
     
     const query: any = {};
     if (productType) query.productType = productType;
+    if (isNewArrival === 'true') query.isNewArrival = true;
     if (category) query.category = category;
     if (subcategory) query.subcategory = subcategory;
     if (collectionName) query.collectionName = collectionName;
@@ -105,7 +107,7 @@ export async function GET(req: NextRequest) {
     if (sort === 'popular') sortQuery = { isFeatured: -1, createdAt: -1 };
 
     const rawProducts = await Product.find(query)
-      .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType isFeatured')
+      .select('_id name slug price originalPrice images referenceImages category subcategory collectionName inventoryCount productType isFeatured isNewArrival')
       .sort(sortQuery)
       .skip(skip)
       .limit(limit > 1000 ? 1000 : limit)
@@ -169,6 +171,7 @@ export async function POST(req: NextRequest) {
       originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
       inventoryCount: Number(body.inventoryCount) || 0,
       isFeatured: Boolean(body.isFeatured),
+      isNewArrival: Boolean(body.isNewArrival),
       referenceImages: body.referenceImages || undefined,
       details: body.details || undefined,
       // Persist SEO fields if provided on creation.

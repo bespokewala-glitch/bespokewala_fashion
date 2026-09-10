@@ -15,6 +15,7 @@ export interface IProduct {
   colors?: string[];
   inventoryCount: number;
   isFeatured: boolean;
+  isNewArrival?: boolean;
   referenceImages?: {
     front?: string;
     back?: string;

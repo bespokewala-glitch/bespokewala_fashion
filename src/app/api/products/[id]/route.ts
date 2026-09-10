@@ -56,6 +56,7 @@ export async function PUT(
       originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
       inventoryCount: Number(body.inventoryCount) || 0,
       isFeatured: Boolean(body.isFeatured),
+      isNewArrival: Boolean(body.isNewArrival),
       referenceImages: body.referenceImages || undefined,
       details: body.details || undefined,
       // Persist SEO fields explicitly so admin overrides are saved to MongoDB.

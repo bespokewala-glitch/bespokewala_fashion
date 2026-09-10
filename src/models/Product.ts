@@ -18,6 +18,7 @@ const productSchema = new Schema<IProduct>(
     colors: { type: [String], default: [] },
     inventoryCount: { type: Number, default: 0, min: 0 },
     isFeatured: { type: Boolean, default: false },
+    isNewArrival: { type: Boolean, default: false },
     referenceImages: {
       front: { type: String },
       back: { type: String },
@@ -52,6 +53,7 @@ productSchema.index({ category: 1, subcategory: 1, productType: 1 });
 productSchema.index({ productType: 1, createdAt: -1 });
 productSchema.index({ category: 1, createdAt: -1 });
 productSchema.index({ isFeatured: -1, createdAt: -1 });
+productSchema.index({ isNewArrival: -1, createdAt: -1 });
 // Compound indexes for primary listing-page query patterns:
 // /products/footwear/womens → { productType, category } filtered + createdAt sorted
 productSchema.index({ productType: 1, category: 1, createdAt: -1 });

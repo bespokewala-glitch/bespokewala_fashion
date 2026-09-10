@@ -32,13 +32,14 @@ export interface CollectionPageParams {
   colors?: string;
   size?: string;
   sort?: string;
+  isNewArrival?: string;
 }
 
 /** Shared data-fetching and rendering logic for all collection / category pages */
 export async function CollectionPageContent({ params }: { params: CollectionPageParams }) {
   await dbConnect();
 
-  const { productType, category, subcategory, collectionName, occasion, slug2, slug3, page, q, minPrice, maxPrice, colors, size, sort } = params;
+  const { productType, category, subcategory, collectionName, occasion, slug2, slug3, page, q, minPrice, maxPrice, colors, size, sort, isNewArrival } = params;
   const currentPage = parseInt(page || '1', 10) || 1;
   const productsPerPage = 24;
   const skip = (currentPage - 1) * productsPerPage;
@@ -164,6 +165,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       // Sizes are usually exactly matched (e.g., 'L', 'XL') but making it case-insensitive is safer
       (productQuery as any).sizes = { $in: sizeArr.map(s => new RegExp(`^${s}$`, 'i')) };
     }
+  }
+
+  if (isNewArrival === 'true') {
+    (productQuery as any).isNewArrival = true;
   }
 
   let sortQuery: any = { createdAt: -1 };
@@ -311,7 +316,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   const effectiveCategory = category || slug2;
   const effectiveSubcategory = subcategory || slug3;
 
-  const generatedTitle = generateCategoryHeading(productType, effectiveCategory, effectiveSubcategory, collectionName);
+  const generatedTitle = isNewArrival === 'true'
+    ? 'New Arrivals'
+    : generateCategoryHeading(productType, effectiveCategory, effectiveSubcategory, collectionName);
   const taxonomySeo = (rawTaxonomy as any)?.seo || {};
   
   // Use the taxonomy's H1 if we matched exactly OR if it's a top-level department
@@ -346,16 +353,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     });
   }
 
-  const containerStyle: React.CSSProperties = {
-    // Only apply bottom padding and horizontal padding inline. 
-    // Top padding is moved to CSS so we can easily override it on mobile without specificity wars.
-    paddingBottom: '4rem',
-    maxWidth: '1600px',
-    margin: '0 auto',
-    minHeight: '80vh',
-  };
 
-  // ... (keeping other variables unchanged)
   const isTopLevelDepartment = Boolean(
     productType &&
     !category &&
@@ -377,6 +375,17 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   // making it act purely as a curated landing page.
   const hideProductGrid = isTopLevelDepartment && pageId === 'jewellery';
 
+  const containerStyle: React.CSSProperties = {
+    paddingBottom: '4rem',
+    paddingLeft: '2rem',
+    paddingRight: '2rem',
+    paddingTop: showHero ? '4rem' : '6rem',
+    maxWidth: '1600px',
+    width: '100%',
+    margin: '0 auto',
+    minHeight: '80vh',
+    boxSizing: 'border-box',
+  };
   const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbs);
 
   const itemListSchema = generateItemListSchema(products, canonicalPath);
@@ -390,7 +399,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           <HeroSection campaigns={finalHeroCampaigns} />
         </div>
       )}
-      <main style={containerStyle} className={`desktop-px-8 mobile-px-4 ${!showHero ? 'desktop-pt-no-hero' : ''} mobile-content-top-pad`}>
+      <main style={containerStyle} className="collection-page-main">
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (

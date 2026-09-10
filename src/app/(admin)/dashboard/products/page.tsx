@@ -58,6 +58,7 @@ function AdminProductsContent() {
         colors: [],
         inventoryCount: '10',
         isFeatured: false,
+        isNewArrival: false,
         seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
       });
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -81,6 +82,7 @@ function AdminProductsContent() {
     colors: [] as string[],
     inventoryCount: '10',
     isFeatured: false,
+    isNewArrival: false,
     seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
   });
 
@@ -336,6 +338,7 @@ function AdminProductsContent() {
       colors: formData.colors,
       inventoryCount: Number(formData.inventoryCount),
       isFeatured: formData.isFeatured,
+      isNewArrival: formData.isNewArrival,
       ...(hasSeoData ? { seo: formData.seo } : {}),
     };
 
@@ -357,7 +360,7 @@ function AdminProductsContent() {
           details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' },
           sizes: [],
           colors: [],
-          inventoryCount: '10', isFeatured: false,
+          inventoryCount: '10', isFeatured: false, isNewArrival: false,
           seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
         });
         setEditingId(null);
@@ -423,6 +426,7 @@ function AdminProductsContent() {
       colors: [],
       inventoryCount: prod.inventoryCount?.toString() || '10',
       isFeatured: prod.isFeatured || false,
+      isNewArrival: prod.isNewArrival || false,
       // Optimistic placeholder — will be overwritten by full product fetch below
       seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false },
     });
@@ -458,6 +462,7 @@ function AdminProductsContent() {
           colors: fullProd.colors || [],
           inventoryCount: fullProd.inventoryCount?.toString() || '10',
           isFeatured: fullProd.isFeatured || false,
+          isNewArrival: fullProd.isNewArrival || false,
           seo: {
             title: fullProd.seo?.title || '',
             description: fullProd.seo?.description || '',
@@ -633,7 +638,7 @@ function AdminProductsContent() {
                 type="button" 
                 onClick={() => {
                   setEditingId(null);
-                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], colors: [], inventoryCount: '10', isFeatured: false, seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false } });
+                  setFormData({ name: '', description: '', price: '', originalPrice: '', productType: activeProductType, category: 'womens', subcategory: '', collectionName: '', occasion: '', imageUrl: '', referenceImages: { front: '', back: '', left: '', right: '' }, details: { styleCode: '', commodityName: '', composition: '', componentsCount: '', includes: '', shipping: '', disclaimer: '', legal: '' }, sizes: [], colors: [], inventoryCount: '10', isFeatured: false, isNewArrival: false, seo: { title: '', description: '', keywords: '', canonicalUrl: '', noIndex: false } });
                 }}
                 style={{ fontSize: '0.8rem', marginLeft: '15px', padding: '4px 8px', cursor: 'pointer', backgroundColor: '#eee', border: '1px solid #ccc', borderRadius: '4px' }}
               >
@@ -887,6 +892,19 @@ function AdminProductsContent() {
               />
               <label htmlFor="isFeatured" style={{ fontWeight: 'bold', cursor: 'pointer' }}>
                 Feature on Homepage (Shows in Featured Arrivals)
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
+              <input 
+                type="checkbox" 
+                id="isNewArrival"
+                checked={formData.isNewArrival}
+                onChange={e => setFormData({...formData, isNewArrival: e.target.checked})}
+                style={{ width: '20px', height: '20px' }}
+              />
+              <label htmlFor="isNewArrival" style={{ fontWeight: 'bold', cursor: 'pointer' }}>
+                Mark as New Arrival (Shows on New Arrivals page)
               </label>
             </div>
 

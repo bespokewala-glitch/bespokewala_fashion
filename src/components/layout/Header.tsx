@@ -349,6 +349,7 @@ export default function Header() {
           <Link href="/products/couture" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Couture</Link>
           <Link href="/products/footwear" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Footwear</Link>
           <Link href="/products/jewellery" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Jewellery</Link>
+          <Link href="/new-arrivals" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>New Arrivals</Link>
         </div>
 
         <div style={navContainer} className="mobile-main-header">
@@ -372,10 +373,13 @@ export default function Header() {
                 <Link prefetch={true} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
               <li onMouseEnter={() => handleMouseEnterMenu('footwear')}>
-                <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }}>Footwear</Link>
+                <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Footwear</Link>
               </li>
               <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}>
-                <Link prefetch={true} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }}>Jewellery</Link>
+                <Link prefetch={true} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Jewellery</Link>
+              </li>
+              <li onMouseEnter={() => handleMouseLeaveMenu()}>
+                <Link prefetch={true} href="/new-arrivals" style={{ padding: '1rem 0', display: 'inline-block', whiteSpace: 'nowrap' }} className="menu-link-hover">New Arrivals</Link>
               </li>
             </ul>
           </nav>
@@ -774,6 +778,7 @@ export default function Header() {
             </div>
 
             <hr style={{ border: 'none', borderTop: '1px solid #eee' }} />
+            <Link href="/new-arrivals" onClick={() => setIsMobileMenuOpen(false)}>New Arrivals</Link>
             {user ? (
               <>
                 <Link href="/account" onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>
