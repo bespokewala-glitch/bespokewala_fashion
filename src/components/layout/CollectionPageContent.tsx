@@ -83,7 +83,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
   if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
-  
+
   if (slug2) {
     const isAll = slug2.toLowerCase() === 'all' || slug2.toLowerCase() === 'all-products' || slug2.toLowerCase() === 'all-collections';
     const slug2Query = !isAll ? buildInQuery(slug2) : undefined;
@@ -118,12 +118,12 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
       }
-      
+
       const KNOWN_OCCASIONS = [
         'bridal', 'cocktail', 'mehendi', 'reception', 'sangeet', 'pooja',
         'festive', 'groom', 'mehandi', 'party', 'wedding'
       ];
-      
+
       const isOccasion = KNOWN_OCCASIONS.includes(slug3.toLowerCase());
       const isCollection = slug3.toLowerCase().includes('collection');
 
@@ -216,13 +216,13 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     getOrFetch(`taxonomy:${pageId}:${canonicalPath}`, 300, async () => {
       import('@/models/Taxonomy');
       const mongoose = await import('mongoose');
-      
+
       const fullRoutePath = canonicalPath.replace(/^\/products\//, '');
       if (fullRoutePath && fullRoutePath !== pageId) {
         const exactMatch = await mongoose.models.Taxonomy?.findOne({ slug: fullRoutePath }).select('seo').lean();
         if (exactMatch) return { ...exactMatch, isExactMatch: true };
       }
-      
+
       const fallback = await mongoose.models.Taxonomy?.findOne({ slug: pageId }).select('seo').lean();
       return fallback ? { ...fallback, isExactMatch: false } : null;
     }),
@@ -243,21 +243,21 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         { $match: productQuery },
         {
           $facet: {
-            colors:       [{ $unwind: '$colors' },       { $group: { _id: '$colors' } },       { $sort: { _id: 1 } }],
-            sizes:        [{ $unwind: '$sizes' },        { $group: { _id: '$sizes' } },        { $sort: { _id: 1 } }],
-            categories:   [{ $group: { _id: '$category' } },   { $sort: { _id: 1 } }],
+            colors: [{ $unwind: '$colors' }, { $group: { _id: '$colors' } }, { $sort: { _id: 1 } }],
+            sizes: [{ $unwind: '$sizes' }, { $group: { _id: '$sizes' } }, { $sort: { _id: 1 } }],
+            categories: [{ $group: { _id: '$category' } }, { $sort: { _id: 1 } }],
             productTypes: [{ $group: { _id: '$productType' } }, { $sort: { _id: 1 } }],
-            occasions:    [{ $match: { occasion: { $exists: true, $nin: [null, ''] } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
+            occasions: [{ $match: { occasion: { $exists: true, $nin: [null, ''] } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
           },
         },
       ]);
       const f = facetResult[0] || {};
       return {
-        colors:       (f.colors       || []).map((d: any) => d._id).filter(Boolean),
-        sizes:        (f.sizes        || []).map((d: any) => d._id).filter(Boolean),
-        categories:   (f.categories   || []).map((d: any) => d._id).filter(Boolean),
+        colors: (f.colors || []).map((d: any) => d._id).filter(Boolean),
+        sizes: (f.sizes || []).map((d: any) => d._id).filter(Boolean),
+        categories: (f.categories || []).map((d: any) => d._id).filter(Boolean),
         productTypes: (f.productTypes || []).map((d: any) => d._id).filter(Boolean),
-        occasions:    (f.occasions    || []).map((d: any) => d._id).filter(Boolean),
+        occasions: (f.occasions || []).map((d: any) => d._id).filter(Boolean),
       };
     }),
   ]);
@@ -320,10 +320,10 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     ? 'New Arrivals'
     : generateCategoryHeading(productType, effectiveCategory, effectiveSubcategory, collectionName);
   const taxonomySeo = (rawTaxonomy as any)?.seo || {};
-  
+
   // Use the taxonomy's H1 if we matched exactly OR if it's a top-level department
   const useTaxonomyH1 = taxonomySeo.seoH1 && (isExactMatch || isRootTaxonomy);
-  
+
   const pageTitle = useTaxonomyH1 ? taxonomySeo.seoH1 : generatedTitle;
   const seoIntro = taxonomySeo.seoIntro;
   const seoContent = taxonomySeo.seoContent;
@@ -377,10 +377,9 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const containerStyle: React.CSSProperties = {
     paddingBottom: '4rem',
-    paddingLeft: '2rem',
-    paddingRight: '2rem',
-    paddingTop: showHero ? '4rem' : '6rem',
-    maxWidth: '1600px',
+    paddingLeft: '4rem',
+    paddingRight: '4rem',
+    paddingTop: showHero ? '4rem' : '4.5rem',
     width: '100%',
     margin: '0 auto',
     minHeight: '80vh',
@@ -404,7 +403,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (
           <div className="desktop-mx-negative mobile-m-0">
-            {sectionMap.CuratedGrid && <CuratedGrid data={{...sectionMap.CuratedGrid, buttonLink: sectionMap.CuratedGrid.buttonLink || (productType ? `/products/${productType}/all` : '/products')}} />}
+            {sectionMap.CuratedGrid && <CuratedGrid data={{ ...sectionMap.CuratedGrid, buttonLink: sectionMap.CuratedGrid.buttonLink || (productType ? `/products/${productType}/all` : '/products') }} />}
             {sectionMap.FeatureBanner && <FeatureBanner data={sectionMap.FeatureBanner} />}
             {sectionMap.SplitShowcase && <SplitShowcase data={sectionMap.SplitShowcase} />}
             {sectionMap.CoutureProcess && pageId !== 'jewellery' && <CoutureProcess data={sectionMap.CoutureProcess} />}
@@ -442,7 +441,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
                 />
 
                 <div style={{ width: '100%' }}>
-                  <InfiniteProductGrid 
+                  <InfiniteProductGrid
                     key={JSON.stringify(params)}
                     initialProducts={products}
                     totalProducts={totalProducts}
