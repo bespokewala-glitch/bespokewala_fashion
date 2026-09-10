@@ -292,9 +292,16 @@ export default function Header() {
 
   const activeSecondaryNav = displayNav ? menuData[displayNav as string] || [] : [];
 
-  const collections = taxonomies.filter(t => t.type === 'collection' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(displayNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(displayCategory as string)));
+  let collections = taxonomies.filter(t => t.type === 'collection' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(displayNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(displayCategory as string)));
   const occasions = taxonomies.filter(t => t.type === 'occasion' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(displayNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(displayCategory as string)));
-  const categories = taxonomies.filter(t => t.type === 'category' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(displayNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(displayCategory as string)));
+  let categories = taxonomies.filter(t => t.type === 'category' && (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(displayNav as string)) && (!t.genders || t.genders.length === 0 || t.genders.includes(displayCategory as string)));
+
+  if (displayCategory === 'womens') {
+    collections = collections.filter(c => c.name.toLowerCase() !== 'bridal collection' && c.name.toLowerCase() !== 'party wear');
+  } else if (displayCategory === 'mens') {
+    collections = collections.filter(c => c.name.toLowerCase() !== 'groom collection');
+    categories = categories.filter(c => c.name.toLowerCase() !== 'ethnic wear' && c.name.toLowerCase() !== 'ethenic wear');
+  }
 
   return (
     <>
