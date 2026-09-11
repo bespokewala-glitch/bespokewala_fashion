@@ -65,7 +65,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     entries: [
       {
         question: 'How long does shipping take?',
-        answer: 'Standard delivery within India takes 5–7 business days. Express delivery (2–3 business days) is available at checkout for an additional charge. International orders typically take 10–14 business days.',
+        answer: 'Standard delivery within India takes 3-7 business days. Footwear typically takes 15-20 days. For Couture, shipping time is 40-50 days. International orders typically take 10–14 business days.',
         keywords: ['shipping time', 'delivery time', 'how long', 'when will i receive', 'dispatch'],
       },
       {
