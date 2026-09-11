@@ -394,14 +394,14 @@ export default function ShippingPageContent() {
                   body: "We offer size or colour exchanges within 14 days of delivery. If the desired size or colour is unavailable, a store credit of equal value will be issued, valid for 6 months from the date of issue.",
                 },
                 {
-                  icon: "💰",
-                  title: "Refund Processing",
-                  body: "Approved refunds are processed to your original payment method within 7–10 business days after we receive and inspect the return. Store credits are issued within 24 hours of return approval.",
+                  icon: "💳",
+                  title: "Store Credit Processing",
+                  body: "Approved returns are processed as store credit within 24 hours of return approval, valid for 6 months.",
                 },
                 {
                   icon: "🚫",
                   title: "Non-Returnable Items",
-                  body: "Custom / bespoke orders, altered garments, jewellery (for hygiene reasons), sale items marked 'Final Sale', and items returned after 7 days are not eligible for return or refund.",
+                  body: "Custom / bespoke orders, altered garments, jewellery (for hygiene reasons), sale items marked 'Final Sale', and items returned after 7 days are not eligible for return.",
                 },
               ].map(({ icon, title, body }) => (
                 <div key={title} className="policy-row">
@@ -429,7 +429,7 @@ export default function ShippingPageContent() {
                 { num: "2", text: "Our team will review and send a Return Authorisation (RA) number within 24 hours." },
                 { num: "3", text: "Pack the item securely in its original packaging with all tags attached. Write the RA number on the parcel." },
                 { num: "4", text: "Ship the package to our Mumbai address. We recommend using a tracked courier." },
-                { num: "5", text: "Once received and quality-checked (2–3 business days), your refund or exchange is processed." },
+                { num: "5", text: "Once received and quality-checked (2–3 business days), your exchange or store credit is processed." },
               ].map(({ num, text }) => (
                 <div key={num} style={{ display: "flex", gap: "1.25rem", marginBottom: "1.5rem", alignItems: "flex-start" }}>
                   <div style={{
@@ -526,7 +526,7 @@ export default function ShippingPageContent() {
             },
             {
               q: "Is my order insured during transit?",
-              a: "Yes. All Bespokewala orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a full refund.",
+              a: "Yes. All Bespokewala orders are fully insured for their purchase value during transit. In the unlikely event of loss or damage in transit, we will send a replacement or issue a store credit.",
             },
             {
               q: "How are the orders packaged?",

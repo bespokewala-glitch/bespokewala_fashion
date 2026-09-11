@@ -121,7 +121,7 @@ export default function TermsConditionsContent() {
               "Pricing & Payment",
               "Orders & Cancellations",
               "Shipping & Delivery",
-              "Returns, Exchanges & Refunds",
+              "Returns & Exchanges",
               "Custom & Bespoke Orders",
               "Intellectual Property",
               "User Conduct",
@@ -200,7 +200,7 @@ export default function TermsConditionsContent() {
                   <li>Non-delivery of payment.</li>
                 </ul>
                 <p><strong>Customer Cancellations:</strong> You may cancel an order within <strong>2 hours</strong> of placement by emailing info@bespokewala.com with your order number. After this window, the order enters production/dispatch and cannot be cancelled. Custom orders cannot be cancelled once confirmed.</p>
-                <p>Approved cancellations will receive a full refund to the original payment method within 7–10 business days.</p>
+                <p>Approved cancellations will receive a store credit valid for 6 months within 24 hours.</p>
               </>
             ),
           },
@@ -226,7 +226,7 @@ export default function TermsConditionsContent() {
           {
             id: "tc-6",
             num: "06",
-            title: "Returns, Exchanges & Refunds",
+            title: "Returns & Exchanges",
             content: (
               <>
                 <p><strong>Returns:</strong> Ready-to-wear items may be returned within <strong>7 days</strong> of delivery, provided they are unused, unwashed, unaltered, and in original packaging with all tags attached.</p>
@@ -240,7 +240,7 @@ export default function TermsConditionsContent() {
                   <li>Items without original tags or packaging</li>
                   <li>Items returned after 7 days of delivery</li>
                 </ul>
-                <p><strong>Refunds:</strong> Approved refunds are processed to the original payment method within 7–10 business days of return receipt and inspection. We do not offer refunds in cash.</p>
+
                 <div className="legal-warning">
                   ⚠ Items that show signs of use, washing, alteration, or damage will not be accepted for return and will be sent back to the customer at their cost.
                 </div>
@@ -257,10 +257,10 @@ export default function TermsConditionsContent() {
                 <ul>
                   <li>A <strong>50% advance payment</strong> is required to confirm a custom order. The balance is due before dispatch.</li>
                   <li>Measurement accuracy is the customer&apos;s responsibility. We are not liable for ill-fitting garments due to incorrect measurements provided by the customer.</li>
-                  <li>Minor design variations from reference images are inherent to handcraftsmanship and are not grounds for cancellation or refund.</li>
+                  <li>Minor design variations from reference images are inherent to handcraftsmanship and are not grounds for cancellation.</li>
                   <li>One complimentary alteration is included with every bespoke order, subject to a fitting appointment at our Mumbai studio.</li>
                   <li>Lead times quoted are estimates. Delays of up to 2 weeks beyond the stated timeline do not constitute a breach of contract and are not grounds for cancellation.</li>
-                  <li>Custom orders are <strong>non-refundable</strong> once production has commenced.</li>
+                  <li>Custom orders are <strong>non-cancellable</strong> once production has commenced.</li>
                 </ul>
               </>
             ),

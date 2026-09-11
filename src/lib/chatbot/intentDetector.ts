@@ -33,7 +33,7 @@ export function detectIntent(text: string): { intent: Intent; confidence: number
   }
 
   // 5. FAQ (Shipping, Returns, Payment, Sizing, Care)
-  if (/shipping|delivery time|return|refund|exchange|payment|emi|cod|size guide|measurements|fabric swatch|custom order|bespoke time/i.test(lower)) {
+  if (/shipping|delivery time|return|exchange|payment|emi|cod|size guide|measurements|fabric swatch|custom order|bespoke time/i.test(lower)) {
     return { intent: 'FAQ', confidence: 0.8 };
   }
 

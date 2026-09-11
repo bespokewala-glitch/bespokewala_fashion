@@ -92,13 +92,9 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       {
         question: 'What is your return policy?',
         answer: 'We accept returns within 7 days of delivery for unused, unworn items in their original condition with all tags intact. Custom and bespoke orders are non-returnable. To initiate a return, email info@bespokewala.com with your order number.',
-        keywords: ['return', 'returns', 'return policy', 'send back', 'refund'],
+        keywords: ['return', 'returns', 'return policy', 'send back'],
       },
-      {
-        question: 'How long does a refund take?',
-        answer: 'Once we receive and inspect your return, refunds are processed within 5–7 business days. The amount is credited back to your original payment method.',
-        keywords: ['refund', 'money back', 'refund time'],
-      },
+
       {
         question: 'Can I exchange an item?',
         answer: 'Yes, exchanges are available for size or colour within 7 days of delivery (subject to availability). Email us at info@bespokewala.com or WhatsApp +91 75067 67452 with your order number.',

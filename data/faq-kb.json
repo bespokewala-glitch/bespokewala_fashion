@@ -17,7 +17,7 @@
     "id": "returns_policy",
     "category": "returns",
     "question": "What is your return policy?",
-    "keywords": ["return", "returns", "refund", "refunds", "exchange", "money back"],
+    "keywords": ["return", "returns", "exchange", "money back"],
     "answer": "[Insert actual return policy here - e.g., Due to the bespoke nature of our garments, we do not accept returns. We do offer free alterations if the fit is not right.]"
   },
   {

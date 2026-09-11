@@ -2,7 +2,6 @@ export function shouldEscalate(userMessage: string): boolean {
   const normalizedMessage = userMessage.toLowerCase();
   
   const escalationKeywords = [
-    "refund",
     "cancel",
     "wrong",
     "complaint",

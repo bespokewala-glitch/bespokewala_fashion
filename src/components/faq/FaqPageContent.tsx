@@ -88,7 +88,7 @@ const CATEGORIES = [
       },
       {
         q: "Are custom orders returnable?",
-        a: "Custom and bespoke orders are non-returnable and non-refundable as they are crafted specifically for you. However, we offer complimentary alterations within 7 days of delivery for bespoke items to ensure a perfect fit.",
+        a: "Custom and bespoke orders are non-returnable as they are crafted specifically for you. However, we offer complimentary alterations within 7 days of delivery for bespoke items to ensure a perfect fit.",
       },
       {
         q: "Do you offer bridal consultation services?",
@@ -126,16 +126,13 @@ const CATEGORIES = [
   {
     id: "returns",
     icon: "↩️",
-    title: "Returns & Refunds",
+    title: "Returns & Exchanges",
     faqs: [
       {
         q: "What is your return policy?",
         a: "Ready-to-wear items can be returned within 7 days of delivery, provided they are unused, unwashed, and in original condition with all tags attached. Initiate the return by emailing info@bespokewala.com with your order number.",
       },
-      {
-        q: "How long does it take to get a refund?",
-        a: "Once we receive and inspect the returned item (2–3 business days after arrival), refunds are processed to your original payment method within 7–10 business days. Store credits are issued within 24 hours of approval.",
-      },
+
       {
         q: "Can I exchange my product for a different size?",
         a: "Yes, size exchanges are accepted within 14 days of delivery. If the desired size is unavailable, we will issue a store credit valid for 6 months. Email us with your order number and the size you need.",
@@ -146,7 +143,7 @@ const CATEGORIES = [
       },
       {
         q: "What if I received a damaged or wrong item?",
-        a: "We sincerely apologise. Please email info@bespokewala.com within 48 hours of delivery with photos of the issue and your order number. We will arrange a complimentary pickup and send a replacement or full refund within 5–7 business days.",
+        a: "We sincerely apologise. Please email info@bespokewala.com within 48 hours of delivery with photos of the issue and your order number. We will arrange a complimentary pickup and send a replacement within 5–7 business days.",
       },
     ],
   },
