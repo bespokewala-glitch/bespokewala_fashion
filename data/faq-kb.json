@@ -13,13 +13,7 @@
     "keywords": ["delivery", "shipping", "how long", "when will i get", "arrive"],
     "answer": "Standard shipping within India takes 3-7 days. Footwear takes 15-20 days. Bespoke pieces and Couture typically take 40-50 days to craft and ship, plus standard shipping time based on your location."
   },
-  {
-    "id": "returns_policy",
-    "category": "returns",
-    "question": "What is your return policy?",
-    "keywords": ["return", "returns", "exchange", "money back"],
-    "answer": "[Insert actual return policy here - e.g., Due to the bespoke nature of our garments, we do not accept returns. We do offer free alterations if the fit is not right.]"
-  },
+
   {
     "id": "payment_methods",
     "category": "payment",

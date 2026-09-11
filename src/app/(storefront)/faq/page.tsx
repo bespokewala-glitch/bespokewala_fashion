@@ -12,16 +12,13 @@ export const metadata = generateStaticPageMetadata(
 const FAQ_ITEMS = [
   {
     question: 'How long does shipping take within India?',
-    answer: 'Standard shipping within India takes 3-7 business days. Footwear typically takes 15-20 days, and for Couture, shipping time is 40-50 days.'
+    answer: 'Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days, and for Couture, shipping time is 40-50 days.'
   },
   {
     question: 'Do you offer custom or bespoke orders?',
     answer: 'Yes, Bespokewala specialises in custom and bespoke garments. Please contact us via WhatsApp or our consultation page to discuss your requirements.'
   },
-  {
-    question: 'What is your return policy?',
-    answer: 'We accept returns within 7 days of delivery for unused, unwashed items in original packaging. Custom and bespoke orders are non-returnable. Please visit our Shipping & Returns page for full details.'
-  },
+
   {
     question: 'How do I find my size?',
     answer: 'Please refer to our Size Guide page for detailed measurement charts across all product categories including lehengas, sarees, and blouses.'

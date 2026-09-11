@@ -103,7 +103,7 @@ const CATEGORIES = [
     faqs: [
       {
         q: "How long does delivery take?",
-        a: "Delivery timelines depend on the product category. Ready-to-wear garments and accessories dispatch within 3-7 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40-50 days. International delivery takes an additional 7-10 business days after dispatch.",
+        a: "Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40-50 days. International delivery takes an additional 7-10 business days after dispatch.",
       },
       {
         q: "Do you offer free shipping?",
@@ -123,30 +123,7 @@ const CATEGORIES = [
       },
     ],
   },
-  {
-    id: "returns",
-    icon: "↩️",
-    title: "Returns & Exchanges",
-    faqs: [
-      {
-        q: "What is your return policy?",
-        a: "Ready-to-wear items can be returned within 7 days of delivery, provided they are unused, unwashed, and in original condition with all tags attached. Initiate the return by emailing info@bespokewala.com with your order number.",
-      },
 
-      {
-        q: "Can I exchange my product for a different size?",
-        a: "Yes, size exchanges are accepted within 14 days of delivery. If the desired size is unavailable, we will issue a store credit valid for 6 months. Email us with your order number and the size you need.",
-      },
-      {
-        q: "What items cannot be returned?",
-        a: "The following are non-returnable: Custom / bespoke orders (though they include complimentary alterations within 7 days), altered garments, jewellery (for hygiene), sale items marked 'Final Sale', and items without original tags or packaging.",
-      },
-      {
-        q: "What if I received a damaged or wrong item?",
-        a: "We sincerely apologise. Please email info@bespokewala.com within 48 hours of delivery with photos of the issue and your order number. We will arrange a complimentary pickup and send a replacement within 5–7 business days.",
-      },
-    ],
-  },
   {
     id: "account",
     icon: "👤",

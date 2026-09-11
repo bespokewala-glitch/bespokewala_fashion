@@ -8,7 +8,15 @@
     "dev:turbo": "npm run clean && next dev --turbo",
     "build": "node --max-old-space-size=8192 node_modules/next/dist/bin/next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest",
+    "test:unit": "jest --selectProjects unit",
+    "test:api": "jest --selectProjects api",
+    "test:components": "jest --selectProjects components",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.120.0",
@@ -30,14 +38,27 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@jest/globals": "^30.5.1",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/bcryptjs": "^3.0.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
+    "jest-environment-node": "^30.5.1",
+    "jest-mock": "^30.5.1",
     "mongodb": "^7.5.0",
+    "mongodb-memory-server": "^10.4.3",
+    "ts-jest": "^29.4.12",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "optionalDependencies": {

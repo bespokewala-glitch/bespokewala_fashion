@@ -14,13 +14,17 @@ export async function GET(request: Request) {
 
     const user = await verifyToken(tokenCookie.value);
     
-    if (!user || !user.userId) {
+    // BUG-003 fix: signToken sets { id } but some code may have used { userId }.
+    // Normalize: accept whichever claim is present.
+    const userId = user?.id || user?.userId;
+    
+    if (!user || !userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     await dbConnect();
 
-    const orders = await Order.find({ user: user.userId })
+    const orders = await Order.find({ user: userId })
       .sort({ createdAt: -1 }) // Newest first
       .lean();
 

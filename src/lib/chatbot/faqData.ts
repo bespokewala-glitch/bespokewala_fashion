@@ -65,7 +65,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
     entries: [
       {
         question: 'How long does shipping take?',
-        answer: 'Standard delivery within India takes 3-7 business days. Footwear typically takes 15-20 days. For Couture, shipping time is 40-50 days. International orders typically take 10–14 business days.',
+        answer: 'Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40-50 days. International delivery takes an additional 7-10 business days after dispatch.',
         keywords: ['shipping time', 'delivery time', 'how long', 'when will i receive', 'dispatch'],
       },
       {
@@ -85,23 +85,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
     ],
   },
-  {
-    id: 'returns',
-    title: 'Returns & Exchanges',
-    entries: [
-      {
-        question: 'What is your return policy?',
-        answer: 'We accept returns within 7 days of delivery for unused, unworn items in their original condition with all tags intact. Custom and bespoke orders are non-returnable. To initiate a return, email info@bespokewala.com with your order number.',
-        keywords: ['return', 'returns', 'return policy', 'send back'],
-      },
 
-      {
-        question: 'Can I exchange an item?',
-        answer: 'Yes, exchanges are available for size or colour within 7 days of delivery (subject to availability). Email us at info@bespokewala.com or WhatsApp +91 75067 67452 with your order number.',
-        keywords: ['exchange', 'swap', 'different size', 'different colour'],
-      },
-    ],
-  },
   {
     id: 'products',
     title: 'Products & Sizing',

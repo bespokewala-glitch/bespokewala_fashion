@@ -14,5 +14,5 @@ export function getShippingEstimate(productType?: string, category?: string, sub
   }
 
   // Default standard shipping for ready-to-wear / accessories
-  return '7-14 days';
+  return '3-7 days';
 }
