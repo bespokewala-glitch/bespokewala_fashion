@@ -186,51 +186,34 @@ export default function AboutPageContent() {
   const storyRef = useInView(0.1);
   const howWeStarted = (
     <section className="about-section-m-v" style={{ backgroundColor: "#1c1c1c", color: "#fff", padding: "7rem 2rem", overflow: "hidden" }}>
-      <div className="about-grid-2" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "5rem", alignItems: "center" }}>
+      <div style={{ maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
 
         {/* Text */}
         <div
           ref={storyRef.ref}
           style={{
             opacity: storyRef.visible ? 1 : 0,
-            transform: storyRef.visible ? "translateX(0)" : "translateX(-50px)",
+            transform: storyRef.visible ? "translateY(0)" : "translateY(40px)",
             transition: "opacity 0.9s ease, transform 0.9s ease",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center"
           }}
         >
           <SectionLabel>Our Story</SectionLabel>
           <h2 style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", fontWeight: 300, letterSpacing: "0.05em", textTransform: "uppercase", lineHeight: 1.25, color: "#fff", marginBottom: "0" }}>
             From a Single Studio<br />to a Fashion Legacy
           </h2>
-          <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "1.5rem 0" }} />
+          <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "1.5rem auto" }} />
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
-            Our journey began and was officially incorporated in 2002 with a 400 sq ft studio in Bandra, Mumbai — a dream, a sewing machine, and an unshakeable belief that Indian couture deserved a global pedestal. The roots were firmly planted when the founder stitched the very first lehenga by hand.
+            BespokeWala began its journey in 2002 with a passion for craftsmanship, bespoke fashion, and timeless Indian luxury. Over the years, the brand has built its experience in creating personalized and premium fashion for its customers.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
-            Word spread quietly at first — a bride here, a celebrity there. By 2008, Bespokewala had dressed its first Bollywood star for a major awards ceremony, and the fashion world took notice. What began as a solo endeavour grew into a collective of over 200 master craftsmen, weavers, and embroiderers.
+            In 2018, the business was formally incorporated as a company, marking the next chapter in its growth and expansion.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc" }}>
-            Today, with flagship studios in Mumbai, Delhi, and Dubai, and clients across five continents, Bespokewala remains anchored by the same belief that launched it — that every person deserves to be dressed in a masterpiece.
+            Today, BespokeWala combines years of craftsmanship and experience with modern design, manufacturing, retail, and a growing digital presence.
           </p>
-        </div>
-
-        {/* Timeline */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {[
-            { year: "2002", event: "Officially incorporated in Bandra, Mumbai with a single studio and a team of three." },
-            { year: "2006", event: "Opened our first flagship atelier and launched the signature bridal collection." },
-            { year: "2010", event: "International debut at London Fashion Week; global recognition begins." },
-            { year: "2016", event: "Expanded to Delhi & Dubai; launched Bespokewala Jewellery." },
-            { year: "2022", event: "Celebrating 20 years — 500+ craftsmen, 5 studios, clients in 40+ countries." },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: "1.5rem", alignItems: "flex-start" }}>
-              <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#d2b48c", letterSpacing: "0.1em", minWidth: "40px", paddingTop: "0.15rem" }}>
-                {item.year}
-              </span>
-              <div style={{ flex: 1, borderLeft: "1px solid #444", paddingLeft: "1.5rem" }}>
-                <p style={{ fontSize: "0.9rem", lineHeight: 1.7, color: "#ccc" }}>{item.event}</p>
-              </div>
-            </div>
-          ))}
         </div>
 
       </div>
