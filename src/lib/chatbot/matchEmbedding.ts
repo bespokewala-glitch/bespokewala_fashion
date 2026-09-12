@@ -41,37 +41,46 @@ function cosineSimilarity(vecA: number[], vecB: number[]): number {
 
 // Load or pre-compute embeddings for FAQ
 async function loadFAQEmbeddings(faqList: FAQEntry[]) {
-  // If we already loaded in memory, check if KB matches
+  // Fast path: already loaded into memory this process lifetime
   if (Object.keys(cachedEmbeddings).length === faqList.length) {
     return;
   }
 
-  // Try to load from disk cache
+  // ── Priority 1: Load from the pre-computed disk cache ──────────────────────
+  // This is the path that runs on every Vercel cold start.  The file is
+  // committed to the repo and bundled via outputFileTracingIncludes in
+  // next.config.ts, so it is always present in production.
   if (fs.existsSync(EMBEDDINGS_FILE)) {
     try {
       const data = fs.readFileSync(EMBEDDINGS_FILE, 'utf-8');
-      cachedEmbeddings = JSON.parse(data);
-      // Verify cache validity (very basic check)
-      if (Object.keys(cachedEmbeddings).length === faqList.length) {
+      const parsed: Record<string, number[]> = JSON.parse(data);
+
+      // Accept the cache as long as it has entries — a partial cache is still
+      // better than running a cold ML model inference on Vercel.
+      if (Object.keys(parsed).length > 0) {
+        cachedEmbeddings = parsed;
         return;
       }
     } catch (err) {
-      console.warn("Failed to read FAQ embeddings cache, recomputing...", err);
+      console.warn('[matchEmbedding] Failed to read faq-embeddings.json cache, will recompute:', err);
     }
   }
 
-  // Pre-compute embeddings for all FAQ entries
-  console.log("Pre-computing FAQ embeddings...");
+  // ── Priority 2: Compute with ML model (localhost / build-time only) ─────────
+  // Only reached if the cache file is missing or completely empty.
+  // On Vercel this should never happen because the file is bundled; on
+  // localhost it will run once and write the cache to disk for future use.
+  console.log('[matchEmbedding] Pre-computing FAQ embeddings (no cache found)…');
   cachedEmbeddings = {};
   for (const faq of faqList) {
     cachedEmbeddings[faq.id] = await generateEmbedding(faq.question);
   }
 
-  // Save to disk
+  // Persist to disk so subsequent cold starts skip model inference
   try {
     fs.writeFileSync(EMBEDDINGS_FILE, JSON.stringify(cachedEmbeddings));
   } catch (err) {
-    console.error("Failed to write FAQ embeddings cache", err);
+    console.error('[matchEmbedding] Failed to write FAQ embeddings cache:', err);
   }
 }
 

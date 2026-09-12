@@ -4,8 +4,23 @@ const nextConfig: NextConfig = {
   // Compress HTTP responses (gzip/Brotli)
   compress: true,
 
-  // Ensure sharp's native binaries are included in the serverless function bundle on Vercel
-  serverExternalPackages: ['sharp'],
+  // Ensure sharp and @xenova/transformers native binaries are resolved correctly on Vercel
+  serverExternalPackages: ['sharp', '@xenova/transformers'],
+
+  // ── Serverless Bundle Inclusions ────────────────────────────────────────────
+  // Tell Next.js output-file-tracing to copy the data/ folder into the chatbot
+  // API route's serverless bundle. Without this, faq-kb.json and
+  // faq-embeddings.json are absent at runtime on Vercel and the chatbot falls
+  // back to the error response on every cold start.
+  experimental: {
+    // outputFileTracingIncludes is present in Next.js 16 config-shared.d.ts:1246
+    // but the IDE's narrower ExperimentalConfig view raises a false positive.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error: valid Next.js 16 experimental option
+    outputFileTracingIncludes: {
+      '/api/chatbot': ['./data/**/*'],
+    },
+  },
 
   // ── Redirects ───────────────────────────────────────────────────────────────
   async redirects() {
