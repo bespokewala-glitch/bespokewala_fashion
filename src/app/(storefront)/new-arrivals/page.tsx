@@ -21,11 +21,12 @@ export default async function NewArrivalsPage({ searchParams }: Props) {
   const searchParamsAwaited = await searchParams;
 
   return (
-    <CollectionPageContent 
-      params={{ 
-        ...searchParamsAwaited, 
-        isNewArrival: 'true'
-      }} 
+    <CollectionPageContent
+      params={{
+        ...searchParamsAwaited,
+        isNewArrival: 'true',
+        productType: 'couture'
+      }}
     />
   );
 }

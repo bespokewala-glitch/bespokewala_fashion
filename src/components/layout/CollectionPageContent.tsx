@@ -55,38 +55,55 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
   const KNOWN_OCCASIONS = ['bridal', 'cocktail', 'mehendi', 'reception', 'sangeet', 'pooja', 'festive', 'groom', 'mehandi', 'party', 'wedding'];
 
+  let finalIsNewArrival = isNewArrival === 'true';
+
+  const extractNewArrival = (val: string | undefined) => {
+    if (val?.toLowerCase() === 'new-arrivals') {
+      finalIsNewArrival = true;
+      return undefined;
+    }
+    return val;
+  };
+
+  const qCategory = extractNewArrival(category);
+  const qSubcategory = extractNewArrival(subcategory);
+  const qCollectionName = extractNewArrival(collectionName);
+  const qOccasion = extractNewArrival(occasion);
+  const qSlug2 = extractNewArrival(slug2);
+  const qSlug3 = extractNewArrival(slug3);
+
   if (productType) (productQuery as any).productType = buildInQuery(productType);
 
-  if (category && category.toLowerCase() !== 'all' && category.toLowerCase() !== 'all-products' && category.toLowerCase() !== 'all-collections') {
-    const isOccasion = KNOWN_OCCASIONS.includes(category.toLowerCase());
-    const isCollection = category.toLowerCase().includes('collection');
+  if (qCategory && qCategory.toLowerCase() !== 'all' && qCategory.toLowerCase() !== 'all-products' && qCategory.toLowerCase() !== 'all-collections') {
+    const isOccasion = KNOWN_OCCASIONS.includes(qCategory.toLowerCase());
+    const isCollection = qCategory.toLowerCase().includes('collection');
     if (isOccasion) {
-      (productQuery as any).occasion = buildInQuery(category);
+      (productQuery as any).occasion = buildInQuery(qCategory);
     } else if (isCollection) {
-      (productQuery as any).collectionName = buildInQuery(category);
+      (productQuery as any).collectionName = buildInQuery(qCategory);
     } else {
-      (productQuery as any).category = buildInQuery(category);
+      (productQuery as any).category = buildInQuery(qCategory);
     }
   }
 
-  if (subcategory && subcategory.toLowerCase() !== 'all' && subcategory.toLowerCase() !== 'all-products' && subcategory.toLowerCase() !== 'all-collections') {
-    const isOccasion = KNOWN_OCCASIONS.includes(subcategory.toLowerCase());
-    const isCollection = subcategory.toLowerCase().includes('collection');
+  if (qSubcategory && qSubcategory.toLowerCase() !== 'all' && qSubcategory.toLowerCase() !== 'all-products' && qSubcategory.toLowerCase() !== 'all-collections') {
+    const isOccasion = KNOWN_OCCASIONS.includes(qSubcategory.toLowerCase());
+    const isCollection = qSubcategory.toLowerCase().includes('collection');
     if (isOccasion) {
-      (productQuery as any).occasion = buildInQuery(subcategory);
+      (productQuery as any).occasion = buildInQuery(qSubcategory);
     } else if (isCollection) {
-      (productQuery as any).collectionName = buildInQuery(subcategory);
+      (productQuery as any).collectionName = buildInQuery(qSubcategory);
     } else {
-      (productQuery as any).subcategory = buildInQuery(subcategory);
+      (productQuery as any).subcategory = buildInQuery(qSubcategory);
     }
   }
 
-  if (collectionName) (productQuery as any).collectionName = buildInQuery(collectionName);
-  if (occasion) (productQuery as any).occasion = buildInQuery(occasion);
+  if (qCollectionName) (productQuery as any).collectionName = buildInQuery(qCollectionName);
+  if (qOccasion) (productQuery as any).occasion = buildInQuery(qOccasion);
 
-  if (slug2) {
-    const isAll = slug2.toLowerCase() === 'all' || slug2.toLowerCase() === 'all-products' || slug2.toLowerCase() === 'all-collections';
-    const slug2Query = !isAll ? buildInQuery(slug2) : undefined;
+  if (qSlug2) {
+    const isAll = qSlug2.toLowerCase() === 'all' || qSlug2.toLowerCase() === 'all-products' || qSlug2.toLowerCase() === 'all-collections';
+    const slug2Query = !isAll ? buildInQuery(qSlug2) : undefined;
     if (slug2Query) {
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
@@ -95,7 +112,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
       // slug2 unambiguously means `category`. When slug3 is absent (2-segment URL:
       // /products/[type]/[collection-or-category]), we keep the broad $or so that
       // collection pages like /products/couture/bridal-collection still work.
-      if (slug3) {
+      if (qSlug3) {
         // 3-segment URL: slug2 = category
         (productQuery as any).$and.push({ category: slug2Query });
       } else {
@@ -111,21 +128,16 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     }
   }
 
-  if (slug3) {
-    const isAll = slug3.toLowerCase() === 'all' || slug3.toLowerCase() === 'all-products' || slug3.toLowerCase() === 'all-collections';
-    const slug3Query = !isAll ? buildInQuery(slug3) : undefined;
+  if (qSlug3) {
+    const isAll = qSlug3.toLowerCase() === 'all' || qSlug3.toLowerCase() === 'all-products' || qSlug3.toLowerCase() === 'all-collections';
+    const slug3Query = !isAll ? buildInQuery(qSlug3) : undefined;
     if (slug3Query) {
       if (!(productQuery as any).$and) {
         (productQuery as any).$and = [];
       }
 
-      const KNOWN_OCCASIONS = [
-        'bridal', 'cocktail', 'mehendi', 'reception', 'sangeet', 'pooja',
-        'festive', 'groom', 'mehandi', 'party', 'wedding'
-      ];
-
-      const isOccasion = KNOWN_OCCASIONS.includes(slug3.toLowerCase());
-      const isCollection = slug3.toLowerCase().includes('collection');
+      const isOccasion = KNOWN_OCCASIONS.includes(qSlug3.toLowerCase());
+      const isCollection = qSlug3.toLowerCase().includes('collection');
 
       if (isOccasion) {
         (productQuery as any).$and.push({ occasion: slug3Query });
@@ -167,7 +179,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     }
   }
 
-  if (isNewArrival === 'true') {
+  if (finalIsNewArrival) {
     (productQuery as any).isNewArrival = true;
   }
 
