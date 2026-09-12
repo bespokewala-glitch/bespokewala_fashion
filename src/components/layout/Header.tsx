@@ -37,6 +37,9 @@ export default function Header() {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [displayCategory, setDisplayCategory] = useState<string | null>(null);
 
+  const [navLeftOffsets, setNavLeftOffsets] = useState<Record<string, number>>({});
+  const navRefs = useRef<Record<string, HTMLLIElement | null>>({});
+
   useEffect(() => {
     if (hoveredNav) setDisplayNav(hoveredNav);
     if (hoveredCategory) setDisplayCategory(hoveredCategory);
@@ -185,6 +188,14 @@ export default function Header() {
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     if (enterTimeoutRef.current) clearTimeout(enterTimeoutRef.current);
 
+    const el = navRefs.current[navId];
+    if (el) {
+      setNavLeftOffsets(prev => ({
+        ...prev,
+        [navId]: el.getBoundingClientRect().left
+      }));
+    }
+
     if (hoveredNav && hoveredNav !== navId) {
       enterTimeoutRef.current = setTimeout(() => {
         setHoveredNav(navId);
@@ -263,8 +274,8 @@ export default function Header() {
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderTop: '1px solid #eee',
     display: 'flex',
-    justifyContent: 'center',
-    padding: '0',
+    justifyContent: 'flex-start',
+    paddingLeft: hoveredNav ? `${navLeftOffsets[hoveredNav] || 64}px` : '4rem',
     opacity: hoveredNav ? 1 : 0,
     visibility: hoveredNav ? 'visible' : 'hidden',
     transform: hoveredNav ? 'translateY(0)' : 'translateY(-10px)',
@@ -274,7 +285,6 @@ export default function Header() {
 
   const menuData: Record<string, { id: string; label: string; href: string; children?: { label: string; href: string }[] }[]> = {
     couture: [
-      { id: 'new-arrivals', label: 'New Arrivals', href: '/products/couture/new-arrivals' },
       { id: 'womens', label: 'Women', href: '/products/couture/womens' },
       { id: 'mens', label: 'Men', href: '/products/couture/mens' },
     ],
@@ -369,13 +379,22 @@ export default function Header() {
           {/* Desktop Left Nav */}
           <nav className="mobile-hide" style={{ flex: 1 }}>
             <ul style={{ ...menuStyle, paddingBottom: '2rem', marginBottom: '-2rem' }} onMouseLeave={handleMouseLeaveMenu}>
-              <li onMouseEnter={() => handleMouseEnterMenu('couture')}>
+              <li 
+                ref={el => { navRefs.current['couture'] = el; }}
+                onMouseEnter={() => handleMouseEnterMenu('couture')}
+              >
                 <Link prefetch={true} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
-              <li onMouseEnter={() => handleMouseEnterMenu('footwear')}>
+              <li 
+                ref={el => { navRefs.current['footwear'] = el; }}
+                onMouseEnter={() => handleMouseEnterMenu('footwear')}
+              >
                 <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Footwear</Link>
               </li>
-              <li onMouseEnter={() => handleMouseEnterMenu('jewellery')}>
+              <li 
+                ref={el => { navRefs.current['jewellery'] = el; }}
+                onMouseEnter={() => handleMouseEnterMenu('jewellery')}
+              >
                 <Link prefetch={true} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Jewellery</Link>
               </li>
               <li onMouseEnter={() => handleMouseLeaveMenu()}>
@@ -511,8 +530,6 @@ export default function Header() {
                 <Link prefetch={true} href={item.href} onClick={() => { setHoveredNav(null); setHoveredCategory(null); }} className="menu-link-hover">
                   {item.label}
                 </Link>
-
-                {/* Jewellery now just uses the same Tertiary panel logic, remove dropdown */}
               </li>
             ))}
           </ul>
