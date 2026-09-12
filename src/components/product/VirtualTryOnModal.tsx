@@ -19,9 +19,11 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
   const [userImage, setUserImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('Creating your look...');
   const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const loadingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -71,6 +73,21 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
 
     setIsLoading(true);
     setError(null);
+    setLoadingMsg('Creating your look...');
+
+    // Progressive loading messages so the user knows we're still working
+    const messages = [
+      'Creating your look...',
+      'Analyzing your photo...',
+      'Fitting the garment...',
+      'Adding finishing touches...',
+      'Almost ready...',
+    ];
+    let msgIndex = 0;
+    loadingTimerRef.current = setInterval(() => {
+      msgIndex = Math.min(msgIndex + 1, messages.length - 1);
+      setLoadingMsg(messages[msgIndex]);
+    }, 12000); // advance message every 12 seconds
 
     try {
       const response = await fetch('/api/virtual-try-on', {
@@ -85,7 +102,13 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to start try-on process.');
+        let errorMessage = 'The try-on service is temporarily busy. Please try again in a moment.';
+        if (data.error) {
+          errorMessage = typeof data.error === 'string' ? data.error : data.error.message || JSON.stringify(data.error);
+        } else if (data.message) {
+          errorMessage = data.message;
+        }
+        throw new Error(errorMessage);
       }
 
       const jobId = data.id;
@@ -93,9 +116,17 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
         throw new Error('Invalid response from server.');
       }
 
+      // Poll with 5s interval, max 3 minutes total
       let isCompleted = false;
+      const maxWaitMs = 3 * 60 * 1000;
+      const startTime = Date.now();
+
       while (!isCompleted) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        if (Date.now() - startTime > maxWaitMs) {
+          throw new Error('The try-on is taking longer than expected. Please try again.');
+        }
 
         const pollResponse = await fetch('/api/virtual-try-on', {
           method: 'POST',
@@ -129,10 +160,15 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
           isCompleted = true;
           throw new Error(pollData.error?.message || 'Virtual Try-On failed.');
         }
+        // status: queued | processing → keep polling
       }
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred.');
     } finally {
+      if (loadingTimerRef.current) {
+        clearInterval(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
       setIsLoading(false);
     }
   };
@@ -320,9 +356,10 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
           {isLoading ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', gap: '16px' }}>
               <div className="vto-spinner" />
-              <p style={{ margin: 0, color: '#666', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Creating your look...
+              <p style={{ margin: 0, color: '#666', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', transition: 'opacity 0.4s' }}>
+                {loadingMsg}
               </p>
+              <p style={{ margin: 0, color: '#bbb', fontSize: '0.72rem' }}>This may take up to a minute</p>
             </div>
           ) : generatedImage ? (
             /* Result State */
