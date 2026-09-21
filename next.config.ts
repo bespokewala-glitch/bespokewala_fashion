@@ -12,14 +12,9 @@ const nextConfig: NextConfig = {
   // API route's serverless bundle. Without this, faq-kb.json and
   // faq-embeddings.json are absent at runtime on Vercel and the chatbot falls
   // back to the error response on every cold start.
-  experimental: {
-    // outputFileTracingIncludes is present in Next.js 16 config-shared.d.ts:1246
-    // but the IDE's narrower ExperimentalConfig view raises a false positive.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error: valid Next.js 16 experimental option
-    outputFileTracingIncludes: {
-      '/api/chatbot': ['./data/**/*'],
-    },
+  // NOTE: In Next.js 16, this moved OUT of `experimental` to the top level.
+  outputFileTracingIncludes: {
+    '/api/chatbot': ['./data/**/*'],
   },
 
   // ── Redirects ───────────────────────────────────────────────────────────────
