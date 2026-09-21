@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { pipeline } from '@xenova/transformers';
 import { FAQEntry } from './matchKeyword';
 
 let extractor: any = null;
@@ -8,10 +7,16 @@ let cachedEmbeddings: Record<string, number[]> = {};
 
 const EMBEDDINGS_FILE = path.join(process.cwd(), 'data', 'faq-embeddings.json');
 
-// Initialize the embedding model
+// Initialize the embedding model — uses a DYNAMIC import so that if the
+// @xenova/transformers native binary is missing (e.g. Vercel serverless),
+// the module-load itself succeeds and only the function call throws.
+// The try/catch in router.ts will then fall through to the LLM tier.
 async function getExtractor() {
   if (!extractor) {
-    // Dynamic import to avoid next.js build issues with top-level await/transformers
+    // Dynamic import — only attempted when this function is actually called.
+    // On Vercel, onnxruntime native binaries are absent; the import will throw
+    // and the caller (router.ts) catches it and falls through to LLM.
+    const { pipeline } = await import('@xenova/transformers');
     extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
       quantized: true, // Use quantized for faster CPU inference
     });

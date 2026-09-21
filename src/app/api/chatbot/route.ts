@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// Give Vercel 30 s on the chatbot route (default is 10 s).
+// The LLM call + cold-start overhead can exceed 10 s.
+export const maxDuration = 30;
+
 import { cookies } from 'next/headers';
+
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import Order from '@/models/Order';
@@ -520,7 +526,8 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Chatbot API] Error:', error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('[Chatbot API] Unhandled error:', errMsg);
     return NextResponse.json({
       text: "I apologise — I'm having a brief moment. Please try again, or contact us on WhatsApp at +91 75067 67452 for immediate assistance.",
       products: [],

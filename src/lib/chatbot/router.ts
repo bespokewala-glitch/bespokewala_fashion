@@ -50,24 +50,33 @@ export async function getResponse(
   }
 
   // 3. Tier 2 - Embedding Matcher
+  // NOTE: @xenova/transformers requires downloading a ML model at runtime.
+  // On Vercel serverless this times out. We gracefully fall through to the
+  // LLM if the embedding tier fails — never return an error to the user.
+  let allMatches: FAQEntry[] = faqList; // default: give LLM all FAQs as context
   try {
-    const { topMatch, allMatches } = await matchByEmbedding(userMessage, faqList);
-    if (topMatch) {
+    const result = await matchByEmbedding(userMessage, faqList);
+    if (result.topMatch) {
       return {
-        text: topMatch.answer,
+        text: result.topMatch.answer,
         tier: 'tier2'
       };
     }
+    allMatches = result.allMatches;
+  } catch (embeddingError) {
+    console.warn('[router] Embedding tier failed, falling through to LLM:', embeddingError);
+    // allMatches stays as full faqList — LLM still gets FAQ context
+  }
 
-    // 4. Tier 3 - LLM Fallback
+  // 4. Tier 3 - LLM Fallback
+  try {
     const llmAnswer = await answerWithLLM(userMessage, conversationHistory, allMatches);
     return {
       text: llmAnswer,
       tier: 'tier3'
     };
-  } catch (error) {
-    console.error("Error in getResponse embedding/llm tier:", error);
-    // Fallback if embedding or LLM fails
+  } catch (llmError) {
+    console.error('[router] LLM tier failed:', llmError);
     return {
       text: "I'm having trouble retrieving information right now. Please connect with our styling team on WhatsApp at +91 75067 67452.",
       tier: 'error'
