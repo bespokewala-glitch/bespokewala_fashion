@@ -24,6 +24,8 @@ interface CartContextType {
   openMiniCart: () => void;
   closeMiniCart: () => void;
   resetCartState: () => void;
+  isAuthenticated: boolean;
+  isLoaded: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -61,7 +63,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const res = await fetch('/api/cart', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          setCart(data.items || []);
+          let currentCart = data.items || [];
+          
+          // Check for pending cart action from guest Add to Cart
+          const pendingAction = localStorage.getItem('pending_cart_action');
+          if (pendingAction) {
+            try {
+              const pendingItem = JSON.parse(pendingAction);
+              const existingItemIndex = currentCart.findIndex((item: CartItem) => item.id === pendingItem.id);
+              if (existingItemIndex > -1) {
+                currentCart[existingItemIndex].quantity += pendingItem.quantity;
+              } else {
+                currentCart.push(pendingItem);
+              }
+              localStorage.removeItem('pending_cart_action');
+              // Sync the newly merged cart to the backend immediately
+              await fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: currentCart })
+              });
+            } catch (err) {
+              console.error('Failed to parse pending cart action', err);
+            }
+          }
+          
+          setCart(currentCart);
           setIsAuthenticated(true);
         } else {
           // Guest user, 401 Unauthorized
@@ -135,7 +162,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <CartContext.Provider value={{
       cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal,
-      isMiniCartOpen, openMiniCart, closeMiniCart, resetCartState
+      isMiniCartOpen, openMiniCart, closeMiniCart, resetCartState, isAuthenticated, isLoaded
     }}>
       {children}
     </CartContext.Provider>

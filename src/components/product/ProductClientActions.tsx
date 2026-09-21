@@ -25,7 +25,7 @@ interface ProductClientActionsProps {
 }
 
 export default function ProductClientActions({ product }: ProductClientActionsProps) {
-  const { addToCart, openMiniCart } = useCart();
+  const { addToCart, openMiniCart, isAuthenticated, isLoaded } = useCart();
   const SIZES_ORDER = [
     'EU 35', 'EU 35½', 'EU 36', 'EU 36½', 'EU 37', 'EU 37½', 'EU 38', 'EU 38½', 'EU 39', 'EU 39½', 'EU 40', 'EU 40½', 'EU 41', 'EU 41½', 'EU 42', 'EU 42½', 'EU 43', 'EU 44', 'EU 45',
     'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'
@@ -55,7 +55,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
 
   const handleAddToCart = () => {
     setIsAdding(true);
-    addToCart({
+    const cartItem = {
       id: `${product.slug}-${selectedSize || 'default'}`,
       productSlug: product.slug,
       name: product.name,
@@ -63,7 +63,15 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       image: normalizeImageUrl(product.images?.[0] || ''),
       quantity,
       size: selectedSize || undefined,
-    });
+    };
+
+    if (isLoaded && !isAuthenticated) {
+      localStorage.setItem('pending_cart_action', JSON.stringify(cartItem));
+      window.location.href = '/login?redirect=/cart';
+      return;
+    }
+
+    addToCart(cartItem);
     
     // Track AddToCart event (Meta Pixel)
     fbEvent('AddToCart', {
