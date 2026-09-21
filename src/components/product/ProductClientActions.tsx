@@ -47,7 +47,9 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const [isAdding, setIsAdding] = useState(false);
   const [isVirtualTryOnOpen, setIsVirtualTryOnOpen] = useState(false);
 
-  const productUrl = typeof window !== 'undefined' ? window.location.href : '';
+  // Fix hydration mismatch by generating the URL deterministically
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  const productUrl = `${siteUrl}/products/${product.slug}`;
   const isCouture = product.productType?.toLowerCase() === 'couture';
   const whatsappNumber = '91750676986';
   const whatsappMessage = encodeURIComponent(`Hi, I would like to know more about this product.\n\nProduct: ${product.name}\nProduct URL: ${productUrl}`);

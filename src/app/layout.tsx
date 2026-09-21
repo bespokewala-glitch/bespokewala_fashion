@@ -5,8 +5,10 @@ import "./responsive.css";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { CookieConsentProvider } from "@/context/CookieConsentContext";
 import MetaPixel from "@/components/MetaPixel";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieBanner from "@/components/CookieConsent/CookieBanner";
 
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
@@ -51,13 +53,16 @@ export default function RootLayout({
       <body>
         <MetaPixel />
         <GoogleAnalytics />
-        <CurrencyProvider>
-          <WishlistProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
-          </WishlistProvider>
-        </CurrencyProvider>
+        <CookieConsentProvider>
+          <CurrencyProvider>
+            <WishlistProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
+            </WishlistProvider>
+          </CurrencyProvider>
+          <CookieBanner />
+        </CookieConsentProvider>
       </body>
     </html>
   );

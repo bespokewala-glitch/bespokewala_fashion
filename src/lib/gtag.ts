@@ -10,7 +10,18 @@
  * re-renders, back-navigation, or React StrictMode double-invoke.
  */
 
+import { readConsent } from '@/lib/consentManager';
+
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
+
+/**
+ * Returns true when the user has explicitly granted analytics consent.
+ * Falls back to false (deny by default) if no decision has been made.
+ */
+function isAnalyticsConsented(): boolean {
+  const c = readConsent();
+  return c?.decided === true && c?.analytics === true;
+}
 
 // ─── Type declarations ────────────────────────────────────────────────────────
 
@@ -37,6 +48,7 @@ export interface GA4Item {
 /** Fire a GA4 page_view event. Called on SPA route changes. */
 export const pageview = (url: string): void => {
   if (typeof window === 'undefined' || !window.gtag || !GA_MEASUREMENT_ID) return;
+  if (!isAnalyticsConsented()) return; // consent guard
   window.gtag('config', GA_MEASUREMENT_ID, {
     page_path: url,
   });
@@ -45,6 +57,7 @@ export const pageview = (url: string): void => {
 /** Fire any GA4 event. */
 export const event = (action: string, params: Record<string, any> = {}): void => {
   if (typeof window === 'undefined' || !window.gtag || !GA_MEASUREMENT_ID) return;
+  if (!isAnalyticsConsented()) return; // consent guard
   window.gtag('event', action, params);
 };
 

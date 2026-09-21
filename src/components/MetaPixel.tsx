@@ -3,6 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { readConsent } from "@/lib/consentManager";
 
 // Extend window object for fbq
 declare global {
@@ -21,6 +22,8 @@ export const pageview = () => {
 };
 
 // Custom event helper for browser-side pixel
+// Guards on window.fbq — if Pixel was not loaded (marketing consent denied),
+// fbq will be undefined and this is a safe no-op.
 export const event = (name: string, options = {}, eventIdData?: { eventID: string }) => {
   if (typeof window !== "undefined" && window.fbq) {
     if (eventIdData) {
@@ -36,16 +39,29 @@ function MetaPixelInner() {
   const searchParams = useSearchParams();
   const [loaded, setLoaded] = useState(false);
 
+  // Consent gate — only render the Pixel script when marketing consent is granted.
+  // On first render (SSR / initial mount), read from localStorage.
+  // If consent was not granted, return null — the Pixel script is never injected.
+  const [marketingConsented, setMarketingConsented] = useState(false);
+
+  useEffect(() => {
+    const saved = readConsent();
+    if (saved && saved.marketing) {
+      setMarketingConsented(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (!FB_PIXEL_ID) return;
-
-    // This ensures PageView fires on route changes
+    // Fire PageView on subsequent SPA route changes (not on the initial load —
+    // that is handled by the fbq('track', 'PageView') inside the Script block).
     if (loaded) {
       pageview();
     }
   }, [pathname, searchParams, loaded]);
 
-  if (!FB_PIXEL_ID) {
+  if (!FB_PIXEL_ID || !marketingConsented) {
+    // Do not inject the Pixel script until the user grants marketing consent.
     return null;
   }
 
