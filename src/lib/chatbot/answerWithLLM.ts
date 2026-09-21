@@ -38,7 +38,7 @@ ${faqContextText || 'No specific FAQ context available for this query.'}`;
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.0-flash',
       systemInstruction,
       safetySettings: [
         { category: HarmCategory.HARM_CATEGORY_HARASSMENT,        threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
