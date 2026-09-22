@@ -289,7 +289,14 @@ export default async function AccountDashboardPage() {
                       </div>
                       <div>
                         <span style={{ fontSize: '0.7rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '0.5rem' }}>Total</span>
-                        <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#000' }}>₹{order.total?.toLocaleString('en-IN')}</span>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 400, color: '#000' }}>
+                          {order.displayCurrency && order.displayTotal
+                            ? new Intl.NumberFormat(
+                                order.displayCurrency === 'INR' ? 'en-IN' : 'en-US',
+                                { style: 'currency', currency: order.displayCurrency, maximumFractionDigits: 0 }
+                              ).format(order.displayTotal)
+                            : `₹${order.total?.toLocaleString('en-IN')}`}
+                        </span>
                       </div>
                       <div>
                         <span style={{ fontSize: '0.7rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '0.5rem' }}>Order ID</span>

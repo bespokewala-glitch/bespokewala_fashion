@@ -7,6 +7,7 @@ import { Search, X, ArrowRight } from 'lucide-react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import { event as fbEvent } from '@/components/MetaPixel';
 import { trackSearch } from '@/lib/gtag';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const ALL_SUGGESTIONS = [
   'lehenga', 'bridal lehenga', 'red bridal lehenga', 'designer lehenga', 'wedding lehenga', 'lehenga set', 'lehengas',
@@ -22,6 +23,7 @@ interface SearchOverlayProps {
 }
 
 function SearchOverlayInner({ isOpen, onClose }: SearchOverlayProps) {
+  const { formatPrice } = useCurrency();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -209,7 +211,7 @@ function SearchOverlayInner({ isOpen, onClose }: SearchOverlayProps) {
                         </div>
                         <div className="result-info" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                           <h4 style={{ fontSize: '0.9rem', fontWeight: 400, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.name}</h4>
-                          <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 500 }}>₹{product.price.toLocaleString('en-IN')}</p>
+                          <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 500 }}>{formatPrice(product.price)}</p>
                         </div>
                       </Link>
                     ))}

@@ -58,7 +58,7 @@ export default function CheckoutClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { formatPrice, currency } = useCurrency();
+  const { formatPrice, currency, rates } = useCurrency();
   const subtotal = cartTotal;
   const shippingCost: number = 0; // subtotal > 10000 ? 0 : 500;
   const total = subtotal + shippingCost;
@@ -296,6 +296,8 @@ export default function CheckoutClient() {
                     size: item.size,
                   })),
                   shippingDetails: finalShippingDetails,
+                  displayCurrency: currency,
+                  exchangeRate: rates[currency] || 1,
                 }),
               });
               const verifyData = await verifyRes.json();

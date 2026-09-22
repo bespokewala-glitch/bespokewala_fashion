@@ -30,6 +30,11 @@ export interface IOrder extends Document {
   subtotal: number;
   shippingCost: number;
   total: number;
+  displayCurrency?: string;
+  exchangeRate?: number;
+  displaySubtotal?: number;
+  displayShippingCost?: number;
+  displayTotal?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -65,6 +70,11 @@ const OrderSchema = new Schema(
     subtotal: { type: Number, required: true },
     shippingCost: { type: Number, required: true },
     total: { type: Number, required: true },
+    displayCurrency: { type: String },
+    exchangeRate: { type: Number },
+    displaySubtotal: { type: Number },
+    displayShippingCost: { type: Number },
+    displayTotal: { type: Number },
   },
   { timestamps: true }
 );

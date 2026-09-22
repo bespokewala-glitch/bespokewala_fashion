@@ -30,6 +30,8 @@ interface OrderDetailProps {
       country?: string;
       phone?: string;
     };
+    displayCurrency?: string;
+    displayTotal?: number;
     items: OrderItem[];
   };
 }
@@ -161,7 +163,11 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
             <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid #eee' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                 <span style={{ color: '#666', fontSize: '0.85rem' }}>Subtotal</span>
-                <span style={{ color: '#000', fontSize: '0.85rem', fontWeight: 500 }}>{formatPrice(order.total)}</span>
+                <span style={{ color: '#000', fontSize: '0.85rem', fontWeight: 500 }}>
+                  {order.displayCurrency && order.displayTotal
+                    ? new Intl.NumberFormat(order.displayCurrency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: order.displayCurrency, maximumFractionDigits: 0 }).format(order.displayTotal)
+                    : formatPrice(order.total)}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                 <span style={{ color: '#666', fontSize: '0.85rem' }}>Shipping</span>
@@ -169,7 +175,11 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #eee' }}>
                 <span style={{ color: '#000', fontSize: '1rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Total</span>
-                <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 600 }}>{formatPrice(order.total)}</span>
+                <span style={{ color: '#000', fontSize: '1.2rem', fontWeight: 600 }}>
+                  {order.displayCurrency && order.displayTotal
+                    ? new Intl.NumberFormat(order.displayCurrency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: order.displayCurrency, maximumFractionDigits: 0 }).format(order.displayTotal)
+                    : formatPrice(order.total)}
+                </span>
               </div>
             </div>
           </div>

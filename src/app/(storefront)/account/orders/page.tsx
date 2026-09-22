@@ -30,6 +30,8 @@ export default async function OrderHistoryPage() {
     _id: o._id.toString(),
     createdAt: o.createdAt ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
     total: o.total || 0,
+    displayCurrency: o.displayCurrency,
+    displayTotal: o.displayTotal,
     orderStatus: o.orderStatus || 'pending',
     shippingDetails: o.shippingDetails ? {
       firstName: o.shippingDetails.firstName || '',

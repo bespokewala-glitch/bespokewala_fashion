@@ -10,6 +10,7 @@ import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
 import { Menu, X, ShoppingBag, User, Heart, Search } from 'lucide-react';
 
 import SearchOverlay from '@/components/layout/SearchOverlay';
+import CurrencySelector from '@/components/layout/CurrencySelector';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -432,6 +433,9 @@ export default function Header() {
             >
               <Search size={20} color="#1c1c1c" />
             </button>
+            <div className="touch-target" style={{ display: 'flex', alignItems: 'center', marginRight: '4px', color: '#1c1c1c' }}>
+              <CurrencySelector />
+            </div>
             <Link
               href="/wishlist"
               className="touch-target"
@@ -465,8 +469,9 @@ export default function Header() {
           {/* Desktop Right Nav */}
           <nav className="mobile-hide" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
             <ul style={{ ...menuStyle, alignItems: 'center', gap: '1.5rem' }}>
-
-              
+              <li>
+                <CurrencySelector />
+              </li>
               {/* Text Links */}
               {user && user.role === 'admin' && (
                 <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChatMessage as ChatMessageType } from './ChatbotWidget';
 import ChatProductCard from './ChatProductCard';
 import { SUPPORT_CONTACTS } from '@/lib/chatbot/faqData';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -85,6 +86,7 @@ function RenderText({ text }: { text: string }) {
 }
 
 export default function ChatMessage({ message, onQuickReply, onClose }: ChatMessageProps) {
+  const { formatPrice } = useCurrency();
   const isUser = message.role === 'user';
   const isTyping = message.isTyping;
 
@@ -143,7 +145,7 @@ export default function ChatMessage({ message, onQuickReply, onClose }: ChatMess
               </span>
             </div>
             <div style={{ fontSize: '0.75rem', color: '#5a4e47', marginBottom: '0.4rem' }}>
-              {message.orderInfo.itemCount} item{message.orderInfo.itemCount !== 1 ? 's' : ''} · ₹{message.orderInfo.total?.toLocaleString('en-IN')}
+              {message.orderInfo.itemCount} item{message.orderInfo.itemCount !== 1 ? 's' : ''} · {formatPrice(message.orderInfo.total || 0)}
               {message.orderInfo.shippingCost === 0 && <span style={{ color: '#4ade80', marginLeft: '0.3rem', fontSize: '0.65rem' }}>· Free Shipping</span>}
             </div>
             {message.orderInfo.shippingCity && (

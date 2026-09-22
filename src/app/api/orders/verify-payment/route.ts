@@ -26,6 +26,8 @@ export async function POST(request: Request) {
       razorpaySignature,
       items,
       shippingDetails,
+      displayCurrency,
+      exchangeRate,
     } = body;
 
     if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
@@ -99,6 +101,11 @@ export async function POST(request: Request) {
       subtotal: calculatedSubtotal,
       shippingCost: calculatedShipping,
       total: calculatedTotal,
+      displayCurrency: displayCurrency || "INR",
+      exchangeRate: exchangeRate || 1,
+      displaySubtotal: calculatedSubtotal * (exchangeRate || 1),
+      displayShippingCost: calculatedShipping * (exchangeRate || 1),
+      displayTotal: calculatedTotal * (exchangeRate || 1),
     });
 
     // --- META CONVERSIONS API: Purchase Event ---

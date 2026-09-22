@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ChatProduct } from './ChatbotWidget';
 import { useWishlist } from '@/context/WishlistContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface ChatProductCardProps {
   product: ChatProduct;
@@ -24,6 +25,7 @@ function formatImageUrl(url: string | undefined): string | null {
 
 export default function ChatProductCard({ product, onShowSimilar, onClose }: ChatProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { formatPrice } = useCurrency();
   const inWishlist = isInWishlist(product.slug);
   const [wishlistAnimating, setWishlistAnimating] = useState(false);
 
@@ -128,9 +130,9 @@ export default function ChatProductCard({ product, onShowSimilar, onClose }: Cha
           <div className="chatbot-product-cat">{product.category || product.productType}</div>
           <div className="chatbot-product-name">{product.name}</div>
           <div className="chatbot-product-price">
-            ₹{product.price?.toLocaleString('en-IN')}
+            {formatPrice(product.price || 0)}
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className="chatbot-product-original">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+              <span className="chatbot-product-original">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
         </div>

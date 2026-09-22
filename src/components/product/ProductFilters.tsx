@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { X, Filter, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface ProductFiltersProps {
   totalCount: number;
@@ -21,6 +22,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const { currencyDetail, formatPrice, rates, currency } = useCurrency();
 
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -117,8 +119,14 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
   const handlePriceSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
-    const min = (form.elements.namedItem('minPrice') as HTMLInputElement).value;
-    const max = (form.elements.namedItem('maxPrice') as HTMLInputElement).value;
+    let min = (form.elements.namedItem('minPrice') as HTMLInputElement).value;
+    let max = (form.elements.namedItem('maxPrice') as HTMLInputElement).value;
+
+    const rate = rates[currency] || 1;
+    
+    // Convert local currency input back to INR for filtering
+    if (min) min = Math.round(Number(min) / rate).toString();
+    if (max) max = Math.round(Number(max) / rate).toString();
 
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     if (min) current.set('minPrice', min); else current.delete('minPrice');
@@ -248,7 +256,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                     if (['page', 'sort', 'q'].includes(key)) return null;
                     return (
                       <button key={`${key}-${value}`} className="filter-chip" onClick={() => updateFilter(key, null)}>
-                        {key === 'minPrice' ? `Min: ₹${value}` : key === 'maxPrice' ? `Max: ₹${value}` : value}
+                        {key === 'minPrice' ? `Min: ${formatPrice(Number(value))}` : key === 'maxPrice' ? `Max: ${formatPrice(Number(value))}` : value}
                         <X size={14} />
                       </button>
                     );
@@ -444,12 +452,12 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                   <form onSubmit={handlePriceSubmit} className="price-filter-form">
                     <div className="price-inputs">
                       <div className="price-input-wrapper">
-                        <span>₹</span>
-                        <input type="number" name="minPrice" placeholder="MIN" defaultValue={activeMinPrice} />
+                        <span>{currencyDetail.symbol}</span>
+                        <input type="number" name="minPrice" placeholder="MIN" defaultValue={activeMinPrice ? Math.round(Number(activeMinPrice) * (rates[currency] || 1)) : ''} />
                       </div>
                       <div className="price-input-wrapper">
-                        <span>₹</span>
-                        <input type="number" name="maxPrice" placeholder="MAX" defaultValue={activeMaxPrice} />
+                        <span>{currencyDetail.symbol}</span>
+                        <input type="number" name="maxPrice" placeholder="MAX" defaultValue={activeMaxPrice ? Math.round(Number(activeMaxPrice) * (rates[currency] || 1)) : ''} />
                       </div>
                     </div>
                     <button type="submit" className="price-submit-btn">Apply</button>

@@ -34,6 +34,8 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
     _id: orderDoc._id.toString(),
     createdAt: orderDoc.createdAt ? new Date(orderDoc.createdAt).toISOString() : new Date().toISOString(),
     total: orderDoc.total || 0,
+    displayCurrency: orderDoc.displayCurrency,
+    displayTotal: orderDoc.displayTotal,
     orderStatus: orderDoc.orderStatus || 'pending',
     shippingDetails: orderDoc.shippingDetails ? {
       firstName: orderDoc.shippingDetails.firstName || '',

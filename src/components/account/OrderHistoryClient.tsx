@@ -22,6 +22,8 @@ interface OrderData {
     firstName?: string;
     lastName?: string;
   };
+  displayCurrency?: string;
+  displayTotal?: number;
   items: OrderItem[];
 }
 
@@ -184,7 +186,11 @@ export default function OrderHistoryClient({ orders }: { orders: OrderData[] }) 
                   </div>
                   <div>
                     <span style={{ fontSize: '0.65rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '0.35rem' }}>Total</span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#000' }}>{formatPrice(order.total)}</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#000' }}>
+                      {order.displayCurrency && order.displayTotal
+                        ? new Intl.NumberFormat(order.displayCurrency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: order.displayCurrency, maximumFractionDigits: 0 }).format(order.displayTotal)
+                        : formatPrice(order.total)}
+                    </span>
                   </div>
                   <div>
                     <span style={{ fontSize: '0.65rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '0.35rem' }}>Ship To</span>
