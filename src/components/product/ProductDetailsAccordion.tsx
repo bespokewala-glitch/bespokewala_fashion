@@ -146,12 +146,12 @@ export default function ProductDetailsAccordion({
             </>
           ) : isCouture ? (
             <>
-              • <strong>Couture Delivery:</strong> 40 to 50 days for handcrafted creation &amp; delivery.{"\n"}
+              • <strong>Couture Delivery:</strong> 40–50 days for handcrafted creation &amp; delivery.{"\n"}
             </>
           ) : (
             <>
               • <strong>Footwear Delivery:</strong> 15 to 20 days.{"\n"}
-              • <strong>Couture &amp; Bespoke:</strong> 40 to 50 days for handcrafted creation &amp; delivery.{"\n"}
+              • <strong>Couture &amp; Bespoke:</strong> 40–50 days for handcrafted creation &amp; delivery.{"\n"}
               • <strong>Standard Shipping:</strong> 3–7 days.{"\n"}
             </>
           )}

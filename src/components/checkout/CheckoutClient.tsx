@@ -563,7 +563,7 @@ export default function CheckoutClient() {
           <div style={{ padding: "1rem", backgroundColor: "#fff", border: "1px solid #e0e0e0", borderLeft: "3px solid #d2b48c", marginBottom: "1.5rem", fontSize: "0.78rem", color: "#555", lineHeight: 1.6 }}>
             <div style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.3rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>⏱️ Estimated Delivery Timelines:</div>
             • <strong>Footwear Collection:</strong> 15 to 20 Days<br />
-            • <strong>Couture &amp; Bespoke:</strong> 40 to 50 Days<br />
+            • <strong>Couture &amp; Bespoke:</strong> 40–50 days<br />
             • <strong>Standard Ready-to-Wear:</strong> 3–7 days
           </div>
 

@@ -218,7 +218,7 @@ export default function ShippingPageContent() {
               </div>
               <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
                 <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>👑 Couture &amp; Bespoke</p>
-                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Handcrafted couture created &amp; delivered in <strong>40 to 50 Days</strong>.</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Handcrafted couture created &amp; delivered in <strong>40–50 days</strong>.</p>
               </div>
               <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
                 <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>✨ Accessories &amp; Jewellery</p>
@@ -361,7 +361,7 @@ export default function ShippingPageContent() {
           </div>
 
           <p style={{ textAlign: "center", fontSize: "0.8rem", color: "#888", marginTop: "3rem" }}>
-            ✦ &nbsp; Ready-to-wear orders are processed within <strong style={{ color: "#d2b48c" }}>1–2 business days</strong>. Footwear shipping takes <strong style={{ color: "#d2b48c" }}>15-20 days</strong>. Couture and bespoke orders take <strong style={{ color: "#d2b48c" }}>40-50 days</strong> for production and delivery.
+            ✦ &nbsp; Ready-to-wear orders are processed within <strong style={{ color: "#d2b48c" }}>1–2 business days</strong>. Footwear shipping takes <strong style={{ color: "#d2b48c" }}>15-20 days</strong>. Couture and bespoke orders take <strong style={{ color: "#d2b48c" }}>40–50 days</strong> for production and delivery.
           </p>
         </div>
       </section>
@@ -510,7 +510,7 @@ export default function ShippingPageContent() {
           {[
             {
               q: "When will my order be dispatched?",
-              a: "Ready-to-wear orders are dispatched within 1–2 business days. Footwear shipping takes 15-20 days. Couture or bespoke orders require 40-50 days for creation and delivery. You will receive a dispatch notification via SMS and email.",
+              a: "Ready-to-wear orders are dispatched within 1–2 business days. Footwear shipping takes 15-20 days. Couture or bespoke orders require 40–50 days for creation and delivery. You will receive a dispatch notification via SMS and email.",
             },
             {
               q: "Can I change my delivery address after placing an order?",

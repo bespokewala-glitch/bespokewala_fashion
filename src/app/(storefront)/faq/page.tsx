@@ -12,7 +12,7 @@ export const metadata = generateStaticPageMetadata(
 const FAQ_ITEMS = [
   {
     question: 'How long does shipping take within India?',
-    answer: 'Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days, and for Couture, shipping time is 40-50 days.'
+    answer: 'Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days, and for Couture, shipping time is 40–50 days.'
   },
   {
     question: 'Do you offer custom or bespoke orders?',

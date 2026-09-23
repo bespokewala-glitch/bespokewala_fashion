@@ -103,7 +103,7 @@ const CATEGORIES = [
     faqs: [
       {
         q: "How long does delivery take?",
-        a: "Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40-50 days. International delivery takes an additional 7-10 business days after dispatch.",
+        a: "Standard shipping within India takes 3-7 days. Footwear typically takes 15-20 days. Couture, gowns, and bespoke lehengas take 40–50 days. International delivery takes an additional 7-10 business days after dispatch.",
       },
       {
         q: "Do you offer free shipping?",

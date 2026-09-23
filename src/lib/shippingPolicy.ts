@@ -10,7 +10,7 @@ export function getShippingEstimate(productType?: string, category?: string, sub
   }
   
   if (combined.includes('couture') || combined.includes('lehenga') || combined.includes('gown')) {
-    return '40-50 days';
+    return '40–50 days';
   }
 
   // Default standard shipping for ready-to-wear / accessories

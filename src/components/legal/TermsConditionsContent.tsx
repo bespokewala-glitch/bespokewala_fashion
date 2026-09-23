@@ -213,7 +213,7 @@ export default function TermsConditionsContent() {
                 <p>We ship across India and internationally. Standard delivery timelines by product category are as follows:</p>
                 <ul>
                   <li><strong>Footwear Collection:</strong> 15 to 20 days for custom crafting and delivery.</li>
-                  <li><strong>Couture &amp; Bespoke Garments:</strong> 40 to 50 days for handcrafted creation and delivery.</li>
+                  <li><strong>Couture &amp; Bespoke Garments:</strong> 40–50 days for handcrafted creation and delivery.</li>
                   <li><strong>Ready-to-Wear &amp; Accessories:</strong> 3–7 days.</li>
                   <li>Risk of loss passes to you upon delivery to the carrier.</li>
                   <li>If you are unavailable at delivery, the courier will attempt re-delivery up to 3 times. Unclaimed packages may be returned to us and re-shipping charges will apply.</li>
