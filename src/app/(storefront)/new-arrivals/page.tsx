@@ -25,7 +25,6 @@ export default async function NewArrivalsPage({ searchParams }: Props) {
       params={{
         ...searchParamsAwaited,
         isNewArrival: 'true',
-        productType: 'couture'
       }}
     />
   );

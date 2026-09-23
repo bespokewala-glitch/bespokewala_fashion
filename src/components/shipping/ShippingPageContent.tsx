@@ -218,7 +218,7 @@ export default function ShippingPageContent() {
               </div>
               <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
                 <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>👑 Couture &amp; Bespoke</p>
-                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Handcrafted couture created &amp; delivered in <strong>40 to 45 Days</strong>.</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Handcrafted couture created &amp; delivered in <strong>40 to 50 Days</strong>.</p>
               </div>
               <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
                 <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>✨ Accessories &amp; Jewellery</p>
@@ -276,7 +276,7 @@ export default function ShippingPageContent() {
                 <tr>
                   <td><strong>South Asia</strong></td>
                   <td>UAE, Saudi Arabia, Qatar, Bahrain, Kuwait, Oman</td>
-                  <td>₹1,200 &nbsp;|&nbsp; Free above ₹75,000</td>
+                  <td>₹1,200 &nbsp;|&nbsp; Free above ₹1,00,000</td>
                   <td>5–8 business days</td>
                 </tr>
                 <tr>
