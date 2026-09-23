@@ -152,7 +152,7 @@ export default function ProductDetailsAccordion({
             <>
               • <strong>Footwear Delivery:</strong> 15 to 20 days.{"\n"}
               • <strong>Couture &amp; Bespoke:</strong> 40 to 50 days for handcrafted creation &amp; delivery.{"\n"}
-              • <strong>Standard Shipping:</strong> 3-7 business days.{"\n"}
+              • <strong>Standard Shipping:</strong> 3–7 days.{"\n"}
             </>
           )}
         </div>

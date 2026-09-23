@@ -70,7 +70,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'Is shipping free?',
-        answer: 'Yes! We offer free standard shipping on all orders above ₹10,000 within India. Orders below ₹10,000 attract a flat ₹500 shipping fee.',
+        answer: 'Yes! We offer free standard shipping on all orders above ₹15,000 within India. Orders below ₹15,000 attract a flat ₹199 shipping fee.',
         keywords: ['free shipping', 'shipping cost', 'delivery charge', 'shipping fee'],
       },
       {

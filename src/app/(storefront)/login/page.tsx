@@ -126,9 +126,42 @@ function LoginContent() {
   );
 }
 
+// Static shell rendered during SSR — identical structure to LoginContent.
+// Avoids the "Loading..." flash while the client component hydrates.
+function LoginShell() {
+  return (
+    <div className="auth-page-wrapper">
+      <div className="auth-container">
+        <div className="auth-header">
+          <div className="auth-brand">Bespokewala</div>
+          <h1 className="auth-title">Login</h1>
+          <p className="auth-subtitle">Access your account</p>
+          <div className="auth-divider"></div>
+        </div>
+        <div className="auth-form">
+          <div className="auth-input-group">
+            <label className="auth-label">Email Address or Mobile Number</label>
+            <input type="text" className="auth-input" readOnly />
+          </div>
+          <div className="auth-input-group">
+            <label className="auth-label">Password</label>
+            <div style={{ position: 'relative' }}>
+              <input type="password" className="auth-input" readOnly style={{ paddingRight: '2.5rem' }} />
+            </div>
+          </div>
+          <button type="button" className="auth-button">SIGN IN</button>
+        </div>
+        <a href="/register" className="auth-footer-link">
+          Don&apos;t have an account? <span>Register</span>
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
+    <Suspense fallback={<LoginShell />}>
       <LoginContent />
     </Suspense>
   );

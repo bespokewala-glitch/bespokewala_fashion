@@ -184,7 +184,7 @@ export default function ShippingPageContent() {
               <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#4caf7d", marginBottom: "0.5rem", fontWeight: 600 }}>Free Delivery</p>
               <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹0</p>
               <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>On orders above ₹15,000</p>
-              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>5–7 business days</strong></p>
+              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>3–7 days</strong></p>
             </div>
 
             {/* Standard */}
@@ -193,7 +193,7 @@ export default function ShippingPageContent() {
               <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "0.5rem", fontWeight: 600 }}>Standard Shipping</p>
               <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹199</p>
               <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>Orders below ₹15,000</p>
-              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>5–7 business days</strong></p>
+              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>3–7 days</strong></p>
             </div>
 
             {/* Express */}
@@ -222,7 +222,7 @@ export default function ShippingPageContent() {
               </div>
               <div style={{ padding: "1.25rem", backgroundColor: "#faf9f7", borderLeft: "4px solid #d2b48c" }}>
                 <p style={{ fontWeight: 600, color: "#1c1c1c", marginBottom: "0.35rem", fontSize: "0.9rem" }}>✨ Accessories &amp; Jewellery</p>
-                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Ready-to-wear pieces dispatched &amp; delivered in <strong>5 to 7 Business Days</strong>.</p>
+                <p style={{ fontSize: "0.85rem", color: "#555", margin: 0, lineHeight: 1.6 }}>Ready-to-wear pieces dispatched &amp; delivered in <strong>3–7 days</strong>.</p>
               </div>
             </div>
           </div>
