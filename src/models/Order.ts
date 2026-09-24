@@ -18,6 +18,7 @@ export interface IShippingDetails {
   zipCode: string;
   country: string;
   phone: string;
+  email?: string;
 }
 
 export interface IOrder extends Document {
@@ -56,7 +57,8 @@ const ShippingDetailsSchema = new Schema({
   state: { type: String, required: true },
   zipCode: { type: String, required: true },
   country: { type: String, required: true },
-  phone: { type: String, required: true }
+  phone: { type: String, required: true },
+  email: { type: String }
 });
 
 const OrderSchema = new Schema(

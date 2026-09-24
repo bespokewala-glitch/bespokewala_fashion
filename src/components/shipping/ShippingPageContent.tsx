@@ -160,7 +160,7 @@ export default function ShippingPageContent() {
       ══════════════════════════════════ */}
       <section style={{ background: "linear-gradient(90deg, #4caf7d 0%, #3a9468 100%)", color: "#fff", padding: "1rem 1.5rem", textAlign: "center" }}>
         <p style={{ fontSize: "0.85rem", letterSpacing: "0.08em", fontWeight: 500 }}>
-          🎉 &nbsp; FREE SHIPPING on all orders above <strong>₹15,000</strong> within India &nbsp;|&nbsp; Free International Shipping on orders above <strong>₹1,00,000</strong>
+          🎉 &nbsp; FREE SHIPPING WORLDWIDE ON ALL ORDERS
         </p>
       </section>
 
@@ -177,32 +177,13 @@ export default function ShippingPageContent() {
             <div style={{ width: "50px", height: "1px", background: "#d2b48c", margin: "1.25rem auto 0" }} />
           </div>
 
-          <div className="ship-rate-grid">
+          <div className="ship-rate-grid" style={{ gridTemplateColumns: "1fr", maxWidth: "400px", margin: "0 auto" }}>
             {/* Free */}
             <div className="ship-card ship-card-free ship-fade">
               <div style={{ fontSize: "1.5rem", marginBottom: "0.75rem" }}>🚚</div>
               <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#4caf7d", marginBottom: "0.5rem", fontWeight: 600 }}>Free Delivery</p>
               <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹0</p>
-              <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>On orders above ₹15,000</p>
-              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>3–7 days</strong></p>
-            </div>
-
-            {/* Standard */}
-            <div className="ship-card ship-fade ship-fade-d1">
-              <div style={{ fontSize: "1.5rem", marginBottom: "0.75rem" }}>📦</div>
-              <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "0.5rem", fontWeight: 600 }}>Standard Shipping</p>
-              <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹199</p>
-              <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>Orders below ₹15,000</p>
-              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>3–7 days</strong></p>
-            </div>
-
-            {/* Express */}
-            <div className="ship-card ship-fade ship-fade-d2">
-              <div style={{ fontSize: "1.5rem", marginBottom: "0.75rem" }}>⚡</div>
-              <p style={{ fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "0.5rem", fontWeight: 600 }}>Express Shipping</p>
-              <p style={{ fontSize: "1.4rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.5rem" }}>₹499</p>
-              <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>Priority handling &amp; dispatch</p>
-              <p style={{ fontSize: "0.8rem", color: "#888", marginTop: "0.75rem" }}>Delivered in <strong>2–3 business days</strong></p>
+              <p style={{ fontSize: "0.8rem", color: "#555", lineHeight: 1.6 }}>On all orders within India</p>
             </div>
           </div>
 
@@ -276,31 +257,31 @@ export default function ShippingPageContent() {
                 <tr>
                   <td><strong>South Asia</strong></td>
                   <td>UAE, Saudi Arabia, Qatar, Bahrain, Kuwait, Oman</td>
-                  <td>₹1,200 &nbsp;|&nbsp; Free above ₹1,00,000</td>
+                  <td>Free</td>
                   <td>5–8 business days</td>
                 </tr>
                 <tr>
                   <td><strong>USA &amp; Canada</strong></td>
                   <td>United States, Canada</td>
-                  <td>₹2,500 &nbsp;|&nbsp; Free above ₹1,00,000</td>
+                  <td>Free</td>
                   <td>8–12 business days</td>
                 </tr>
                 <tr>
                   <td><strong>UK &amp; Europe</strong></td>
                   <td>UK, Germany, France, Netherlands, Italy, Sweden, and 20+ more</td>
-                  <td>₹2,200 &nbsp;|&nbsp; Free above ₹1,00,000</td>
+                  <td>Free</td>
                   <td>7–10 business days</td>
                 </tr>
                 <tr>
                   <td><strong>Australia &amp; NZ</strong></td>
                   <td>Australia, New Zealand</td>
-                  <td>₹2,800 &nbsp;|&nbsp; Free above ₹1,00,000</td>
+                  <td>Free</td>
                   <td>10–14 business days</td>
                 </tr>
                 <tr>
                   <td><strong>Rest of World</strong></td>
                   <td>Singapore, Malaysia, South Africa, and other serviceable countries</td>
-                  <td>₹3,000 &nbsp;|&nbsp; Free above ₹1,00,000</td>
+                  <td>Free</td>
                   <td>12–18 business days</td>
                 </tr>
               </tbody>

@@ -219,7 +219,7 @@ export default function TermsConditionsContent() {
                   <li>If you are unavailable at delivery, the courier will attempt re-delivery up to 3 times. Unclaimed packages may be returned to us and re-shipping charges will apply.</li>
                   <li>For international shipments, customs duties and import taxes are the buyer&apos;s sole responsibility.</li>
                 </ul>
-                <p>Please refer to our <Link href="/shipping" style={{ color: "#d2b48c" }}>Shipping &amp; Returns page</Link> for full details on rates and timelines.</p>
+                <p>Please refer to our <Link href="/shipping" style={{ color: "#d2b48c" }}>Shipping &amp; Returns page</Link> for full details on our delivery timelines.</p>
               </>
             ),
           },

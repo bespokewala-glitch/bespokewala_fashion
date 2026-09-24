@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const calculatedShipping = calculatedSubtotal > 10000 ? 0 : 500;
+    const calculatedShipping = 0;
     const calculatedTotal = calculatedSubtotal + calculatedShipping;
 
     let userId = (user as any).userId || (user as any).id;

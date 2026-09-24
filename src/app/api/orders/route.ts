@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const calculatedShipping = calculatedSubtotal > 10000 ? 0 : 500;
+    const calculatedShipping = 0;
     const calculatedTotal = calculatedSubtotal + calculatedShipping;
 
     const newOrder = await Order.create({

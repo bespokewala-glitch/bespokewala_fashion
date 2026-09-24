@@ -70,12 +70,12 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       },
       {
         question: 'Is shipping free?',
-        answer: 'Yes! We offer free standard shipping on all orders above ₹15,000 within India. Orders below ₹15,000 attract a flat ₹199 shipping fee.',
+        answer: 'Yes! We offer completely free standard shipping on all orders, both within India and internationally.',
         keywords: ['free shipping', 'shipping cost', 'delivery charge', 'shipping fee'],
       },
       {
         question: 'Do you ship internationally?',
-        answer: 'Yes, we ship worldwide. International shipping charges are calculated at checkout based on your location and order weight. Customs and import duties may apply and are the responsibility of the recipient.',
+        answer: 'Yes, we ship worldwide with absolutely free international shipping. Customs and import duties may apply and are the responsibility of the recipient.',
         keywords: ['international shipping', 'ship abroad', 'overseas', 'worldwide', 'export'],
       },
       {

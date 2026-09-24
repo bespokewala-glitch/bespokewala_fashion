@@ -12,37 +12,33 @@ const STEPS = [
   { key: "delivered",  icon: "🏠", label: "Delivered"       },
 ];
 
-/* ── Simulate a lookup (replace with real API call) ── */
+/* ── API Call ── */
 async function lookupOrder(orderId: string, email: string) {
-  // Stub: in production, call your real orders API endpoint
-  await new Promise(r => setTimeout(r, 1400));
+  const res = await fetch('/api/orders/track', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId, email }),
+  });
+  
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new Error('Server error');
+  }
 
-  // Demo: any valid-looking order ID returns a mock result
-  const clean = orderId.trim().toUpperCase();
-  if (!clean.startsWith("BSW") && clean.length < 6) return null;
-
-  return {
-    id: clean,
-    status: "shipped" as const,
-    date: "02 Aug 2026",
-    eta: "07 Aug 2026",
-    courier: "Blue Dart",
-    trackingNumber: "BD7834901234",
-    trackingUrl: "https://www.bluedart.com/tracking",
-    items: [
-      { name: "Embroidered Silk Lehenga", qty: 1, size: "M", color: "Ivory Gold" },
-      { name: "Zardozi Dupatta", qty: 1, size: "Free Size", color: "Ivory" },
-    ],
-    timeline: [
-      { status: "placed",     date: "02 Aug 2026, 10:32 AM", note: "Order received and payment confirmed." },
-      { status: "confirmed",  date: "02 Aug 2026, 11:15 AM", note: "Order verified and sent to atelier." },
-      { status: "processing", date: "03 Aug 2026, 02:00 PM", note: "Quality inspection passed." },
-      { status: "shipped",    date: "04 Aug 2026, 09:45 AM", note: "Dispatched via Blue Dart. AWB: BD7834901234" },
-    ],
-  };
+  return res.json();
 }
 
-type OrderData = Awaited<ReturnType<typeof lookupOrder>>;
+type OrderData = {
+  id: string;
+  status: string;
+  date: string;
+  eta: string;
+  courier: string;
+  trackingNumber: string;
+  trackingUrl: string;
+  items: { name: string; qty: number; size: string; color: string }[];
+  timeline: { status: string; date: string; note: string }[];
+} | null;
 
 export default function TrackOrderContent() {
   const [orderId, setOrderId]   = useState("");
@@ -354,25 +350,35 @@ export default function TrackOrderContent() {
                   {/* Progress bar */}
                   <div className="order-card">
                     <p style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#999", marginBottom: "1.5rem" }}>Delivery Progress</p>
-                    <div className="step-bar">
-                      {STEPS.map((s, i) => {
-                        const isDone   = i < activeIndex;
-                        const isActive = i === activeIndex;
-                        return (
-                          <div key={s.key} className="step-item">
-                            <div className={`step-circle ${isDone ? "done" : isActive ? "active" : ""}`}>
-                              {isDone ? "✓" : s.icon}
-                            </div>
-                            <span className={`step-label ${isDone ? "done" : isActive ? "active" : ""}`}>
-                              {s.label}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <p style={{ fontSize: "0.8rem", color: "#555", textAlign: "center" }}>
-                      Estimated Delivery: <strong style={{ color: "#1c1c1c" }}>{order.eta}</strong>
-                    </p>
+                    
+                    {order.status === 'cancelled' ? (
+                      <div style={{ textAlign: "center", padding: "1rem", color: "#c0392b", background: "#fdf2f2", border: "1px solid #f5c6c6" }}>
+                        <span style={{ fontSize: "1.5rem", display: "block", marginBottom: "0.5rem" }}>❌</span>
+                        <strong>This order has been cancelled.</strong>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="step-bar">
+                          {STEPS.map((s, i) => {
+                            const isDone   = i < activeIndex;
+                            const isActive = i === activeIndex;
+                            return (
+                              <div key={s.key} className="step-item">
+                                <div className={`step-circle ${isDone ? "done" : isActive ? "active" : ""}`}>
+                                  {isDone ? "✓" : s.icon}
+                                </div>
+                                <span className={`step-label ${isDone ? "done" : isActive ? "active" : ""}`}>
+                                  {s.label}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p style={{ fontSize: "0.8rem", color: "#555", textAlign: "center" }}>
+                          Estimated Delivery: <strong style={{ color: "#1c1c1c" }}>{order.eta}</strong>
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   {/* Courier info */}

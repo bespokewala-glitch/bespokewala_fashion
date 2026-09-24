@@ -551,7 +551,7 @@ export default function CheckoutClient() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", color: "#666", fontSize: "0.9rem" }}>
               <span>Shipping</span>
-              <span>{shippingCost === 0 ? "Free" : formatPrice(shippingCost)}</span>
+              <span>{shippingCost === 0 ? "FREE" : formatPrice(shippingCost)}</span>
             </div>
           </div>
 

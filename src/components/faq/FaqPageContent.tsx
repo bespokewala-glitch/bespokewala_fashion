@@ -107,11 +107,11 @@ const CATEGORIES = [
       },
       {
         q: "Do you offer free shipping?",
-        a: "Yes! Free standard shipping is available on all India orders above ₹15,000 and on all international orders above ₹1,00,000. For orders below these thresholds, domestic shipping costs ₹199 and international starts at ₹1,200.",
+        a: "Yes! We offer completely free standard shipping on all orders, both within India and internationally.",
       },
       {
         q: "Do you ship internationally?",
-        a: "Yes, we ship to 40+ countries including the UAE, USA, UK, Canada, Australia, Singapore, and most of Europe. Shipping rates and delivery timelines vary by region — details are on our Shipping page.",
+        a: "Yes, we ship to 40+ countries including the UAE, USA, UK, Canada, Australia, Singapore, and most of Europe with absolutely free shipping.",
       },
       {
         q: "How can I track my order?",
