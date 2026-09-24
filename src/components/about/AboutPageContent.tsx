@@ -70,13 +70,13 @@ export default function AboutPageContent() {
     },
     {
       icon: "❋",
-      title: "Sustainable Luxury",
-      desc: "We partner with ethical weavers and support India's traditional textile communities, ensuring that timeless fashion also protects the planet and its people.",
+      title: "Commitment to Craft",
+      desc: "We partner with dedicated weavers and support India's traditional textile communities, ensuring our craft honors the heritage of handmade fashion.",
     },
     {
       icon: "◉",
-      title: "Celebrity & Bridal Heritage",
-      desc: "Trusted by discerning brides and icons for over two decades, our heritage of dressing royalty and film stars speaks to the calibre of our craft.",
+      title: "Bridal Heritage",
+      desc: "Trusted by discerning brides for over two decades, our heritage of bespoke tailoring and attention to detail speaks to the calibre of our craft.",
     },
     {
       icon: "✧",
@@ -87,10 +87,10 @@ export default function AboutPageContent() {
 
   /* Team */
   const team = [
-    { name: "Himali Patil", role: "Head Designer & CMO", initial: "H", image: "/Hemali%20Patil.jpeg" },
-    { name: "Hemkumar Jain", role: "Head Designer", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
+    { name: "Hemali Patil", role: "Head Designer & CMO", initial: "H", image: "/Hemali%20Patil.jpeg" },
+    { name: "Hemkumar Jayant", role: "Head Designer", initial: "H", image: "/Hemkumar%20Jayant.jpeg" },
     { name: "Manish Verma", role: "Chief Technology Officer", initial: "M", image: "/Manish%20Verma.jpeg" },
-    { name: "Savitri Verma", role: "Head OF Ecommerce", initial: "S", image: "/Savitri%20Verma.jpeg" },
+    { name: "Savitri Verma", role: "Head of Ecommerce", initial: "S", image: "/Savitri%20Verma.jpeg" },
   ];
 
   /* ── HERO ── */
@@ -113,7 +113,7 @@ export default function AboutPageContent() {
           Established 2002 · Incorporated 2018 · Mumbai, India
         </p>
         <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 300, letterSpacing: "0.12em", textTransform: "uppercase", lineHeight: 1.1, marginBottom: "1.5rem" }}>
-          The Art of<br />Bespokewala Fashion
+          The Art of<br />Bespokewala
         </h1>
         <p style={{ fontSize: "1rem", fontWeight: 300, maxWidth: "560px", lineHeight: 1.8, color: "rgba(255,255,255,0.85)", letterSpacing: "0.04em" }}>
           Where timeless Indian heritage meets contemporary luxury — crafted for those who refuse to be ordinary.
@@ -206,13 +206,13 @@ export default function AboutPageContent() {
           </h2>
           <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "1.5rem auto" }} />
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
-            BespokeWala began its journey in 2002 with a passion for craftsmanship, bespoke fashion, and timeless Indian luxury. Over the years, the brand has built its experience in creating personalized and premium fashion for its customers.
+            Bespokewala began its journey in 2002 with a passion for craftsmanship, bespoke fashion, and timeless Indian luxury. Over the years, the brand has built its experience in creating personalized and premium fashion for its customers.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc", marginBottom: "1.25rem" }}>
             In 2018, the business was formally incorporated as a company, marking the next chapter in its growth and expansion.
           </p>
           <p style={{ fontSize: "0.975rem", lineHeight: 1.9, color: "#ccc" }}>
-            Today, BespokeWala combines years of craftsmanship and experience with modern design, manufacturing, retail, and a growing digital presence.
+            Today, Bespokewala combines years of craftsmanship and experience with modern design, manufacturing, retail, and a growing digital presence.
           </p>
         </div>
 
@@ -229,8 +229,8 @@ export default function AboutPageContent() {
         {/* Portrait */}
         <div style={{ position: "relative" }}>
           <img
-            src="/bespoken.png"
-            alt="Founder of Bespokewala Fashion"
+            src="/about-hero.png"
+            alt="Founder of Bespokewala"
             style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
           />
           {/* decorative frame */}
@@ -441,13 +441,14 @@ export default function AboutPageContent() {
         <Link href="/products/couture" className="btn-primary" style={{ marginRight: "1rem" }}>
           Discover Couture
         </Link>
-        <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
+        <Link href="/consultation" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
           Book an Appointment
         </Link>
       </div>
 
-      <p style={{ fontSize: "0.9rem", color: "#888" }}>
-        For sales-related inquiries, please email us at <a href="mailto:sales@bespokewala.com" style={{ color: "#d2b48c", textDecoration: "underline" }}>sales@bespokewala.com</a>
+      <p style={{ fontSize: "0.9rem", color: "#888", lineHeight: 1.6 }}>
+        <strong>General Enquiries:</strong> <a href="mailto:info@bespokewala.com" style={{ color: "#d2b48c", textDecoration: "underline" }}>info@bespokewala.com</a><br/>
+        <strong>Sales &amp; Product Enquiries:</strong> <a href="mailto:sales@bespokewala.com" style={{ color: "#d2b48c", textDecoration: "underline" }}>sales@bespokewala.com</a>
       </p>
     </section>
   );

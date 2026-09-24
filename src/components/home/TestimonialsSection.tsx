@@ -24,7 +24,7 @@ const testimonials = [
     text: "Wearing Bespokewala makes you feel like royalty. The fabrics, the fit, the embroidery—pure luxury.",
     author: "Ayesha K.",
     location: "Dubai, UAE",
-    product: "Emerald Zari Gown",
+    product: "Signature Evening Gown",
     rating: 5
   }
 ];

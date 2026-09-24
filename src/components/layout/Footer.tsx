@@ -64,7 +64,7 @@ export default function Footer() {
       <footer style={footerStyle} className="mobile-section-py mobile-px-container">
         <div style={containerStyle} className="mobile-stack">
           <div style={columnStyle}>
-            <h4 style={headingStyle}>Company</h4>
+            <p style={headingStyle}>Company</p>
             <ul style={listStyle}>
               <li><Link href="/about">About Us</Link></li>
               <li><Link href="/press">Press</Link></li>
@@ -73,7 +73,7 @@ export default function Footer() {
           </div>
           
           <div style={columnStyle}>
-            <h4 style={headingStyle}>Customer Care</h4>
+            <p style={headingStyle}>Customer Care</p>
             <ul style={listStyle}>
               <li><Link href="/shipping">Shipping &amp; Returns</Link></li>
               <li><Link href="/faq">FAQ</Link></li>
@@ -83,7 +83,7 @@ export default function Footer() {
           </div>
 
           <div style={columnStyle}>
-            <h4 style={headingStyle}>Shop</h4>
+            <p style={headingStyle}>Shop</p>
             <ul style={listStyle}>
               <li><Link href="/products/couture">Couture</Link></li>
               <li><Link href="/products/jewellery">Jewellery</Link></li>
@@ -92,7 +92,7 @@ export default function Footer() {
           </div>
 
           <div style={columnStyle}>
-            <h4 style={headingStyle}>Legal</h4>
+            <p style={headingStyle}>Legal</p>
             <ul style={listStyle}>
               <li><Link href="/privacy-policy">Privacy Policy</Link></li>
               <li><Link href="/terms-conditions">Terms &amp; Conditions</Link></li>
@@ -118,8 +118,20 @@ export default function Footer() {
             </ul>
           </div>
 
+          <div style={columnStyle}>
+            <p style={headingStyle}>Contact Us</p>
+            <ul style={listStyle}>
+              <li style={{ color: '#ccc', fontSize: '0.875rem', lineHeight: '1.6' }}>
+                General: <a href="mailto:info@bespokewala.com" style={{ color: '#ccc', textDecoration: 'none' }}>info@bespokewala.com</a><br/>
+                Sales: <a href="mailto:sales@bespokewala.com" style={{ color: '#ccc', textDecoration: 'none' }}>sales@bespokewala.com</a><br/>
+                Phone: <a href="tel:+917506767452" style={{ color: '#ccc', textDecoration: 'none' }}>+91 75067 67452</a><br/><br/>
+                Lotus Arc One, Monginis Lane<br/>Andheri West, Mumbai 400053
+              </li>
+            </ul>
+          </div>
+
           <div style={columnStyle} className="mobile-footer-full">
-            <h4 style={headingStyle}>Newsletter</h4>
+            <p style={headingStyle}>Newsletter</p>
             <p style={{ fontSize: '0.875rem', color: '#ccc', marginBottom: '1rem' }}>
               Subscribe to receive updates, access to exclusive deals, and more.
             </p>

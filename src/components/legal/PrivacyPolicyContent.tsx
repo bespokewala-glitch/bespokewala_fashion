@@ -288,7 +288,7 @@ export default function PrivacyPolicyContent() {
                 <ul>
                   <li><strong>Email:</strong> info@bespokewala.com</li>
                   <li><strong>Phone / WhatsApp:</strong> +91 75067 67452</li>
-                  <li><strong>Address:</strong> Lotus Arc One (Arc One) Building, Monginis Lane, Off New Link Road, Andheri West, Mumbai, Maharashtra – 400053</li>
+                  <li><strong>Address:</strong> Lotus Arc One, Monginis Lane, Off New Link Road, Andheri West, Mumbai, Maharashtra – 400053</li>
                 </ul>
                 <p>We are committed to working with you to resolve any concern regarding your privacy.</p>
               </>

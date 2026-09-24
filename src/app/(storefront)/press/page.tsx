@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 export const metadata = generateStaticPageMetadata(
   'Press & Media',
-  'Bespokewala Fashion press coverage, media kit, brand assets, and enquiry contacts. Read what the media is saying about Bespokewala.',
+  'Bespokewala press coverage, media kit, brand assets, and enquiry contacts. Read what the media is saying about Bespokewala.',
   '/press'
 );
 

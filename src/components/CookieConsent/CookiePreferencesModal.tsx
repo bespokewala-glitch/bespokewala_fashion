@@ -247,7 +247,7 @@ export default function CookiePreferencesModal() {
         <CategoryRow
           id="pref-necessary"
           title="Necessary Cookies"
-          description="Required for login, sessions, cart, checkout, security, and payment processing. These cookies keep BespokeWala working."
+          description="Required for login, sessions, cart, checkout, security, and payment processing. These cookies keep Bespokewala working."
           checked={true}
           disabled={true}
         />

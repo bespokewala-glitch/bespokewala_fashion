@@ -179,7 +179,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
 
         <div className="process-btn-wrapper" style={{ marginTop: '5rem', textAlign: 'center' }}>
           <a 
-            href="/contact" 
+            href="/consultation" 
             className="btn-primary" 
             style={{ 
               display: 'inline-block',

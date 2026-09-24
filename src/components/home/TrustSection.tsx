@@ -257,7 +257,7 @@ export default function TrustSection() {
           <div className="trust-card-num">03</div>
           <h3 style={titleStyle}>Personal Styling</h3>
           <p className="trust-desc">Guidance for choosing your look.</p>
-          <Link href="/contact" aria-label="Book a Design Consultation" className="trust-link">
+          <Link href="/consultation" aria-label="Book a Design Consultation" className="trust-link">
             Book a Consultation <span className="arrow-icon">&rarr;</span>
           </Link>
         </div>

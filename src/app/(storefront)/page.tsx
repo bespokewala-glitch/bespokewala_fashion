@@ -170,6 +170,7 @@ export default async function Home() {
         <TrustSection />
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
+        <CoutureProcess data={sectionMap.CoutureProcess} />
         <LookbookCarousel data={sectionMap.LookbookCarousel} />
         <BrandStory data={sectionMap.BrandStory} />
         <TestimonialsSection />

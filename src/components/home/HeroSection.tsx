@@ -176,6 +176,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
           muted
           loop={activeCampaigns.length <= 1}
           playsInline
+          poster=""
           onEnded={activeCampaigns.length > 1 ? handleVideoEnd : undefined}
           style={videoStyle}
           className="hero-video"
@@ -236,7 +237,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
         <h2 style={titleStyle} className="mobile-hero-title">{currentCampaign?.title}</h2>
 
         <div className="hero-cta-group">
-          <Link href="/contact" className="hero-secondary-btn" style={secondaryBtnStyle}>
+          <Link href="/consultation" className="hero-secondary-btn" style={secondaryBtnStyle}>
             Book a Consultation
           </Link>
         </div>

@@ -3,7 +3,7 @@ import FaqPageContent from '@/components/faq/FaqPageContent';
 
 export const metadata = generateStaticPageMetadata(
   'FAQ — Frequently Asked Questions',
-  'Find answers to the most common questions about Bespokewala Fashion — orders, shipping, returns, custom garments, sizing, payments, and more.',
+  'Find answers to the most common questions about Bespokewala — orders, shipping, returns, custom garments, sizing, payments, and more.',
   '/faq'
 );
 

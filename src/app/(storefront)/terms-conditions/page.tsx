@@ -3,7 +3,7 @@ import TermsConditionsContent from '@/components/legal/TermsConditionsContent';
 
 export const metadata = generateStaticPageMetadata(
   'Terms & Conditions',
-  "Read Bespokewala Fashion's Terms & Conditions governing the use of our website and the purchase of our products.",
+  "Read Bespokewala's Terms & Conditions governing the use of our website and the purchase of our products.",
   '/terms-conditions'
 );
 

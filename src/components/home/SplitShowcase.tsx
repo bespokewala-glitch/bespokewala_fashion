@@ -77,7 +77,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
       <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', minHeight: '400px', position: 'relative' }}>
         <OptimizedImage 
           src={modelImage || ''} 
-          alt="Bespokewala model showcasing luxury jewellery"
+          alt=""
           fill
           sizes="(max-width: 767px) 100vw, 50vw"
           style={{ objectFit: 'cover' }}
@@ -113,7 +113,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
               <OptimizedImage 
                 src={products[currentIndex].image || ''} 
-                alt={products[currentIndex].name ? `Bespokewala ${products[currentIndex].name}` : 'Bespokewala luxury product'}
+                alt={products[currentIndex].name ? products[currentIndex].name : 'Featured item'}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: 'contain' }}
@@ -143,8 +143,26 @@ export default function SplitShowcase({ data }: { data?: any }) {
           </div>
         </div>
 
+        {/* View All CTA */}
+        <div style={{ padding: '1.5rem 2rem 2rem', textAlign: 'center' }}>
+          <Link
+            href="/products"
+            style={{
+              fontSize: '0.7rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              color: '#1c1c1c',
+              textDecoration: 'none',
+              borderBottom: '1px solid #1c1c1c',
+              paddingBottom: '2px',
+              transition: 'color 0.2s, border-color 0.2s',
+            }}
+            aria-label="View all collections"
+          >
+            View All Collection →
+          </Link>
+        </div>
 
-        
       </div>
     </section>
   );

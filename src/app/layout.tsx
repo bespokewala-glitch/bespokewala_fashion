@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     description: "Discover Bespokewala's luxury couture, footwear and jewellery collections, crafted with timeless elegance and exceptional design.",
     siteName: 'Bespokewala',
     type: 'website',
-    images: [{ url: '/bespoken-transparent.png', width: 1200, height: 630, alt: 'Bespokewala — Luxury Indian Fashion' }],
+    images: [{ url: '/about-hero.png', width: 1200, height: 630, alt: 'Bespokewala — Luxury Indian Fashion' }],
   },
   twitter: {
     card: 'summary_large_image',

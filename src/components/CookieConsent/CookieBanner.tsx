@@ -70,7 +70,7 @@ export default function CookieBanner() {
               >
                 Your Privacy Matters
               </strong>
-              We use necessary cookies to keep BespokeWala working and optional
+              We use necessary cookies to keep Bespokewala working and optional
               cookies to understand how visitors use our website and improve your
               experience.
             </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useCookieConsent } from "@/context/CookieConsentContext";
 
 /* ─────────────────────────────────────────────────────────────
    HYDRATION-SAFE APPROACH
@@ -19,7 +20,7 @@ const INFO = {
   instagram:        "https://www.instagram.com/bespokewala?igsh=Y3Zud3V3OHd6OTIz",
   instagramHandle:  "@bespokewala",
   address: {
-    line1: "Lotus Arc One (Arc One) Building",
+    line1: "Lotus Arc One",
     line2: "Monginis Lane, Off New Link Road",
     line3: "Andheri West, Mumbai",
     line4: "Maharashtra – 400053",
@@ -95,8 +96,10 @@ function ContactCard({
 export default function ContactPageContent() {
   /* Track mount so the form submit handler can use window safely */
   const [mounted, setMounted] = useState(false);
-  const [formState, setFormState] = useState({ name: "", email: "", subject: "", message: "" });
+  const { consent, openPreferences } = useCookieConsent();
+  const [formState, setFormState] = useState({ name: "", email: "", phone: "", subject: "", message: "", _honeypot: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [subjectError, setSubjectError] = useState("");
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -107,7 +110,16 @@ export default function ContactPageContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!mounted) return;
-    const body    = encodeURIComponent(`Name: ${formState.name}\nEmail: ${formState.email}\n\n${formState.message}`);
+    // Honeypot: if bot filled the hidden field, silently abort
+    if (formState._honeypot) return;
+    // Subject validation
+    if (!formState.subject) {
+      setSubjectError("Please select a subject before sending.");
+      return;
+    }
+    setSubjectError("");
+    const phoneLine = formState.phone ? `\nPhone: ${formState.phone}` : "";
+    const body    = encodeURIComponent(`Name: ${formState.name}\nEmail: ${formState.email}${phoneLine}\n\n${formState.message}`);
     const subject = encodeURIComponent(formState.subject || "Enquiry from Website");
     window.location.href = `mailto:${INFO.email}?subject=${subject}&body=${body}`;
     setSubmitted(true);
@@ -270,7 +282,7 @@ export default function ContactPageContent() {
         </h1>
         <div style={{ width: "60px", height: "1px", backgroundColor: "#d2b48c", margin: "0 auto 1.5rem" }} />
         <p style={{ fontSize: "clamp(0.85rem,2vw,0.975rem)", fontWeight: 300, maxWidth: "500px", margin: "0 auto", lineHeight: 1.8, color: "rgba(255,255,255,0.7)" }}>
-          Visit our Mumbai atelier, send us an email, or reach out on WhatsApp — our team is always happy to assist.
+          Visit our Mumbai studio, send us an email, or reach out on WhatsApp — our team is always happy to assist.
         </p>
       </section>
 
@@ -278,10 +290,10 @@ export default function ContactPageContent() {
       <section style={{ backgroundColor: "#faf9f7", padding: "clamp(3rem,8vw,5rem) 1.5rem" }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div className="contact-cards-grid">
-            <ContactCard id="card-email"     icon={<IconEmail />}     label="Email Us"  line1={INFO.email}            line2="Send us a message →"  href={`mailto:${INFO.email}`}                                                                        delay="0s"    />
-            <ContactCard id="card-phone"     icon={<IconPhone />}     label="Call Us"   line1={INFO.phone}            line2="Tap to call →"        href="tel:+917506767452"                                                                              delay="0.1s"  />
-            <ContactCard id="card-whatsapp"  icon={<IconWhatsApp />}  label="WhatsApp"  line1={INFO.whatsappDisplay}  line2="Chat with us →"       href={`https://wa.me/${INFO.whatsapp}?text=Hello%20Bespokewala%2C%20I%20have%20an%20enquiry.`}         delay="0.2s"  />
-            <ContactCard id="card-instagram" icon={<IconInstagram />} label="Instagram" line1={INFO.instagramHandle}  line2="Follow us →"          href={INFO.instagram}                                                                                 delay="0.3s"  />
+            <ContactCard id="card-email-info"  icon={<IconEmail />}     label="General Enquiries" line1={INFO.email}            line2="Send us a message →"  href={`mailto:${INFO.email}`}                                                                        delay="0s"    />
+            <ContactCard id="card-email-sales" icon={<IconEmail />}     label="Sales Enquiries"   line1="sales@bespokewala.com" line2="Send us a message →"  href="mailto:sales@bespokewala.com"                                                                  delay="0.1s"  />
+            <ContactCard id="card-phone"       icon={<IconPhone />}     label="Call Us"           line1={INFO.phone}            line2="Tap to call →"        href="tel:+917506767452"                                                                              delay="0.2s"  />
+            <ContactCard id="card-whatsapp"    icon={<IconWhatsApp />}  label="WhatsApp"          line1={INFO.whatsappDisplay}  line2="Chat with us →"       href={`https://wa.me/${INFO.whatsapp}?text=Hello%20Bespokewala%2C%20I%20have%20an%20enquiry.`}         delay="0.3s"  />
           </div>
         </div>
       </section>
@@ -319,16 +331,28 @@ export default function ContactPageContent() {
             </a>
 
             {/* Map */}
-            <div style={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", border: "1px solid #e8e0d6" }}>
-              <iframe
-                title="Bespokewala Studio Location"
-                src="https://maps.google.com/maps?q=Lotus+Arc+One+Andheri+West+Mumbai&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0, display: "block" }}
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            <div style={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", border: "1px solid #e8e0d6", position: "relative" }}>
+              {!consent.marketing ? (
+                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#f9f8f6", padding: "2rem", textAlign: "center" }}>
+                  <IconLocation />
+                  <p style={{ marginTop: "1rem", fontSize: "0.875rem", color: "#666" }}>
+                    Please accept marketing cookies to view the interactive map.
+                  </p>
+                  <button onClick={openPreferences} className="btn-secondary" style={{ marginTop: "1rem", fontSize: "0.75rem", padding: "0.5rem 1rem" }}>
+                    Manage Preferences
+                  </button>
+                </div>
+              ) : (
+                <iframe
+                  title="Bespokewala Studio Location"
+                  src="https://maps.google.com/maps?q=Lotus+Arc+One+Andheri+West+Mumbai&output=embed"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, display: "block" }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              )}
             </div>
 
             {/* Social row */}
@@ -381,11 +405,54 @@ export default function ContactPageContent() {
                   </div>
                 </div>
 
+                {/* Honeypot — hidden from real users, catches bots */}
+                <input
+                  type="text"
+                  name="_honeypot"
+                  value={formState._honeypot}
+                  onChange={handleChange}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden', opacity: 0 }}
+                />
+
                 <div>
-                  <label style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#999", display: "block", marginBottom: "0.5rem" }}>
-                    Subject
+                  <label
+                    htmlFor="contact-phone"
+                    style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#999", display: "block", marginBottom: "0.5rem" }}
+                  >
+                    Phone Number <span style={{ fontWeight: 300, fontSize: "0.55rem" }}>(Optional)</span>
                   </label>
-                  <select className="contact-input" name="subject" value={formState.subject} onChange={handleChange}>
+                  <input
+                    id="contact-phone"
+                    className="contact-input"
+                    type="tel"
+                    name="phone"
+                    placeholder="+91 98765 43210"
+                    value={formState.phone}
+                    onChange={handleChange}
+                    pattern="^[+]?[\d\s\-().]{7,20}$"
+                    title="Please enter a valid phone number (7–20 digits)"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-subject"
+                    style={{ fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#999", display: "block", marginBottom: "0.5rem" }}
+                  >
+                    Subject *
+                  </label>
+                  <select
+                    id="contact-subject"
+                    className="contact-input"
+                    name="subject"
+                    required
+                    aria-required="true"
+                    value={formState.subject}
+                    onChange={(e) => { handleChange(e); setSubjectError(""); }}
+                  >
                     <option value="">Select a topic…</option>
                     <option value="Bridal Enquiry">Bridal Enquiry</option>
                     <option value="Custom Order">Custom / Bespoke Order</option>
@@ -394,6 +461,11 @@ export default function ContactPageContent() {
                     <option value="Press & Media">Press &amp; Media</option>
                     <option value="General Enquiry">General Enquiry</option>
                   </select>
+                  {subjectError && (
+                    <p role="alert" style={{ color: '#c0392b', fontSize: '0.7rem', marginTop: '0.4rem', letterSpacing: '0.02em' }}>
+                      {subjectError}
+                    </p>
+                  )}
                 </div>
 
                 <div>

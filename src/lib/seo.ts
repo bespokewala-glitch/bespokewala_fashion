@@ -5,7 +5,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespoke
 export const SITE_NAME = 'Bespokewala';
 
 // Default OG image — shown when no product/category image is available
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/bespoken-transparent.png`;
+export const DEFAULT_OG_IMAGE = `${SITE_URL}/about-hero.png`;
 
 export interface SEOFields {
   title?: string;
@@ -88,7 +88,7 @@ export function generatePageMetadata(
       canonical: url,
     },
     openGraph: {
-      title,
+      title: `${title} | ${SITE_NAME}`,
       description,
       url,
       siteName: SITE_NAME,
@@ -97,7 +97,7 @@ export function generatePageMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: `${title} | ${SITE_NAME}`,
       description,
       images: twitterImageUrl ? [twitterImageUrl] : undefined,
     },
