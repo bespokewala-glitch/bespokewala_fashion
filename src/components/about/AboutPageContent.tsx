@@ -110,7 +110,7 @@ export default function AboutPageContent() {
         color: "#fff", textAlign: "center", padding: "2rem",
       }}>
         <p style={{ fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#d2b48c", marginBottom: "1.25rem" }}>
-          Started & Incorporated 2002 · Mumbai, India
+          Established 2002 · Incorporated 2018 · Mumbai, India
         </p>
         <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)", fontWeight: 300, letterSpacing: "0.12em", textTransform: "uppercase", lineHeight: 1.1, marginBottom: "1.5rem" }}>
           The Art of<br />Bespokewala Fashion
