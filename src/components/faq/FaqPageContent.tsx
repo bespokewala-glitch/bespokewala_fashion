@@ -61,7 +61,7 @@ const CATEGORIES = [
       },
       {
         q: "Are the products in stock, or made to order?",
-        a: "Most ready-to-wear pieces are in stock and dispatch within 1–2 business days. Limited-edition and festive pieces may be made to order and have a lead time of 7–14 business days, clearly mentioned on the product page.",
+        a: "Most ready-to-wear pieces are in stock and dispatch within 3–7 days. Limited-edition and festive pieces may be made to order and have a lead time of 3–7 days, clearly mentioned on the product page.",
       },
     ],
   },
