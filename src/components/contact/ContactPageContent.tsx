@@ -403,7 +403,11 @@ export default function ContactPageContent() {
                   <textarea className="contact-input contact-textarea" name="message" required placeholder="Tell us how we can help…" value={formState.message} onChange={handleChange} />
                 </div>
 
-                <button type="submit" className="btn-primary" style={{ alignSelf: "flex-start", marginTop: "0.5rem" }}>
+                <p style={{ fontSize: '0.72rem', color: '#888', lineHeight: 1.6, margin: '0.25rem 0' }}>
+                  By submitting this form you agree that Bespokewala may use your information to respond to your enquiry. View our{' '}
+                  <a href="/privacy-policy" style={{ color: '#d2b48c', textDecoration: 'underline' }}>Privacy Policy</a>.
+                </p>
+                <button type="submit" className="btn-primary" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
                   Send Message
                 </button>
               </form>

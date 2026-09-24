@@ -7,17 +7,28 @@ import OptimizedImage from '@/components/ui/OptimizedImage';
 export default function LookbookCarousel({ data }: { data?: any }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Non-celebrity fashion / textile imagery used when no authorised CMS images are available.
+  // These are royalty-free Unsplash photos — no real persons are depicted as Bespokewala muses.
   const defaultMuses = [
-    { name: 'Ranveer Singh', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80' },
-    { name: 'Alia Bhatt', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80' },
-    { name: 'Shahrukh Khan', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80' },
+    { name: 'Bridal Couture', img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&q=80' },
+    { name: 'Festive Elegance', img: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80' },
+    { name: 'Heritage Weaves', img: 'https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&q=80' },
   ];
 
-  const subtitle = data?.subtitle || "Where dreams are draped in couture and stars become muse.";
-  const muses = (data?.items && data.items.length > 0) ? data.items.map((i: any) => ({
-    name: i.name || '',
-    img: i.image || ''
-  })) : defaultMuses;
+  const subtitle = data?.subtitle || "Where timeless Indian craft meets contemporary luxury.";
+
+  // Filter out any CMS items that use AI-generated images (ChatGPT_Image filenames)
+  // to avoid presenting AI-generated likenesses of real public figures as endorsements.
+  const rawItems: { name: string; img: string }[] = (data?.items && data.items.length > 0)
+    ? data.items.map((i: any) => ({ name: i.name || '', img: i.image || '' }))
+    : [];
+
+  const authorisedItems = rawItems.filter(
+    (item) => item.img && !item.img.toLowerCase().includes('chatgpt_image')
+  );
+
+  const muses = authorisedItems.length > 0 ? authorisedItems : defaultMuses;
+
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -58,6 +69,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
           width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem',
           boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
         }}
+        aria-label="Previous"
       >
         &#10094;
       </button>
@@ -70,6 +82,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
           width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem',
           boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
         }}
+        aria-label="Next"
       >
         &#10095;
       </button>

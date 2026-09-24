@@ -81,7 +81,7 @@ export default function AboutPageContent() {
     {
       icon: "✧",
       title: "Global Reach, Intimate Service",
-      desc: "With flagship studios across India and delivery worldwide, every customer receives the same white-glove service regardless of where they are.",
+      desc: "With our Mumbai studio and delivery worldwide, every customer receives the same white-glove service regardless of where they are.",
     },
   ];
 
@@ -435,10 +435,10 @@ export default function AboutPageContent() {
         Ready to Wear a Masterpiece?
       </h2>
       <p style={{ fontSize: "0.975rem", color: "#aaa", maxWidth: "480px", margin: "0 auto 2.5rem", lineHeight: 1.8 }}>
-        Explore our latest collections or book a personal styling consultation at your nearest atelier.
+        Explore our latest collections or book a personal styling consultation at our Mumbai studio.
       </p>
       <div className="cta-buttons" style={{ display: 'flex', justifyContent: 'center', marginBottom: "2.5rem" }}>
-        <Link href="/products/couture/womens" className="btn-primary" style={{ marginRight: "1rem" }}>
+        <Link href="/products/couture" className="btn-primary" style={{ marginRight: "1rem" }}>
           Discover Couture
         </Link>
         <Link href="/contact" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>

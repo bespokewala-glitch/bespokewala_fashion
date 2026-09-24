@@ -385,7 +385,7 @@ export default function Header() {
                 ref={el => { navRefs.current['couture'] = el; }}
                 onMouseEnter={() => handleMouseEnterMenu('couture')}
               >
-                <Link prefetch={true} href="/" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
+                <Link prefetch={true} href="/products/couture" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
               <li 
                 ref={el => { navRefs.current['footwear'] = el; }}
@@ -450,12 +450,11 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <a
-              href="#"
-              onClick={(e) => { e.preventDefault(); openMiniCart(); }}
+            <button
+              onClick={openMiniCart}
               className="touch-target"
               aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`}
-              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}
+              style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               <ShoppingBag size={20} color="#1c1c1c" />
               {cartCount > 0 && (
@@ -463,7 +462,7 @@ export default function Header() {
                   {cartCount}
                 </span>
               )}
-            </a>
+            </button>
           </div>
 
 
@@ -478,7 +477,7 @@ export default function Header() {
                 <li><Link href="/dashboard/campaigns" style={{ fontWeight: 'bold' }}>Admin</Link></li>
               )}
               {user && (
-                <li><a href="#" onClick={handleLogout} className="text-gray-500 hover:text-current transition-colors">Logout</a></li>
+                <li><button onClick={handleLogout} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', color: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit' }} className="text-gray-500 hover:text-current transition-colors">Logout</button></li>
               )}
 
               {/* Icons */}
@@ -488,7 +487,7 @@ export default function Header() {
                 </button>
               </li>
               <li>
-                <Link href={user ? "/account" : "/login"} aria-label={user ? "Account" : "Login"} style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
+                <Link href={user ? "/account" : "/login"} aria-label={user ? "My Account" : "Login / Register"} style={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
                   <User size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                 </Link>
               </li>
@@ -503,14 +502,14 @@ export default function Header() {
                 </Link>
               </li>
               <li>
-                <a href="#" onClick={(e) => { e.preventDefault(); openMiniCart(); }} aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', textDecoration: 'none' }}>
+                <button onClick={openMiniCart} aria-label={`Shopping bag${cartCount > 0 ? ` (${cartCount} items)` : ''}`} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '0', color: 'inherit', background: 'transparent', border: 'none', cursor: 'pointer' }}>
                   <ShoppingBag size={20} color={isLightHeader ? '#1c1c1c' : '#ffffff'} />
                   {cartCount > 0 && (
                     <span style={{ position: 'absolute', top: '-5px', right: '-8px', background: isLightHeader ? '#000' : '#fff', color: isLightHeader ? '#fff' : '#000', fontSize: '9px', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                       {cartCount}
                     </span>
                   )}
-                </a>
+                </button>
               </li>
             </ul>
           </nav>
@@ -712,7 +711,7 @@ export default function Header() {
                       </div>
                     );
                   })}
-                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Couture</Link>
+                  <Link href="/products/couture" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Couture</Link>
                 </div>
               )}
             </div>
@@ -806,7 +805,7 @@ export default function Header() {
               <>
                 <Link href="/account" onClick={() => setIsMobileMenuOpen(false)}>My Account</Link>
                 {user.role === 'admin' && <Link href="/dashboard/campaigns" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>}
-                <a href="#" onClick={(e) => { setIsMobileMenuOpen(false); handleLogout(e); }}>Logout</a>
+                <button onClick={(e) => { setIsMobileMenuOpen(false); handleLogout(e as any); }} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', color: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', textAlign: 'left' }}>Logout</button>
               </>
             ) : (
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Login / Register</Link>

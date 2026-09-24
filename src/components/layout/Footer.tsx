@@ -147,6 +147,10 @@ export default function Footer() {
                 cursor: 'pointer',
               }}>Subscribe</button>
             </form>
+            <p style={{ fontSize: '0.7rem', color: '#888', marginTop: '0.75rem', lineHeight: 1.6 }}>
+              By subscribing you agree to receive marketing emails from Bespokewala. You can unsubscribe at any time. View our{' '}
+              <Link href="/privacy-policy" style={{ color: '#d2b48c', textDecoration: 'underline' }}>Privacy Policy</Link>.
+            </p>
           </div>
         </div>
         
