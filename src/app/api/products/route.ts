@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { IProduct } from '@/types/product';
 import { preWarmMany } from '@/lib/preWarmVariants';
+import { invalidateCachePrefix } from '@/lib/serverCache';
+import { revalidatePath } from 'next/cache';
 
 export async function GET(req: NextRequest) {
   try {
@@ -200,6 +202,11 @@ export async function POST(req: NextRequest) {
     if (newImageUrls.length > 0) {
       preWarmMany(newImageUrls).catch(() => {});
     }
+
+    // Invalidate caches so frontend sees new products immediately
+    invalidateCachePrefix('products:');
+    invalidateCachePrefix('home:');
+    revalidatePath('/', 'layout');
 
     return NextResponse.json(product, { status: 201 });
   } catch (error: any) {

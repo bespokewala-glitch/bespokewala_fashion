@@ -725,7 +725,6 @@ function AdminProductsContent() {
                     <>
                       <option value="womens">Womens</option>
                       <option value="mens">Mens</option>
-                      <option value="new-arrivals">New Arrivals</option>
                     </>
                   )}
                   {activeProductType === 'jewellery' && (
@@ -733,7 +732,6 @@ function AdminProductsContent() {
                       <option value="signature-collection">Signature Collection</option>
                       <option value="diamond-collection">Diamond Collection</option>
                       <option value="menswear-collection">Menswear Collection</option>
-                      <option value="new-arrivals">New Arrivals</option>
                     </>
                   )}
                   {activeProductType !== 'couture' && activeProductType !== 'jewellery' && (

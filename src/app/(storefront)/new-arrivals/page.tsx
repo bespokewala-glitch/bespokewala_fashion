@@ -24,6 +24,7 @@ export default async function NewArrivalsPage({ searchParams }: Props) {
     <CollectionPageContent
       params={{
         ...searchParamsAwaited,
+        productType: 'Couture',
         isNewArrival: 'true',
       }}
     />

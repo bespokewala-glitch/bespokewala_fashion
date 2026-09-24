@@ -3,6 +3,8 @@ import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import { IProduct } from '@/types/product';
 import { preWarmGcsKey } from '@/lib/preWarmVariants';
+import { invalidateCachePrefix } from '@/lib/serverCache';
+import { revalidatePath } from 'next/cache';
 
 
 export async function GET(
@@ -97,6 +99,11 @@ export async function PUT(
       Promise.allSettled(allImageUrls.map(url => preWarmGcsKey(url))).catch(() => {});
     }
 
+    // Invalidate caches so frontend sees updates immediately
+    invalidateCachePrefix('products:');
+    invalidateCachePrefix('home:');
+    revalidatePath('/', 'layout');
+
     return NextResponse.json(updatedProduct);
   } catch (error: any) {
     console.error('Error updating product:', error);
@@ -122,6 +129,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
     
+    // Invalidate caches so frontend sees updates immediately
+    invalidateCachePrefix('products:');
+    invalidateCachePrefix('home:');
+    revalidatePath('/', 'layout');
+
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
   } catch (error: any) {
     console.error('Error deleting product:', error);

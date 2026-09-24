@@ -290,6 +290,7 @@ export default function Header() {
       { id: 'mens', label: 'Men', href: '/products/couture/mens' },
     ],
     footwear: [
+      { id: 'new-arrivals', label: 'New Arrivals', href: '/products/footwear/new-arrivals' },
       { id: 'womens', label: 'Women', href: '/products/footwear/womens' },
       { id: 'mens', label: 'Men', href: '/products/footwear/mens' },
     ],
