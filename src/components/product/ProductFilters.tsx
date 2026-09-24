@@ -13,6 +13,8 @@ interface ProductFiltersProps {
     colors: string[];
     sizes: string[];
     categories: string[];
+    subcategories?: string[];
+    collectionNames?: string[];
     productTypes: string[];
     occasions?: string[];
   };
@@ -135,11 +137,40 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
     router.push(`${pathname}?${current.toString()}`);
   };
 
-  const hasMultipleCategories = dynamicFilters && dynamicFilters.categories && dynamicFilters.categories.length > 1;
   const hasMultipleProductTypes = dynamicFilters && dynamicFilters.productTypes && dynamicFilters.productTypes.length > 1;
   const availableColors = (dynamicFilters && dynamicFilters.colors) || [];
   const availableSizes = (dynamicFilters && dynamicFilters.sizes) || [];
   const availableOccasions = (dynamicFilters && dynamicFilters.occasions) || [];
+
+  const isGender = (val: string) => ['mens', 'womens', 'men', 'women'].includes(val.toLowerCase());
+  const isNewArrival = (val: string) => val.toLowerCase() === 'new-arrivals' || val.toLowerCase() === 'new arrivals';
+
+  const allCategories = dynamicFilters?.categories || [];
+  const allSubcategories = dynamicFilters?.subcategories || [];
+  const allCollectionNames = dynamicFilters?.collectionNames || [];
+
+  const genderFilters = allCategories.filter(isGender);
+  const nonGenderCategories = allCategories.filter(c => !isGender(c) && !isNewArrival(c));
+  const validSubcategories = allSubcategories.filter(s => !isGender(s) && !isNewArrival(s));
+  const validCollectionNames = allCollectionNames.filter(c => !isGender(c) && !isNewArrival(c));
+
+  const collectionValues: { label: string, param: string, value: string }[] = [];
+  nonGenderCategories.forEach(c => collectionValues.push({ label: c, param: 'category', value: c }));
+  validSubcategories.forEach(s => collectionValues.push({ label: s, param: 'subcategory', value: s }));
+  validCollectionNames.forEach(c => collectionValues.push({ label: c, param: 'collectionName', value: c }));
+  
+  if (availableSubcategories) {
+    availableSubcategories.filter(s => !isGender(s) && !isNewArrival(s)).forEach(s => {
+      if (!collectionValues.find(v => v.label === s)) {
+        collectionValues.push({ label: s, param: 'subcategory', value: s });
+      }
+    });
+  }
+
+  const uniqueCollectionValues = Array.from(new Map(collectionValues.map(item => [item.label, item])).values())
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  const hasNewArrival = allCategories.some(isNewArrival) || allSubcategories.some(isNewArrival) || allCollectionNames.some(isNewArrival);
 
   const getColorHex = (colorName: string) => {
     const map: Record<string, string> = {
@@ -265,27 +296,28 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
               </div>
             )}
 
-            {/* Subcategory */}
-            {availableSubcategories && availableSubcategories.length > 0 && (
+            {/* SUBCATEGORY / COLLECTION */}
+            {uniqueCollectionValues.length > 0 && (
               <div className="filter-section">
                 <button className="filter-section-header" onClick={() => toggleSection('subcategory')}>
-                  <span>SUBCATEGORY</span>
+                  <span>SUBCATEGORY / COLLECTION</span>
                   <span className="chevron-text">{expandedSections.subcategory ? '⌃' : '˅'}</span>
                 </button>
                 <div className={`filter-section-content ${expandedSections.subcategory ? 'expanded' : ''} two-column-grid`}>
                   <div className="filter-section-content-inner">
-                    {availableSubcategories.map(sub => {
+                    {uniqueCollectionValues.map(item => {
+                      const isActive = searchParams.get(item.param) === item.value;
                       return (
-                        <label key={sub} className="filter-checkbox-label">
+                        <label key={`${item.param}-${item.value}`} className="filter-checkbox-label">
                           <input
                             type="checkbox"
-                            checked={activeSubcategory === sub}
-                            onChange={(e) => updateFilter('subcategory', e.target.checked ? sub : null)}
+                            checked={isActive}
+                            onChange={(e) => updateFilter(item.param, e.target.checked ? item.value : null)}
                           />
                           <span className="checkbox-custom">
-                            {activeSubcategory === sub && <Check size={12} strokeWidth={3} />}
+                            {isActive && <Check size={12} strokeWidth={3} />}
                           </span>
-                          <span className="checkbox-text">{sub.replace(/-/g, ' ')}</span>
+                          <span className="checkbox-text">{item.label.replace(/-/g, ' ')}</span>
                         </label>
                       );
                     })}
@@ -355,7 +387,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
             )}
 
             {/* GENDER */}
-            {hasMultipleCategories && (
+            {genderFilters.length > 0 && (
               <div className="filter-section">
                 <button className="filter-section-header" onClick={() => toggleSection('gender')}>
                   <span>GENDER</span>
@@ -363,7 +395,7 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                 </button>
                 <div className={`filter-section-content ${expandedSections.gender ? 'expanded' : ''}`}>
                   <div className="filter-section-content-inner">
-                    {dynamicFilters?.categories.map(gender => {
+                    {genderFilters.map(gender => {
                       const isActive = searchParams.get('category') === gender;
                       return (
                         <label key={gender} className="filter-checkbox-label">
@@ -379,6 +411,41 @@ export default function ProductFilters({ totalCount, availableSubcategories, ava
                         </label>
                       );
                     })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* NEW ARRIVAL STATUS */}
+            {hasNewArrival && (
+              <div className="filter-section">
+                <button className="filter-section-header" onClick={() => toggleSection('new_arrival')}>
+                  <span>STATUS</span>
+                  <span className="chevron-text">{expandedSections.new_arrival ? '⌃' : '˅'}</span>
+                </button>
+                <div className={`filter-section-content ${expandedSections.new_arrival ? 'expanded' : ''}`}>
+                  <div className="filter-section-content-inner">
+                    <label className="filter-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={searchParams.get('category') === 'new-arrivals' || searchParams.get('isNewArrival') === 'true'}
+                        onChange={(e) => {
+                          const current = new URLSearchParams(Array.from(searchParams.entries()));
+                          if (!e.target.checked) {
+                            if (current.get('category') === 'new-arrivals') current.delete('category');
+                            if (current.get('isNewArrival') === 'true') current.delete('isNewArrival');
+                          } else {
+                            current.set('category', 'new-arrivals');
+                          }
+                          current.delete('page');
+                          router.push(`${pathname}?${current.toString()}`);
+                        }}
+                      />
+                      <span className="checkbox-custom">
+                        {(searchParams.get('category') === 'new-arrivals' || searchParams.get('isNewArrival') === 'true') && <Check size={12} strokeWidth={3} />}
+                      </span>
+                      <span className="checkbox-text" style={{ textTransform: 'capitalize' }}>New Arrivals</span>
+                    </label>
                   </div>
                 </div>
               </div>

@@ -258,6 +258,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
             colors: [{ $unwind: '$colors' }, { $group: { _id: '$colors' } }, { $sort: { _id: 1 } }],
             sizes: [{ $unwind: '$sizes' }, { $group: { _id: '$sizes' } }, { $sort: { _id: 1 } }],
             categories: [{ $group: { _id: '$category' } }, { $sort: { _id: 1 } }],
+            subcategories: [{ $group: { _id: '$subcategory' } }, { $sort: { _id: 1 } }],
+            collectionNames: [{ $group: { _id: '$collectionName' } }, { $sort: { _id: 1 } }],
             productTypes: [{ $group: { _id: '$productType' } }, { $sort: { _id: 1 } }],
             occasions: [{ $match: { occasion: { $exists: true, $nin: [null, ''] } } }, { $group: { _id: '$occasion' } }, { $sort: { _id: 1 } }],
           },
@@ -268,6 +270,8 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
         colors: (f.colors || []).map((d: any) => d._id).filter(Boolean),
         sizes: (f.sizes || []).map((d: any) => d._id).filter(Boolean),
         categories: (f.categories || []).map((d: any) => d._id).filter(Boolean),
+        subcategories: (f.subcategories || []).map((d: any) => d._id).filter(Boolean),
+        collectionNames: (f.collectionNames || []).map((d: any) => d._id).filter(Boolean),
         productTypes: (f.productTypes || []).map((d: any) => d._id).filter(Boolean),
         occasions: (f.occasions || []).map((d: any) => d._id).filter(Boolean),
       };
@@ -291,7 +295,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
   }));
 
   const filterList = Array.isArray(rawFilters) ? rawFilters.filter(Boolean) : [];
-  const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], productTypes: string[], occasions: string[] };
+  const dynamicFilters = rawDynamicFilters as { colors: string[], sizes: string[], categories: string[], subcategories: string[], collectionNames: string[], productTypes: string[], occasions: string[] };
 
   const plainCampaigns = (rawCampaigns as any[] || []).map((c: any) => ({
     _id: c._id.toString(),
