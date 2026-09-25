@@ -238,7 +238,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
         <div className="hero-cta-group">
           <Link href="/consultation" className="hero-secondary-btn" style={secondaryBtnStyle}>
-            Book a Consultation
+            Request a Consultation
           </Link>
         </div>
       </div>

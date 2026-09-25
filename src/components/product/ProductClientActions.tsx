@@ -218,7 +218,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             }}>
               <strong>Bespoke Sizing:</strong> Our style concierge will contact you for precise measurements after your order is placed to ensure a perfect fit. 
               <br/><br/>
-              Need help before ordering? <Link href="/consultation" style={{ textDecoration: 'underline', color: '#000' }}>Book a Consultation</Link>.
+              Need help before ordering? <Link href="/consultation" style={{ textDecoration: 'underline', color: '#000' }}>Request a Consultation</Link>.
             </div>
           )}
         </div>

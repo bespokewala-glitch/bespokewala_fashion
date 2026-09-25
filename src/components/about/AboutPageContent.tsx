@@ -442,7 +442,7 @@ export default function AboutPageContent() {
           Discover Couture
         </Link>
         <Link href="/consultation" className="btn-secondary" style={{ color: "#fff", borderColor: "#fff" }}>
-          Book an Appointment
+          Request an Appointment
         </Link>
       </div>
 

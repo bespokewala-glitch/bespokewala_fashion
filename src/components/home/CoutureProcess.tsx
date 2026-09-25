@@ -195,7 +195,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#d2b48c'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#1c1c1c'}
           >
-            Book a Consultation
+            Request a Consultation
           </a>
         </div>
       </div>
