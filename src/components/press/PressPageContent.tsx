@@ -3,46 +3,82 @@ import Link from 'next/link';
 
 const PRESS_COVERAGE = [
   {
-    publication: "Harper's Bazaar India",
-    logo: "BAZAAR",
-    quote: "A label that understands the Indian woman of today — powerful, style-conscious, and deeply rooted in her cultural identity.",
-    article: "30 Indian Fashion Labels Leading the Sustainable Luxury Charge",
-    date: "January 2026",
-    category: "Fashion",
+    publication: "The Economic Times",
+    logo: "THE ECONOMIC TIMES",
+    title: "Achievers 2020 – Recognising and honouring achievers",
+    year: "2020",
+    category: "Business",
+    url: "https://economictimes.indiatimes.com/magazines/panache/achievers-2020-recognising-and-honouring-achievers/articleshow/80442702.cms?from=mdr",
   },
   {
-    publication: "Femina",
-    logo: "FEMINA",
-    quote: "From their Andheri atelier, Bespokewala crafts pieces that feel like heirlooms in the making — each stitch a story.",
-    article: "Inside Mumbai's Most Sought-After Boutique Ateliers",
-    date: "December 2025",
-    category: "Lifestyle",
-  },
-  {
-    publication: "Filmfare",
-    logo: "FILMFARE",
-    quote: "Bespokewala outfits have quietly become a favourite on the festival circuit — spotted on several leading actresses at recent premieres.",
-    article: "Labels Making Waves on the Red Carpet",
-    date: "September 2025",
+    publication: "Bollywood Hungama",
+    logo: "BOLLYWOOD HUNGAMA",
+    title: "Chitrangda Singh snapped inaugurating the Bespokewala store of Imran Shaikh",
+    year: "2023",
     category: "Celebrity",
+    url: "https://www.bollywoodhungama.com/full-coverage/2023-09-05/",
+  },
+  {
+    publication: "NewsVoir",
+    logo: "NEWSVOIR",
+    title: "Bespokewala's Adaa Collection Unveiled by Showstopper Saiee Manjrekar at the GMFL Runway Showcase in Dubai",
+    year: "2023",
+    category: "Fashion",
+    url: "https://www.newsvoir.com/release/bespokewala-apos-s-adaa-collection-unveiled-by-showstopper-saiee-manjrekar-at-the-gmfl-runway-showcase-in-dubai-25667.html",
+  },
+  {
+    publication: "Live Mumbai",
+    logo: "LIVE MUMBAI",
+    title: "India and South Korea Collaborate in a Spectacular Beauty and Fashion Showcase at the Grand Finale of Face of India 2023",
+    year: "2023",
+    category: "Events",
+    url: "https://livemumbai.in/index.php/2023/10/04/india-and-south-korea-collaborate-in-a-spectacular-beauty-and-fashion-showcase-at-the-grand-finale-of-face-of-india-2023-held-in-mumbai/",
+  },
+  {
+    publication: "ThePrint / ANI",
+    logo: "THEPRINT / ANI",
+    title: "Universal Eminence Awards 2024 Season 1 Celebrates Visionaries Shaping the Future",
+    year: "2024",
+    category: "Awards",
+    url: "https://theprint.in/ani-press-releases/universal-eminence-awards-2024-season-1-celebrates-visionaries-shaping-the-future/2253877/",
   },
 ];
 
 const MEDIA_STATS = [
-  { number: "50+",  label: "Press Features"       },
-  { number: "12",   label: "Magazine Covers"       },
-  { number: "200K+",label: "Customers"            },
-  { number: "12",   label: "Awards Won"            },
-  { number: "6",    label: "Films Costumed"       },
+  { number: "200K+",  label: "Customers"            },
+  { number: "12",     label: "Awards Won"            },
+  { number: "6",      label: "Films Costumed"       },
 ];
 
 const AWARDS = [
-  { year: "2024", award: "Iconic Designer in Ethnic Wear", body: "Universal Eminence Awards Season 1" },
+  { 
+    year: "2024", 
+    award: "Iconic Designer in Ethnic Wear", 
+    body: "Universal Eminence Awards Season 1",
+    links: [
+      { label: "View Source", url: "https://www.linkedin.com/posts/universal-eminence-awards_universaleminenceawards-bespokewala-bespokewalabyhimaliraj-activity-7232968818392764416-RAOU" },
+      { label: "Read Coverage", url: "https://theprint.in/ani-press-releases/universal-eminence-awards-2024-season-1-celebrates-visionaries-shaping-the-future/2253877/" }
+    ]
+  },
   { year: "2024", award: "Designer of the Year (Bridal & Groom – Indian)", body: "Midday Retail and Lifestyle Icons" },
-  { year: "2024", award: "Face of India", body: "Asia Model Festival" },
+  { 
+    year: "2024", 
+    award: "Face of India", 
+    body: "Asia Model Festival",
+    links: [
+      { label: "Read Coverage", url: "https://deccanbusiness.com/strengthening-cultural-ties-india-and-south-korea-collaborate-in-a-spectacular-beauty-and-fashion-showcase-at-the-grand-finale-of-face-of-india-2023-held-in-mumbai/" }
+    ]
+  },
   { year: "2023", award: "Iconic Fashion Designer", body: "Midday Icons" },
   { year: "2022", award: "Times Leading Icons", body: "The Times Group" },
-  { year: "2020", award: "Iconic Luxury Fashion Brand", body: "Midday Retail Icons" },
+  { 
+    year: "2020", 
+    award: "Iconic Luxury Fashion Brand", 
+    body: "Midday Retail Icons",
+    links: [
+      { label: "Read Coverage", url: "https://economictimes.indiatimes.com/magazines/panache/achievers-2020-recognising-and-honouring-achievers/articleshow/80442702.cms" }
+    ]
+  },
 ];
 
 export default function PressPageContent() {
@@ -89,6 +125,22 @@ export default function PressPageContent() {
           border-bottom: 1px solid #e8e0d6;
         }
         .award-row:first-child { border-top: 1px solid #e8e0d6; }
+        .award-link {
+          font-size: 0.65rem;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          color: #d2b48c;
+          border: 1px solid #d2b48c;
+          padding: 0.35rem 0.75rem;
+          text-decoration: none;
+          transition: all 0.2s;
+          white-space: nowrap;
+          display: inline-block;
+        }
+        .award-link:hover {
+          background-color: #d2b48c;
+          color: #fff;
+        }
 
         /* ── media kit box ── */
         .kit-item {
@@ -114,7 +166,7 @@ export default function PressPageContent() {
         }
         .stat-grid {
           display: grid;
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: repeat(3, 1fr);
         }
         .kit-grid {
           display: grid;
@@ -182,7 +234,7 @@ export default function PressPageContent() {
             As Seen In
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "2.5rem 4rem" }}>
-            {["BAZAAR", "FEMINA", "FILMFARE", "VERVE", "TIMES OF INDIA", "MID-DAY", "ANI", "PTI", "HINDUSTAN TIMES"].map(pub => (
+            {["THE ECONOMIC TIMES", "BOLLYWOOD HUNGAMA", "NEWSVOIR", "LIVE MUMBAI", "THEPRINT", "ANI", "MID-DAY", "TIMES OF INDIA"].map(pub => (
               <span key={pub} style={{
                 fontSize: "0.95rem",
                 fontWeight: 800,
@@ -215,21 +267,21 @@ export default function PressPageContent() {
             {PRESS_COVERAGE.map((item, i) => (
               <div key={i} className="press-card press-fade" style={{ animationDelay: `${i * 0.08}s` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <span className="press-pub-logo">{item.logo}</span>
-                  <span style={{ fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#d2b48c", background: "#fdf5e8", padding: "0.25rem 0.6rem" }}>
+                  <span className="press-pub-logo" style={{ fontSize: "0.9rem" }}>{item.logo}</span>
+                  <span style={{ fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#d2b48c", background: "#fdf5e8", padding: "0.25rem 0.6rem", flexShrink: 0, marginLeft: "0.5rem" }}>
                     {item.category}
                   </span>
                 </div>
 
-                <p style={{ fontSize: "0.9rem", fontStyle: "italic", color: "#333", lineHeight: 1.8, flexGrow: 1 }}>
-                  &ldquo;{item.quote}&rdquo;
+                <p style={{ fontSize: "0.95rem", fontWeight: 500, color: "#333", lineHeight: 1.6, flexGrow: 1 }}>
+                  {item.title}
                 </p>
 
-                <div style={{ borderTop: "1px solid #f0ebe4", paddingTop: "1rem" }}>
-                  <p style={{ fontSize: "0.78rem", fontWeight: 500, color: "#1c1c1c", marginBottom: "0.25rem" }}>
-                    {item.article}
-                  </p>
-                  <p style={{ fontSize: "0.72rem", color: "#aaa" }}>{item.publication} &nbsp;·&nbsp; {item.date}</p>
+                <div style={{ borderTop: "1px solid #f0ebe4", paddingTop: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <p style={{ fontSize: "0.72rem", color: "#aaa" }}>{item.publication} &nbsp;·&nbsp; {item.year}</p>
+                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="award-link" style={{ margin: 0, fontSize: "0.6rem" }}>
+                    Read Article &rarr;
+                  </a>
                 </div>
               </div>
             ))}
@@ -261,9 +313,24 @@ export default function PressPageContent() {
                 {a.year}
               </span>
               <span style={{ fontSize: "1.1rem", color: "#d2b48c", flexShrink: 0 }}>✦</span>
-              <div>
+              <div style={{ flexGrow: 1 }}>
                 <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "#1c1c1c", marginBottom: "0.2rem" }}>{a.award}</p>
-                <p style={{ fontSize: "0.78rem", color: "#888" }}>{a.body}</p>
+                <p style={{ fontSize: "0.78rem", color: "#888", marginBottom: a.links ? "0.75rem" : "0" }}>{a.body}</p>
+                {a.links && (
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                    {a.links.map((link, j) => (
+                      <a
+                        key={j}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="award-link"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
