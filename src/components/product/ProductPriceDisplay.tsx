@@ -6,6 +6,19 @@ import { useCurrency } from '@/context/CurrencyContext';
 export default function ProductPriceDisplay({ price }: { price: number }) {
   const { formatPrice } = useCurrency();
 
+  if (!price || price === 0) {
+    return (
+      <div>
+        <div style={{ fontSize: '1.15rem', fontWeight: 500, color: '#d32f2f', marginTop: '0.25rem' }}>
+          Price Not Configured
+        </div>
+        <div style={{ fontSize: '0.825rem', color: '#888', marginTop: '0.15rem' }}>
+          Please update in admin panel
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div style={{ fontSize: '1.15rem', fontWeight: 500, color: '#000', marginTop: '0.25rem' }}>

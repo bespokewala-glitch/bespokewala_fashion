@@ -125,8 +125,8 @@ export default function ProductCard({ product, variant = 'default', priority = f
         >
           {product.name}
         </h3>
-        <span style={{ fontSize: '0.875rem', color: '#666' }}>
-          {product.productType?.toLowerCase() === 'jewellery' ? 'Price on Request' : formattedPrice}
+        <span style={{ fontSize: '0.875rem', color: (!product.price || product.price === 0) ? '#d32f2f' : '#666' }}>
+          {(!product.price || product.price === 0) ? 'Price Not Configured' : formattedPrice}
         </span>
       </div>
     </Link>

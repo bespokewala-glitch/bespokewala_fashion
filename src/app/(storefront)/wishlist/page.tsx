@@ -274,12 +274,10 @@ export default function WishlistPage() {
                     <h3 className="wishlist-product-name">
                       {item.name}
                     </h3>
-                    <div className="wishlist-price">
-                      {item.productType?.toLowerCase() === 'jewellery' ? 'Price on Request' : formatPrice(item.price)}
+                    <div className="wishlist-price" style={(!item.price || item.price === 0) ? { color: '#d32f2f' } : {}}>
+                      {(!item.price || item.price === 0) ? 'Price Not Configured' : formatPrice(item.price)}
                     </div>
-                    {item.productType?.toLowerCase() !== 'jewellery' && (
-                      <span className="wishlist-move-to-bag">Move to Bag</span>
-                    )}
+                    <span className="wishlist-move-to-bag">Move to Bag</span>
                   </div>
                 </Link>
               </div>

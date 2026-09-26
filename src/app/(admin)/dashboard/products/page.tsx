@@ -324,8 +324,8 @@ function AdminProductsContent() {
     const payload = {
       name: formData.name,
       description: formData.description,
-      price: activeProductType === 'jewellery' ? 0 : Number(formData.price),
-      originalPrice: activeProductType === 'jewellery' ? undefined : (formData.originalPrice ? Number(formData.originalPrice) : undefined),
+      price: Number(formData.price),
+      originalPrice: formData.originalPrice ? Number(formData.originalPrice) : undefined,
       productType: formData.productType,
       category: formData.category,
       subcategory: formData.subcategory,
@@ -676,7 +676,6 @@ function AdminProductsContent() {
               />
             </div>
 
-            {activeProductType !== 'jewellery' && (
               <div className={styles.formRow}>
                 <div style={{ flex: 1 }}>
                   <label className={styles.formLabel}>Price ($)</label>
@@ -704,7 +703,6 @@ function AdminProductsContent() {
                   />
                 </div>
               </div>
-            )}
 
             <div className={styles.sectionHeader}>
               <h3>2. Category & Collection</h3>

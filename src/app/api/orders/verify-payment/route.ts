@@ -6,6 +6,7 @@ import dbConnect from "@/lib/mongoose";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
 import { sendMetaEvent } from "@/lib/metaConversions";
+import { validateAddress } from "@/lib/addressValidation";
 
 export async function POST(request: Request) {
   try {
@@ -32,6 +33,13 @@ export async function POST(request: Request) {
 
     if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
       return NextResponse.json({ message: "Missing payment verification fields" }, { status: 400 });
+    }
+
+    if (shippingDetails) {
+      const valRes = await validateAddress(shippingDetails);
+      if (!valRes.isValid) {
+        return NextResponse.json({ message: valRes.message || "Invalid address provided." }, { status: 400 });
+      }
     }
 
     // Verify HMAC-SHA256 signature — critical security step

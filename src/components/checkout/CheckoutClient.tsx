@@ -41,6 +41,8 @@ export default function CheckoutClient() {
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [isFetchingAddresses, setIsFetchingAddresses] = useState(true);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [addressValidationMsg, setAddressValidationMsg] = useState<string | null>(null);
+  const [suggestedAddress, setSuggestedAddress] = useState<any>(null);
 
   const [shippingDetails, setShippingDetails] = useState({
     firstName: "",
@@ -128,7 +130,49 @@ export default function CheckoutClient() {
 
     setIsSavingAddress(true);
     setError(null);
+    setAddressValidationMsg(null);
+    
     try {
+      // 1. Validate Address via API
+      const valRes = await fetch('/api/validate-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          address: shippingDetails.address,
+          city: shippingDetails.city,
+          state: shippingDetails.state,
+          zipCode: shippingDetails.zipCode,
+          country: shippingDetails.country
+        })
+      });
+      const valData = await valRes.json();
+      
+      if (!valData.isValid) {
+        setError(valData.message || "Please enter a valid address.");
+        setIsSavingAddress(false);
+        return;
+      }
+      
+      if (valData.message && valData.isValid) {
+         // E.g. "Address verification is temporarily unavailable"
+         setAddressValidationMsg(valData.message);
+      }
+
+      if (valData.suggestedAddress && !suggestedAddress) {
+        setSuggestedAddress(valData.suggestedAddress);
+        setError("We've standardized your address for better delivery. Please review and click Save again to confirm.");
+        setShippingDetails(prev => ({
+          ...prev,
+          address: valData.suggestedAddress.address || prev.address,
+          city: valData.suggestedAddress.city || prev.city,
+          state: valData.suggestedAddress.state || prev.state,
+          zipCode: valData.suggestedAddress.zipCode || prev.zipCode
+        }));
+        setIsSavingAddress(false);
+        return;
+      }
+
+      // 2. Save Address
       const url = editingAddressId 
         ? `/api/account/addresses/${editingAddressId}`
         : `/api/account/addresses`;
@@ -161,6 +205,7 @@ export default function CheckoutClient() {
 
       // GA4 add_shipping_info — fires after user successfully saves/confirms a shipping address
       trackAddShippingInfo(cart, total);
+      setSuggestedAddress(null);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -247,7 +292,7 @@ export default function CheckoutClient() {
       const orderRes = await fetch("/api/orders/create-razorpay-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total, currency: "INR" }),
+        body: JSON.stringify({ amount: total, currency: "INR", shippingDetails: finalShippingDetails }),
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.message || "Failed to create payment order");
@@ -380,6 +425,11 @@ export default function CheckoutClient() {
           {error}
         </div>
       )}
+      {addressValidationMsg && !error && (
+        <div style={{ backgroundColor: "#fff3e0", color: "#e65100", padding: "1rem", marginBottom: "2rem", textAlign: "center", border: "1px solid #ffcc80" }}>
+          {addressValidationMsg}
+        </div>
+      )}
 
       <form onSubmit={handlePayWithRazorpay} style={{ display: "flex", flexWrap: "wrap", gap: "2rem 4rem", alignItems: "flex-start" }}>
         {/* Shipping Form / Address Book */}
@@ -500,7 +550,7 @@ export default function CheckoutClient() {
                       disabled={isSavingAddress}
                       style={{ backgroundColor: "#000", color: "#fff", border: "none", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
                     >
-                      {isSavingAddress ? "Saving..." : "Save Address"}
+                      {isSavingAddress ? "Saving..." : suggestedAddress ? "Confirm & Save" : "Save Address"}
                     </button>
                     
                     {savedAddresses.length > 0 && (
@@ -509,6 +559,8 @@ export default function CheckoutClient() {
                         onClick={() => {
                            setShowAddressForm(false);
                            setEditingAddressId(null);
+                           setSuggestedAddress(null);
+                           setError(null);
                         }}
                         style={{ backgroundColor: "transparent", color: "#000", border: "1px solid #ccc", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
                       >

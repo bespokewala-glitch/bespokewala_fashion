@@ -1,7 +1,8 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 import https from "https";
+import { validateAddress } from "@/lib/addressValidation";
 
 export async function POST(request: Request) {
   try {
@@ -16,10 +17,17 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { amount, currency = "INR" } = body;
+    const { amount, currency = "INR", shippingDetails } = body;
 
     if (!amount || typeof amount !== "number" || amount <= 0) {
       return NextResponse.json({ message: "Invalid amount" }, { status: 400 });
+    }
+
+    if (shippingDetails) {
+      const valRes = await validateAddress(shippingDetails);
+      if (!valRes.isValid) {
+        return NextResponse.json({ message: valRes.message || "Invalid address provided." }, { status: 400 });
+      }
     }
 
     const keyId = process.env.RAZORPAY_KEY_ID;

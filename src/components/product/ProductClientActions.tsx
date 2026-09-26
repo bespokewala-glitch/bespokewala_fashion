@@ -174,12 +174,11 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
     padding: '0 0.5rem',
   };
 
-  const isJewellery = product.productType?.toLowerCase() === 'jewellery';
   const shippingEstimate = getShippingEstimate(product.productType, product.category, product.subcategory);
 
   return (
     <>
-      {!isJewellery && product.sizes && product.sizes.length > 0 && (
+      {product.sizes && product.sizes.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={sectionLabelStyle}>Size</div>
@@ -224,28 +223,24 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
       )}
 
-      {!isJewellery && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1rem' }}>
-          <div style={sectionLabelStyle}>Quantity</div>
-          <div style={quantitySelectorStyle}>
-            <button style={qtyBtnStyle} onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-            <span style={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '0.5rem 1rem' }}>{quantity}</span>
-            <button style={qtyBtnStyle} onClick={() => setQuantity(quantity + 1)}>+</button>
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', marginTop: '1rem' }}>
+        <div style={sectionLabelStyle}>Quantity</div>
+        <div style={quantitySelectorStyle}>
+          <button style={qtyBtnStyle} onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+          <span style={{ fontSize: '0.85rem', border: '1px solid #ddd', padding: '0.5rem 1rem' }}>{quantity}</span>
+          <button style={qtyBtnStyle} onClick={() => setQuantity(quantity + 1)}>+</button>
         </div>
-      )}
+      </div>
       
-      {!isJewellery && (
-        <div style={{ fontSize: '0.85rem', color: '#444', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="1" y="3" width="15" height="13"></rect>
-            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-            <circle cx="5.5" cy="18.5" r="2.5"></circle>
-            <circle cx="18.5" cy="18.5" r="2.5"></circle>
-          </svg>
-          <span>Shipping Time: <strong>{shippingEstimate}</strong></span>
-        </div>
-      )}
+      <div style={{ fontSize: '0.85rem', color: '#444', marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="1" y="3" width="15" height="13"></rect>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+        </svg>
+        <span>Shipping Time: <strong>{shippingEstimate}</strong></span>
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
         
@@ -277,25 +272,18 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
         </div>
 
         {/* Primary Button */}
-        {!isJewellery ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <button style={{ ...primaryBtnStyle, marginTop: 0 }} onClick={handleAddToCart}>
-              {isAdding ? 'Adding...' : 'Add to Cart'}
-            </button>
-            <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666' }}>
-              Complimentary alterations within 7 days of delivery for bespoke items.
-            </div>
-          </div>
-        ) : (
-          <a 
-            href={`https://wa.me/917506767452?text=Hello%20Bespokewala,%20I'm%20interested%20in%20the%20${encodeURIComponent(product.name)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ ...primaryBtnStyle, marginTop: 0, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <button 
+            style={{ ...primaryBtnStyle, marginTop: 0, opacity: (!product.price || product.price === 0) ? 0.5 : (isAdding ? 0.7 : 1), cursor: (!product.price || product.price === 0) ? 'not-allowed' : 'pointer' }} 
+            onClick={(!product.price || product.price === 0) ? undefined : handleAddToCart}
+            disabled={!product.price || product.price === 0}
           >
-            Ask for Price
-          </a>
-        )}
+            {(!product.price || product.price === 0) ? 'Price Not Configured' : (isAdding ? 'Adding...' : 'Add to Cart')}
+          </button>
+          <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666' }}>
+            Complimentary alterations within 7 days of delivery for bespoke items.
+          </div>
+        </div>
       </div>
 
       <VirtualTryOnModal 
