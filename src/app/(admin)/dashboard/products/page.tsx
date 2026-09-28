@@ -35,7 +35,7 @@ function AdminProductsContent() {
   const [savingMenuImages, setSavingMenuImages] = useState(false);
 
   useEffect(() => {
-    if (productTypeParam && ['couture', 'jewellery', 'footwear'].includes(productTypeParam)) {
+    if (productTypeParam && ['couture', 'jewellery', 'accessories', 'footwear'].includes(productTypeParam)) {
       setActiveProductType(productTypeParam);
       setEditingId(null);
       setCurrentPage(1);

@@ -300,6 +300,10 @@ export default function Header() {
       { id: 'diamond-collection', label: 'Diamond Collection', href: '/products/jewellery/diamond-collection' },
       { id: 'menswear-collection', label: 'Menswear Collection', href: '/products/jewellery/menswear-collection' },
     ],
+    accessories: [
+      { id: 'womens', label: 'Women', href: '/products/accessories/womens' },
+      { id: 'mens', label: 'Men', href: '/products/accessories/mens' },
+    ],
   };
 
   const activeSecondaryNav = displayNav ? menuData[displayNav as string] || [] : [];
@@ -359,8 +363,9 @@ export default function Header() {
           zIndex: 101
         }}>
           <Link href="/products/couture" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Couture</Link>
-          <Link href="/products/footwear" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Footwear</Link>
           <Link href="/products/jewellery" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Jewellery</Link>
+          <Link href="/products/accessories" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Accessories</Link>
+          <Link href="/products/footwear" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Footwear</Link>
           <Link href="/new-arrivals" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>New Arrivals</Link>
         </div>
 
@@ -388,16 +393,22 @@ export default function Header() {
                 <Link prefetch={true} href="/products/couture" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Couture</Link>
               </li>
               <li 
-                ref={el => { navRefs.current['footwear'] = el; }}
-                onMouseEnter={() => handleMouseEnterMenu('footwear')}
-              >
-                <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Footwear</Link>
-              </li>
-              <li 
                 ref={el => { navRefs.current['jewellery'] = el; }}
                 onMouseEnter={() => handleMouseEnterMenu('jewellery')}
               >
                 <Link prefetch={true} href="/products/jewellery" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Jewellery</Link>
+              </li>
+              <li 
+                ref={el => { navRefs.current['accessories'] = el; }}
+                onMouseEnter={() => handleMouseEnterMenu('accessories')}
+              >
+                <Link prefetch={true} href="/products/accessories" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Accessories</Link>
+              </li>
+              <li 
+                ref={el => { navRefs.current['footwear'] = el; }}
+                onMouseEnter={() => handleMouseEnterMenu('footwear')}
+              >
+                <Link prefetch={true} href="/products/footwear" style={{ padding: '1rem 0', display: 'inline-block' }} className="menu-link-hover">Footwear</Link>
               </li>
               <li onMouseEnter={() => handleMouseLeaveMenu()}>
                 <Link prefetch={true} href="/new-arrivals" style={{ padding: '1rem 0', display: 'inline-block', whiteSpace: 'nowrap' }} className="menu-link-hover">New Arrivals</Link>
@@ -795,6 +806,89 @@ export default function Header() {
                     );
                   })}
                   <Link href="/products/jewellery" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Jewellery</Link>
+                </div>
+              )}
+            </div>
+
+            {/* Accessories Accordion */}
+            <div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'accessories' ? null : 'accessories'); setExpandedMobileSubMenu(null); }}
+              >
+                <span>Accessories</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'accessories' ? '-' : '+'}</span>
+              </div>
+              {expandedMobileMenu === 'accessories' && (
+                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                  {menuData.accessories.map(item => {
+                    const colls = taxonomies.filter((t: any) => t.type === 'collection' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const occs = taxonomies.filter((t: any) => t.type === 'occasion' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const cats = taxonomies.filter((t: any) => t.type === 'category' && (!t.productTypes?.length || t.productTypes.includes('accessories')) && (!t.genders?.length || t.genders.includes(item.id)));
+                    const hasTax = colls.length > 0 || occs.length > 0 || cats.length > 0;
+                    const subKey = `accessories-${item.id}`;
+                    const isSubOpen = expandedMobileSubMenu === subKey;
+                    return (
+                      <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                          {hasTax ? (
+                            <div
+                              onClick={() => setExpandedMobileSubMenu(isSubOpen ? null : subKey)}
+                              style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer', alignItems: 'center' }}
+                            >
+                              <span>{item.label}</span>
+                              <span style={{ color: '#666', fontSize: '1.1rem', lineHeight: 1, minWidth: '32px', textAlign: 'right' }}>
+                                {isSubOpen ? '−' : '›'}
+                              </span>
+                            </div>
+                          ) : (
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
+                          )}
+                        </div>
+                        {isSubOpen && (
+                          <div style={{ paddingLeft: '0.75rem', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ fontSize: '0.75rem', fontWeight: 600, color: '#000', paddingTop: '0.5rem', letterSpacing: '0.05em', textTransform: 'uppercase' }}>VIEW ALL {item.label}</Link>
+                            {[{ label: 'COLLECTIONS', items: colls }, { label: 'OCCASION', items: occs }, { label: 'CATEGORIES', items: cats }]
+                              .filter(g => g.items.length > 0)
+                              .map(group => (
+                                <div key={group.label}>
+                                  <div style={{ fontSize: '0.6rem', letterSpacing: '0.15em', color: '#aaa', marginBottom: '0.4rem', fontWeight: 600 }}>{group.label}</div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    {group.items.map((tx: any) => (
+                                      <Link key={tx._id} href={`/products/accessories/${item.id}/${tx.slug}`} onClick={() => setIsMobileMenuOpen(false)} style={{ color: '#555', fontSize: '0.75rem', letterSpacing: '0.04em' }}>{tx.name}</Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <Link href="/products/accessories" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Accessories</Link>
+                </div>
+              )}
+            </div>
+
+            {/* Footwear Accordion */}
+            <div>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
+                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'footwear' ? null : 'footwear'); setExpandedMobileSubMenu(null); }}
+              >
+                <span>Footwear</span>
+                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'footwear' ? '-' : '+'}</span>
+              </div>
+              {expandedMobileMenu === 'footwear' && (
+                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
+                  {menuData.footwear.map(item => (
+                    <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
+                        <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
+                      </div>
+                    </div>
+                  ))}
+                  <Link href="/products/footwear" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Footwear</Link>
                 </div>
               )}
             </div>

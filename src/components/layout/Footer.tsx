@@ -87,6 +87,7 @@ export default function Footer() {
             <ul style={listStyle}>
               <li><Link href="/products/couture">Couture</Link></li>
               <li><Link href="/products/jewellery">Jewellery</Link></li>
+              <li><Link href="/products/accessories">Accessories</Link></li>
               <li><Link href="/products/footwear">Footwear</Link></li>
             </ul>
           </div>
