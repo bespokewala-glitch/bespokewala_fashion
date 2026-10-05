@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Review from '@/models/Review';
 import Order from '@/models/Order';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAuth } from '@/lib/auth';
 import mongoose from 'mongoose';
 
 export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
@@ -99,16 +98,11 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
     const { id: productId } = params;
     
     // Auth check
-    const tokenCookie = (await cookies()).get('token');
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Please log in to write a review' }, { status: 401 });
+    const { user, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
-
-    const decoded = await verifyToken(tokenCookie.value);
-    if (!decoded || !decoded.userId) {
-      return NextResponse.json({ message: 'Invalid or expired session' }, { status: 401 });
-    }
-    const userId = decoded.userId;
+    const userId = user.userId || user.id;
 
     const body = await request.json();
     const { rating, title, comment, images } = body;

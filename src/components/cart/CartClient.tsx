@@ -18,7 +18,43 @@ export default function CartClient() {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return null; // Avoid hydration mismatch
+  if (!isMounted) {
+    return (
+      <div style={{ padding: '4rem 4rem 8rem', maxWidth: '1400px', margin: '0 auto' }} className="mobile-px-4 mobile-py-4">
+        <style>{`
+          @keyframes cart-shimmer-base {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .cart-shimmer-base {
+            background: linear-gradient(90deg, #f5f0eb 25%, #ede6df 50%, #f5f0eb 75%);
+            background-size: 200% 100%;
+            animation: cart-shimmer-base 1.5s infinite;
+          }
+        `}</style>
+        <div className="cart-shimmer-base" style={{ width: '120px', height: '32px', margin: '0 auto 4rem', borderRadius: '2px' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '4rem' }} className="mobile-flex-col">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {[1, 2].map((i) => (
+              <div key={i} style={{ display: 'flex', gap: '2rem', paddingBottom: '2rem', borderBottom: '1px solid #eee' }}>
+                <div className="cart-shimmer-base" style={{ width: '120px', height: '160px', borderRadius: '2px', flexShrink: 0 }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="cart-shimmer-base" style={{ width: '60%', height: '20px', borderRadius: '2px' }} />
+                  <div className="cart-shimmer-base" style={{ width: '30%', height: '16px', borderRadius: '2px' }} />
+                  <div className="cart-shimmer-base" style={{ width: '100px', height: '36px', borderRadius: '2px' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ border: '1px solid #eee', padding: '2rem', height: '240px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="cart-shimmer-base" style={{ width: '140px', height: '20px', borderRadius: '2px' }} />
+            <div className="cart-shimmer-base" style={{ width: '100%', height: '16px', borderRadius: '2px' }} />
+            <div className="cart-shimmer-base" style={{ width: '100%', height: '48px', borderRadius: '2px', marginTop: 'auto' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (cart.length === 0) {
     return (
@@ -77,7 +113,7 @@ export default function CartClient() {
                         });
                         removeFromCart(item.id);
                       }}
-                      style={{ background: 'none', border: 'none', color: '#999', fontSize: '0.8rem', padding: 0, marginTop: '1rem', cursor: 'pointer', textDecoration: 'underline' }}
+                      style={{ background: 'none', border: 'none', color: '#999', fontSize: '0.8rem', padding: '0.5rem 0', marginTop: '0.5rem', cursor: 'pointer', textDecoration: 'underline', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
                     >
                       Remove
                     </button>
@@ -85,10 +121,10 @@ export default function CartClient() {
                 </div>
 
                 <div style={{ flex: '1', display: 'flex', justifyContent: 'center' }} className="mobile-w-full mobile-text-left">
-                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', padding: '0.5rem' }}>
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#666', padding: '0 0.5rem' }}>-</button>
+                  <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd' }}>
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#666', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>-</button>
                     <span style={{ fontSize: '1rem', width: '2rem', textAlign: 'center' }}>{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#666', padding: '0 0.5rem' }}>+</button>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#666', minWidth: '44px', minHeight: '44px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                   </div>
                 </div>
 

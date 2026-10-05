@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Taxonomy from '@/models/Taxonomy';
 import { getOrFetch, invalidateCachePrefix } from '@/lib/serverCache';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
@@ -54,11 +55,35 @@ export async function GET(request: Request) {
   }
 }
 
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
+
 export async function POST(request: Request) {
   let data: any;
   try {
+    const rl = await checkAdminRateLimit(request, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     data = await request.json();
+
+    if (!data.name || typeof data.name !== 'string' || data.name.trim().length < 2) {
+      return NextResponse.json({ error: 'Valid taxonomy name (at least 2 characters) is required' }, { status: 400 });
+    }
+
+    if (!data.type || !['category', 'subcategory', 'collection', 'occasion'].includes(data.type)) {
+      return NextResponse.json({ error: 'Valid taxonomy type (category, subcategory, collection, occasion) is required' }, { status: 400 });
+    }
     
     // Auto-generate slug if not provided
     if (!data.slug && data.name) {
@@ -68,6 +93,21 @@ export async function POST(request: Request) {
     const taxonomy = new Taxonomy(data);
     await taxonomy.save();
     invalidateCachePrefix('taxonomies:'); // clear cached taxonomy lists
+
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'taxonomy.created',
+      target_type: 'taxonomy',
+      target_id: taxonomy._id.toString(),
+      meta: {
+        name: taxonomy.name,
+        type: taxonomy.type,
+        slug: taxonomy.slug,
+      },
+      req: request,
+    });
+
     return NextResponse.json(taxonomy, { status: 201 });
   } catch (error: any) {
     if (error.code === 11000) {
@@ -112,3 +152,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

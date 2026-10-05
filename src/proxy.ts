@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const secretKey = process.env.JWT_SECRET || 'super-secret-key-for-development-only';
+const secretKey = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'super-secret-key-for-development-only';
 const key = new TextEncoder().encode(secretKey);
 
 // Named export (required by Next.js 16+ proxy convention)
 export async function proxy(request: NextRequest) {
-  const token = request.cookies.get('auth-token')?.value;
+  const token =
+    request.cookies.get('auth-token')?.value ||
+    request.cookies.get('token')?.value;
   const { pathname } = request.nextUrl;
 
   // Paths that require authentication

@@ -51,7 +51,7 @@ interface Order {
   shippingDetails: ShippingDetails;
   paymentMethod: string;
   paymentStatus: "pending" | "completed" | "failed";
-  orderStatus: "processing" | "shipped" | "delivered" | "cancelled";
+  orderStatus: string;
   subtotal: number;
   shippingCost: number;
   total: number;
@@ -63,10 +63,15 @@ interface Order {
 const PAGE_SIZE = 10;
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  processing: { label: "Processing", color: "#b45309", bg: "#fef3c7", icon: Clock },
-  shipped:    { label: "Shipped",    color: "#1d4ed8", bg: "#dbeafe", icon: Truck },
-  delivered:  { label: "Delivered",  color: "#15803d", bg: "#dcfce7", icon: CheckCircle },
-  cancelled:  { label: "Cancelled",  color: "#dc2626", bg: "#fee2e2", icon: XCircle },
+  confirmed:  { label: "Confirmed",   color: "#16a34a", bg: "#dcfce7", icon: CheckCircle },
+  production: { label: "Production",  color: "#d97706", bg: "#fef3c7", icon: Clock },
+  qc:         { label: "QC",          color: "#7c3aed", bg: "#ede9fe", icon: CheckCircle },
+  dispatched: { label: "Dispatched",  color: "#2563eb", bg: "#dbeafe", icon: Truck },
+  in_transit: { label: "In Transit",  color: "#0891b2", bg: "#cffafe", icon: Truck },
+  delivered:  { label: "Delivered",   color: "#15803d", bg: "#dcfce7", icon: CheckCircle },
+  cancelled:  { label: "Cancelled",   color: "#dc2626", bg: "#fee2e2", icon: XCircle },
+  processing: { label: "Processing",  color: "#b45309", bg: "#fef3c7", icon: Clock },
+  shipped:    { label: "Shipped",     color: "#1d4ed8", bg: "#dbeafe", icon: Truck },
 };
 
 const PAYMENT_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -76,9 +81,11 @@ const PAYMENT_CONFIG: Record<string, { label: string; color: string; bg: string 
 };
 
 const FILTERS = [
-  { key: "all",        label: "All" },
-  { key: "processing", label: "Processing" },
-  { key: "shipped",    label: "Shipped" },
+  { key: "all",        label: "All Orders" },
+  { key: "confirmed",  label: "Confirmed" },
+  { key: "production", label: "Production" },
+  { key: "qc",         label: "QC" },
+  { key: "dispatched", label: "Dispatched" },
   { key: "delivered",  label: "Delivered" },
   { key: "cancelled",  label: "Cancelled" },
 ];
@@ -160,10 +167,13 @@ function OrderDrawer({
             <select
               className={styles.drawerStatusSelect}
               value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value as Order["orderStatus"])}
+              onChange={(e) => setNewStatus(e.target.value)}
             >
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="production">In Production</option>
+              <option value="qc">Quality Check (QC)</option>
+              <option value="dispatched">Dispatched</option>
+              <option value="in_transit">In Transit</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
             </select>
@@ -293,11 +303,37 @@ function OrderDrawer({
         </div>
 
         {/* Footer */}
-        <div className={styles.drawerFooter}>
+        <div className={styles.drawerFooter} style={{ display: "flex", gap: "10px" }}>
+          {order.orderStatus !== "cancelled" && (
+            <button
+              onClick={async () => {
+                if (window.confirm(`Are you sure you want to cancel order #${order._id.slice(-8).toUpperCase()}? This will update the status to Cancelled and automatically notify the customer.`)) {
+                  setSaving(true);
+                  await onStatusUpdate(order._id, "cancelled");
+                  setSaving(false);
+                }
+              }}
+              disabled={saving}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                borderRadius: "8px",
+                border: "1px solid #fecaca",
+                background: "#fef2f2",
+                color: "#dc2626",
+                fontWeight: 600,
+                fontSize: "0.82rem",
+                cursor: "pointer",
+              }}
+            >
+              Cancel Order
+            </button>
+          )}
           <button
             className={styles.btnSaveStatus}
             onClick={handleSave}
             disabled={saving || newStatus === order.orderStatus}
+            style={{ flex: 1 }}
           >
             {saving ? (
               <span className={styles.saving}>Saving…</span>
@@ -511,7 +547,12 @@ export default function AdminOrdersPage() {
 
       {/* ── Table ── */}
       <div className={styles.tableCard}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className={styles.loadingScreen} style={{ minHeight: '300px' }}>
+            <div className={styles.spinner} />
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748b' }}>Loading atelier orders...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>
               <ShoppingBag size={28} color="#9ca3af" />

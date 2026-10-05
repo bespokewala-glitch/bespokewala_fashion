@@ -288,11 +288,18 @@ export default function CheckoutClient() {
     trackAddPaymentInfo(cart, total, 'Razorpay');
 
     try {
-      // Step 1: Create Razorpay order on server
+      // Step 1: Create Razorpay order on server (amount calculated server-side)
       const orderRes = await fetch("/api/orders/create-razorpay-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: total, currency: "INR", shippingDetails: finalShippingDetails }),
+        body: JSON.stringify({
+          items: cart.map((item: CartItem) => ({
+            productSlug: item.productSlug,
+            quantity: item.quantity,
+          })),
+          currency: "INR",
+          shippingDetails: finalShippingDetails,
+        }),
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.message || "Failed to create payment order");
@@ -405,13 +412,14 @@ export default function CheckoutClient() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    padding: "1rem",
+    padding: "0.85rem 1rem",
     border: "1px solid #e0e0e0",
     backgroundColor: "#fafafa",
-    fontSize: "0.9rem",
+    fontSize: "16px", // 16px prevents iOS Safari auto-zoom on focus
     outline: "none",
     boxSizing: "border-box",
     fontFamily: "inherit",
+    minHeight: "48px",
   };
 
   return (
@@ -548,7 +556,7 @@ export default function CheckoutClient() {
                       type="button" 
                       onClick={handleSaveAddress}
                       disabled={isSavingAddress}
-                      style={{ backgroundColor: "#000", color: "#fff", border: "none", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
+                      style={{ backgroundColor: "#000", color: "#fff", border: "none", padding: "0.85rem 1.5rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1, minHeight: "48px", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                     >
                       {isSavingAddress ? "Saving..." : suggestedAddress ? "Confirm & Save" : "Save Address"}
                     </button>
@@ -562,7 +570,7 @@ export default function CheckoutClient() {
                            setSuggestedAddress(null);
                            setError(null);
                         }}
-                        style={{ backgroundColor: "transparent", color: "#000", border: "1px solid #ccc", padding: "1rem 2rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1 }}
+                        style={{ backgroundColor: "transparent", color: "#000", border: "1px solid #ccc", padding: "0.85rem 1.5rem", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.05em", fontSize: "0.85rem", flex: 1, minHeight: "48px", display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                       >
                         Cancel
                       </button>
@@ -625,6 +633,10 @@ export default function CheckoutClient() {
             style={{
               width: "100%",
               padding: "1.2rem",
+              minHeight: "52px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               backgroundColor: "#000",
               color: "#fff",
               border: "none",

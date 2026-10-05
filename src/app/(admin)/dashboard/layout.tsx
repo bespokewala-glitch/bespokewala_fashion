@@ -1,12 +1,28 @@
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminHamburger from '@/components/admin/AdminHamburger';
 import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { verifyToken } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth-token')?.value || cookieStore.get('token')?.value;
+
+  if (!token) {
+    redirect('/login?redirect=/dashboard');
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user || user.role !== 'admin') {
+    redirect('/login?redirect=/dashboard&error=unauthorized');
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
       {/* Overriding the global storefront body padding for the admin dashboard */}

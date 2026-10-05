@@ -7,7 +7,7 @@
  *   Pre-generated WebP variants (_variants/medium/...) are used to bypass Next.js image optimization bottlenecks.
  */
 
-const GCS_BUCKET = process.env.NEXT_PUBLIC_BUCKET_NAME || 'bespokewala-public-product-images';
+const GCS_BUCKET = process.env.NEXT_PUBLIC_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET_NAME || 'bespokewala-public-product-images';
 const GCS_BASE = `https://storage.googleapis.com/${GCS_BUCKET}/`;
 
 export const PLACEHOLDER_IMAGE =
@@ -90,8 +90,39 @@ export function generateGcsSrcSet(url: string | null | undefined): string | unde
   return undefined;
 }
 
+/**
+ * Returns true when Next.js image optimisation should be bypassed (unoptimized=true).
+ *
+ * We bypass for any external URL that is NOT from a hostname explicitly listed
+ * in next.config.ts `images.remotePatterns`. This prevents the dreaded
+ * "next-image-unconfigured-host" error when a product in the DB has a
+ * placeholder or third-party image URL.
+ *
+ * GCS and Unsplash URLs are allowed through the optimizer normally.
+ */
 export function shouldBypassOptimizer(url: string | null | undefined): boolean {
-  return false; 
+  if (!url) return false;
+  const trimmed = url.trim();
+
+  // Local paths — always safe for the optimizer
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) return false;
+
+  // Hostnames that are listed in next.config.ts remotePatterns
+  const ALLOWED_REMOTE_HOSTS = [
+    'storage.googleapis.com',
+    'images.unsplash.com',
+  ];
+
+  try {
+    const { hostname } = new URL(trimmed);
+    if (ALLOWED_REMOTE_HOSTS.includes(hostname)) return false; // let optimizer handle it
+  } catch {
+    // Malformed URL — bypass to avoid crashing
+    return true;
+  }
+
+  // Any other external hostname → bypass optimizer, render as plain <img>
+  return true;
 }
 
 export function getProductImageUrl(

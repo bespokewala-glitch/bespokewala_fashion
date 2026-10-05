@@ -191,7 +191,24 @@ function SearchOverlayInner({ isOpen, onClose }: SearchOverlayProps) {
                 </h3>
 
                 {loading ? (
-                  <div style={{ padding: '2rem 0', color: '#999' }}>Loading results...</div>
+                  <div className="search-results-grid">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="search-result-card">
+                        <div
+                          style={{
+                            aspectRatio: '3/4',
+                            background: 'linear-gradient(90deg, #f5f0eb 25%, #ede6df 50%, #f5f0eb 75%)',
+                            backgroundSize: '200% 100%',
+                            animation: 'bw-shimmer 1.5s infinite',
+                            marginBottom: '1rem',
+                            borderRadius: '2px',
+                          }}
+                        />
+                        <div style={{ height: '14px', background: '#eee', borderRadius: '2px', width: '80%', marginBottom: '6px' }} />
+                        <div style={{ height: '12px', background: '#eee', borderRadius: '2px', width: '40%' }} />
+                      </div>
+                    ))}
+                  </div>
                 ) : results.length > 0 ? (
                   <div className="search-results-grid">
                     {results.map((product) => (

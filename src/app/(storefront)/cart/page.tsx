@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function CartPage() {
   return (
     <>
-            <main style={{ minHeight: '80vh', paddingTop: '6rem' }}>
+            <main className="cart-page-main" style={{ minHeight: '80vh', paddingTop: '6rem' }}>
         <CartClient />
       </main>
           </>

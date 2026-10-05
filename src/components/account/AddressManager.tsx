@@ -123,7 +123,29 @@ export default function AddressManager() {
   };
 
   if (loading) {
-    return <div style={{ padding: '4rem', textAlign: 'center', color: '#888' }}>Loading addresses...</div>;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem', padding: '1rem 0' }}>
+        <style>{`
+          @keyframes addr-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+          }
+          .addr-shimmer {
+            background: linear-gradient(90deg, #f5f0eb 25%, #ede6df 50%, #f5f0eb 75%);
+            background-size: 200% 100%;
+            animation: addr-shimmer 1.5s infinite;
+          }
+        `}</style>
+        {[1, 2].map((i) => (
+          <div key={i} style={{ border: '1px solid #eee', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '12px', background: '#fff', borderRadius: '4px' }}>
+            <div className="addr-shimmer" style={{ width: '45%', height: '18px', borderRadius: '2px' }} />
+            <div className="addr-shimmer" style={{ width: '85%', height: '14px', borderRadius: '2px' }} />
+            <div className="addr-shimmer" style={{ width: '60%', height: '14px', borderRadius: '2px' }} />
+            <div className="addr-shimmer" style={{ width: '40%', height: '14px', borderRadius: '2px', marginTop: '1rem' }} />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   const inputStyle: React.CSSProperties = {

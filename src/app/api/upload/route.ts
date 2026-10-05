@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bucket } from '@/lib/gcs';
+import { requireAdmin } from '@/lib/auth';
 
 // ─── Thumbnail sizes generated eagerly at upload time ─────────────────────────
 // These match the variants checked by /api/media/[...path]/route.ts.
@@ -46,6 +47,11 @@ async function generateAndSaveVariant(
 
 export async function POST(request: NextRequest) {
   try {
+    const { errorResponse } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     const data = await request.formData();
     const file: File | null = data.get('file') as unknown as File;
 
@@ -59,6 +65,35 @@ export async function POST(request: NextRequest) {
     if (buffer.length === 0) {
       return NextResponse.json(
         { success: false, error: 'The uploaded file is empty (0 bytes). If using a cloud drive, please ensure the file is fully downloaded to your device before uploading.' },
+        { status: 400 }
+      );
+    }
+
+    // ── Security Validations: File size and MIME type ─────────────────────────
+    const ALLOWED_MIME_TYPES = new Set([
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/avif',
+      'video/mp4',
+      'video/webm',
+      'video/quicktime',
+    ]);
+
+    const isVideo = file.type?.startsWith('video/');
+    const maxSizeBytes = isVideo ? 50 * 1024 * 1024 : 15 * 1024 * 1024; // 50MB for video, 15MB for images
+
+    if (buffer.length > maxSizeBytes) {
+      return NextResponse.json(
+        { success: false, error: `File size exceeds the limit (${isVideo ? '50MB' : '15MB'}).` },
+        { status: 400 }
+      );
+    }
+
+    if (file.type && !ALLOWED_MIME_TYPES.has(file.type.toLowerCase())) {
+      return NextResponse.json(
+        { success: false, error: 'Unsupported file type. Only JPEG, PNG, WebP, AVIF images and MP4/WebM videos are allowed.' },
         { status: 400 }
       );
     }
@@ -101,6 +136,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('[upload] Error uploading file to GCS:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    const sanitizedMsg = error.message?.includes('credential') || error.message?.includes('key') || error.message?.includes('bucket')
+      ? 'Storage service is temporarily unavailable. Please try again later.'
+      : (error.message || 'File upload failed. Please try again.');
+    return NextResponse.json({ success: false, error: sanitizedMsg }, { status: 500 });
   }
 }
+

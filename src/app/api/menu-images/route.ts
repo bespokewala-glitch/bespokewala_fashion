@@ -1,23 +1,10 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import MenuImage from '@/models/MenuImage';
-import { cookies } from 'next/headers';
-import { verifyToken } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth';
 import { getOrFetch, invalidateCachePrefix } from '@/lib/serverCache';
-
-// Helper to verify admin token
-async function verifyAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token')?.value;
-  if (!token) return false;
-  
-  try {
-    const payload = await verifyToken(token);
-    return payload?.role === 'admin';
-  } catch (error) {
-    return false;
-  }
-}
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
 
 export async function GET(request: Request) {
   try {
@@ -46,9 +33,17 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const isAdmin = await verifyAdmin();
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const rl = await checkAdminRateLimit(request, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     await dbConnect();
@@ -65,8 +60,25 @@ export async function POST(request: Request) {
       { new: true, upsert: true }
     );
 
+    invalidateCachePrefix('menu-images:');
+
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'content.updated',
+      target_type: 'content',
+      meta: {
+        section: 'menu-images',
+        productType,
+        category,
+        imageCount: images.length,
+      },
+      req: request,
+    });
+
     return NextResponse.json(updatedMenuImage);
   } catch (error: unknown) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
+

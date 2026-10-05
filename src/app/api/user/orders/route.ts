@@ -1,26 +1,16 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAuth } from '@/lib/auth';
 
 export async function GET(request: Request) {
   try {
-    const tokenCookie = (await cookies()).get('auth-token');
-    
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    const { user, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
-    const user = await verifyToken(tokenCookie.value);
-    
-    // BUG-003 fix: signToken sets { id } but some code may have used { userId }.
-    // Normalize: accept whichever claim is present.
-    const userId = user?.id || user?.userId;
-    
-    if (!user || !userId) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = user.id || user.userId;
 
     await dbConnect();
 
@@ -34,3 +24,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+

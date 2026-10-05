@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import HomepageSection from '@/models/HomepageSection';
 import { invalidateCachePrefix } from '@/lib/serverCache';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +16,24 @@ export async function GET(request: NextRequest) {
   }
 }
 
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
+
 export async function POST(request: NextRequest) {  
   try {
+    const rl = await checkAdminRateLimit(request, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     const body = await request.json();
     const { sectionType, content, page = 'home' } = body;
@@ -35,9 +52,22 @@ export async function POST(request: NextRequest) {
     // Invalidate the server-side cache so the next page request picks up fresh data
     invalidateCachePrefix('home:');
 
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'content.updated',
+      target_type: 'content',
+      meta: {
+        sectionType,
+        page,
+      },
+      req: request,
+    });
+
     return NextResponse.json({ success: true, section }, { status: 201 });
   } catch (error: any) {
     console.error('Error saving homepage section:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+

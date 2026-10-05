@@ -16,12 +16,20 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   mobileNumber: { type: String, required: false }, // Made optional to support existing users
-  password: { type: String, required: false }, // Optional for passwordless auth
+  password: { type: String, required: false }, // Optional for passwordless / OAuth auth
   role: { type: String, enum: ['admin', 'customer'], default: 'customer' },
+  status: { type: String, enum: ['active', 'suspended'], default: 'active' },
+  // OAuth fields
+  googleId: { type: String, default: null, sparse: true }, // Google sub claim
+  provider: { type: String, enum: ['local', 'google'], default: 'local' },
   addresses: [addressSchema]
 }, {
   timestamps: true
 });
+
+userSchema.index({ role: 1, createdAt: -1 });
+userSchema.index({ status: 1, createdAt: -1 });
+userSchema.index({ mobileNumber: 1 }, { sparse: true });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 export default User;

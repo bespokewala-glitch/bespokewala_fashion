@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { getAuthUser } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -20,16 +19,8 @@ export async function POST(request: Request) {
     }
 
     // Optional: Get user from token if logged in
-    const tokenCookie = (await cookies()).get('token');
-    let userId = null;
-    if (tokenCookie) {
-      try {
-        const decoded = await verifyToken(tokenCookie.value);
-        userId = decoded?.userId;
-      } catch (err) {
-        // Ignore invalid token, just treat as guest
-      }
-    }
+    const authUser = await getAuthUser(request);
+    const userId = authUser?.userId || authUser?.id || null;
 
     // Calculate totals securely on the server
     let calculatedSubtotal = 0;
@@ -64,8 +55,8 @@ export async function POST(request: Request) {
       user: userId,
       items: finalItems,
       shippingDetails,
-      paymentMethod: paymentMethod || 'card',
-      paymentStatus: 'completed', // Simulated successful payment
+      paymentMethod: paymentMethod || 'cod',
+      paymentStatus: 'pending', // Payment NOT confirmed — requires manual verification or COD
       orderStatus: 'confirmed',
       subtotal: calculatedSubtotal,
       shippingCost: calculatedShipping,
@@ -83,3 +74,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: error.message || 'Server error' }, { status: 500 });
   }
 }
+

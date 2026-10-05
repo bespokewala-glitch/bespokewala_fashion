@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
 import Otp from '@/models/Otp';
-import { signToken } from '@/lib/auth';
+import { signToken, verifyPassword, hashPassword } from '@/lib/auth';
 import { checkSingleLimit, rateLimitHeaders } from '@/lib/media/rateLimit';
+import { sendLoginAlertEmail } from '@/lib/email';
 
 function getClientIp(req: Request): string {
   return (
@@ -41,26 +42,39 @@ export async function POST(request: Request) {
       );
     }
 
+    const cleanIdentifier = typeof identifier === 'string' ? identifier.trim() : '';
+    const cleanEmail = cleanIdentifier.toLowerCase();
+
     const user = await User.findOne({ 
-      $or: [{ email: identifier }, { mobileNumber: identifier }]
+      $or: [{ email: cleanEmail }, { mobileNumber: cleanIdentifier }]
     });
     
-    if (!user) {
+    // Constant-time/generic failure to prevent account enumeration
+    if (!user || !user.password) {
       return NextResponse.json(
-        { error: 'Account not found' },
-        { status: 404 }
-      );
-    }
-
-    if (!user.password) {
-      return NextResponse.json(
-        { error: 'Account uses OTP. Please reset your password or use old login.' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
 
-    // Plain text password comparison (as requested)
-    const isValid = password === user.password;
+    // Secure verification: check bcrypt hash first, with auto-upgrade for legacy plain-text
+    let isValid = false;
+    const isBcrypt = user.password.startsWith('$2a$') || user.password.startsWith('$2b$');
+
+    if (isBcrypt) {
+      isValid = await verifyPassword(password, user.password);
+    } else {
+      // Legacy plain-text password fallback: verify and automatically upgrade to bcrypt
+      if (password === user.password) {
+        isValid = true;
+        try {
+          user.password = await hashPassword(password);
+          await user.save();
+        } catch (upgradeErr) {
+          console.warn('[auth] Could not auto-upgrade legacy password hash:', upgradeErr);
+        }
+      }
+    }
 
     if (!isValid) {
       return NextResponse.json(
@@ -69,12 +83,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate token
+    if (user.status === 'suspended') {
+      return NextResponse.json(
+        { error: 'Your account has been restricted or suspended. Please contact customer care.' },
+        { status: 403 }
+      );
+    }
+
+    // Generate token with normalized claims
     const token = await signToken({
       id: user._id.toString(),
+      userId: user._id.toString(),
       email: user.email,
       role: user.role,
       name: user.name,
+    });
+
+    // Send login security alert email (asynchronous, non-fatal)
+    sendLoginAlertEmail(user.email, user.name, ip, new Date()).catch((emailErr) => {
+      console.warn('[auth] Could not send login alert email:', emailErr?.message ?? emailErr);
     });
 
     const response = NextResponse.json(
@@ -90,16 +117,17 @@ export async function POST(request: Request) {
       { status: 200 }
     );
 
-    // Set HTTP-only cookie
-    response.cookies.set({
-      name: 'auth-token',
-      value: token,
+    // Set secure HTTP-only cookies (set both auth-token and token for full backward compatibility)
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       path: '/',
       maxAge: 60 * 60 * 24, // 1 day
-    });
+    };
+
+    response.cookies.set({ name: 'auth-token', value: token, ...cookieOptions });
+    response.cookies.set({ name: 'token', value: token, ...cookieOptions });
 
     return response;
   } catch (error: any) {
@@ -110,3 +138,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

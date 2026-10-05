@@ -3,7 +3,7 @@ import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 
 export default function FeatureBanner({ data }: { data?: any }) {
-  const image = data?.image || "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80";
+  const image = data?.image || "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?auto=format&fit=crop&q=80";
   const title = data?.title || "High Jewellery";
   const subtitle = data?.subtitle || "Pair text with an image to focus on your chosen product.";
   let link = data?.link || "/products/jewellery/all";

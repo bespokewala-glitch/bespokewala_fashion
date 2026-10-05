@@ -5,6 +5,7 @@ import { IProduct } from '@/types/product';
 import { preWarmGcsKey } from '@/lib/preWarmVariants';
 import { invalidateCachePrefix } from '@/lib/serverCache';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth';
 
 
 export async function GET(
@@ -33,11 +34,27 @@ export async function GET(
   }
 }
 
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rl = await checkAdminRateLimit(req, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(req);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     const resolvedParams = await params;
     const id = resolvedParams.id;
@@ -47,6 +64,20 @@ export async function PUT(
     }
 
     const body = await req.json();
+
+    if (body.price !== undefined) {
+      const p = Number(body.price);
+      if (isNaN(p) || p < 0) {
+        return NextResponse.json({ error: 'Price must be a valid non-negative number' }, { status: 400 });
+      }
+    }
+
+    if (body.inventoryCount !== undefined) {
+      const inv = Number(body.inventoryCount);
+      if (isNaN(inv) || inv < 0) {
+        return NextResponse.json({ error: 'Inventory count must be a non-negative number' }, { status: 400 });
+      }
+    }
     
     const productData: Partial<IProduct> = {
       ...body,
@@ -54,15 +85,13 @@ export async function PUT(
       sizes: Array.isArray(body.sizes) ? body.sizes : [],
       colors: Array.isArray(body.colors) ? body.colors : [],
       subcategory: body.subcategory || 'general',
-      price: Number(body.price) || 0,
-      originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
-      inventoryCount: Number(body.inventoryCount) || 0,
-      isFeatured: Boolean(body.isFeatured),
-      isNewArrival: Boolean(body.isNewArrival),
+      price: body.price !== undefined ? Number(body.price) : undefined,
+      originalPrice: body.originalPrice !== undefined ? (body.originalPrice ? Number(body.originalPrice) : undefined) : undefined,
+      inventoryCount: body.inventoryCount !== undefined ? Number(body.inventoryCount) : undefined,
+      isFeatured: body.isFeatured !== undefined ? Boolean(body.isFeatured) : undefined,
+      isNewArrival: body.isNewArrival !== undefined ? Boolean(body.isNewArrival) : undefined,
       referenceImages: body.referenceImages || undefined,
       details: body.details || undefined,
-      // Persist SEO fields explicitly so admin overrides are saved to MongoDB.
-      // If body.seo is undefined (old clients), this is a no-op.
       seo: body.seo
         ? {
             title: body.seo.title || undefined,
@@ -75,6 +104,9 @@ export async function PUT(
         : undefined,
     };
 
+    // Remove undefined values to avoid overwriting existing properties unintendedly
+    Object.keys(productData).forEach(key => (productData as any)[key] === undefined && delete (productData as any)[key]);
+
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { $set: productData },
@@ -85,8 +117,22 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    // Audit log
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'product.updated',
+      target_type: 'product',
+      target_id: id,
+      meta: {
+        name: updatedProduct.name,
+        price: updatedProduct.price,
+        inventoryCount: updatedProduct.inventoryCount,
+      },
+      req,
+    });
+
     // Fire-and-forget: pre-warm all image variants for the updated product.
-    // This runs in the background without blocking the admin response.
     const allImageUrls: string[] = [
       ...(Array.isArray(body.images) ? body.images : []),
       body.referenceImages?.front,
@@ -107,14 +153,28 @@ export async function PUT(
     return NextResponse.json(updatedProduct);
   } catch (error: any) {
     console.error('Error updating product:', error);
-    return NextResponse.json({ error: error.message || 'Failed to update product' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
   }
 }
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rl = await checkAdminRateLimit(req, 'adminSensitive');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(req);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     const resolvedParams = await params;
     const id = resolvedParams.id;
@@ -128,6 +188,20 @@ export async function DELETE(
     if (!deletedProduct) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
+
+    // Audit log
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'product.deleted',
+      target_type: 'product',
+      target_id: id,
+      meta: {
+        name: deletedProduct.name,
+        slug: deletedProduct.slug,
+      },
+      req,
+    });
     
     // Invalidate caches so frontend sees updates immediately
     invalidateCachePrefix('products:');
@@ -137,6 +211,6 @@ export async function DELETE(
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
   } catch (error: any) {
     console.error('Error deleting product:', error);
-    return NextResponse.json({ error: error.message || 'Failed to delete product' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
   }
 }

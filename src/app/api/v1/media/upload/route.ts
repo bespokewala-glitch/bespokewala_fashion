@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
 
     // ── 4. Rate limiting (now async — supports Redis) ─────────────────────────
     const ip = getClientIp(req);
-    const rateResult = await checkRateLimit(uploader_id, entity_type, ip);
+    const rateResult = await checkRateLimit(uploader_id, entity_type, ip ?? 'unknown');
     const rlHeaders = rateLimitHeaders(rateResult.remaining ?? 0, 60_000);
 
     if (!rateResult.allowed) {
@@ -348,3 +348,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

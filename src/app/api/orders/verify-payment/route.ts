@@ -1,23 +1,18 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import dbConnect from "@/lib/mongoose";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
 import { sendMetaEvent } from "@/lib/metaConversions";
 import { validateAddress } from "@/lib/addressValidation";
+import { sendOrderConfirmationEmail, sendNewOrderAdminEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-    if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    const user = await verifyToken(token);
-    if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const { user, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const body = await request.json();
@@ -53,12 +48,26 @@ export async function POST(request: Request) {
       .update(`${razorpayOrderId}|${razorpayPaymentId}`)
       .digest("hex");
 
-    if (expectedSignature !== razorpaySignature) {
+    const expectedBuf = Buffer.from(expectedSignature, 'utf-8');
+    const receivedBuf = Buffer.from(razorpaySignature, 'utf-8');
+    const isValidSignature =
+      expectedBuf.length === receivedBuf.length &&
+      crypto.timingSafeEqual(expectedBuf, receivedBuf);
+
+    if (!isValidSignature) {
       return NextResponse.json({ message: "Payment verification failed: invalid signature" }, { status: 400 });
     }
 
-    // Signature valid — now create the order in DB
     await dbConnect();
+
+    // ── Idempotency: prevent duplicate orders for same payment ID ─────────────
+    const existingOrder = await Order.findOne({ razorpayPaymentId }).lean();
+    if (existingOrder) {
+      return NextResponse.json(
+        { success: true, orderId: (existingOrder as any)._id.toString(), message: "Order already exists" },
+        { status: 200 }
+      );
+    }
 
     let calculatedSubtotal = 0;
     const finalItems = [];
@@ -90,6 +99,26 @@ export async function POST(request: Request) {
     const calculatedShipping = 0;
     const calculatedTotal = calculatedSubtotal + calculatedShipping;
 
+    // ── Cross-check: fetch Razorpay order to verify amount was not tampered ───
+    try {
+      const keyId = process.env.RAZORPAY_KEY_ID;
+      if (keyId && keySecret) {
+        const rzpOrderRes = await fetch(`https://api.razorpay.com/v1/orders/${razorpayOrderId}`, {
+          headers: { Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}` },
+        });
+        if (rzpOrderRes.ok) {
+          const rzpOrder = await rzpOrderRes.json();
+          const rzpAmountInRupees = rzpOrder.amount / 100;
+          if (Math.abs(rzpAmountInRupees - calculatedTotal) > 1) {
+            console.error(`Amount mismatch: Razorpay=${rzpAmountInRupees}, Calculated=${calculatedTotal}`);
+            return NextResponse.json({ message: "Payment amount mismatch. Please contact support." }, { status: 400 });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Razorpay amount cross-check failed (non-fatal):", e);
+    }
+
     let userId = (user as any).userId || (user as any).id;
     if (userId && typeof userId === 'object' && userId.buffer) {
       userId = Buffer.from(Object.values(userId.buffer)).toString('hex');
@@ -102,7 +131,7 @@ export async function POST(request: Request) {
       items: finalItems,
       shippingDetails,
       paymentMethod: "razorpay",
-      paymentStatus: "paid",
+      paymentStatus: "completed",   // enum: pending | completed | failed
       razorpayOrderId,
       razorpayPaymentId,
       orderStatus: "confirmed",
@@ -144,12 +173,40 @@ export async function POST(request: Request) {
     });
     // ---------------------------------------------
 
+    // ── Transactional emails (non-fatal) ─────────────────────────────────────
+    const emailData = {
+      orderId: newOrder._id.toString(),
+      items: finalItems,
+      shippingDetails,
+      subtotal: calculatedSubtotal,
+      shippingCost: calculatedShipping,
+      total: calculatedTotal,
+      currency: displayCurrency || 'INR',
+      paymentMethod: 'Razorpay',
+      razorpayPaymentId,
+    };
+
+    const customerEmail = shippingDetails?.email;
+    if (customerEmail) {
+      sendOrderConfirmationEmail(customerEmail, emailData).catch((e) =>
+        console.error('[email] Order confirmation failed:', e?.message)
+      );
+    }
+    sendNewOrderAdminEmail(emailData).catch((e) =>
+      console.error('[email] Admin order alert failed:', e?.message)
+    );
+    // ─────────────────────────────────────────────────────────────────────────
+
     return NextResponse.json(
       { success: true, orderId: newOrder._id.toString(), message: "Payment verified and order placed" },
       { status: 201 }
     );
   } catch (error: any) {
     console.error("Payment verification error:", error);
-    return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Payment verification encountered an unexpected error. If your account was debited, our concierge team will verify and confirm your order shortly." },
+      { status: 500 }
+    );
   }
 }
+

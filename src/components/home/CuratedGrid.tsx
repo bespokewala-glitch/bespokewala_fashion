@@ -10,7 +10,7 @@ export default function CuratedGrid({ data }: { data?: any }) {
       link: '/products/couture/womens'
     },
     {
-      url: 'https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80',
+      url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80',
       title: 'Fine Jewellery',
       link: '/products/jewellery/all'
     },

@@ -35,7 +35,7 @@ export default async function Home() {
   // so warm requests within 5 minutes are served instantly with zero DB round-trips.
   const [rawFeaturedProducts, campaigns, hpSections] = await Promise.all([
     getOrFetch('home:featuredProducts', 300, () =>
-      Product.find({ isFeatured: true, productType: { $regex: /^couture$/i } })
+      Product.find({ isFeatured: true })
         .sort({ _id: -1 })
         .select('name slug price images category referenceImages')
         .limit(10)
@@ -170,7 +170,6 @@ export default async function Home() {
         <TrustSection />
         <FeatureBanner data={sectionMap.FeatureBanner} />
         <SplitShowcase data={sectionMap.SplitShowcase} />
-        <CoutureProcess data={sectionMap.CoutureProcess} />
         <LookbookCarousel data={sectionMap.LookbookCarousel} />
         <BrandStory data={sectionMap.BrandStory} />
         <TestimonialsSection />
@@ -207,7 +206,6 @@ export default async function Home() {
               .featured-cta-container {
                 margin-top: 2rem;
               }
-              
               @media (max-width: 767px) {
                 .featured-arrivals-section {
                   padding: 3rem 0 1rem 0;
@@ -255,7 +253,9 @@ export default async function Home() {
         )}
 
         <CoutureProcess data={sectionMap.CoutureProcess} />
+
       </main>
+
     </>
   );
 }

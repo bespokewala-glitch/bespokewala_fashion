@@ -275,7 +275,7 @@ const ipRequestCounts = new Map<string, { count: number; windowStart: number }>(
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 30;
 
-function checkRateLimit(ip: string): boolean {
+function checkAdminRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = ipRequestCounts.get(ip) || { count: 0, windowStart: now };
 
@@ -295,7 +295,7 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
   const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
 
-  if (!checkRateLimit(ip)) {
+  if (!checkAdminRateLimit(ip)) {
     return NextResponse.json({
       text: "You're sending messages a bit too fast. Please wait a moment.",
       products: [],
@@ -536,3 +536,4 @@ export async function POST(req: NextRequest) {
     });
   }
 }
+

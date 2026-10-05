@@ -5,7 +5,7 @@ import '../chatbot.css';
 
 const Footer = dynamic(() => import('@/components/layout/Footer'));
 import MiniCart from '@/components/cart/MiniCart';
-import ChatbotWidget from '@/components/chatbot/ChatbotWidget';
+import ChatbotLoader from '@/components/chatbot/ChatbotLoader';
 
 export default function StorefrontLayout({
   children,
@@ -18,7 +18,7 @@ export default function StorefrontLayout({
       {children}
       <Footer />
       <MiniCart />
-      <ChatbotWidget />
+      <ChatbotLoader />
     </>
   );
 }

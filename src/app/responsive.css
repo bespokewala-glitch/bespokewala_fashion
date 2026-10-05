@@ -48,7 +48,70 @@
 
   body {
     width: 100%;
-    padding-top: 110px !important;
+    padding-top: var(--site-header-height-mobile, 94px) !important;
+  }
+
+  /* Mobile Top Category Navigation Bar */
+  .mobile-top-bar {
+    display: flex !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap !important;
+    gap: 1.25rem !important;
+    padding: 0.65rem 1rem !important;
+    justify-content: flex-start !important;
+    border-bottom: 1px solid #eeeeee !important;
+    background-color: #ffffff !important;
+    width: 100% !important;
+  }
+  .mobile-top-bar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  @media (min-width: 480px) and (max-width: 1023px) {
+    .mobile-top-bar {
+      justify-content: center !important;
+      gap: 1.75rem !important;
+    }
+  }
+
+  /* Mobile Main Header row */
+  .mobile-main-header {
+    padding: 0 1rem !important;
+    height: 56px !important;
+    min-height: 56px !important;
+  }
+
+  .mobile-icon-right {
+    flex: 1 !important;
+    justify-content: flex-end !important;
+    gap: 0.25rem !important;
+  }
+
+  .mobile-hero-title {
+    font-size: clamp(1.75rem, 6vw, 2.5rem) !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.08em !important;
+    word-break: break-word;
+  }
+
+  .cart-page-main {
+    padding-top: 1.5rem !important;
+  }
+
+  .product-detail-page-main {
+    padding: 1.5rem 1rem !important;
+    gap: 1.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .product-detail-page-main .details-scroll-container {
+    position: static !important;
+    top: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
   }
 
   .mobile-hide {
@@ -1431,12 +1494,11 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 /* ── Body scroll-lock when mobile drawer is open ───────────────────────────── */
-.body-drawer-open {
+body.body-drawer-open {
   overflow: hidden !important;
-  /* Prevent iOS bounce scroll from bleeding through */
-  position: fixed;
-  width: 100%;
+  touch-action: none;
 }
+
 
 /* ── touch-action on horizontal carousels ─────────────────────────────────── */
 /* Prevents the browser from interpreting a horizontal swipe as a vertical
@@ -1476,25 +1538,6 @@
     min-height: 180px !important;
   }
 
-  /* The inline columnStyle has minWidth:'200px' which overflows at 320px.
-     Target via the .mobile-stack children which are the columns. */
-  footer .mobile-stack>div {
-    min-width: 0 !important;
-    width: 100% !important;
-  }
-
-  /* Footer link touch targets — ensure 44px minimum */
-  footer ul li {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-  }
-
-  footer ul li a {
-    display: block;
-    width: 100%;
-    padding: 4px 0;
-  }
 
   /* ── TestimonialsSection — reduce mobile padding & min-height ──────────── */
   .testimonials-section {

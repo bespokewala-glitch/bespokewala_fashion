@@ -1,28 +1,35 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { verifyToken } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import https from "https";
 import { validateAddress } from "@/lib/addressValidation";
+import dbConnect from "@/lib/mongoose";
+import Product from "@/models/Product";
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth-token")?.value;
-    if (!token) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    const user = await verifyToken(token);
-    if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const { user, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const body = await request.json();
-    const { amount, currency = "INR", shippingDetails } = body;
+    const { items, currency = "INR", shippingDetails } = body;
 
-    if (!amount || typeof amount !== "number" || amount <= 0) {
-      return NextResponse.json({ message: "Invalid amount" }, { status: 400 });
+    // ── Validate cart items ──────────────────────────────────────────────────
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
     }
 
+    for (const item of items) {
+      if (!item.productSlug) {
+        return NextResponse.json({ message: "Product slug is required for all items" }, { status: 400 });
+      }
+      if (!Number.isInteger(item.quantity) || item.quantity < 1) {
+        return NextResponse.json({ message: `Invalid quantity for item: ${item.productSlug}` }, { status: 400 });
+      }
+    }
+
+    // ── Validate address if provided ────────────────────────────────────────
     if (shippingDetails) {
       const valRes = await validateAddress(shippingDetails);
       if (!valRes.isValid) {
@@ -30,6 +37,29 @@ export async function POST(request: Request) {
       }
     }
 
+    // ── Server-side price calculation (NEVER trust client amount) ────────────
+    await dbConnect();
+    const productSlugs = items.map((i: any) => i.productSlug);
+    const products = await Product.find({ slug: { $in: productSlugs } }).select("slug price").lean();
+    const productMap = new Map((products as any[]).map((p: any) => [p.slug, p]));
+
+    let calculatedSubtotal = 0;
+    for (const item of items) {
+      const product = productMap.get(item.productSlug);
+      if (!product) {
+        return NextResponse.json({ message: `Product not found: ${item.productSlug}` }, { status: 404 });
+      }
+      calculatedSubtotal += (product as any).price * item.quantity;
+    }
+
+    const shippingCost = 0; // Free shipping — update when shipping logic is added
+    const authorativeTotal = calculatedSubtotal + shippingCost;
+
+    if (authorativeTotal <= 0) {
+      return NextResponse.json({ message: "Order total must be greater than zero" }, { status: 400 });
+    }
+
+    // ── Create Razorpay order with server-calculated amount ──────────────────
     const keyId = process.env.RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -39,19 +69,22 @@ export async function POST(request: Request) {
     }
 
     const razorpayOrder = await createRazorpayOrder(
-      { amount: Math.round(amount * 100), currency, receipt: `receipt_${Date.now()}` },
+      { amount: Math.round(authorativeTotal * 100), currency, receipt: `receipt_${Date.now()}` },
       keyId,
       keySecret
     );
 
     return NextResponse.json({
       razorpayOrderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
+      amount: razorpayOrder.amount,       // paise — authoritative server amount
       currency: razorpayOrder.currency,
     });
   } catch (error: any) {
     console.error("Razorpay order creation error:", error);
-    return NextResponse.json({ message: error.message || "Failed to create payment order" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Unable to initiate payment session. Please try again or contact concierge support." },
+      { status: 500 }
+    );
   }
 }
 
@@ -94,3 +127,6 @@ function createRazorpayOrder(
     req.end();
   });
 }
+
+
+

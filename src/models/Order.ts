@@ -22,7 +22,7 @@ export interface IShippingDetails {
 }
 
 export interface IOrder extends Document {
-  user?: mongoose.Types.ObjectId; // Optional, for logged in users
+  user?: mongoose.Types.ObjectId;
   items: IOrderItem[];
   shippingDetails: IShippingDetails;
   paymentMethod: string;
@@ -31,6 +31,8 @@ export interface IOrder extends Document {
   subtotal: number;
   shippingCost: number;
   total: number;
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
   displayCurrency?: string;
   exchangeRate?: number;
   displaySubtotal?: number;
@@ -72,6 +74,8 @@ const OrderSchema = new Schema(
     subtotal: { type: Number, required: true },
     shippingCost: { type: Number, required: true },
     total: { type: Number, required: true },
+    razorpayOrderId: { type: String },
+    razorpayPaymentId: { type: String },
     displayCurrency: { type: String },
     exchangeRate: { type: Number },
     displaySubtotal: { type: Number },
@@ -81,8 +85,12 @@ const OrderSchema = new Schema(
   { timestamps: true }
 );
 
-// Add indexes for faster querying
+// Indexes
 OrderSchema.index({ user: 1, createdAt: -1 });
 OrderSchema.index({ createdAt: -1 });
+OrderSchema.index({ orderStatus: 1, createdAt: -1 });
+OrderSchema.index({ paymentStatus: 1, createdAt: -1 });
+// Prevent duplicate orders for the same Razorpay payment (idempotency)
+OrderSchema.index({ razorpayPaymentId: 1 }, { unique: true, sparse: true });
 
 export default mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);

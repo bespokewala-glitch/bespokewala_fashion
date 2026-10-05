@@ -3,11 +3,17 @@ import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
 import User from '@/models/User';
+import { requireAdmin } from '@/lib/auth';
 
 export const revalidate = 60;
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { errorResponse } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
 
     const now = new Date();
@@ -21,6 +27,9 @@ export async function GET() {
       totalOrders,
       totalUsers,
       totalProducts,
+      paidOrdersCount,
+      pendingOrdersCount,
+      failedOrdersCount,
       revenueAgg,
       thisMonthRevenueAgg,
       lastMonthRevenueAgg,
@@ -32,10 +41,17 @@ export async function GET() {
       topProducts,
       newUsersThisMonth,
       newUsersLastMonth,
+      lowStockProducts,
+      lowStockCount,
     ] = await Promise.all([
       Order.countDocuments(),
       User.countDocuments({ role: 'customer' }),
       Product.countDocuments(),
+
+      // Payment status counts
+      Order.countDocuments({ paymentStatus: 'completed' }),
+      Order.countDocuments({ paymentStatus: 'pending' }),
+      Order.countDocuments({ paymentStatus: 'failed' }),
 
       // Total revenue (completed payments only)
       Order.aggregate([
@@ -107,6 +123,13 @@ export async function GET() {
       User.countDocuments({ role: 'customer', createdAt: { $gte: startOfThisMonth } }),
       // New users last month
       User.countDocuments({ role: 'customer', createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }),
+      // Low stock products (< 5 items)
+      Product.find({ inventoryCount: { $lte: 5 } })
+        .select('_id name slug price inventoryCount images productType category')
+        .sort({ inventoryCount: 1 })
+        .limit(8)
+        .lean(),
+      Product.countDocuments({ inventoryCount: { $lte: 5 } }),
     ]);
 
     // ─── Process results ─────────────────────────────────────────────────────
@@ -134,8 +157,13 @@ export async function GET() {
       stats: {
         totalRevenue,
         totalOrders,
+        paidOrders: paidOrdersCount,
+        pendingOrders: pendingOrdersCount,
+        failedOrders: failedOrdersCount,
         totalUsers,
         totalProducts,
+        lowStockCount,
+        lowStockProducts,
         thisMonthRevenue,
         revenueGrowth,
         thisMonthOrders: thisMonthOrdersCount,
@@ -143,8 +171,11 @@ export async function GET() {
         newUsersThisMonth,
         usersGrowth,
         ordersByStatus: {
-          processing: statusMap['processing'] ?? 0,
-          shipped: statusMap['shipped'] ?? 0,
+          confirmed: statusMap['confirmed'] ?? 0,
+          production: statusMap['production'] ?? 0,
+          qc: statusMap['qc'] ?? 0,
+          dispatched: statusMap['dispatched'] ?? statusMap['shipped'] ?? 0,
+          in_transit: statusMap['in_transit'] ?? 0,
           delivered: statusMap['delivered'] ?? 0,
           cancelled: statusMap['cancelled'] ?? 0,
         },
@@ -158,3 +189,4 @@ export async function GET() {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+

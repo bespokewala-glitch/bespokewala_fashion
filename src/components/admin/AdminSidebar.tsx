@@ -19,26 +19,77 @@ import {
   Menu,
   X,
   Tags,
+  Boxes,
+  Percent,
+  Star,
+  Settings,
+  Mail,
+  Layers,
+  ShieldCheck,
 } from "lucide-react";
 
-const navItems = [
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Orders", path: "/dashboard/orders", icon: ShoppingBag },
+interface NavItem {
+  name: string;
+  path: string;
+  icon: React.ElementType;
+  badge?: string;
+  subItems?: { name: string; productType: string; icon: React.ElementType }[];
+}
+
+interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
   {
-    name: "Products",
-    path: "/dashboard/products",
-    icon: Package,
-    subItems: [
-      { name: "Couture", productType: "couture", icon: Sparkles },
-      { name: "Jewellery", productType: "jewellery", icon: Gem },
-      { name: "Accessories", productType: "accessories", icon: Tags },
-      { name: "Footwear", productType: "footwear", icon: Briefcase },
+    group: "Overview",
+    items: [
+      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     ],
   },
-  { name: "Users", path: "/dashboard/users", icon: Users },
-  { name: "Taxonomies", path: "/dashboard/taxonomies", icon: Tags },
-  { name: "Campaigns", path: "/dashboard/campaigns", icon: ImageIcon },
-  { name: "Homepage Sections", path: "/dashboard/homepage", icon: LayoutTemplate },
+  {
+    group: "Catalog & Inventory",
+    items: [
+      {
+        name: "Products",
+        path: "/dashboard/products",
+        icon: Package,
+        subItems: [
+          { name: "Couture", productType: "couture", icon: Sparkles },
+          { name: "Jewellery", productType: "jewellery", icon: Gem },
+          { name: "Accessories", productType: "accessories", icon: Tags },
+          { name: "Footwear", productType: "footwear", icon: Briefcase },
+        ],
+      },
+      { name: "Categories", path: "/dashboard/taxonomies", icon: Layers },
+      { name: "Inventory", path: "/dashboard/inventory", icon: Boxes },
+    ],
+  },
+  {
+    group: "Sales & Customers",
+    items: [
+      { name: "Orders", path: "/dashboard/orders", icon: ShoppingBag },
+      { name: "Customers", path: "/dashboard/users", icon: Users },
+      { name: "Discounts & Coupons", path: "/dashboard/coupons", icon: Percent },
+    ],
+  },
+  {
+    group: "Content & Marketing",
+    items: [
+      { name: "Campaigns", path: "/dashboard/campaigns", icon: ImageIcon },
+      { name: "Homepage Sections", path: "/dashboard/homepage", icon: LayoutTemplate },
+      { name: "Reviews", path: "/dashboard/reviews", icon: Star },
+    ],
+  },
+  {
+    group: "Operations & System",
+    items: [
+      { name: "Notifications / Email", path: "/dashboard/notifications", icon: Mail },
+      { name: "Audit Logs", path: "/dashboard/audit-logs", icon: ShieldCheck },
+      { name: "Settings", path: "/dashboard/settings", icon: Settings },
+    ],
+  },
 ];
 
 export default function AdminSidebar() {
@@ -146,151 +197,154 @@ export default function AdminSidebar() {
           overflowY: "auto",
         }}
       >
-        <div
-          style={{
-            fontSize: "0.65rem",
-            fontWeight: 600,
-            color: "#444",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            padding: "6px 12px 8px",
-          }}
-        >
-          Main Menu
-        </div>
+        {navGroups.map((group, gIdx) => (
+          <div key={group.group} style={{ marginBottom: "10px" }}>
+            <div
+              style={{
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                color: "#525252",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                padding: "8px 12px 4px",
+              }}
+            >
+              {group.group}
+            </div>
 
-        {navItems.map((item) => {
-          // Use mounted state to prevent hydration mismatches from Next.js router hooks
-          const isActive = mounted && pathname === item.path;
-          const isProductsActive = mounted && pathname.startsWith("/dashboard/products");
-          const Icon = item.icon;
+            {group.items.map((item) => {
+              const isActive = mounted && pathname === item.path;
+              const isProductsActive = mounted && pathname.startsWith("/dashboard/products");
+              const Icon = item.icon;
 
-          if (item.subItems) {
-            const expanded = expandedItems[item.path];
-            return (
-              <div key={item.path}>
-                <button
-                  onClick={() => toggleExpand(item.path)}
+              if (item.subItems) {
+                const expanded = expandedItems[item.path];
+                return (
+                  <div key={item.path}>
+                    <button
+                      onClick={() => toggleExpand(item.path)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        padding: "9px 12px",
+                        backgroundColor:
+                          isProductsActive
+                            ? "rgba(255,255,255,0.08)"
+                            : "transparent",
+                        color: isProductsActive ? "#fff" : "#999",
+                        border: "none",
+                        width: "100%",
+                        textAlign: "left",
+                        cursor: "pointer",
+                        borderRadius: "6px",
+                        fontSize: "0.84rem",
+                        fontFamily: "inherit",
+                        fontWeight: isProductsActive ? 500 : 400,
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <Icon size={15} />
+                      <span style={{ flex: 1 }}>{item.name}</span>
+                      {expanded ? (
+                        <ChevronDown size={13} />
+                      ) : (
+                        <ChevronRight size={13} />
+                      )}
+                    </button>
+
+                    {expanded && (
+                      <div
+                        style={{
+                          marginLeft: "24px",
+                          marginTop: "2px",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "2px",
+                          borderLeft: "1px solid rgba(255,255,255,0.08)",
+                          paddingLeft: "10px",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        {item.subItems.map((sub: any) => {
+                          const isSubActive =
+                            isProductsActive && currentProductType === sub.productType;
+                          const SubIcon = sub.icon;
+                          return (
+                            <Link
+                              key={sub.productType}
+                              href={`${item.path}?productType=${sub.productType}`}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                padding: "7px 10px",
+                                color: isSubActive ? "#fff" : "#777",
+                                textDecoration: "none",
+                                borderRadius: "6px",
+                                fontSize: "0.8rem",
+                                fontWeight: isSubActive ? 600 : 400,
+                                backgroundColor: isSubActive
+                                  ? "rgba(255,255,255,0.08)"
+                                  : "transparent",
+                                transition: "all 0.15s",
+                              }}
+                            >
+                              <SubIcon size={12} />
+                              {sub.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "10px",
-                    padding: "10px 12px",
+                    padding: "9px 12px",
                     backgroundColor:
-                      isProductsActive
-                        ? "rgba(255,255,255,0.06)"
+                      isActive && !currentProductType
+                        ? "rgba(255,255,255,0.08)"
                         : "transparent",
-                    color: isProductsActive ? "#fff" : "#888",
-                    border: "none",
-                    width: "100%",
-                    textAlign: "left",
-                    cursor: "pointer",
+                    color:
+                      isActive && !currentProductType ? "#fff" : "#999",
+                    textDecoration: "none",
                     borderRadius: "6px",
-                    fontSize: "0.85rem",
-                    fontFamily: "inherit",
-                    fontWeight: isProductsActive ? 500 : 400,
+                    fontSize: "0.84rem",
+                    fontWeight: isActive && !currentProductType ? 500 : 400,
                     transition: "all 0.2s",
+                    position: "relative",
                   }}
                 >
-                  <Icon size={16} />
-                  <span style={{ flex: 1 }}>{item.name}</span>
-                  {expanded ? (
-                    <ChevronDown size={14} />
-                  ) : (
-                    <ChevronRight size={14} />
+                  {isActive && !currentProductType && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: "3px",
+                        height: "18px",
+                        background: "#c8a96e",
+                        borderRadius: "0 2px 2px 0",
+                      }}
+                    />
                   )}
-                </button>
-
-                {expanded && (
-                  <div
-                    style={{
-                      marginLeft: "26px",
-                      marginTop: "2px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "2px",
-                      borderLeft: "1px solid rgba(255,255,255,0.06)",
-                      paddingLeft: "12px",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    {item.subItems.map((sub: any) => {
-                      const isSubActive =
-                        isProductsActive && currentProductType === sub.productType;
-                      const SubIcon = sub.icon;
-                      return (
-                        <Link
-                          key={sub.productType}
-                          href={`${item.path}?productType=${sub.productType}`}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            padding: "8px 10px",
-                            color: isSubActive ? "#fff" : "#666",
-                            textDecoration: "none",
-                            borderRadius: "8px",
-                            fontSize: "0.83rem",
-                            fontWeight: isSubActive ? 600 : 400,
-                            backgroundColor: isSubActive
-                              ? "rgba(255,255,255,0.08)"
-                              : "transparent",
-                            transition: "all 0.15s",
-                          }}
-                        >
-                          <SubIcon size={13} />
-                          {sub.name}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          return (
-            <Link
-              key={item.path}
-              href={item.path}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "10px 12px",
-                backgroundColor:
-                  isActive && !currentProductType
-                    ? "rgba(255,255,255,0.06)"
-                    : "transparent",
-                color:
-                  isActive && !currentProductType ? "#fff" : "#888",
-                textDecoration: "none",
-                borderRadius: "6px",
-                fontSize: "0.85rem",
-                fontWeight: isActive && !currentProductType ? 500 : 400,
-                transition: "all 0.2s",
-                position: "relative",
-              }}
-            >
-              {isActive && !currentProductType && (
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "3px",
-                    height: "20px",
-                    background: "#fff",
-                    borderRadius: "0 2px 2px 0",
-                  }}
-                />
-              )}
-              <Icon size={16} />
-              {item.name}
-            </Link>
-          );
-        })}
+                  <Icon size={15} />
+                  <span style={{ flex: 1 }}>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* ── Footer ── */}

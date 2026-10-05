@@ -1,21 +1,14 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Review from '@/models/Review';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '@/lib/auth';
 import User from '@/models/User'; // Ensure User is registered
 
 export async function GET(request: Request) {
   try {
-    // Admin auth check
-    const tokenCookie = (await cookies()).get('token');
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
-    const decoded = await verifyToken(tokenCookie.value);
-    if (!decoded || decoded.role !== 'admin') {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    const { errorResponse } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const { searchParams } = new URL(request.url);
@@ -58,3 +51,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
   }
 }
+

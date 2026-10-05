@@ -1,30 +1,13 @@
 import { NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAuth, verifyPassword, hashPassword } from '@/lib/auth';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
 
-async function getUserId() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth-token')?.value;
-  if (!token) return null;
-  const payload = await verifyToken(token);
-  let userId = payload?.userId || payload?.id;
-  
-  if (userId && typeof userId === 'object' && userId.buffer) {
-    userId = Buffer.from(Object.values(userId.buffer)).toString('hex');
-  } else if (userId) {
-    userId = userId.toString();
-  }
-  
-  return userId || null;
-}
-
 export async function PUT(request: Request) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { user: authUser, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const { currentPassword, newPassword } = await request.json();
@@ -33,30 +16,45 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Current and new password are required' }, { status: 400 });
     }
 
+    if (newPassword.length < 6) {
+      return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
+    }
+
     if (currentPassword === newPassword) {
       return NextResponse.json({ error: 'New password must be different from current password' }, { status: 400 });
     }
 
     await dbConnect();
+    const userId = authUser.id || authUser.userId;
     const user = await User.findById(userId);
     
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Verify current password (plain text as per current system)
-    if (user.password !== currentPassword) {
+    // Verify current password (supports bcrypt and legacy plain text fallback)
+    let isCurrentValid = false;
+    if (user.password) {
+      if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
+        isCurrentValid = await verifyPassword(currentPassword, user.password);
+      } else {
+        isCurrentValid = (user.password === currentPassword);
+      }
+    }
+
+    if (!isCurrentValid) {
       return NextResponse.json({ error: 'Incorrect current password' }, { status: 400 });
     }
 
-    // Update password
-    user.password = newPassword;
+    // Update with securely hashed password
+    user.password = await hashPassword(newPassword);
     await user.save();
 
     return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 });
     
   } catch (error: any) {
     console.error('Error updating password:', error);
-    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

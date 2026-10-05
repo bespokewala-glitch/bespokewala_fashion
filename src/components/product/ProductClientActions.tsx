@@ -7,8 +7,12 @@ import SizeGuide from '@/components/product/SizeGuide';
 import { normalizeImageUrl } from '@/lib/imageUrl';
 import { getShippingEstimate } from '@/lib/shippingPolicy';
 import { event as fbEvent } from '@/components/MetaPixel';
+import dynamic from 'next/dynamic';
 import { trackAddToCart, trackChatWithStylist, trackSizeSelection } from '@/lib/gtag';
-import VirtualTryOnModal from '@/components/product/VirtualTryOnModal';
+
+const VirtualTryOnModal = dynamic(() => import('@/components/product/VirtualTryOnModal'), {
+  ssr: false,
+});
 
 interface ProductClientActionsProps {
   product: {
@@ -109,12 +113,16 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   };
 
   const optionBtnStyle: React.CSSProperties = {
-    padding: '0.5rem 0.75rem',
+    padding: '0.6rem 0.85rem',
     border: '1px solid #ddd',
     background: 'transparent',
     cursor: 'pointer',
-    fontSize: '0.75rem',
-    minWidth: '2.5rem',
+    fontSize: '0.8rem',
+    minWidth: '44px',
+    minHeight: '44px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     textAlign: 'center',
     transition: 'all 0.2s',
   };
@@ -168,10 +176,15 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const qtyBtnStyle: React.CSSProperties = {
     background: 'none',
     border: 'none',
-    fontSize: '1rem',
+    fontSize: '1.25rem',
     cursor: 'pointer',
     color: '#666',
-    padding: '0 0.5rem',
+    minWidth: '44px',
+    minHeight: '44px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 0,
   };
 
   const shippingEstimate = getShippingEstimate(product.productType, product.category, product.subcategory);
@@ -276,9 +289,9 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
           <button 
             style={{ ...primaryBtnStyle, marginTop: 0, opacity: (!product.price || product.price === 0) ? 0.5 : (isAdding ? 0.7 : 1), cursor: (!product.price || product.price === 0) ? 'not-allowed' : 'pointer' }} 
             onClick={(!product.price || product.price === 0) ? undefined : handleAddToCart}
-            disabled={!product.price || product.price === 0}
+            disabled={!product.price || product.price === 0 || isAdding}
           >
-            {(!product.price || product.price === 0) ? 'Price Not Configured' : (isAdding ? 'Adding...' : 'Add to Cart')}
+            {(!product.price || product.price === 0) ? 'Price Not Configured' : (isAdding ? 'Adding to Bag...' : 'Add to Cart')}
           </button>
           <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#666' }}>
             Complimentary alterations within 7 days of delivery for bespoke items.

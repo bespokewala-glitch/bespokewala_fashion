@@ -445,8 +445,90 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
 
             {/* Product grid */}
             {products.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '4rem' }}>
-                <p className="text-body">No products found in this category.</p>
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '5rem 2rem',
+                  backgroundColor: '#faf8f5',
+                  border: '1px solid #ede8e2',
+                  borderRadius: '4px',
+                  margin: '2rem 0',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'inline-block',
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: '#c8a96e',
+                    marginBottom: '0.75rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Atelier Catalog
+                </span>
+                <h3
+                  style={{
+                    fontSize: '1.5rem',
+                    fontWeight: 300,
+                    letterSpacing: '0.05em',
+                    margin: '0 0 0.75rem',
+                    color: '#1a1a1a',
+                  }}
+                >
+                  No Creations Match Your Selection
+                </h3>
+                <p
+                  style={{
+                    color: '#777',
+                    maxWidth: '460px',
+                    margin: '0 auto 2rem',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  We could not find any bespoke pieces matching your chosen filter criteria. Try adjusting your filters or explore our complete collection.
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {productType && (
+                    <Link
+                      href={`/products/${productType}`}
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.85rem 1.75rem',
+                        backgroundColor: '#1a1a1a',
+                        color: '#c8a96e',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        textDecoration: 'none',
+                        borderRadius: '2px',
+                      }}
+                    >
+                      Clear Filters
+                    </Link>
+                  )}
+                  <Link
+                    href="/products"
+                    style={{
+                      display: 'inline-block',
+                      padding: '0.85rem 1.75rem',
+                      backgroundColor: 'transparent',
+                      color: '#1a1a1a',
+                      border: '1px solid #1a1a1a',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      textDecoration: 'none',
+                      borderRadius: '2px',
+                    }}
+                  >
+                    View All Collections
+                  </Link>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

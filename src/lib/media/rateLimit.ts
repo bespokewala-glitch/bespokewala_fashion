@@ -26,6 +26,9 @@ const LIMITS: Record<string, RateLimitConfig> = {
   // Private file serving — tighter window to prevent abuse and excessive GCS costs
   serve:          { windowMs: 60_000,         maxRequests: isDev ? 1000 : 30 },   // 30/min per user  (serve)
   auth:           { windowMs: 15 * 60_000,    maxRequests: isDev ? 1000 : 5 },    // 5/15min per IP   (auth)
+  otp:            { windowMs: 10 * 60_000,    maxRequests: isDev ? 1000 : 3 },    // 3 OTP sends/10min per email
+  adminAction:    { windowMs: 60_000,         maxRequests: isDev ? 1000 : 60 },   // 60 actions/min per admin
+  adminSensitive: { windowMs: 60_000,         maxRequests: isDev ? 1000 : 15 },   // 15 sensitive ops/min (user bans, tests, deletions)
 };
 
 export interface RateLimitResult {
@@ -220,4 +223,26 @@ export function rateLimitHeaders(remaining: number, windowMs: number): Record<st
     'X-RateLimit-Remaining': String(remaining),
     'X-RateLimit-Reset': String(Math.ceil((Date.now() + windowMs) / 1000)),
   };
+}
+
+/**
+ * Convenience wrapper for admin route rate-limiting.
+ * Derives a per-IP key from the Request and checks the named limit bucket.
+ *
+ * Usage (same pattern used in all admin routes):
+ *   const rl = await checkAdminRateLimit(request, 'adminAction');
+ *   if (!rl.allowed) return 429;
+ *
+ * @param request  - The incoming Next.js Request object
+ * @param limitKey - One of 'adminAction' | 'adminSensitive' | 'auth' | etc.
+ */
+export async function checkAdminRateLimit(
+  request: Request,
+  limitKey: keyof typeof LIMITS
+): Promise<RateLimitResult> {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+  return checkSingleLimit(limitKey, `admin:${limitKey}:${ip}`);
 }

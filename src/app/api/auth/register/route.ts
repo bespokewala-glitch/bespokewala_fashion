@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
 import Otp from '@/models/Otp';
-import { signToken } from '@/lib/auth';
+import { signToken, hashPassword } from '@/lib/auth';
 import { checkSingleLimit, rateLimitHeaders } from '@/lib/media/rateLimit';
+import { sendWelcomeEmail } from '@/lib/email';
 
 function getClientIp(req: Request): string {
   return (
@@ -41,9 +42,28 @@ export async function POST(request: Request) {
       );
     }
 
+    // Input validations
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
+        { status: 400 }
+      );
+    }
+
+    if (typeof password !== 'string' || password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
+        { status: 400 }
+      );
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanMobile = mobileNumber.trim();
+
     // Check if user already exists
     const existingUser = await User.findOne({ 
-      $or: [{ email }, { mobileNumber }] 
+      $or: [{ email: cleanEmail }, { mobileNumber: cleanMobile }] 
     });
     if (existingUser) {
       return NextResponse.json(
@@ -52,13 +72,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Store password as plain text (as requested, though not recommended for production)
+    // Securely hash password with bcrypt
+    const hashedPassword = await hashPassword(password);
+
     const newUser = await User.create({
-      name,
-      email,
-      mobileNumber,
-      password: password,
-      role: 'customer', // Default role for new registrations
+      name: name.trim(),
+      email: cleanEmail,
+      mobileNumber: cleanMobile,
+      password: hashedPassword,
+      role: 'customer',
     });
 
     // Generate token
@@ -67,6 +89,11 @@ export async function POST(request: Request) {
       email: newUser.email,
       role: newUser.role,
       name: newUser.name,
+    });
+
+    // Send welcome email (asynchronous, non-fatal)
+    sendWelcomeEmail(newUser.email, newUser.name).catch((emailErr) => {
+      console.error('[auth] Failed to send welcome email:', emailErr?.message ?? emailErr);
     });
 
     const response = NextResponse.json(
@@ -102,3 +129,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

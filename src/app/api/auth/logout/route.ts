@@ -6,14 +6,18 @@ export async function POST() {
     { status: 200 }
   );
 
-  // Clear the auth cookie
-  response.cookies.set({
-    name: 'auth-token',
+  // Clear all auth cookies
+  const clearCookieOptions = {
     value: '',
     httpOnly: true,
     expires: new Date(0),
+    maxAge: 0,
     path: '/',
-  });
+  };
+
+  response.cookies.set({ name: 'auth-token', ...clearCookieOptions });
+  response.cookies.set({ name: 'token', ...clearCookieOptions });
 
   return response;
 }
+

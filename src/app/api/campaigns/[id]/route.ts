@@ -3,12 +3,28 @@ import dbConnect from '@/lib/mongoose';
 import HeroCampaign from '@/models/HeroCampaign';
 import { invalidateCachePrefix } from '@/lib/serverCache';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth';
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rl = await checkAdminRateLimit(request, 'adminSensitive');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     
     const { id } = await params;
@@ -26,6 +42,18 @@ export async function DELETE(
     invalidateCachePrefix('home:campaigns');
     revalidatePath('/');
 
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'content.deleted',
+      target_type: 'content',
+      target_id: id,
+      meta: {
+        title: deletedCampaign.title,
+      },
+      req: request,
+    });
+
     return NextResponse.json({ success: true, message: 'Campaign deleted successfully' }, { status: 200 });
   } catch (error: any) {
     console.error('Error deleting campaign:', error);
@@ -38,6 +66,19 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rl = await checkAdminRateLimit(request, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     
     const { id } = await params;
@@ -60,6 +101,18 @@ export async function PUT(
     // Invalidate caches so frontend updates instantly
     invalidateCachePrefix('home:campaigns');
     revalidatePath('/');
+
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'content.updated',
+      target_type: 'content',
+      target_id: id,
+      meta: {
+        title: updatedCampaign.title,
+      },
+      req: request,
+    });
 
     return NextResponse.json({ success: true, campaign: updatedCampaign }, { status: 200 });
   } catch (error: any) {

@@ -14,6 +14,7 @@ const josefinSans = Josefin_Sans({
   subsets: ["latin"],
   variable: "--font-josefin-sans",
   weight: ["300", "400", "600", "700"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {

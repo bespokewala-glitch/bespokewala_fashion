@@ -2,52 +2,112 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 
 // --- Types -------------------------------------------------------------------
 export type AuditOutcome = 'success' | 'denied' | 'not_found' | 'rate_limited' | 'error';
-export type AuditAction  = 'private_file_access';
+
+// All recognised admin action strings — use dot-notation namespaces
+export type AuditAction =
+  // Legacy (kept for backward compat)
+  | 'private_file_access'
+  | 'admin_login'
+  | 'order_status_update'
+  | 'order_cancellation'
+  | 'user_status_update'
+  | 'user_role_update'
+  | 'product_create'
+  | 'product_update'
+  | 'product_delete'
+  | 'inventory_update'
+  | 'coupon_create'
+  | 'coupon_update'
+  | 'coupon_delete'
+  | 'email_test_dispatch'
+  | 'taxonomy_update'
+  // Namespaced (new)
+  | 'product.created'
+  | 'product.updated'
+  | 'product.deleted'
+  | 'order.status_updated'
+  | 'order.cancelled'
+  | 'order.refunded'
+  | 'user.suspended'
+  | 'user.reactivated'
+  | 'user.role_updated'
+  | 'inventory.updated'
+  | 'coupon.created'
+  | 'coupon.updated'
+  | 'coupon.deleted'
+  | 'taxonomy.created'
+  | 'taxonomy.updated'
+  | 'taxonomy.deleted'
+  | 'content.created'
+  | 'content.updated'
+  | 'content.deleted'
+  | 'system.settings_updated'
+  | 'system.email_test'
+  | 'system.prewarm';
+
+export type AuditTargetType =
+  | 'order'
+  | 'product'
+  | 'user'
+  | 'inventory'
+  | 'coupon'
+  | 'taxonomy'
+  | 'content'
+  | 'system'
+  | 'auth';
 
 export interface IAuditLog extends Document {
-  /** Action that was attempted */
   action: AuditAction;
-  /** Authenticated user making the request (null = unauthenticated) */
-  user_id: string | null;
-  /** The Media document ID being accessed */
-  resource_id: string;
+  /** Actor user ID */
+  actor_id: string | null;
+  /** Email of the acting administrator */
+  actor_email?: string | null;
+  /** Category of the target resource */
+  target_type: AuditTargetType;
+  /** MongoDB ObjectId or identifier of the affected resource */
+  target_id?: string | null;
   /** Outcome of the request */
   outcome: AuditOutcome;
-  /** Client IP address (may be null in serverless environments) */
+  /** Client IP address */
   ip: string | null;
-  /** Optional extra context — never log file contents or signed URLs */
-  meta?: Record<string, string | number | boolean>;
-  /** When the event occurred — set automatically by timestamps option */
-  created_at: Date;
+  /** User-Agent header */
+  user_agent?: string | null;
+  /** Optional sanitized context — never log passwords or sensitive tokens */
+  meta?: Record<string, any>;
+  createdAt: Date;
 }
 
 // --- Schema ------------------------------------------------------------------
 const AuditLogSchema = new Schema<IAuditLog>(
   {
-    action:      { type: String, enum: ['private_file_access'], required: true, index: true },
-    user_id:     { type: String, default: null, index: true },
-    resource_id: { type: String, required: true, index: true },
-    outcome:     {
+    action:       { type: String, required: true, index: true },
+    actor_id:     { type: String, default: null, index: true },
+    actor_email:  { type: String, default: null },
+    target_type:  { type: String, required: true, index: true },
+    target_id:    { type: String, default: null, index: true },
+    outcome: {
       type: String,
       enum: ['success', 'denied', 'not_found', 'rate_limited', 'error'],
       required: true,
       index: true,
     },
-    ip:   { type: String, default: null },
-    meta: { type: Schema.Types.Mixed },
+    ip:         { type: String, default: null },
+    user_agent: { type: String, default: null },
+    meta:       { type: Schema.Types.Mixed },
   },
   {
-    // createdAt = created_at; no updatedAt — audit logs are immutable
-    timestamps: { createdAt: 'created_at', updatedAt: false },
+    timestamps: true, // createdAt + updatedAt (updatedAt never actually changes)
   }
 );
 
-// Auto-delete entries older than 90 days (data hygiene / GDPR)
-AuditLogSchema.index({ created_at: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
+// Auto-delete entries older than 180 days (data hygiene / GDPR compliance)
+AuditLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 180 * 24 * 60 * 60 });
 
-// Query indexes: "all accesses by user" and "all accesses to a file"
-AuditLogSchema.index({ user_id: 1, created_at: -1 });
-AuditLogSchema.index({ resource_id: 1, created_at: -1 });
+// Compound query indexes
+AuditLogSchema.index({ actor_id: 1, createdAt: -1 });
+AuditLogSchema.index({ action: 1, createdAt: -1 });
+AuditLogSchema.index({ target_type: 1, createdAt: -1 });
+AuditLogSchema.index({ target_id: 1, createdAt: -1 });
 
 // --- Model -------------------------------------------------------------------
 const AuditLog: Model<IAuditLog> =

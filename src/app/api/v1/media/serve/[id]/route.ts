@@ -52,8 +52,9 @@ function audit(params: {
 }) {
   AuditLog.create({
     action:      'private_file_access',
-    user_id:     params.userId,
-    resource_id: params.mediaId,
+    actor_id:    params.userId,
+    target_type: 'content',
+    target_id:   params.mediaId,
     outcome:     params.outcome,
     ip:          params.ip,
     meta:        params.meta,

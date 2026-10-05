@@ -48,20 +48,29 @@ interface RecentOrder {
 interface Stats {
   totalRevenue: number;
   totalOrders: number;
+  paidOrders: number;
+  pendingOrders: number;
+  failedOrders: number;
   totalUsers: number;
   totalProducts: number;
+  lowStockCount: number;
+  lowStockProducts: {
+    _id: string;
+    name: string;
+    slug: string;
+    price: number;
+    inventoryCount: number;
+    images?: string[];
+    productType?: string;
+    category?: string;
+  }[];
   thisMonthRevenue: number;
   revenueGrowth: number;
   thisMonthOrders: number;
   ordersGrowth: number;
   newUsersThisMonth: number;
   usersGrowth: number;
-  ordersByStatus: {
-    processing: number;
-    shipped: number;
-    delivered: number;
-    cancelled: number;
-  };
+  ordersByStatus: Record<string, number>;
   recentOrders: RecentOrder[];
   last7DaysOrders: DayData[];
   topProducts: TopProduct[];
@@ -79,10 +88,15 @@ const statusConfig: Record<
   string,
   { label: string; color: string; bg: string; icon: React.ElementType }
 > = {
-  processing: { label: "Processing", color: "#b45309", bg: "#fef3c7", icon: Clock },
-  shipped: { label: "Shipped", color: "#1d4ed8", bg: "#dbeafe", icon: Truck },
+  confirmed: { label: "Confirmed", color: "#16a34a", bg: "#dcfce7", icon: CheckCircle },
+  production: { label: "In Production", color: "#d97706", bg: "#fef3c7", icon: Clock },
+  qc: { label: "Quality Check", color: "#7c3aed", bg: "#ede9fe", icon: Star },
+  dispatched: { label: "Dispatched", color: "#2563eb", bg: "#dbeafe", icon: Truck },
+  in_transit: { label: "In Transit", color: "#0891b2", bg: "#cffafe", icon: Truck },
   delivered: { label: "Delivered", color: "#15803d", bg: "#dcfce7", icon: CheckCircle },
   cancelled: { label: "Cancelled", color: "#dc2626", bg: "#fee2e2", icon: XCircle },
+  processing: { label: "Processing", color: "#b45309", bg: "#fef3c7", icon: Clock },
+  shipped: { label: "Shipped", color: "#1d4ed8", bg: "#dbeafe", icon: Truck },
 };
 
 // ─── Mini sparkline (pure SVG, no library) ────────────────────────────────────
@@ -230,12 +244,15 @@ function StatusPill({ status }: { status: string }) {
 function DonutChart({
   data,
 }: {
-  data: { processing: number; shipped: number; delivered: number; cancelled: number };
+  data: Record<string, number>;
 }) {
   const items = [
+    { key: "confirmed", label: "Confirmed", color: "#16a34a" },
+    { key: "production", label: "Production", color: "#d97706" },
+    { key: "qc", label: "QC", color: "#7c3aed" },
+    { key: "dispatched", label: "Dispatched", color: "#2563eb" },
+    { key: "in_transit", label: "In Transit", color: "#0891b2" },
     { key: "delivered", label: "Delivered", color: "#22c55e" },
-    { key: "processing", label: "Processing", color: "#f59e0b" },
-    { key: "shipped", label: "Shipped", color: "#3b82f6" },
     { key: "cancelled", label: "Cancelled", color: "#ef4444" },
   ] as const;
 
@@ -410,6 +427,127 @@ export default function DashboardHome() {
         />
       </div>
 
+      {/* ── Business Health Strip: Paid, Pending, Failed & Stock ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '14px',
+        marginBottom: '24px'
+      }}>
+        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Paid Orders</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: '#16a34a', marginTop: '2px' }}>{(stats?.paidOrders ?? 0).toLocaleString()}</div>
+          </div>
+          <span style={{ background: '#dcfce7', color: '#15803d', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '20px' }}>Completed</span>
+        </div>
+
+        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Payment</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: '#d97706', marginTop: '2px' }}>{(stats?.pendingOrders ?? 0).toLocaleString()}</div>
+          </div>
+          <span style={{ background: '#fef3c7', color: '#b45309', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '20px' }}>Action Pending</span>
+        </div>
+
+        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Failed Payment</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: '#dc2626', marginTop: '2px' }}>{(stats?.failedOrders ?? 0).toLocaleString()}</div>
+          </div>
+          <span style={{ background: '#fee2e2', color: '#b91c1c', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '20px' }}>Attention</span>
+        </div>
+
+        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Low Stock Alert</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 700, color: (stats?.lowStockCount ?? 0) > 0 ? '#ea580c' : '#16a34a', marginTop: '2px' }}>
+              {(stats?.lowStockCount ?? 0).toLocaleString()} items
+            </div>
+          </div>
+          <Link href="/dashboard/inventory" style={{ textDecoration: 'none', background: (stats?.lowStockCount ?? 0) > 0 ? '#ffedd5' : '#f1f5f9', color: (stats?.lowStockCount ?? 0) > 0 ? '#c2410c' : '#475569', fontSize: '0.75rem', fontWeight: 700, padding: '4px 10px', borderRadius: '20px' }}>
+            {(stats?.lowStockCount ?? 0) > 0 ? 'Restock' : 'Healthy'}
+          </Link>
+        </div>
+      </div>
+
+      {/* ── Low Stock Alert Banner & Quick Table (if any) ── */}
+      {Boolean(stats?.lowStockCount && stats.lowStockCount > 0) && (
+        <div style={{ background: '#fff', border: '1px solid #fed7aa', borderRadius: '12px', padding: '20px', marginBottom: '24px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '1.25rem' }}>⚠️</span>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#9a3412' }}>
+                  Low Stock Warning ({stats?.lowStockCount} products have 5 or fewer items remaining)
+                </h3>
+                <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: '#c2410c' }}>
+                  Restock these items to prevent checkout abandonment.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/dashboard/inventory"
+              style={{
+                textDecoration: 'none',
+                background: '#ea580c',
+                color: '#fff',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                padding: '7px 14px',
+                borderRadius: '6px'
+              }}
+            >
+              Open Inventory Manager
+            </Link>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #fed7aa', color: '#9a3412', textAlign: 'left' }}>
+                  <th style={{ padding: '8px 12px' }}>Product</th>
+                  <th style={{ padding: '8px 12px' }}>Category</th>
+                  <th style={{ padding: '8px 12px' }}>Price</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'center' }}>Stock Left</th>
+                  <th style={{ padding: '8px 12px', textAlign: 'right' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats?.lowStockProducts.map((p) => (
+                  <tr key={p._id} style={{ borderBottom: '1px solid #ffedd5' }}>
+                    <td style={{ padding: '10px 12px', fontWeight: 600, color: '#1e293b' }}>{p.name}</td>
+                    <td style={{ padding: '10px 12px', color: '#64748b', textTransform: 'capitalize' }}>{p.category || p.productType}</td>
+                    <td style={{ padding: '10px 12px', color: '#1e293b' }}>{fmt(p.price)}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-block',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        background: p.inventoryCount === 0 ? '#fee2e2' : '#ffedd5',
+                        color: p.inventoryCount === 0 ? '#dc2626' : '#ea580c'
+                      }}>
+                        {p.inventoryCount === 0 ? 'Out of Stock' : `${p.inventoryCount} left`}
+                      </span>
+                    </td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                      <Link
+                        href={`/dashboard/products?search=${encodeURIComponent(p.name)}`}
+                        style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 600, fontSize: '0.8rem' }}
+                      >
+                        Edit Stock →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ── Charts Row ── */}
       <div className={`${styles.chartsRow} mobile-flex-col`}>
         {/* Revenue Bar Chart */}
@@ -468,6 +606,7 @@ export default function DashboardHome() {
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Amount</th>
+                  <th>Payment</th>
                   <th>Status</th>
                   <th>Date</th>
                 </tr>
@@ -475,7 +614,7 @@ export default function DashboardHome() {
               <tbody>
                 {(stats?.recentOrders ?? []).length === 0 ? (
                   <tr>
-                    <td colSpan={6} className={styles.emptyRow}>
+                    <td colSpan={7} className={styles.emptyRow}>
                       No orders yet
                     </td>
                   </tr>
@@ -508,6 +647,19 @@ export default function DashboardHome() {
                         </td>
                         <td className={styles.itemName}>{itemSummary}</td>
                         <td className={styles.amount}>{fmt(order.total)}</td>
+                        <td>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            background: order.paymentStatus === 'completed' ? '#dcfce7' : order.paymentStatus === 'failed' ? '#fee2e2' : '#fef3c7',
+                            color: order.paymentStatus === 'completed' ? '#15803d' : order.paymentStatus === 'failed' ? '#b91c1c' : '#b45309'
+                          }}>
+                            {order.paymentStatus === 'completed' ? 'Paid' : order.paymentStatus === 'failed' ? 'Failed' : 'Pending'}
+                          </span>
+                        </td>
                         <td>
                           <StatusPill status={order.orderStatus} />
                         </td>

@@ -11,7 +11,7 @@ export default function BrandStory({ data }: { data?: any }) {
   const text2 = data?.text2 || "Our bespoke philosophy ensures that every garment is more than just clothing; it is a personalized work of art, designed to celebrate your unique identity and the most special moments of your life.";
   const ctaText = data?.ctaText || "Discover Our Story";
   const ctaLink = data?.ctaLink || "/about";
-  const image = data?.image || "https://images.unsplash.com/photo-1584308972271-204c35ce82c3?auto=format&fit=crop&q=80&w=1200";
+  const image = data?.image || "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=1200";
 
   return (
     <section className="brand-story-section">
@@ -97,6 +97,11 @@ export default function BrandStory({ data }: { data?: any }) {
             text-align: center;
             align-items: center;
           }
+          .brand-story-cta {
+            align-self: center !important;
+            margin: 1.5rem auto 0 auto !important;
+            text-align: center !important;
+          }
           .brand-story-image-wrapper {
             width: 100%;
             height: 500px;
@@ -108,16 +113,30 @@ export default function BrandStory({ data }: { data?: any }) {
         }
         @media (max-width: 768px) {
           .brand-story-section {
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.25rem 4rem;
+          }
+          .brand-story-content {
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .brand-story-cta {
+            align-self: center !important;
+            margin: 1rem auto 0 auto !important;
+            text-align: center !important;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
           }
           .brand-story-image-wrapper {
-            height: 400px;
+            height: 360px;
           }
           .brand-story-title {
-            font-size: 2rem;
+            font-size: clamp(1.75rem, 5.5vw, 2.25rem);
           }
           .brand-story-text {
-            font-size: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
           }
         }
       `}</style>

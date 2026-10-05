@@ -15,6 +15,9 @@
   --border-radius-md: 8px;
   --border-radius-lg: 16px;
   --border-radius-full: 9999px;
+
+  --site-header-height-desktop: 80px;
+  --site-header-height-mobile: 94px;
 }
 
 html {
@@ -36,6 +39,19 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body.body-drawer-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 * {
@@ -689,4 +705,27 @@ a {
     gap: 1rem; /* tighter gap for the row items on mobile */
   }
 }
+
+/* ─── Global Loading Animations & Spinners ────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.85s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes bw-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.bw-shimmer {
+  background: linear-gradient(90deg, #f5f0eb 25%, #ede6df 50%, #f5f0eb 75%);
+  background-size: 200% 100%;
+  animation: bw-shimmer 1.5s infinite;
+}
+
 

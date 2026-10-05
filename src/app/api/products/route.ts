@@ -5,6 +5,7 @@ import { IProduct } from '@/types/product';
 import { preWarmMany } from '@/lib/preWarmVariants';
 import { invalidateCachePrefix } from '@/lib/serverCache';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
@@ -78,7 +79,8 @@ export async function GET(req: NextRequest) {
 
     if (q) {
       const words = q.trim().split(/\s+/).filter(Boolean);
-      const regexPattern = words.map(w => `(?=.*${w})`).join('');
+      const escapeRegex = (str: string) => str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regexPattern = words.map(w => `(?=.*${escapeRegex(w)})`).join('');
       const regexString = `^${regexPattern}`;
 
       if (!query.$and) query.$and = [];
@@ -142,10 +144,40 @@ export async function GET(req: NextRequest) {
   }
 }
 
+import { checkAdminRateLimit } from '@/lib/media/rateLimit';
+import { logAdminAction } from '@/lib/audit';
+
 export async function POST(req: NextRequest) {
   try {
+    const rl = await checkAdminRateLimit(req, 'adminAction');
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+      );
+    }
+
+    const { errorResponse, user } = await requireAdmin(req);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     await dbConnect();
     const body = await req.json();
+
+    if (!body.name || typeof body.name !== 'string' || body.name.trim().length < 2) {
+      return NextResponse.json({ error: 'Valid product name (at least 2 characters) is required' }, { status: 400 });
+    }
+
+    const numericPrice = Number(body.price);
+    if (isNaN(numericPrice) || numericPrice < 0) {
+      return NextResponse.json({ error: 'Valid price (greater than or equal to 0) is required' }, { status: 400 });
+    }
+
+    const numericInventory = body.inventoryCount !== undefined ? Number(body.inventoryCount) : 0;
+    if (isNaN(numericInventory) || numericInventory < 0) {
+      return NextResponse.json({ error: 'Inventory count must be a non-negative number' }, { status: 400 });
+    }
     
     // Check if slug is provided, otherwise generate one from name
     let slug = body.slug;
@@ -164,14 +196,15 @@ export async function POST(req: NextRequest) {
 
     const productData: Partial<IProduct> = {
       ...body,
+      name: body.name.trim(),
       slug,
       images: Array.isArray(body.images) ? body.images : (body.images ? [body.images] : []),
       sizes: Array.isArray(body.sizes) ? body.sizes : [],
       colors: Array.isArray(body.colors) ? body.colors : [],
       subcategory: body.subcategory || 'general', // default if not provided
-      price: Number(body.price) || 0,
-      originalPrice: body.originalPrice ? Number(body.originalPrice) : undefined,
-      inventoryCount: Number(body.inventoryCount) || 0,
+      price: numericPrice,
+      originalPrice: body.originalPrice && !isNaN(Number(body.originalPrice)) ? Number(body.originalPrice) : undefined,
+      inventoryCount: numericInventory,
       isFeatured: Boolean(body.isFeatured),
       isNewArrival: Boolean(body.isNewArrival),
       referenceImages: body.referenceImages || undefined,
@@ -190,6 +223,22 @@ export async function POST(req: NextRequest) {
     };
 
     const product = await Product.create(productData);
+
+    // Audit log
+    await logAdminAction({
+      actor_id: user?.userId,
+      actor_email: user?.email,
+      action: 'product.created',
+      target_type: 'product',
+      target_id: product._id.toString(),
+      meta: {
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        inventoryCount: product.inventoryCount,
+      },
+      req,
+    });
 
     // Fire-and-forget: pre-warm variants for the new product's images
     const newImageUrls: string[] = [
@@ -214,3 +263,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || 'Failed to create product' }, { status: 500 });
   }
 }
+

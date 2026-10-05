@@ -352,16 +352,7 @@ export default function Header() {
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
         {/* Mobile Top Category Bar (matches Manish Malhotra reference) */}
-        <div className="mobile-top-bar desktop-hide" style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '2rem',
-          padding: '0.75rem 1rem',
-          backgroundColor: '#ffffff',
-          borderBottom: '1px solid #eeeeee',
-          width: '100%',
-          zIndex: 101
-        }}>
+        <div className="mobile-top-bar desktop-hide">
           <Link href="/products/couture" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Couture</Link>
           <Link href="/products/jewellery" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Jewellery</Link>
           <Link href="/products/accessories" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Accessories</Link>
@@ -436,7 +427,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Right Icons — right: Wishlist + Cart */}
-          <div className="desktop-hide mobile-icon-right" style={{ flex: '0 0 96px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+          <div className="desktop-hide mobile-icon-right" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
             <button
               onClick={() => setIsSearchOpen(true)}
               className="touch-target"

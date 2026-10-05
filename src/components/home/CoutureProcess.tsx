@@ -9,7 +9,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
     {
       title: "Design Consultation",
       description: "Discuss your vision, occasion, style preferences, and customization requirements with our design experts.",
-      image: "https://images.unsplash.com/photo-1558769132-cb1fac0850f9?auto=format&fit=crop&q=80&w=800",
+      image: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&q=80&w=800",
       enabled: true
     },
     {

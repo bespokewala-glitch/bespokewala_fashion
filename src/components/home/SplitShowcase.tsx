@@ -11,13 +11,13 @@ export default function SplitShowcase({ data }: { data?: any }) {
   const defaultProducts = [
     {
       id: 1,
-      image: "https://images.unsplash.com/photo-1605100804763-247f66126e28?auto=format&fit=crop&q=80",
+      image: "https://images.unsplash.com/photo-1603561596112-0a132b757442?auto=format&fit=crop&q=80",
       name: "Three Two Four Ring",
       price: "$12,000"
     },
     {
       id: 2,
-      image: "https://images.unsplash.com/photo-1599643478514-4a4e09b52342?auto=format&fit=crop&q=80", 
+      image: "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?auto=format&fit=crop&q=80", 
       name: "Drop Pendant",
       price: "$5,200"
     },

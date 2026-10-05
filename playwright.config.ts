@@ -16,12 +16,13 @@ export default defineConfig({
     ['list'],
   ],
   use: {
-    // Base URL for the running dev server
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',
+    // Always use port 3000 — dev server must be running (or webServer below starts it)
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    // Use a fresh browser context (no persistent cookies between tests unless set)
-    storageState: undefined,
+    // Explicit timeouts — prevents 1ms "instant fail" when browser hasn't fully loaded
+    navigationTimeout: 30_000,
+    actionTimeout: 15_000,
   },
 
   projects: [
@@ -40,11 +41,12 @@ export default defineConfig({
     },
   ],
 
-  // Start the Next.js dev server automatically for E2E tests
+  // Reuse the already-running dev server on port 3000.
+  // If nothing is running, Playwright starts `npm run dev` automatically.
   webServer: {
-    command: 'npm run build && npm start',
+    command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: true,
-    timeout: 180_000,
+    timeout: 120_000,
   },
 });

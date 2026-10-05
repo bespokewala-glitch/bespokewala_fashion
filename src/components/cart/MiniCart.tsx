@@ -58,7 +58,8 @@ export default function MiniCart() {
           right: isMiniCartOpen ? 0 : '-100%',
           width: '100%',
           maxWidth: '400px',
-          height: '100vh',
+          height: '100dvh',
+          maxHeight: '100dvh',
           backgroundColor: '#fff',
           zIndex: 10000,
           transition: 'right 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -74,7 +75,7 @@ export default function MiniCart() {
             <h2 style={{ fontSize: '0.95rem', fontWeight: 400, letterSpacing: '0.05em', margin: 0, textTransform: 'uppercase' }}>MAIN CART</h2>
             <button 
               onClick={closeMiniCart}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#000', padding: 0, display: 'flex' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#000', padding: 0, display: 'flex', minWidth: '44px', minHeight: '44px', alignItems: 'center', justifyContent: 'center' }}
               aria-label="Close cart"
             >
               <X size={20} strokeWidth={1} />
@@ -136,17 +137,19 @@ export default function MiniCart() {
                     )}
                     
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #eaeaea', padding: '0.2rem 0.5rem', borderRadius: '2px', backgroundColor: '#fff' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #eaeaea', borderRadius: '4px', backgroundColor: '#fff' }}>
                         <button 
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.25rem', color: '#666', fontSize: '1rem' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#666', fontSize: '1.1rem', minWidth: '36px', minHeight: '36px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                          aria-label="Decrease quantity"
                         >
                           &minus;
                         </button>
-                        <span style={{ fontSize: '0.85rem', width: '24px', textAlign: 'center', color: '#333' }}>{item.quantity}</span>
+                        <span style={{ fontSize: '0.85rem', width: '28px', textAlign: 'center', color: '#333' }}>{item.quantity}</span>
                         <button 
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.25rem', color: '#666', fontSize: '1rem' }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: '#666', fontSize: '1.1rem', minWidth: '36px', minHeight: '36px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                          aria-label="Increase quantity"
                         >
                           &#43;
                         </button>
@@ -162,7 +165,7 @@ export default function MiniCart() {
                           });
                           removeFromCart(item.id);
                         }}
-                        style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: 0, display: 'inline-flex', minWidth: '36px', minHeight: '36px', alignItems: 'center', justifyContent: 'center' }}
                         aria-label="Remove item"
                       >
                         <Trash2 size={16} strokeWidth={1.5} />

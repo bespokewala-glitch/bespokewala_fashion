@@ -220,7 +220,7 @@ export default async function ProductsSlugPage({ params, searchParams }: Props) 
       
       <ProductViewTracker product={product} />
 
-      <main style={containerStyle} className="mobile-flex-col mobile-px-4 mobile-pt-4 mobile-pb-4">
+      <main style={containerStyle} className="product-detail-page-main mobile-flex-col mobile-px-4 mobile-pt-4 mobile-pb-4">
         <div>
           {(() => {
             const isFootwear = product.productType?.toLowerCase() === 'footwear' || product.category?.toLowerCase() === 'footwear';

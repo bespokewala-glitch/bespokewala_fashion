@@ -1,20 +1,13 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Review from '@/models/Review';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAdmin } from '@/lib/auth';
 
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    // Admin auth check
-    const tokenCookie = (await cookies()).get('token');
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
-    const decoded = await verifyToken(tokenCookie.value);
-    if (!decoded || decoded.role !== 'admin') {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    const { errorResponse } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const params = await props.params;
@@ -48,15 +41,9 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
 export async function DELETE(request: Request, props: { params: Promise<{ id: string }> }) {
   try {
-    // Admin auth check
-    const tokenCookie = (await cookies()).get('token');
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
-    const decoded = await verifyToken(tokenCookie.value);
-    if (!decoded || decoded.role !== 'admin') {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+    const { errorResponse } = await requireAdmin(request);
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const params = await props.params;

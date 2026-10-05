@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
+import { requireAdmin } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
+  const { errorResponse } = await requireAdmin(req);
+  if (errorResponse) {
+    return errorResponse;
+  }
+
   await dbConnect();
   
   const searchParams = req.nextUrl.searchParams;
@@ -63,3 +69,4 @@ export async function GET(req: NextRequest) {
     }))
   });
 }
+

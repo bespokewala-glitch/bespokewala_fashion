@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Review from '@/models/Review';
-import { verifyToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { requireAuth } from '@/lib/auth';
 
 export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
   try {
@@ -10,16 +9,11 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
     const { id: reviewId } = params;
     
     // Auth check
-    const tokenCookie = (await cookies()).get('token');
-    if (!tokenCookie) {
-      return NextResponse.json({ message: 'Please log in to vote' }, { status: 401 });
+    const { user, errorResponse } = await requireAuth(request);
+    if (errorResponse) {
+      return errorResponse;
     }
-
-    const decoded = await verifyToken(tokenCookie.value);
-    if (!decoded || !decoded.userId) {
-      return NextResponse.json({ message: 'Invalid or expired session' }, { status: 401 });
-    }
-    const userId = decoded.userId;
+    const userId = user.userId || user.id;
 
     await dbConnect();
 
