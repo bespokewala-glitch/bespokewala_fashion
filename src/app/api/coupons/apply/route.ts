@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Coupon from '@/models/Coupon';
@@ -73,4 +74,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ valid: false, message: error.message || 'Server error' }, { status: 500 });
   }
 }
-

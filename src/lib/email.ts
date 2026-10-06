@@ -65,7 +65,7 @@ const B = {
   danger: '#dc2626',
   success: '#16a34a',
   fontFamily: "'Helvetica Neue', Arial, sans-serif",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://bespokewala.com',
+  siteUrl: process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://bespokewala.com',
 };
 
 // ─── Layout helpers ────────────────────────────────────────────────────────────

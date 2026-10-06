@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import https from "https";
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
       razorpayOrderId: razorpayOrder.id,
       amount: razorpayOrder.amount,       // paise — authoritative server amount
       currency: razorpayOrder.currency,
+      razorpayKeyId: keyId,
     });
   } catch (error: any) {
     console.error("Razorpay order creation error:", error);

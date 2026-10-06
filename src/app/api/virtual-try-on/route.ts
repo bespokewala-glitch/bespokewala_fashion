@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 // Increase Next.js route timeout to 120 seconds
@@ -140,4 +141,3 @@ export async function POST(req: Request) {
     );
   }
 }
-

@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image, { ImageProps } from 'next/image';
 import {
   normalizeImageUrl,
   shouldBypassOptimizer,
-  getGcsVariantUrl,
-  generateGcsSrcSet,
   ImageVariant
 } from '@/lib/imageUrl';
 
@@ -70,6 +68,8 @@ function LoadingShimmer({ fill, style }: { fill?: boolean; style?: React.CSSProp
           background: 'linear-gradient(90deg, #f0ebe5 25%, #e8e1d9 50%, #f0ebe5 75%)',
           backgroundSize: '200% 100%',
           animation: 'bw-shimmer 1.5s infinite',
+          pointerEvents: 'none',
+          zIndex: 1,
           ...(fill ? { position: 'absolute' as const, inset: 0 } : {}),
           ...style,
         }}
@@ -83,104 +83,81 @@ export default function OptimizedImage({
   src,
   variant,
   priority = false,
-  alt,
+  alt = 'Bespokewala Image',
   style,
   fill,
   sizes,
   unoptimized,
+  onLoad,
+  onError,
   ...rest
 }: OptimizedImageProps) {
-  // errorPhase: 0 = ok, 1 = GCS failed (try Next.js), 2 = all failed (show placeholder)
+  // errorPhase: 0 = try target variant, 1 = try original without variant, 2 = all failed
   const [errorPhase, setErrorPhase] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Reset state when src changes
-  const prevSrc = React.useRef(src);
-  if (prevSrc.current !== src) {
+  // Reset state when src or variant changes
+  const prevSrc = useRef(src);
+  const prevVariant = useRef(variant);
+  if (prevSrc.current !== src || prevVariant.current !== variant) {
     prevSrc.current = src;
+    prevVariant.current = variant;
     if (errorPhase !== 0) setErrorPhase(0);
     if (isLoaded) setIsLoaded(false);
   }
 
+  const targetUrl = normalizeImageUrl(src, variant);
   const originalUrl = normalizeImageUrl(src);
 
-  if (!originalUrl || errorPhase >= 2) {
+  const currentUrl = errorPhase === 1 ? (originalUrl || '') : (targetUrl || '');
+  const isBypass = shouldBypassOptimizer(currentUrl) || unoptimized;
+
+  // Immediate check if browser already has the image cached
+  // NOTE: useEffect must come before any early returns to satisfy Rules of Hooks
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      setIsLoaded(true);
+    }
+  }, [currentUrl]);
+
+  // All hooks are called above — now safe to return early
+  if (!targetUrl || errorPhase >= 2) {
     return <NoImagePlaceholder style={style as React.CSSProperties} />;
   }
 
-  // ── GCS Native Path ──────────────────────────────────────────────────────────
-  // For GCS images, bypass Next.js optimizer and use pre-generated variant URLs.
-  // This avoids recursive Vercel serverless calls.
-  const isGcsImage = originalUrl.includes('storage.googleapis.com');
-  const useNativeGcs = isGcsImage && errorPhase === 0 && !unoptimized;
-
-  if (useNativeGcs) {
-    const directSrc = variant
-      ? getGcsVariantUrl(originalUrl, variant) || originalUrl
-      : getGcsVariantUrl(originalUrl, 'medium') || originalUrl;
-
-    const gcsSrcSet = generateGcsSrcSet(originalUrl);
-
-    const imgStyle: React.CSSProperties = {
-      ...style,
-      opacity: isLoaded ? 1 : 0,
-      transition: 'opacity 0.3s ease',
-      ...(fill
-        ? {
-            position: 'absolute',
-            height: '100%',
-            width: '100%',
-            left: 0,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            color: 'transparent',
-          }
-        : {}),
-    };
-
-    return (
-      <>
-        {!isLoaded && <LoadingShimmer fill={fill} />}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          {...rest}
-          src={directSrc}
-          srcSet={gcsSrcSet}
-          sizes={sizes}
-          alt={alt || 'Bespokewala Image'}
-          style={imgStyle}
-          loading={priority ? undefined : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
-          onLoad={() => setIsLoaded(true)}
-          onError={() => {
-            // GCS variant 404 → fall through to Next.js optimizer
-            setErrorPhase(1);
-            setIsLoaded(false);
-          }}
-        />
-      </>
-    );
-  }
-
-  // ── Next.js Image Optimizer Path ─────────────────────────────────────────────
-  // Used for: external URLs (Unsplash, etc.) or as GCS fallback after a variant 404.
   return (
     <>
       {!isLoaded && <LoadingShimmer fill={fill} />}
       <Image
         {...rest}
-        src={originalUrl}
+        ref={imgRef}
+        src={currentUrl}
         alt={alt || 'Bespokewala Image'}
         priority={priority}
         fill={fill}
         sizes={sizes}
-        unoptimized={shouldBypassOptimizer(originalUrl) || unoptimized}
-        style={{ ...style, opacity: isLoaded ? 1 : 0, transition: 'opacity 0.3s ease' }}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => {
-          // Both GCS variant and Next.js optimizer failed — show placeholder
-          setErrorPhase(2);
+        unoptimized={isBypass}
+        style={{
+          ...style,
+          opacity: isLoaded ? 1 : 0,
+          transition: 'opacity 0.25s ease-in-out',
+        }}
+        onLoad={(e) => {
+          setIsLoaded(true);
+          onLoad?.(e);
+        }}
+        onError={(e) => {
+          if (errorPhase === 0 && targetUrl !== originalUrl) {
+            // Variant failed to load — fallback to original file
+            setErrorPhase(1);
+            setIsLoaded(false);
+          } else {
+            // Both failed — show placeholder
+            setErrorPhase(2);
+            setIsLoaded(false);
+            onError?.(e);
+          }
         }}
       />
     </>

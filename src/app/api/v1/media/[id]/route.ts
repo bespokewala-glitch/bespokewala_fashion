@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * GET    /api/v1/media/[id]  — Get media status and URLs
  * DELETE /api/v1/media/[id]  — Delete media record + GCS objects

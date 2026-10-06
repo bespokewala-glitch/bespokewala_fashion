@@ -304,12 +304,12 @@ export default function CheckoutClient() {
       const orderData = await orderRes.json();
       if (!orderRes.ok) throw new Error(orderData.message || "Failed to create payment order");
 
-      const { razorpayOrderId, amount: rzpAmount, currency } = orderData;
+      const { razorpayOrderId, amount: rzpAmount, currency, razorpayKeyId } = orderData;
 
       // Step 2: Open Razorpay modal
       await new Promise<void>((resolve, reject) => {
         const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          key: razorpayKeyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           amount: rzpAmount,
           currency,
           name: "Bespokewala",

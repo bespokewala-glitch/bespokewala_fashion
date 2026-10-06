@@ -52,7 +52,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const [isVirtualTryOnOpen, setIsVirtualTryOnOpen] = useState(false);
 
   // Fix hydration mismatch by generating the URL deterministically
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
   const productUrl = `${siteUrl}/products/${product.slug}`;
   const isCouture = product.productType?.toLowerCase() === 'couture';
   const whatsappNumber = '91750676986';

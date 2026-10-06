@@ -116,3 +116,42 @@ export async function requireAdmin(req?: Request) {
   }
   return { user, errorResponse: null };
 }
+
+/**
+ * Resolves the canonical site URL for OAuth redirects and emails.
+ * Normalizes trailing slashes, inspects forwarded headers, and defaults cleanly.
+ */
+export function getSiteUrl(req?: Request): string {
+  const envUrl = (process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL)?.trim().replace(/\/+$/, '');
+
+  // 1. If explicit env variable is set and not localhost, respect it
+  if (envUrl && !envUrl.includes('localhost')) {
+    return envUrl;
+  }
+
+  // 2. Check incoming request headers if available
+  if (req) {
+    const forwardedHost = req.headers.get('x-forwarded-host');
+    const forwardedProto = req.headers.get('x-forwarded-proto') || 'https';
+    if (forwardedHost) {
+      const host = forwardedHost.split(',')[0].trim();
+      return `${forwardedProto}://${host}`.replace(/\/+$/, '');
+    }
+
+    const host = req.headers.get('host');
+    if (host && !host.includes('localhost')) {
+      const proto = 'https';
+      return `${proto}://${host}`.replace(/\/+$/, '');
+    }
+  }
+
+  // 3. Fallback to envUrl if set
+  if (envUrl) {
+    return envUrl;
+  }
+
+  // 4. Default based on NODE_ENV
+  return process.env.NODE_ENV === 'production'
+    ? 'https://www.bespokewala.com'
+    : 'http://localhost:3000';
+}

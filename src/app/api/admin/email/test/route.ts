@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/auth';
 import { verifySmtpConnection, sendTestEmail } from '@/lib/email';
@@ -100,4 +101,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-

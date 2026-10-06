@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
@@ -138,4 +139,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

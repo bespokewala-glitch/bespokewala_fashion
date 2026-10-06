@@ -718,28 +718,6 @@ export default function Header() {
               )}
             </div>
 
-            {/* Footwear Accordion */}
-            <div>
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', minHeight: '44px' }}
-                onClick={() => { setExpandedMobileMenu(expandedMobileMenu === 'footwear' ? null : 'footwear'); setExpandedMobileSubMenu(null); }}
-              >
-                <span>Footwear</span>
-                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>{expandedMobileMenu === 'footwear' ? '-' : '+'}</span>
-              </div>
-              {expandedMobileMenu === 'footwear' && (
-                <div style={{ padding: '0.5rem 0 0 1rem', display: 'flex', flexDirection: 'column', fontSize: '0.8rem' }}>
-                  {menuData.footwear.map(item => (
-                    <div key={item.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '44px', paddingRight: '0.25rem' }}>
-                        <Link href={item.href} onClick={() => setIsMobileMenuOpen(false)} style={{ flex: 1, padding: '0.5rem 0' }}>{item.label}</Link>
-                      </div>
-                    </div>
-                  ))}
-                  <Link href="/products/footwear" onClick={() => setIsMobileMenuOpen(false)} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', minHeight: '44px' }}>View All Footwear</Link>
-                </div>
-              )}
-            </div>
 
             {/* Jewellery Accordion */}
             <div>

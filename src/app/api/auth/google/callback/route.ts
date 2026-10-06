@@ -1,8 +1,9 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
-import { signToken } from '@/lib/auth';
+import { signToken, getSiteUrl } from '@/lib/auth';
 
 const secretKey = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'super-secret-key-for-development-only';
 const key = new TextEncoder().encode(secretKey);
@@ -21,7 +22,7 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
  *  5. Issues our standard JWT + HTTP-only cookies, then redirects.
  */
 export async function GET(request: Request) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = getSiteUrl(request);
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -53,15 +54,18 @@ export async function GET(request: Request) {
   }
 
   let redirectAfter = '/account';
+  let callbackUrl = `${siteUrl}/api/auth/google/callback`;
   try {
     const { payload } = await jwtVerify(stateParam, key);
     redirectAfter = (payload.redirectAfter as string) || '/account';
+    if (payload.callbackUrl && typeof payload.callbackUrl === 'string') {
+      callbackUrl = payload.callbackUrl;
+    }
   } catch {
     return errorRedirect('State token expired. Please try signing in again.');
   }
 
   // ── 2. Exchange code for access token ──────────────────────────────────────
-  const callbackUrl = `${siteUrl}/api/auth/google/callback`;
   let googleAccessToken: string;
 
   try {
@@ -80,7 +84,7 @@ export async function GET(request: Request) {
     const tokenData = await tokenRes.json();
 
     if (!tokenRes.ok || !tokenData.access_token) {
-      console.error('[google-oauth] Token exchange failed:', tokenData);
+      console.error('[google-oauth] Token exchange failed with callbackUrl:', callbackUrl, tokenData);
       return errorRedirect('Failed to verify your Google account. Please try again.');
     }
 

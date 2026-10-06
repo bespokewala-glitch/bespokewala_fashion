@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { normalizeImageUrl } from './imageUrl';
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+export const SITE_URL = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
 export const SITE_NAME = 'Bespokewala';
 
 // Default OG image — shown when no product/category image is available
@@ -20,7 +20,7 @@ export interface SEOFields {
  * Strips query strings and trailing slashes for canonical URLs to prevent duplicate indexing
  */
 export function getCanonicalUrl(path: string): string {
-  let baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
+  let baseUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
 
   // Force production domain for canonicals if baseUrl is localhost, ngrok, or vercel preview
   if (

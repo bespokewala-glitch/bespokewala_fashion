@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 /**
  * POST /api/v1/media/process  (INTERNAL — called by Cloud Tasks or /confirm)
  *
@@ -53,4 +54,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

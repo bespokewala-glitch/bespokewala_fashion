@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
@@ -89,4 +90,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to search products' }, { status: 500 });
   }
 }
-

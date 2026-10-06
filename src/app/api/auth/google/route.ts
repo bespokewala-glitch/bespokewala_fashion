@@ -1,5 +1,7 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
+import { getSiteUrl } from '@/lib/auth';
 
 const secretKey = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'super-secret-key-for-development-only';
 const key = new TextEncoder().encode(secretKey);
@@ -12,7 +14,8 @@ const key = new TextEncoder().encode(secretKey);
  */
 export async function GET(request: Request) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = getSiteUrl(request);
+  const callbackUrl = `${siteUrl}/api/auth/google/callback`;
 
   if (!clientId) {
     return NextResponse.json(
@@ -25,14 +28,14 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectAfter = searchParams.get('redirect') || '/account';
 
-  // Build a signed state JWT: {nonce, redirectAfter} — expires in 5 minutes
-  const state = await new SignJWT({ nonce: crypto.randomUUID(), redirectAfter })
+  // Build a signed state JWT: {nonce, redirectAfter, callbackUrl} — expires in 5 minutes
+  const state = await new SignJWT({ nonce: crypto.randomUUID(), redirectAfter, callbackUrl })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('5m')
     .sign(key);
 
-  const callbackUrl = `${siteUrl}/api/auth/google/callback`;
+  console.log('[google-auth] Redirecting to Google OAuth with callback URL:', callbackUrl);
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -59,4 +62,3 @@ export async function GET(request: Request) {
 
   return response;
 }
-

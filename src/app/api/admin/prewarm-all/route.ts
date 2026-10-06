@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 /**
  * /api/admin/prewarm-all - One-time backfill to pre-generate all image variants
  *

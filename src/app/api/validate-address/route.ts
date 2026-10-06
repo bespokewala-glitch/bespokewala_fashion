@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { validateAddress } from '@/lib/addressValidation';
 
@@ -18,4 +19,3 @@ export async function POST(request: Request) {
     }, { status: 200 });
   }
 }
-

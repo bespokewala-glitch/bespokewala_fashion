@@ -115,18 +115,19 @@ export async function GET(
         return new NextResponse(null, { status: 304 });
       }
 
-      // Check GCS for an already-generated variant
-      const [variantExists] = await variantFile.exists();
+      // Check GCS for an already-generated variant in a single round-trip
+      let variantMetadata: any = null;
+      try {
+        const [metadata] = await variantFile.getMetadata();
+        variantMetadata = metadata;
+      } catch {
+        variantMetadata = null;
+      }
 
-      if (variantExists) {
+      if (variantMetadata) {
         // ✅ Fast path: variant already generated — stream it directly
-        // Get metadata and stream in one operation to reduce GCS round-trips
         const { Readable } = await import('stream');
-        let contentLength = 0;
-        try {
-          const [metadata] = await variantFile.getMetadata();
-          contentLength = parseInt(String(metadata.size || '0'), 10);
-        } catch { /* non-fatal — serve without Content-Length */ }
+        const contentLength = parseInt(String(variantMetadata.size || '0'), 10);
 
         const nodeStream = variantFile.createReadStream();
         const webStream = Readable.toWeb(nodeStream);
@@ -152,22 +153,20 @@ export async function GET(
         });
       }
 
-      // ⚡ Variant does NOT exist yet.
-      // KEY CHANGE: We MUST block and generate the thumbnail inline.
-      // If we serve the original here, Vercel will cache the 3MB file under the thumbnail URL!
+      // ⚡ Variant does NOT exist yet — generate inline
       console.log(
         `[media] ℹ️  Variant not found: "${variantPath}". Generating inline...`,
       );
 
       const gcsFile = bucket.file(fileParam);
-      const [exists] = await gcsFile.exists();
-
-      if (!exists) {
+      let originalBuffer: Buffer;
+      try {
+        const [buf] = await gcsFile.download();
+        originalBuffer = buf;
+      } catch {
         console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
         return missingFileResponse(fileParam);
       }
-
-      const [originalBuffer] = await gcsFile.download();
 
       // ── Dynamic sharp import ─────────────────────────────────────────────────
       // IMPORTANT: sharp is loaded here (not at module top-level) so that any

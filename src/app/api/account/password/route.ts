@@ -1,3 +1,4 @@
+﻿export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { requireAuth, verifyPassword, hashPassword } from '@/lib/auth';
 import dbConnect from '@/lib/mongoose';
@@ -57,4 +58,3 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
