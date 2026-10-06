@@ -57,7 +57,7 @@ async function fetchWithRetry(
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const apiKey = process.env.PIXELAPI_KEY || process.env.FASHN_API_KEY;
+    const apiKey = (process.env.PIXELAPI_KEY || process.env.FASHN_API_KEY || '').trim();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -70,7 +70,12 @@ export async function POST(req: Request) {
     if (body.jobId) {
       const { res: statusRes, data: statusData } = await fetchWithRetry(
         `https://api.pixelapi.dev/v1/virtual-tryon/jobs/${body.jobId}`,
-        { headers: { Authorization: `Bearer ${apiKey}` } },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'User-Agent': 'Bespokewala/1.0',
+          },
+        },
       );
 
       if (!statusRes.ok) {
@@ -214,8 +219,8 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
-          'X-API-Key': apiKey,
           'Content-Type': 'application/json',
+          'User-Agent': 'Bespokewala/1.0',
         },
         body: JSON.stringify(payload),
       },
