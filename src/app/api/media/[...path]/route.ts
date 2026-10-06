@@ -125,23 +125,21 @@ export async function GET(
       }
 
       if (variantMetadata) {
-        // ✅ Fast path: variant already generated — stream it directly
-        const { Readable } = await import('stream');
+        // ✅ Fast path: variant already generated — download buffer and serve
         const contentLength = parseInt(String(variantMetadata.size || '0'), 10);
 
-        const nodeStream = variantFile.createReadStream();
-        const webStream = Readable.toWeb(nodeStream);
+        const [variantBuffer] = await variantFile.download();
 
         console.log(
           `[media] 200 variant ${variantPath}` +
           ` — ${contentLength} bytes, image/webp (${Date.now() - startMs}ms)`,
         );
 
-        return new NextResponse(webStream as unknown as BodyInit, {
+        return new NextResponse(variantBuffer as unknown as BodyInit, {
           status: 200,
           headers: {
             'Content-Type': 'image/webp',
-            'Content-Length': String(contentLength),
+            'Content-Length': String(variantBuffer.length),
             'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable',
             'ETag': etag,
             'Vary': 'Accept-Encoding',
@@ -247,22 +245,21 @@ export async function GET(
       return missingFileResponse(fileParam);
     }
 
-    // Download the original from GCS
-    // Use Web Streams instead of downloading the whole file into RAM
-    const { Readable } = await import('stream');
-    const nodeStream = gcsFile.createReadStream();
-    const webStream = Readable.toWeb(nodeStream);
+    // Download the original from GCS into a buffer and serve it.
+    // NOTE: We intentionally avoid Readable.toWeb() — that static method only
+    // exists on Node.js ≥17 and crashes on Vercel's Node 16.x runtime.
+    const [originalBuffer] = await gcsFile.download();
 
     console.log(
       `[media] 200 original "${fileParam}"` +
-      ` — ${contentLength} bytes, ${contentType} (${Date.now() - startMs}ms)`,
+      ` — ${originalBuffer.length} bytes, ${contentType} (${Date.now() - startMs}ms)`,
     );
 
-    return new NextResponse(webStream as unknown as BodyInit, {
+    return new NextResponse(originalBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Content-Length': String(contentLength),
+        'Content-Length': String(originalBuffer.length),
         // Immutable: file content never changes for a given key
         'Cache-Control': 'public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=86400, immutable',
         'ETag': etagOrig,
