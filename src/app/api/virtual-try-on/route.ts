@@ -82,14 +82,43 @@ export async function POST(req: Request) {
         return NextResponse.json(statusData, { status: statusRes.status });
       }
 
+      // Extract image URL from any known field format in PixelAPI / Fashn response
+      let finalOutput: string | undefined = undefined;
+
+      if (statusData.result_urls && Array.isArray(statusData.result_urls) && statusData.result_urls.length > 0) {
+        finalOutput = statusData.result_urls[0];
+      } else if (typeof statusData.result_urls === 'string') {
+        finalOutput = statusData.result_urls;
+      } else if (statusData.result_url) {
+        finalOutput = statusData.result_url;
+      } else if (Array.isArray(statusData.output) && statusData.output.length > 0) {
+        finalOutput = statusData.output[0];
+      } else if (typeof statusData.output === 'string') {
+        finalOutput = statusData.output;
+      } else if (Array.isArray(statusData.outputs) && statusData.outputs.length > 0) {
+        finalOutput = statusData.outputs[0];
+      } else if (statusData.output_image_url) {
+        finalOutput = statusData.output_image_url;
+      } else if (statusData.image_url) {
+        finalOutput = statusData.image_url;
+      } else if (Array.isArray(statusData.images) && statusData.images.length > 0) {
+        finalOutput = statusData.images[0];
+      } else if (statusData.result_image_b64) {
+        finalOutput = statusData.result_image_b64.startsWith('data:')
+          ? statusData.result_image_b64
+          : `data:image/png;base64,${statusData.result_image_b64}`;
+      }
+
       const mappedResponse = {
+        ...statusData,
         status: statusData.status, // queued | processing | completed | failed
-        output:
-          statusData.status === 'completed' && statusData.result_image_b64
-            ? `data:image/png;base64,${statusData.result_image_b64}`
-            : undefined,
+        output: finalOutput,
+        outputs: finalOutput ? [finalOutput] : undefined,
+        output_image_url: finalOutput,
         error:
-          statusData.status === 'failed' ? statusData.error_message : undefined,
+          statusData.status === 'failed'
+            ? statusData.error || statusData.error_message || statusData.detail || 'Virtual Try-On processing failed.'
+            : undefined,
       };
 
       return NextResponse.json(mappedResponse);

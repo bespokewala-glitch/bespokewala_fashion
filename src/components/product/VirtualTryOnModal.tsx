@@ -145,9 +145,16 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
           throw new Error(pollData.error || 'Failed to check status.');
         }
 
-        if (pollData.status === 'completed') {
+        if (pollData.status === 'completed' || pollData.status === 'succeeded' || pollData.status === 'success') {
           isCompleted = true;
-          const outputUrl = pollData.outputs?.[0] || pollData.output_image_url || pollData.output;
+          const outputUrl =
+            pollData.output ||
+            pollData.output_image_url ||
+            pollData.outputs?.[0] ||
+            pollData.result_urls?.[0] ||
+            pollData.result_url ||
+            pollData.image_url ||
+            pollData.images?.[0];
           if (outputUrl) {
             setGeneratedImage(outputUrl);
             // GA4 virtual_try_on — fires only after successful result.
@@ -159,6 +166,7 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
               productPrice,
             });
           } else {
+            console.error('Virtual try-on completed but no image URL found in response:', pollData);
             throw new Error('Failed to retrieve the generated image.');
           }
         } else if (pollData.status === 'failed') {
