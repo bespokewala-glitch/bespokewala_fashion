@@ -90,12 +90,17 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
     }, 12000); // advance message every 12 seconds
 
     try {
+      const fullProductUrl = productImage?.startsWith('/')
+        ? `${window.location.origin}${productImage}`
+        : productImage;
+
       const response = await fetch('/api/virtual-try-on', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userImageBase64: userImage,
-          productImageUrl: productImage,
+          productImageUrl: fullProductUrl,
+          category: productCategory,
         }),
       });
 

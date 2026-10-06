@@ -1,5 +1,7 @@
-﻿export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
+import { bucket } from '@/lib/gcs';
 
 // Increase Next.js route timeout to 120 seconds
 export const maxDuration = 120;
@@ -86,20 +88,101 @@ export async function POST(req: Request) {
     // ── INITIAL request branch ───────────────────────────────────────────────
     const { userImageBase64, productImageUrl } = body;
 
-    // Strip data-URI prefix — PixelAPI needs raw base64
-    const person_image = userImageBase64.replace(/^data:image\/\w+;base64,/, '');
+    if (!userImageBase64) {
+      return NextResponse.json(
+        { error: 'Please upload a photo of yourself first.' },
+        { status: 400 },
+      );
+    }
+
+    // Strip data-URI prefix and optimize person image if needed
+    let person_image = userImageBase64.replace(/^data:image\/\w+;base64,/, '');
+    try {
+      const sharp = (await import('sharp')).default;
+      const userBuf = Buffer.from(person_image, 'base64');
+      const optimizedUserBuf = await sharp(userBuf)
+        .resize(1024, 1536, { fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 90 })
+        .toBuffer();
+      person_image = optimizedUserBuf.toString('base64');
+    } catch {
+      // Keep original person_image base64 if sharp optimization fails
+    }
 
     // Fetch garment image and convert to base64
     let garment_image = '';
     try {
-      const productRes = await fetch(productImageUrl);
-      if (!productRes.ok) throw new Error('Failed to fetch product image');
-      const productBuffer = await productRes.arrayBuffer();
-      garment_image = Buffer.from(productBuffer).toString('base64');
-    } catch (e) {
-      console.error('Failed to convert garment image to base64', e);
+      if (!productImageUrl || typeof productImageUrl !== 'string') {
+        throw new Error('Garment image URL is missing or invalid');
+      }
+
+      if (productImageUrl.startsWith('data:image')) {
+        garment_image = productImageUrl.replace(/^data:image\/\w+;base64,/, '');
+      } else {
+        let buffer: Buffer | null = null;
+
+        // 1. Try direct GCS download first (fastest, handles private bucket)
+        let gcsKey: string | null = null;
+        if (productImageUrl.startsWith('/api/media/')) {
+          gcsKey = productImageUrl.replace(/^\/api\/media\//, '').split('?')[0];
+        } else if (productImageUrl.includes('/api/media/')) {
+          gcsKey = productImageUrl.split('/api/media/')[1]?.split('?')[0];
+        } else if (productImageUrl.startsWith('uploads/')) {
+          gcsKey = productImageUrl.split('?')[0];
+        } else if (productImageUrl.includes('storage.googleapis.com/')) {
+          const match = productImageUrl.match(/storage\.googleapis\.com\/[^/]+\/(.+)/);
+          if (match && match[1]) {
+            gcsKey = match[1].split('?')[0];
+          }
+        }
+
+        if (gcsKey) {
+          try {
+            const [gcsBuf] = await bucket.file(gcsKey).download();
+            buffer = gcsBuf;
+          } catch (gcsErr: any) {
+            console.warn(`[VTO] GCS direct download failed for "${gcsKey}":`, gcsErr?.message);
+          }
+        }
+
+        // 2. Fallback to HTTP fetch with absolute URL resolution
+        if (!buffer) {
+          const host = req.headers.get('host');
+          const proto = req.headers.get('x-forwarded-proto') || (host?.includes('localhost') ? 'http' : 'https');
+          const siteUrl = host ? `${proto}://${host}` : (process.env.SITE_URL || 'https://www.bespokewala.com');
+
+          const resolvedUrl = productImageUrl.startsWith('/')
+            ? `${siteUrl.replace(/\/$/, '')}${productImageUrl}`
+            : productImageUrl;
+
+          const productRes = await fetch(resolvedUrl);
+          if (!productRes.ok) {
+            throw new Error(`HTTP ${productRes.status} loading image from ${resolvedUrl}`);
+          }
+          const productBuffer = await productRes.arrayBuffer();
+          buffer = Buffer.from(productBuffer);
+        }
+
+        if (!buffer || buffer.length === 0) {
+          throw new Error('Retrieved garment image is empty');
+        }
+
+        // Optimize & normalize garment image format to standard JPEG
+        try {
+          const sharp = (await import('sharp')).default;
+          const optimizedBuf = await sharp(buffer)
+            .resize(1024, 1536, { fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: 90 })
+            .toBuffer();
+          garment_image = optimizedBuf.toString('base64');
+        } catch {
+          garment_image = buffer.toString('base64');
+        }
+      }
+    } catch (e: any) {
+      console.error('[VTO] Failed to convert garment image to base64:', e?.message || e);
       return NextResponse.json(
-        { error: 'Failed to process garment image' },
+        { error: 'Failed to process garment image. Please ensure the product image is accessible.' },
         { status: 400 },
       );
     }
