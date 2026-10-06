@@ -15,6 +15,51 @@ interface VirtualTryOnModalProps {
   productPrice?: number;
 }
 
+function findClientImageUrl(obj: any): string | undefined {
+  if (!obj) return undefined;
+  if (typeof obj === 'string') {
+    const trimmed = obj.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('//')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('data:image/')) {
+      return trimmed;
+    }
+    if (trimmed.length > 500 && /^[A-Za-z0-9+/=]+$/.test(trimmed.slice(0, 80))) {
+      return `data:image/png;base64,${trimmed}`;
+    }
+    return undefined;
+  }
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const found = findClientImageUrl(item);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (typeof obj === 'object') {
+    const priority = [
+      'output', 'outputs', 'result_urls', 'result_url', 'result_image_url',
+      'output_image_url', 'output_url', 'image_url', 'imageUrl', 'image',
+      'images', 'result', 'results', 'data', 'url', 'urls', 'result_image',
+      'result_image_b64', 'b64_json', 'file_url', 'file', 'files', 'job'
+    ];
+    for (const key of priority) {
+      if (key in obj && obj[key] !== null && obj[key] !== undefined) {
+        const found = findClientImageUrl(obj[key]);
+        if (found) return found;
+      }
+    }
+    for (const [k, v] of Object.entries(obj)) {
+      if (!priority.includes(k) && k !== 'person_image' && k !== 'garment_image' && k !== 'model_image' && k !== 'userImageBase64') {
+        const found = findClientImageUrl(v);
+        if (found) return found;
+      }
+    }
+  }
+  return undefined;
+}
+
 export default function VirtualTryOnModal({ isOpen, onClose, productImage, productId, productName, productCategory, productPrice }: VirtualTryOnModalProps) {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -147,14 +192,7 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
 
         if (pollData.status === 'completed' || pollData.status === 'succeeded' || pollData.status === 'success') {
           isCompleted = true;
-          const outputUrl =
-            pollData.output ||
-            pollData.output_image_url ||
-            pollData.outputs?.[0] ||
-            pollData.result_urls?.[0] ||
-            pollData.result_url ||
-            pollData.image_url ||
-            pollData.images?.[0];
+          const outputUrl = findClientImageUrl(pollData);
           if (outputUrl) {
             setGeneratedImage(outputUrl);
             // GA4 virtual_try_on — fires only after successful result.

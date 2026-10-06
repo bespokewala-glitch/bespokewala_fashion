@@ -54,6 +54,55 @@ async function fetchWithRetry(
   throw lastError ?? new Error('Max retries exceeded');
 }
 
+/**
+ * Recursively search any API response tree for an image URL or base64 data.
+ */
+function extractImageUrl(obj: any): string | undefined {
+  if (!obj) return undefined;
+  if (typeof obj === 'string') {
+    const trimmed = obj.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('//')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('data:image/')) {
+      return trimmed;
+    }
+    // Check if it's raw base64 data
+    if (trimmed.length > 500 && /^[A-Za-z0-9+/=]+$/.test(trimmed.slice(0, 80))) {
+      return `data:image/png;base64,${trimmed}`;
+    }
+    return undefined;
+  }
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const found = extractImageUrl(item);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (typeof obj === 'object') {
+    const priority = [
+      'output', 'outputs', 'result_urls', 'result_url', 'result_image_url',
+      'output_image_url', 'output_url', 'image_url', 'imageUrl', 'image',
+      'images', 'result', 'results', 'data', 'url', 'urls', 'result_image',
+      'result_image_b64', 'b64_json', 'file_url', 'file', 'files', 'job'
+    ];
+    for (const key of priority) {
+      if (key in obj && obj[key] !== null && obj[key] !== undefined) {
+        const found = extractImageUrl(obj[key]);
+        if (found) return found;
+      }
+    }
+    for (const [k, v] of Object.entries(obj)) {
+      if (!priority.includes(k) && k !== 'person_image' && k !== 'garment_image' && k !== 'model_image') {
+        const found = extractImageUrl(v);
+        if (found) return found;
+      }
+    }
+  }
+  return undefined;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -82,32 +131,8 @@ export async function POST(req: Request) {
         return NextResponse.json(statusData, { status: statusRes.status });
       }
 
-      // Extract image URL from any known field format in PixelAPI / Fashn response
-      let finalOutput: string | undefined = undefined;
-
-      if (statusData.result_urls && Array.isArray(statusData.result_urls) && statusData.result_urls.length > 0) {
-        finalOutput = statusData.result_urls[0];
-      } else if (typeof statusData.result_urls === 'string') {
-        finalOutput = statusData.result_urls;
-      } else if (statusData.result_url) {
-        finalOutput = statusData.result_url;
-      } else if (Array.isArray(statusData.output) && statusData.output.length > 0) {
-        finalOutput = statusData.output[0];
-      } else if (typeof statusData.output === 'string') {
-        finalOutput = statusData.output;
-      } else if (Array.isArray(statusData.outputs) && statusData.outputs.length > 0) {
-        finalOutput = statusData.outputs[0];
-      } else if (statusData.output_image_url) {
-        finalOutput = statusData.output_image_url;
-      } else if (statusData.image_url) {
-        finalOutput = statusData.image_url;
-      } else if (Array.isArray(statusData.images) && statusData.images.length > 0) {
-        finalOutput = statusData.images[0];
-      } else if (statusData.result_image_b64) {
-        finalOutput = statusData.result_image_b64.startsWith('data:')
-          ? statusData.result_image_b64
-          : `data:image/png;base64,${statusData.result_image_b64}`;
-      }
+      // Robustly extract the generated image from any property in the API response
+      const finalOutput = extractImageUrl(statusData);
 
       const mappedResponse = {
         ...statusData,
@@ -115,6 +140,7 @@ export async function POST(req: Request) {
         output: finalOutput,
         outputs: finalOutput ? [finalOutput] : undefined,
         output_image_url: finalOutput,
+        result_urls: finalOutput ? [finalOutput] : statusData.result_urls,
         error:
           statusData.status === 'failed'
             ? statusData.error || statusData.error_message || statusData.detail || 'Virtual Try-On processing failed.'
