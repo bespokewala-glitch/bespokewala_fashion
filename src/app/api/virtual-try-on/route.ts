@@ -22,27 +22,32 @@ async function fetchWithRetry(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const res = await fetch(url, options);
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
-      // If the service says it is retryable (e.g. vton_preflight_unavailable), retry
+      // Retry on server-busy status codes or explicit retryable flags
       const isRetryable =
-        (res.status === 503 || res.status === 429) &&
-        (data?.detail?.retryable === true || data?.retryable === true);
+        res.status === 503 ||
+        res.status === 429 ||
+        res.status === 502 ||
+        res.status === 504 ||
+        data?.detail?.retryable === true ||
+        data?.retryable === true ||
+        data?.detail?.code === 'vton_preflight_unavailable';
 
       if (!isRetryable || attempt === maxRetries) {
         return { res, data };
       }
 
-      const backoff = Math.min(3000 * Math.pow(2, attempt), 20000); // 3s, 6s, 12s, 20s
+      const backoff = Math.min(2500 * Math.pow(1.8, attempt), 15000); // 2.5s, 4.5s, 8.1s, 14.5s
       console.warn(
-        `[VTO] Retryable error (attempt ${attempt + 1}/${maxRetries}). Retrying in ${backoff / 1000}s…`,
-        data?.detail?.code,
+        `[VTO] PixelAPI busy/retryable (attempt ${attempt + 1}/${maxRetries}, status ${res.status}). Retrying in ${(backoff / 1000).toFixed(1)}s…`,
+        data?.detail?.code || data?.detail || '',
       );
       await sleep(backoff);
     } catch (err: any) {
       lastError = err;
       if (attempt === maxRetries) break;
-      const backoff = Math.min(3000 * Math.pow(2, attempt), 20000);
+      const backoff = Math.min(2500 * Math.pow(1.8, attempt), 15000);
       await sleep(backoff);
     }
   }
@@ -187,10 +192,20 @@ export async function POST(req: Request) {
       );
     }
 
+    // Map to valid PixelAPI categories: upperbody | lowerbody | dress | saree | lehenga | kurti | sherwani
+    let category = 'dress';
+    const rawCat = (body.category || '').toLowerCase();
+    if (rawCat.includes('saree')) category = 'saree';
+    else if (rawCat.includes('lehenga')) category = 'lehenga';
+    else if (rawCat.includes('kurti') || rawCat.includes('kurta')) category = 'kurti';
+    else if (rawCat.includes('sherwani') || rawCat.includes('suit') || rawCat.includes('blazer')) category = 'sherwani';
+    else if (rawCat.includes('top') || rawCat.includes('shirt')) category = 'upperbody';
+    else if (rawCat.includes('pant') || rawCat.includes('trouser') || rawCat.includes('bottom')) category = 'lowerbody';
+
     const payload = {
       person_image,
       garment_image,
-      category: 'dress', // Best fit for couture / lehengas / gowns
+      category,
     };
 
     const { res: runRes, data: runData } = await fetchWithRetry(
@@ -199,6 +214,7 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
+          'X-API-Key': apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
@@ -206,12 +222,24 @@ export async function POST(req: Request) {
     );
 
     if (!runRes.ok) {
-      console.error('PixelAPI Error (after retries):', runData);
-      const errorMessage =
-        runData.detail?.message ||
-        runData.error ||
-        'The try-on service is temporarily busy. Please try again in a moment.';
-      return NextResponse.json({ error: errorMessage }, { status: runRes.status });
+      console.error(`[VTO] PixelAPI Error (status ${runRes.status}):`, JSON.stringify(runData));
+
+      let errorMessage = '';
+      if (typeof runData.detail === 'string') {
+        errorMessage = runData.detail;
+      } else if (Array.isArray(runData.detail) && runData.detail.length > 0) {
+        errorMessage = runData.detail.map((d: any) => d.msg || d.message || JSON.stringify(d)).join('; ');
+      } else if (runData.detail?.message) {
+        errorMessage = runData.detail.message;
+      } else if (runData.message) {
+        errorMessage = runData.message;
+      } else if (runData.error) {
+        errorMessage = typeof runData.error === 'string' ? runData.error : runData.error.message || JSON.stringify(runData.error);
+      } else {
+        errorMessage = 'The try-on service is temporarily busy. Please try again in a moment.';
+      }
+
+      return NextResponse.json({ error: errorMessage, details: runData }, { status: runRes.status });
     }
 
     // Map job_id → id for the frontend
