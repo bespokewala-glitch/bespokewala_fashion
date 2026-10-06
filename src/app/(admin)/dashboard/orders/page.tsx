@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Eye,
   AlertCircle,
+  Trash2,
 } from "lucide-react";
 import styles from "./orders.module.css";
 
@@ -111,10 +112,14 @@ function OrderDrawer({
   order,
   onClose,
   onStatusUpdate,
+  onDelete,
+  deleting = false,
 }: {
   order: Order;
   onClose: () => void;
   onStatusUpdate: (id: string, status: string) => Promise<void>;
+  onDelete: (id: string, orderNumber?: string) => Promise<void>;
+  deleting?: boolean;
 }) {
   const [newStatus, setNewStatus] = useState(order.orderStatus);
   const [saving, setSaving] = useState(false);
@@ -303,46 +308,71 @@ function OrderDrawer({
         </div>
 
         {/* Footer */}
-        <div className={styles.drawerFooter} style={{ display: "flex", gap: "10px" }}>
-          {order.orderStatus !== "cancelled" && (
-            <button
-              onClick={async () => {
-                if (window.confirm(`Are you sure you want to cancel order #${order._id.slice(-8).toUpperCase()}? This will update the status to Cancelled and automatically notify the customer.`)) {
-                  setSaving(true);
-                  await onStatusUpdate(order._id, "cancelled");
-                  setSaving(false);
-                }
-              }}
-              disabled={saving}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                borderRadius: "8px",
-                border: "1px solid #fecaca",
-                background: "#fef2f2",
-                color: "#dc2626",
-                fontWeight: 600,
-                fontSize: "0.82rem",
-                cursor: "pointer",
-              }}
-            >
-              Cancel Order
-            </button>
-          )}
-          <button
-            className={styles.btnSaveStatus}
-            onClick={handleSave}
-            disabled={saving || newStatus === order.orderStatus}
-            style={{ flex: 1 }}
-          >
-            {saving ? (
-              <span className={styles.saving}>Saving…</span>
-            ) : (
-              <>
-                <Save size={14} />
-                Update Status
-              </>
+        <div className={styles.drawerFooter} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            {order.orderStatus !== "cancelled" && (
+              <button
+                onClick={async () => {
+                  if (window.confirm(`Are you sure you want to cancel order #${order._id.slice(-8).toUpperCase()}? This will update the status to Cancelled and automatically notify the customer.`)) {
+                    setSaving(true);
+                    await onStatusUpdate(order._id, "cancelled");
+                    setSaving(false);
+                  }
+                }}
+                disabled={saving || deleting}
+                style={{
+                  flex: 1,
+                  padding: "10px 14px",
+                  borderRadius: "8px",
+                  border: "1px solid #fecaca",
+                  background: "#fef2f2",
+                  color: "#dc2626",
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel Order
+              </button>
             )}
+            <button
+              className={styles.btnSaveStatus}
+              onClick={handleSave}
+              disabled={saving || deleting || newStatus === order.orderStatus}
+              style={{ flex: 1 }}
+            >
+              {saving ? (
+                <span className={styles.saving}>Saving…</span>
+              ) : (
+                <>
+                  <Save size={14} />
+                  Update Status
+                </>
+              )}
+            </button>
+          </div>
+          <button
+            onClick={() => onDelete(order._id, `#${order._id.slice(-8).toUpperCase()}`)}
+            disabled={saving || deleting}
+            style={{
+              width: "100%",
+              padding: "9px 14px",
+              borderRadius: "8px",
+              border: "1px solid #fee2e2",
+              background: "#fff",
+              color: "#dc2626",
+              fontWeight: 600,
+              fontSize: "0.82rem",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              transition: "all 0.15s",
+            }}
+          >
+            <Trash2 size={14} />
+            {deleting ? "Deleting Order…" : "Delete Order"}
           </button>
         </div>
       </div>
@@ -449,6 +479,34 @@ export default function AdminOrdersPage() {
       }
     } catch {
       setToast({ message: "Network error. Please try again.", type: "error" });
+    }
+  }, []);
+
+  // ── Delete Order ─────────────────────────────────────────────────────────
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteOrder = useCallback(async (orderId: string, orderNumber?: string) => {
+    const displayId = orderNumber || `#${orderId.slice(-8).toUpperCase()}`;
+    if (!window.confirm(`Are you sure you want to delete order ${displayId}? This will remove it permanently.`)) {
+      return;
+    }
+    setDeletingId(orderId);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAllOrders(prev => prev.filter(o => o._id !== orderId));
+        setSelectedOrder(prev => prev?._id === orderId ? null : prev);
+        setToast({ message: "Order deleted successfully", type: "success" });
+      } else {
+        setToast({ message: data.error || "Failed to delete order", type: "error" });
+      }
+    } catch {
+      setToast({ message: "Network error while deleting order", type: "error" });
+    } finally {
+      setDeletingId(null);
     }
   }, []);
 
@@ -576,7 +634,7 @@ export default function AdminOrdersPage() {
                     <th>Status</th>
                     <th>Date</th>
                     <th>Update</th>
-                    <th></th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -657,13 +715,25 @@ export default function AdminOrdersPage() {
                           </select>
                         </td>
                         <td onClick={e => e.stopPropagation()}>
-                          <button
-                            className={styles.actionBtn}
-                            onClick={() => setSelectedOrder(order)}
-                          >
-                            <Eye size={13} />
-                            View
-                          </button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <button
+                              className={styles.actionBtn}
+                              onClick={() => setSelectedOrder(order)}
+                              title="View Order"
+                            >
+                              <Eye size={13} />
+                              View
+                            </button>
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => handleDeleteOrder(order._id, `#${order._id.slice(-8).toUpperCase()}`)}
+                              disabled={deletingId === order._id}
+                              title="Delete Order"
+                            >
+                              <Trash2 size={13} />
+                              {deletingId === order._id ? "..." : "Delete"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -693,7 +763,31 @@ export default function AdminOrdersPage() {
                     </div>
                     <div className={styles.moCardBottom}>
                       <span className={styles.moAmount}>{fmt(order.total)}</span>
-                      <span className={styles.moViewBtn}>View Order →</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteOrder(order._id, `#${order._id.slice(-8).toUpperCase()}`);
+                          }}
+                          disabled={deletingId === order._id}
+                          style={{
+                            background: "#fef2f2",
+                            border: "1px solid #fecaca",
+                            borderRadius: "6px",
+                            color: "#dc2626",
+                            padding: "4px 8px",
+                            fontSize: "0.75rem",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          <Trash2 size={12} />
+                          Delete
+                        </button>
+                        <span className={styles.moViewBtn}>View Order →</span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -751,6 +845,8 @@ export default function AdminOrdersPage() {
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
           onStatusUpdate={handleStatusUpdate}
+          onDelete={handleDeleteOrder}
+          deleting={deletingId === selectedOrder._id}
         />
       )}
 

@@ -84,3 +84,44 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { user: currentAdmin, errorResponse } = await requireAdmin(request);
+    if (errorResponse) return errorResponse;
+
+    // Rate-limit admin actions
+    const adminLimit = await checkSingleLimit('adminAction', `admin:${currentAdmin.id}`);
+    if (!adminLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many administrative requests. Please slow down.' },
+        { status: 429 }
+      );
+    }
+
+    await dbConnect();
+    const resolvedParams = await params;
+    const order = await Order.findByIdAndDelete(resolvedParams.id);
+
+    if (!order) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    // Audit log administrative deletion
+    logAdminAction({
+      action: 'order.deleted',
+      actor_id: currentAdmin.id,
+      actor_email: currentAdmin.email,
+      target_type: 'order',
+      target_id: resolvedParams.id,
+      outcome: 'success',
+      req: request,
+      meta: { orderNumber: order.orderNumber, total: order.total },
+    });
+
+    return NextResponse.json({ success: true, message: 'Order deleted successfully' });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+

@@ -55,7 +55,7 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
   const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bespokewala.com';
   const productUrl = `${siteUrl}/products/${product.slug}`;
   const isCouture = product.productType?.toLowerCase() === 'couture';
-  const whatsappNumber = '91750676986';
+  const whatsappNumber = '917506767986';
   const whatsappMessage = encodeURIComponent(`Hi, I would like to know more about this product.\n\nProduct: ${product.name}\nProduct URL: ${productUrl}`);
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
