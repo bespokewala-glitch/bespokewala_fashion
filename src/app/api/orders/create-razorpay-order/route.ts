@@ -1,10 +1,12 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import https from "https";
 import { validateAddress } from "@/lib/addressValidation";
 import dbConnect from "@/lib/mongoose";
 import Product from "@/models/Product";
+import Order from "@/models/Order";
+import { isStockEnforced } from "@/lib/inventory";
 
 export async function POST(request: Request) {
   try {
@@ -38,10 +40,12 @@ export async function POST(request: Request) {
       }
     }
 
-    // ── Server-side price calculation (NEVER trust client amount) ────────────
+    // ── Server-side price calculation & stock check ─────────────────────────
     await dbConnect();
     const productSlugs = items.map((i: any) => i.productSlug);
-    const products = await Product.find({ slug: { $in: productSlugs } }).select("slug price").lean();
+    const products = await Product.find({ slug: { $in: productSlugs } })
+      .select("slug price name images inventoryCount")
+      .lean();
     const productMap = new Map((products as any[]).map((p: any) => [p.slug, p]));
 
     let calculatedSubtotal = 0;
@@ -49,6 +53,11 @@ export async function POST(request: Request) {
       const product = productMap.get(item.productSlug);
       if (!product) {
         return NextResponse.json({ message: `Product not found: ${item.productSlug}` }, { status: 404 });
+      }
+      // Stock blocking is opt-in (ENFORCE_STOCK_LIMITS=true). Bespoke/made-to-order items
+      // legitimately have inventoryCount missing or 0, so by default we do not block them.
+      if (isStockEnforced() && typeof product.inventoryCount === 'number' && product.inventoryCount < item.quantity) {
+        return NextResponse.json({ message: `"${product.name}" is currently out of stock.` }, { status: 400 });
       }
       calculatedSubtotal += (product as any).price * item.quantity;
     }
@@ -74,6 +83,50 @@ export async function POST(request: Request) {
       keyId,
       keySecret
     );
+
+    // ── Persist pending order in MongoDB to protect against orphaned payments ─
+    try {
+      const orderItems = items.map((item: any) => {
+        const product = productMap.get(item.productSlug);
+        return {
+          productId: product?._id,
+          productSlug: item.productSlug,
+          name: product?.name || item.name || "Bespoke Creation",
+          price: product?.price || 0,
+          quantity: item.quantity,
+          image: item.image || (product?.images && product.images[0]) || "",
+          size: item.size,
+        };
+      });
+
+      let userId = (user as any)?.userId || (user as any)?.id;
+      if (userId && typeof userId === 'object' && userId.buffer) {
+        userId = Buffer.from(Object.values(userId.buffer)).toString('hex');
+      } else if (userId) {
+        userId = userId.toString();
+      }
+
+      await Order.create({
+        user: userId || null,
+        items: orderItems,
+        shippingDetails,
+        paymentMethod: "razorpay",
+        paymentStatus: "pending",
+        orderStatus: "pending",
+        subtotal: calculatedSubtotal,
+        shippingCost,
+        total: authorativeTotal,
+        razorpayOrderId: razorpayOrder.id,
+        displayCurrency: currency || "INR",
+        exchangeRate: 1,
+        displaySubtotal: calculatedSubtotal,
+        displayShippingCost: shippingCost,
+        displayTotal: authorativeTotal,
+      });
+    } catch (orderSaveErr) {
+      console.error("Warning: Failed to persist pending order in MongoDB:", orderSaveErr);
+      // Non-fatal for client: verify-payment fallback will still attempt creation
+    }
 
     return NextResponse.json({
       razorpayOrderId: razorpayOrder.id,

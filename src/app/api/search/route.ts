@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
@@ -17,9 +17,10 @@ export async function GET(req: NextRequest) {
     // Text search using regex for partial matching (live search)
     if (q) {
       const words = q.trim().split(/\s+/).filter(Boolean);
+      const escapeRegex = (str: string) => str.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
       // Create a regex that ensures every word is present somewhere in the string, in any order.
       // e.g. "Designer Saree" -> /^(?=.*Designer)(?=.*Saree)/i
-      const regexPattern = words.map(w => `(?=.*${w})`).join('');
+      const regexPattern = words.map(w => `(?=.*${escapeRegex(w)})`).join('');
       const regexString = `^${regexPattern}`;
       
       query.$or = [

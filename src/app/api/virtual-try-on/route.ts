@@ -103,6 +103,18 @@ function extractImageUrl(obj: any): string | undefined {
   return undefined;
 }
 
+function sanitizeVtoError(rawError: any): string {
+  if (!rawError) return 'The try-on service is temporarily busy. Please try again in a moment.';
+  const str = typeof rawError === 'string' ? rawError : (rawError.message || JSON.stringify(rawError));
+
+  // Intercept technical, billing, quota, or upstream authorization errors
+  if (/credit|trial|capped|subscribe|pricing|plan|denied|unauthorized|forbidden|internal|preflight|busy/i.test(str)) {
+    return 'The Virtual Try-On studio is currently experiencing high demand. Please try again shortly or connect directly with our stylist on WhatsApp.';
+  }
+
+  return str;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -128,7 +140,12 @@ export async function POST(req: Request) {
       );
 
       if (!statusRes.ok) {
-        return NextResponse.json(statusData, { status: statusRes.status });
+        console.error(`[VTO] Poll Error (status ${statusRes.status}):`, JSON.stringify(statusData));
+        const rawPollError = statusData?.error || statusData?.detail || statusData?.message || 'Failed to check status.';
+        return NextResponse.json(
+          { error: sanitizeVtoError(rawPollError), details: statusData },
+          { status: statusRes.status },
+        );
       }
 
       // Robustly extract the generated image from any property in the API response
@@ -143,7 +160,7 @@ export async function POST(req: Request) {
         result_urls: finalOutput ? [finalOutput] : statusData.result_urls,
         error:
           statusData.status === 'failed'
-            ? statusData.error || statusData.error_message || statusData.detail || 'Virtual Try-On processing failed.'
+            ? sanitizeVtoError(statusData.error || statusData.error_message || statusData.detail || 'Virtual Try-On processing failed.')
             : undefined,
       };
 
@@ -299,7 +316,7 @@ export async function POST(req: Request) {
         errorMessage = 'The try-on service is temporarily busy. Please try again in a moment.';
       }
 
-      return NextResponse.json({ error: errorMessage, details: runData }, { status: runRes.status });
+      return NextResponse.json({ error: sanitizeVtoError(errorMessage), details: runData }, { status: runRes.status });
     }
 
     // Map job_id → id for the frontend

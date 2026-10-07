@@ -3,7 +3,7 @@ import ShippingPageContent from '@/components/shipping/ShippingPageContent';
 
 export const metadata = generateStaticPageMetadata(
   'Shipping & Returns',
-  "Learn about Bespokewala's shipping options, delivery timelines, return policy, and how to track your order. Free shipping on orders above ₹15,000 within India.",
+  "Learn about Bespokewala's shipping options, delivery timelines, return policy, and how to track your order. Complimentary worldwide shipping on all luxury couture and bespoke creations.",
   '/shipping'
 );
 

@@ -13,7 +13,9 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
-export async function signToken(payload: any, expiresIn: string = '1d'): Promise<string> {
+export async function signToken(payload: any, expiresInArg?: string): Promise<string> {
+  // Customers: 7d. Admin sessions stay short (1d) unless explicitly overridden.
+  const expiresIn = expiresInArg ?? (payload?.role === 'admin' ? '1d' : '7d');
   const normalizedPayload = {
     ...payload,
     id: payload.id || payload.userId,

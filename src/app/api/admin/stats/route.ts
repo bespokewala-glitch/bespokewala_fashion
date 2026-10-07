@@ -1,10 +1,11 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
 import User from '@/models/User';
 import { requireAdmin } from '@/lib/auth';
+import { HIDE_PENDING_RAZORPAY_FOR_ADMIN } from '@/lib/orderFilters';
 
 export const revalidate = 60;
 
@@ -45,13 +46,13 @@ export async function GET(request: Request) {
       lowStockProducts,
       lowStockCount,
     ] = await Promise.all([
-      Order.countDocuments(),
+      Order.countDocuments(HIDE_PENDING_RAZORPAY_FOR_ADMIN),
       User.countDocuments({ role: 'customer' }),
       Product.countDocuments(),
 
       // Payment status counts
       Order.countDocuments({ paymentStatus: 'completed' }),
-      Order.countDocuments({ paymentStatus: 'pending' }),
+      Order.countDocuments({ paymentStatus: 'pending', ...HIDE_PENDING_RAZORPAY_FOR_ADMIN }),
       Order.countDocuments({ paymentStatus: 'failed' }),
 
       // Total revenue (completed payments only)
@@ -73,17 +74,18 @@ export async function GET(request: Request) {
       ]),
 
       // This month orders count
-      Order.countDocuments({ createdAt: { $gte: startOfThisMonth } }),
+      Order.countDocuments({ createdAt: { $gte: startOfThisMonth }, ...HIDE_PENDING_RAZORPAY_FOR_ADMIN }),
       // Last month orders count
-      Order.countDocuments({ createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth } }),
+      Order.countDocuments({ createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }, ...HIDE_PENDING_RAZORPAY_FOR_ADMIN }),
 
       // Orders grouped by status
       Order.aggregate([
+        { $match: HIDE_PENDING_RAZORPAY_FOR_ADMIN },
         { $group: { _id: '$orderStatus', count: { $sum: 1 } } },
       ]),
 
       // Recent 8 orders with user info
-      Order.find()
+      Order.find(HIDE_PENDING_RAZORPAY_FOR_ADMIN)
         .populate('user', 'name email')
         .sort({ createdAt: -1 })
         .limit(8)

@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
@@ -124,7 +124,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
       path: '/',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     };
 
     response.cookies.set({ name: 'auth-token', value: token, ...cookieOptions });

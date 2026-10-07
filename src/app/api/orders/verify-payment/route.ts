@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { requireAuth } from "@/lib/auth";
@@ -8,6 +8,7 @@ import Product from "@/models/Product";
 import { sendMetaEvent } from "@/lib/metaConversions";
 import { validateAddress } from "@/lib/addressValidation";
 import { sendOrderConfirmationEmail, sendNewOrderAdminEmail } from "@/lib/email";
+import { decrementStock } from "@/lib/inventory";
 
 export async function POST(request: Request) {
   try {
@@ -62,10 +63,10 @@ export async function POST(request: Request) {
     await dbConnect();
 
     // ── Idempotency: prevent duplicate orders for same payment ID ─────────────
-    const existingOrder = await Order.findOne({ razorpayPaymentId }).lean();
-    if (existingOrder) {
+    const existingCompleted = await Order.findOne({ razorpayPaymentId, paymentStatus: "completed" }).lean();
+    if (existingCompleted) {
       return NextResponse.json(
-        { success: true, orderId: (existingOrder as any)._id.toString(), message: "Order already exists" },
+        { success: true, orderId: (existingCompleted as any)._id.toString(), message: "Order already completed" },
         { status: 200 }
       );
     }
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
       calculatedSubtotal += product.price * item.quantity;
       finalItems.push({
         productId: product._id,
+        productSlug: product.slug,
         name: product.name,
         price: product.price,
         quantity: item.quantity,
@@ -127,13 +129,16 @@ export async function POST(request: Request) {
       userId = userId.toString();
     }
 
-    const newOrder = await Order.create({
+    // ── Atomically claim the pending → completed transition ──────────────────
+    // findOneAndUpdate with a `$ne: completed` guard is atomic, so only ONE of
+    // (verify-payment, webhook) can win. The winner alone decrements stock and
+    // sends emails; the loser returns idempotently.
+    const completedFields = {
       user: userId || null,
       items: finalItems,
       shippingDetails,
       paymentMethod: "razorpay",
-      paymentStatus: "completed",   // enum: pending | completed | failed
-      razorpayOrderId,
+      paymentStatus: "completed",
       razorpayPaymentId,
       orderStatus: "confirmed",
       subtotal: calculatedSubtotal,
@@ -144,7 +149,49 @@ export async function POST(request: Request) {
       displaySubtotal: calculatedSubtotal * (exchangeRate || 1),
       displayShippingCost: calculatedShipping * (exchangeRate || 1),
       displayTotal: calculatedTotal * (exchangeRate || 1),
-    });
+    };
+
+    let order: any = await Order.findOneAndUpdate(
+      { razorpayOrderId, paymentStatus: { $ne: "completed" } },
+      { $set: completedFields },
+      { new: true }
+    );
+    let isTransitioningToCompleted = !!order;
+
+    if (!order) {
+      const existing: any = await Order.findOne({ razorpayOrderId }).lean();
+      if (existing) {
+        // Already completed (e.g. by webhook) — idempotent success, no duplicate side effects.
+        return NextResponse.json(
+          { success: true, orderId: existing._id.toString(), message: "Order already completed" },
+          { status: 200 }
+        );
+      }
+      // Fallback: pending order was never persisted — create it now.
+      try {
+        order = await Order.create({ ...completedFields, razorpayOrderId });
+        isTransitioningToCompleted = true;
+      } catch (createErr: any) {
+        if (createErr?.code === 11000) {
+          // Duplicate razorpayPaymentId: a concurrent request already created it.
+          const dup: any = await Order.findOne({ razorpayPaymentId }).lean();
+          if (dup) {
+            return NextResponse.json(
+              { success: true, orderId: dup._id.toString(), message: "Order already completed" },
+              { status: 200 }
+            );
+          }
+        }
+        throw createErr;
+      }
+    }
+
+    const newOrder = order;
+
+    // ── Reduce tracked stock (floored at 0, untracked products untouched) ─────
+    if (isTransitioningToCompleted) {
+      await decrementStock(finalItems, "verify-payment");
+    }
 
     // --- META CONVERSIONS API: Purchase Event ---
     const eventId = `purchase_${newOrder._id.toString()}`;

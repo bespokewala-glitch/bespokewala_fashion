@@ -65,6 +65,7 @@ export const CurrencyProvider = ({ children }: { children: React.ReactNode }) =>
             
             if (SUPPORTED_CURRENCIES[detectedCurrency]) {
               if (isMounted) setCurrencyState(detectedCurrency);
+              localStorage.setItem('user_currency', detectedCurrency);
             }
           }
         } catch (geoError) {

@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import dbConnect from '@/lib/mongoose';
@@ -175,7 +175,7 @@ export async function GET(request: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax' as const,
       path: '/',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     };
 
     response.cookies.set({ name: 'auth-token', value: token, ...cookieOptions });

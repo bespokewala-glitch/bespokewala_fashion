@@ -30,7 +30,7 @@ export async function GET(
       currency: "INR",
       items: order.items.map((item: any) => ({
         productId: item.productId?.toString(),
-        slug: item.productSlug,
+        slug: item.productSlug || item.productId?.toString(),
         name: item.name,
         price: item.price,
         quantity: item.quantity

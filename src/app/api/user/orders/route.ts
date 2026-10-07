@@ -1,8 +1,9 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
 import { requireAuth } from '@/lib/auth';
+import { HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER } from '@/lib/orderFilters';
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
 
     await dbConnect();
 
-    const orders = await Order.find({ user: userId })
+    const orders = await Order.find({ user: userId, ...HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER })
       .sort({ createdAt: -1 }) // Newest first
       .lean();
 

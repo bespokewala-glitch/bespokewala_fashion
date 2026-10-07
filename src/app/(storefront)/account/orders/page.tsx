@@ -4,6 +4,7 @@ import { verifyToken } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
+import { HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER } from '@/lib/orderFilters';
 import OrderHistoryClient from '@/components/account/OrderHistoryClient';
 
 export default async function OrderHistoryPage() {
@@ -22,7 +23,7 @@ export default async function OrderHistoryPage() {
 
   await dbConnect();
   
-  const rawOrders = await Order.find({ user: user.userId })
+  const rawOrders = await Order.find({ user: user.userId, ...HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER })
     .sort({ createdAt: -1 })
     .lean();
 

@@ -1,8 +1,9 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import dbConnect from "@/lib/mongoose";
 import Order from "@/models/Order";
+import { decrementStock } from "@/lib/inventory";
 import {
   sendPaymentFailureEmail,
   sendRefundEmail,
@@ -77,6 +78,11 @@ export async function POST(request: Request) {
           );
           if (updated) {
             console.log(`[Razorpay Webhook] payment.captured: Order ${updated._id} marked completed`);
+            // Reduce tracked stock if this webhook won the pending → completed transition
+            if (Array.isArray(updated.items)) {
+              await decrementStock(updated.items as any, "Razorpay Webhook");
+            }
+
             // Transactional emails if order was completed via webhook
             const customerEmail = updated.shippingDetails?.email;
             const emailData = {
@@ -137,7 +143,12 @@ export async function POST(request: Request) {
             { $set: { paymentStatus: "completed", ...(paymentId ? { razorpayPaymentId: paymentId } : {}), orderStatus: "confirmed" } },
             { new: true }
           );
-          console.log(`[Razorpay Webhook] order.paid: ${razorpayOrderId} confirmed`);
+          if (updated) {
+            console.log(`[Razorpay Webhook] order.paid: ${razorpayOrderId} confirmed`);
+            if (Array.isArray(updated.items)) {
+              await decrementStock(updated.items as any, "Razorpay Webhook");
+            }
+          }
         }
         break;
       }

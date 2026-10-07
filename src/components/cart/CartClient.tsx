@@ -61,7 +61,7 @@ export default function CartClient() {
       <div style={{ textAlign: 'center', padding: '8rem 2rem', minHeight: '60vh' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 300, marginBottom: '2rem', letterSpacing: '0.1em' }}>YOUR CART</h1>
         <p style={{ color: '#666', marginBottom: '3rem' }}>Your cart is currently empty.</p>
-        <Link href="/products?productType=couture" style={{
+        <Link href="/products/couture" style={{
           display: 'inline-block',
           padding: '1rem 3rem',
           backgroundColor: '#000',

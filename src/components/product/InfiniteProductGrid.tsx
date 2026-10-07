@@ -239,14 +239,14 @@ export default function InfiniteProductGrid({ initialProducts, totalProducts, qu
   return (
     <div style={{ width: '100%' }}>
       <div className="product-grid" style={{ marginTop: 0 }} onClickCapture={handleGridClickCapture}>
-        {products.map((product) => (
+        {products.map((product, idx) => (
           <ProductCard 
             // Use ONLY _id as the React key — no index tiebreaker.
             // Adding an index suffix means React can't detect when the same
             // product appears at two different positions in the list.
             key={product._id}
             product={product} 
-            priority={false} 
+            priority={idx < 4} 
           />
         ))}
       </div>

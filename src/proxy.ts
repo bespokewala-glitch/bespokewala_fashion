@@ -30,7 +30,9 @@ export async function proxy(request: NextRequest) {
 
   // If user is accessing protected routes without valid token
   if ((isDashboard || isAccount) && !payload) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const redirectUrl = new URL('/login', request.url);
+    redirectUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
   // If user is accessing admin routes but is not admin

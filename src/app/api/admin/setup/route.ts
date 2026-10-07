@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import User from '@/models/User';
@@ -50,14 +50,24 @@ export async function GET(req: NextRequest) {
     }
 
     // Create admin user with securely hashed password if none exists
-    const adminExists = await User.findOne({ email: 'admin@bespoken.com' });
+    const initialEmail = process.env.ADMIN_INITIAL_EMAIL || 'admin@bespokewala.com';
+    const initialPassword = process.env.ADMIN_INITIAL_PASSWORD || (isProd ? null : 'password123');
+
+    if (isProd && !initialPassword) {
+      return NextResponse.json(
+        { error: 'ADMIN_INITIAL_PASSWORD environment variable must be configured in production.' },
+        { status: 400 }
+      );
+    }
+
+    const adminExists = await User.findOne({ email: initialEmail });
     let adminUser;
 
     if (!adminExists) {
-      const hashedPassword = await hashPassword('password123');
+      const hashedPassword = await hashPassword(initialPassword!);
       adminUser = await User.create({
         name: 'Admin User',
-        email: 'admin@bespoken.com',
+        email: initialEmail,
         mobileNumber: '9999999999',
         password: hashedPassword,
         role: 'admin',

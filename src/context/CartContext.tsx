@@ -65,7 +65,33 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const data = await res.json();
           let currentCart = data.items || [];
           
-          // Check for pending cart action from guest Add to Cart
+          // Check for guest cart to merge upon login
+          const guestCartRaw = localStorage.getItem('bw_guest_cart');
+          if (guestCartRaw) {
+            try {
+              const guestItems: CartItem[] = JSON.parse(guestCartRaw);
+              if (Array.isArray(guestItems) && guestItems.length > 0) {
+                guestItems.forEach((gItem) => {
+                  const existingIndex = currentCart.findIndex((item: CartItem) => item.id === gItem.id);
+                  if (existingIndex > -1) {
+                    currentCart[existingIndex].quantity += gItem.quantity;
+                  } else {
+                    currentCart.push(gItem);
+                  }
+                });
+                localStorage.removeItem('bw_guest_cart');
+                await fetch('/api/cart', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ items: currentCart })
+                });
+              }
+            } catch (err) {
+              console.error('Failed to parse guest cart on login', err);
+            }
+          }
+
+          // Check for pending cart action from legacy guest Add to Cart
           const pendingAction = localStorage.getItem('pending_cart_action');
           if (pendingAction) {
             try {

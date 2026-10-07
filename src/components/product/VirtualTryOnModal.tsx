@@ -401,7 +401,25 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
           </div>
 
           {/* Error */}
-          {error && <div className="vto-error">{error}</div>}
+          {error && (
+            <div className="vto-error" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <span>{error}</span>
+              <a
+                href="https://wa.me/917506767986?text=Hi%2C%20I%20would%20like%20stylist%20assistance%20with%20trying%20on%20this%20product."
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: '#111',
+                  textDecoration: 'underline',
+                  fontSize: '0.78rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Chat with Stylist on WhatsApp &rarr;
+              </a>
+            </div>
+          )}
 
           {/* Loading */}
           {isLoading ? (

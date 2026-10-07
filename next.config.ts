@@ -129,7 +129,7 @@ const nextConfig: NextConfig = {
       },
       {
         // Cache public static assets (logo, icons, fonts) for 1 week
-        source: "/:path*(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2)",
+        source: "/:path*.(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2)",
         headers: [
           {
             key: "Cache-Control",

@@ -71,12 +71,6 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
       size: selectedSize || undefined,
     };
 
-    if (isLoaded && !isAuthenticated) {
-      localStorage.setItem('pending_cart_action', JSON.stringify(cartItem));
-      window.location.href = '/login?redirect=/cart';
-      return;
-    }
-
     addToCart(cartItem);
     
     // Track AddToCart event (Meta Pixel)

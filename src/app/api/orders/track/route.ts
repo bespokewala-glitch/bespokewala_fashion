@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
@@ -15,17 +15,16 @@ export async function POST(request: Request) {
 
     await dbConnect();
 
-    // Check if orderId is a valid ObjectId, otherwise it might be a custom ID (but the schema uses ObjectId)
-    let query: any = {};
-    if (mongoose.Types.ObjectId.isValid(orderId)) {
-      query = { _id: orderId };
-    } else {
-      // If the schema supported custom string IDs we would query by that, but here it's likely an ObjectId
-      // For now, if it's not a valid ObjectId, we return not found
-      return NextResponse.json({ message: 'Order not found or access denied' }, { status: 404 });
-    }
+    const cleanOrderId = orderId.trim();
+    let order: any = null;
 
-    const order = await Order.findById(query._id).populate('user').lean();
+    if (mongoose.Types.ObjectId.isValid(cleanOrderId)) {
+      order = await Order.findById(cleanOrderId).populate('user').lean();
+    }
+    
+    if (!order) {
+      order = await Order.findOne({ razorpayOrderId: cleanOrderId }).populate('user').lean();
+    }
 
     if (!order) {
       return NextResponse.json({ message: 'Order not found or access denied' }, { status: 404 });

@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { normalizeImageUrl, shouldBypassOptimizer } from '@/lib/imageUrl';
-import { Menu, X, ShoppingBag, User, Heart, Search } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, Heart, Search, ChevronDown } from 'lucide-react';
 
 import SearchOverlay from '@/components/layout/SearchOverlay';
 import CurrencySelector from '@/components/layout/CurrencySelector';
@@ -16,9 +16,16 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null);
   const [expandedMobileSubMenu, setExpandedMobileSubMenu] = useState<string | null>(null);
+  const [activeMobileTopDropdown, setActiveMobileTopDropdown] = useState<string | null>(null);
+  const [activeMobileTopSubCategory, setActiveMobileTopSubCategory] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  // Reset mobile top dropdown on navigation
+  useEffect(() => {
+    setActiveMobileTopDropdown(null);
+  }, [pathname]);
 
   // Lock body scroll when mobile drawer is open (prevents iOS bounce bleed)
   useEffect(() => {
@@ -234,12 +241,69 @@ export default function Header() {
     width: '100%',
     zIndex: 100,
     transition: 'all 0.3s ease',
-    backgroundColor: (isScrolled || !isHomePage || hoveredNav) ? 'rgba(255, 255, 255, 0.98)' : 'transparent',
-    borderBottom: (isScrolled || !isHomePage || hoveredNav) ? '1px solid #eee' : 'none',
-    color: (isScrolled || !isHomePage || hoveredNav) ? '#1c1c1c' : '#ffffff',
+    backgroundColor: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? 'rgba(255, 255, 255, 0.98)' : 'transparent',
+    borderBottom: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? '1px solid #eee' : 'none',
+    color: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? '#1c1c1c' : '#ffffff',
   };
 
-  const isLightHeader = Boolean(isScrolled || !isHomePage || hoveredNav);
+  const isLightHeader = Boolean(isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown);
+
+  const handleToggleMobileTopDropdown = (catId: string) => {
+    if (activeMobileTopDropdown === catId) {
+      setActiveMobileTopDropdown(null);
+    } else {
+      setActiveMobileTopDropdown(catId);
+      setIsMobileMenuOpen(false);
+      if (catId === 'new-arrivals') {
+        setActiveMobileTopSubCategory('all');
+      } else {
+        const subItems = menuData[catId];
+        if (subItems && subItems.length > 0) {
+          setActiveMobileTopSubCategory(subItems[0].id);
+        } else {
+          setActiveMobileTopSubCategory(null);
+        }
+      }
+    }
+  };
+
+  const getTaxonomiesForSubCategory = (productType: string, subCatId: string) => {
+    let colls = taxonomies.filter(
+      (t: any) =>
+        t.type === 'collection' &&
+        (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(productType)) &&
+        (!t.genders || t.genders.length === 0 || t.genders.includes(subCatId))
+    );
+    let occs = taxonomies.filter(
+      (t: any) =>
+        t.type === 'occasion' &&
+        (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(productType)) &&
+        (!t.genders || t.genders.length === 0 || t.genders.includes(subCatId))
+    );
+    let cats = taxonomies.filter(
+      (t: any) =>
+        t.type === 'category' &&
+        (!t.productTypes || t.productTypes.length === 0 || t.productTypes.includes(productType)) &&
+        (!t.genders || t.genders.length === 0 || t.genders.includes(subCatId))
+    );
+
+    if (subCatId === 'womens') {
+      colls = colls.filter(
+        (c: any) =>
+          c.name.toLowerCase() !== 'bridal collection' &&
+          c.name.toLowerCase() !== 'party wear'
+      );
+    } else if (subCatId === 'mens') {
+      colls = colls.filter((c: any) => c.name.toLowerCase() !== 'groom collection');
+      cats = cats.filter(
+        (c: any) =>
+          c.name.toLowerCase() !== 'ethnic wear' &&
+          c.name.toLowerCase() !== 'ethenic wear'
+      );
+    }
+
+    return { colls, occs, cats };
+  };
 
   const navContainer: React.CSSProperties = {
     display: 'flex',
@@ -346,6 +410,13 @@ export default function Header() {
         .menu-link-hover:hover { color: #888 !important; }
         .sub-link-hover { transition: color 0.2s ease; }
         .sub-link-hover:hover { color: #000 !important; }
+        @keyframes mobileDropdownSlide {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .mobile-top-bar-dropdown {
+          animation: mobileDropdownSlide 0.22s ease-out;
+        }
         @media (max-width: 1023px) {
           .header-logo-img { filter: none !important; }
         }
@@ -353,11 +424,52 @@ export default function Header() {
       <header style={headerStyle} className="mobile-header-sticky">
         {/* Mobile Top Category Bar (matches Manish Malhotra reference) */}
         <div className="mobile-top-bar desktop-hide">
-          <Link href="/products/couture" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Couture</Link>
-          <Link href="/products/jewellery" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Jewellery</Link>
-          <Link href="/products/accessories" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Accessories</Link>
-          <Link href="/products/footwear" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500 }}>Footwear</Link>
-          <Link href="/new-arrivals" style={{ fontSize: '0.65rem', letterSpacing: '0.12em', color: '#000000', textTransform: 'uppercase', textDecoration: 'none', fontWeight: 500, whiteSpace: 'nowrap' }}>New Arrivals</Link>
+          {[
+            { id: 'couture', label: 'Couture' },
+            { id: 'jewellery', label: 'Jewellery' },
+            { id: 'accessories', label: 'Accessories' },
+            { id: 'footwear', label: 'Footwear' },
+            { id: 'new-arrivals', label: 'New Arrivals' },
+          ].map((cat) => {
+            const isActive = activeMobileTopDropdown === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleToggleMobileTopDropdown(cat.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px 2px',
+                  fontSize: '0.66rem',
+                  letterSpacing: '0.12em',
+                  color: isActive ? '#000000' : '#444444',
+                  textTransform: 'uppercase',
+                  fontWeight: isActive ? 700 : 500,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  whiteSpace: 'nowrap',
+                  borderBottom: isActive ? '2px solid #c8a96e' : '2px solid transparent',
+                  transition: 'all 0.2s ease',
+                  minHeight: '28px',
+                }}
+                aria-expanded={isActive}
+                aria-label={`${cat.label} dropdown`}
+              >
+                <span>{cat.label}</span>
+                <ChevronDown
+                  size={10}
+                  style={{
+                    transform: isActive ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                    color: isActive ? '#c8a96e' : '#777777',
+                  }}
+                />
+              </button>
+            );
+          })}
         </div>
 
         <div style={navContainer} className="mobile-main-header">
@@ -516,6 +628,362 @@ export default function Header() {
             </ul>
           </nav>
         </div>
+
+        {/* Mobile Top Category Bar Dropdown Panel */}
+        {activeMobileTopDropdown && (
+          <>
+            {/* Backdrop Dimmer */}
+            <div
+              className="desktop-hide"
+              onClick={() => setActiveMobileTopDropdown(null)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                backdropFilter: 'blur(2px)',
+                zIndex: 90,
+              }}
+            />
+
+            {/* Dropdown Panel */}
+            <div
+              className="desktop-hide mobile-top-bar-dropdown"
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                width: '100%',
+                backgroundColor: '#ffffff',
+                borderTop: '1px solid #eeeeee',
+                borderBottom: '2px solid #c8a96e',
+                boxShadow: '0 18px 40px rgba(0, 0, 0, 0.16)',
+                zIndex: 100,
+                maxHeight: 'calc(100vh - 100px)',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
+              {activeMobileTopDropdown === 'new-arrivals' ? (
+                /* New Arrivals Section */
+                <div style={{ padding: '1.25rem 1rem 1.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.6rem', borderBottom: '1px solid #eeeeee' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#1c1c1c', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        New Arrivals
+                      </span>
+                      <span style={{ fontSize: '0.65rem', color: '#c8a96e', fontWeight: 600, letterSpacing: '0.05em' }}>
+                        ★ LATEST DROPS
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveMobileTopDropdown(null)}
+                      aria-label="Close dropdown"
+                      style={{ background: 'none', border: 'none', color: '#666666', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    {[
+                      { label: 'All New Arrivals', href: '/new-arrivals' },
+                      { label: 'Couture New Arrivals', href: '/products/couture/new-arrivals' },
+                      { label: 'Jewellery New Arrivals', href: '/products/jewellery/new-arrivals' },
+                      { label: 'Footwear New Arrivals', href: '/products/footwear/new-arrivals' },
+                      { label: 'Accessories New Arrivals', href: '/products/accessories' },
+                    ].map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setActiveMobileTopDropdown(null)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '11px 14px',
+                          borderRadius: '6px',
+                          backgroundColor: '#faf8f5',
+                          border: '1px solid #eee7dc',
+                          color: '#1c1c1c',
+                          textDecoration: 'none',
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        <span>{item.label}</span>
+                        <span style={{ color: '#c8a96e' }}>→</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (() => {
+                const subList = menuData[activeMobileTopDropdown] || [];
+                const activeSubItem = subList.find((s) => s.id === activeMobileTopSubCategory) || subList[0];
+                const { colls, occs, cats } = getTaxonomiesForSubCategory(
+                  activeMobileTopDropdown,
+                  activeSubItem?.id || ''
+                );
+
+                return (
+                  <div>
+                    {/* Top Switcher Bar (Tabs + Close) */}
+                    {subList.length > 0 && (
+                      <div
+                        style={{
+                          position: 'sticky',
+                          top: 0,
+                          zIndex: 2,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.65rem 1rem',
+                          backgroundColor: '#faf8f5',
+                          borderBottom: '1px solid #eeeeee',
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', scrollbarWidth: 'none' }}>
+                          {subList.map((item) => {
+                            const isSelected = (activeSubItem?.id || '') === item.id;
+                            return (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => setActiveMobileTopSubCategory(item.id)}
+                                style={{
+                                  padding: '5px 12px',
+                                  borderRadius: '20px',
+                                  fontSize: '0.7rem',
+                                  letterSpacing: '0.08em',
+                                  textTransform: 'uppercase',
+                                  fontWeight: isSelected ? 700 : 500,
+                                  border: isSelected ? '1px solid #1c1c1c' : '1px solid #e0dbd3',
+                                  backgroundColor: isSelected ? '#1c1c1c' : '#ffffff',
+                                  color: isSelected ? '#ffffff' : '#444444',
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap',
+                                  transition: 'all 0.15s ease',
+                                }}
+                              >
+                                {item.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setActiveMobileTopDropdown(null)}
+                          aria-label="Close dropdown"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#666666',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexShrink: 0,
+                            marginLeft: '8px',
+                          }}
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Content for Active Subcategory */}
+                    <div style={{ padding: '1rem 1rem 1.5rem' }}>
+                      {/* Direct View All Link for this subcategory */}
+                      {activeSubItem && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            paddingBottom: '0.75rem',
+                            marginBottom: '1rem',
+                            borderBottom: '1px solid #f0f0f0',
+                          }}
+                        >
+                          <Link
+                            href={activeSubItem.href}
+                            onClick={() => setActiveMobileTopDropdown(null)}
+                            style={{
+                              fontSize: '0.76rem',
+                              fontWeight: 700,
+                              color: '#1c1c1c',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.08em',
+                              textDecoration: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                            }}
+                          >
+                            <span>View All {activeSubItem.label} {activeMobileTopDropdown}</span>
+                            <span style={{ color: '#c8a96e' }}>→</span>
+                          </Link>
+                          <span style={{ fontSize: '0.65rem', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            Bespokewala
+                          </span>
+                        </div>
+                      )}
+
+                      {/* 3 Structured Sections: Collections, Occasion, Categories */}
+                      {(colls.length > 0 || occs.length > 0 || cats.length > 0) ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                          {/* Collections */}
+                          {colls.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.64rem', fontWeight: 700, letterSpacing: '0.14em', color: '#888888', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Collections
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 0.75rem' }}>
+                                {colls.map((tx: any) => (
+                                  <Link
+                                    key={tx._id}
+                                    href={`/products/${activeMobileTopDropdown}/${activeSubItem?.id || ''}/${tx.slug}`}
+                                    onClick={() => setActiveMobileTopDropdown(null)}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      color: '#333333',
+                                      textDecoration: 'none',
+                                      letterSpacing: '0.02em',
+                                      padding: '4px 0',
+                                      display: 'block',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {tx.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Occasion */}
+                          {occs.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.64rem', fontWeight: 700, letterSpacing: '0.14em', color: '#888888', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Occasion
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 0.75rem' }}>
+                                {occs.map((tx: any) => (
+                                  <Link
+                                    key={tx._id}
+                                    href={`/products/${activeMobileTopDropdown}/${activeSubItem?.id || ''}/${tx.slug}`}
+                                    onClick={() => setActiveMobileTopDropdown(null)}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      color: '#333333',
+                                      textDecoration: 'none',
+                                      letterSpacing: '0.02em',
+                                      padding: '4px 0',
+                                      display: 'block',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {tx.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Categories */}
+                          {cats.length > 0 && (
+                            <div>
+                              <div style={{ fontSize: '0.64rem', fontWeight: 700, letterSpacing: '0.14em', color: '#888888', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                                Categories
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem 0.75rem' }}>
+                                {cats.map((tx: any) => (
+                                  <Link
+                                    key={tx._id}
+                                    href={`/products/${activeMobileTopDropdown}/${activeSubItem?.id || ''}/${tx.slug}`}
+                                    onClick={() => setActiveMobileTopDropdown(null)}
+                                    style={{
+                                      fontSize: '0.75rem',
+                                      color: '#333333',
+                                      textDecoration: 'none',
+                                      letterSpacing: '0.02em',
+                                      padding: '4px 0',
+                                      display: 'block',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                    }}
+                                  >
+                                    {tx.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div style={{ padding: '0.5rem 0', color: '#666666', fontSize: '0.8rem' }}>
+                          <p style={{ margin: '0 0 0.5rem' }}>Explore our curated {activeMobileTopDropdown} creations.</p>
+                          <Link
+                            href={`/products/${activeMobileTopDropdown}`}
+                            onClick={() => setActiveMobileTopDropdown(null)}
+                            style={{
+                              color: '#c8a96e',
+                              fontWeight: 600,
+                              textDecoration: 'none',
+                              fontSize: '0.8rem',
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            View All {activeMobileTopDropdown} →
+                          </Link>
+                        </div>
+                      )}
+
+                      {/* Bottom Button to View Entire Department */}
+                      <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid #f0f0f0', textAlign: 'center' }}>
+                        <Link
+                          href={`/products/${activeMobileTopDropdown}`}
+                          onClick={() => setActiveMobileTopDropdown(null)}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            width: '100%',
+                            padding: '10px 16px',
+                            backgroundColor: '#faf8f5',
+                            border: '1px solid #e5dfd5',
+                            borderRadius: '6px',
+                            color: '#1c1c1c',
+                            fontSize: '0.76rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.08em',
+                            textTransform: 'uppercase',
+                            textDecoration: 'none',
+                          }}
+                        >
+                          <span>Explore All {activeMobileTopDropdown}</span>
+                          <span style={{ color: '#c8a96e' }}>→</span>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </>
+        )}
 
         {/* Sub-navigation Menu (Departments) */}
         <div style={{ ...subNavContainer, minHeight: hoveredNav ? '50px' : '0' }} onMouseEnter={handleMouseEnterSubMenu} onMouseLeave={handleMouseLeaveSubMenu}>

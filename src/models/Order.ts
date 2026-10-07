@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IOrderItem {
   productId: mongoose.Types.ObjectId;
+  productSlug?: string;
   name: string;
   price: number;
   quantity: number;
@@ -44,6 +45,7 @@ export interface IOrder extends Document {
 
 const OrderItemSchema = new Schema({
   productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+  productSlug: { type: String },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true, min: 1 },
@@ -90,7 +92,8 @@ OrderSchema.index({ user: 1, createdAt: -1 });
 OrderSchema.index({ createdAt: -1 });
 OrderSchema.index({ orderStatus: 1, createdAt: -1 });
 OrderSchema.index({ paymentStatus: 1, createdAt: -1 });
-// Prevent duplicate orders for the same Razorpay payment (idempotency)
+// Faster webhook lookups and idempotency
+OrderSchema.index({ razorpayOrderId: 1 }, { sparse: true });
 OrderSchema.index({ razorpayPaymentId: 1 }, { unique: true, sparse: true });
 
 export default mongoose.models.Order || mongoose.model<IOrder>('Order', OrderSchema);

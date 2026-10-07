@@ -6,6 +6,7 @@ import { normalizeImageUrl } from '@/lib/imageUrl';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import dbConnect from '@/lib/mongoose';
 import Order from '@/models/Order';
+import { HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER } from '@/lib/orderFilters';
 import Product from '@/models/Product';
 import User from '@/models/User';
 import Link from 'next/link';
@@ -30,12 +31,12 @@ export default async function AccountDashboardPage() {
   await dbConnect();
 
   // Fetch only the 2 most recent orders for the dashboard preview
-  const recentOrders = await Order.find({ user: user.userId })
+  const recentOrders = await Order.find({ user: user.userId, ...HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER })
     .sort({ createdAt: -1 })
     .limit(2)
     .lean();
 
-  const totalOrders = await Order.countDocuments({ user: user.userId });
+  const totalOrders = await Order.countDocuments({ user: user.userId, ...HIDE_UNPAID_RAZORPAY_FOR_CUSTOMER });
 
   const userRecord = await User.findById(user.userId).lean();
   const addressCount = userRecord?.addresses?.length || 0;
@@ -79,9 +80,14 @@ export default async function AccountDashboardPage() {
   };
 
   const getStatusIndex = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch ((status || '').toLowerCase()) {
       case 'pending': return 0;
+      case 'confirmed': return 0;
+      case 'production':
+      case 'qc':
       case 'processing': return 1;
+      case 'dispatched':
+      case 'in_transit':
       case 'shipped': return 2;
       case 'delivered': return 3;
       case 'cancelled': return -1;

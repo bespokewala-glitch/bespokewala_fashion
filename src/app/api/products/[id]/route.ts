@@ -147,6 +147,7 @@ export async function PUT(
     }
 
     // Invalidate caches so frontend sees updates immediately
+    invalidateCachePrefix('product:');
     invalidateCachePrefix('products:');
     invalidateCachePrefix('home:');
     revalidatePath('/', 'layout');
@@ -205,6 +206,7 @@ export async function DELETE(
     });
     
     // Invalidate caches so frontend sees updates immediately
+    invalidateCachePrefix('product:');
     invalidateCachePrefix('products:');
     invalidateCachePrefix('home:');
     revalidatePath('/', 'layout');

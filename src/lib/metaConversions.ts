@@ -60,15 +60,22 @@ export const sendMetaEvent = async (eventData: MetaEventData) => {
       client_user_agent: clientUserAgent,
     };
 
+    const cleanedPhone = userData.phone ? userData.phone.replace(/[^0-9]/g, '') : undefined;
+    const cleanedCountry = userData.country
+      ? (userData.country.trim().toLowerCase() === 'india' || userData.country.trim().toLowerCase() === 'ind'
+          ? 'in'
+          : userData.country.trim().toLowerCase())
+      : undefined;
+
     if (clientIp) formattedUserData.client_ip_address = clientIp;
     if (userData.email) formattedUserData.em = [hashData(userData.email)];
-    if (userData.phone) formattedUserData.ph = [hashData(userData.phone)];
+    if (cleanedPhone) formattedUserData.ph = [hashData(cleanedPhone)];
     if (userData.firstName) formattedUserData.fn = [hashData(userData.firstName)];
     if (userData.lastName) formattedUserData.ln = [hashData(userData.lastName)];
     if (userData.city) formattedUserData.ct = [hashData(userData.city)];
     if (userData.state) formattedUserData.st = [hashData(userData.state)];
     if (userData.zipCode) formattedUserData.zp = [hashData(userData.zipCode)];
-    if (userData.country) formattedUserData.country = [hashData(userData.country)];
+    if (cleanedCountry) formattedUserData.country = [hashData(cleanedCountry)];
     if (userData.externalId) formattedUserData.external_id = [hashData(userData.externalId)];
 
     const payload = {

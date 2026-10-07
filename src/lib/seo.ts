@@ -355,10 +355,28 @@ export function generateProductSchema(product: any, allImages: { url: string; al
       "url": getCanonicalUrl(`/products/${product.slug}`),
       "priceCurrency": "INR",
       "price": product.price,
+      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       "itemCondition": "https://schema.org/NewCondition",
       "availability": (product.inventoryCount ?? 1) > 0
         ? "https://schema.org/InStock"
-        : "https://schema.org/OutOfStock"
+        : "https://schema.org/OutOfStock",
+      // NOTE: Return policy and delivery-time markup are intentionally omitted.
+      // The published policy varies by product type (ready-to-wear 7-day returns with
+      // customer-paid return shipping and store credit; bespoke/custom non-returnable;
+      // couture 40–50 day lead time), which a single static markup block cannot
+      // represent accurately. Structured data must match visible page content.
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": "INR"
+        },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": "IN"
+        }
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-﻿export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
@@ -254,6 +254,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Invalidate caches so frontend sees new products immediately
+    invalidateCachePrefix('product:');
     invalidateCachePrefix('products:');
     invalidateCachePrefix('home:');
     revalidatePath('/', 'layout');
