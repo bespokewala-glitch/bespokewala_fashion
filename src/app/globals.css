@@ -483,6 +483,7 @@ a {
   text-align: center;
   margin-bottom: 0.5rem;
   padding: 0.5rem 0;
+  scroll-margin-top: calc(var(--site-header-height-desktop, 80px) + 20px);
 }
 .page-heading-container .h1 {
   margin: 0;
@@ -508,7 +509,8 @@ a {
   .page-heading-container {
     margin-bottom: 0.5rem;
     padding: 0.75rem 0;
-    margin-top: -1.5rem;
+    margin-top: 0;
+    scroll-margin-top: calc(var(--site-header-height-mobile, 94px) + 16px);
   }
   .page-heading-container .h1 {
     font-size: 1.15rem;

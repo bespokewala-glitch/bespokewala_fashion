@@ -199,6 +199,10 @@
     padding-top: 1.5rem !important;
   }
 
+  .collection-page-main.no-hero {
+    padding-top: 1.75rem !important;
+  }
+
   .mobile-py-4 {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;

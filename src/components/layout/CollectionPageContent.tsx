@@ -395,7 +395,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
     paddingBottom: '4rem',
     paddingLeft: '4rem',
     paddingRight: '4rem',
-    paddingTop: showHero ? '4rem' : '4.5rem',
+    paddingTop: showHero ? '4rem' : 'calc(var(--site-header-height-desktop, 80px) + 2.5rem)',
     width: '100%',
     margin: '0 auto',
     minHeight: '80vh',
@@ -414,7 +414,7 @@ export async function CollectionPageContent({ params }: { params: CollectionPage
           <HeroSection campaigns={finalHeroCampaigns} />
         </div>
       )}
-      <main style={containerStyle} className="collection-page-main">
+      <main style={containerStyle} className={`collection-page-main ${showHero ? 'has-hero' : 'no-hero'}`}>
         {/* Curated Sections */}
         {/* We use desktop-mx-negative to apply the negative margins ONLY on desktop, avoiding mobile breakages */}
         {(sectionMap.CuratedGrid || sectionMap.FeatureBanner || sectionMap.SplitShowcase || sectionMap.CoutureProcess || sectionMap.JewelleryProcess) && (
