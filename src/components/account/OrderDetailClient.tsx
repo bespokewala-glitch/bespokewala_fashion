@@ -115,17 +115,42 @@ export default function OrderDetailClient({ order }: OrderDetailProps) {
               Placed on {new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
-          <div style={{ 
-            padding: '0.4rem 1rem', 
-            backgroundColor: isCancelled ? '#fafafa' : '#000', 
-            color: isCancelled ? '#999' : '#fff', 
-            fontSize: '0.75rem', 
-            fontWeight: 600, 
-            textTransform: 'uppercase',
-            letterSpacing: '0.1em',
-            border: isCancelled ? '1px solid #eee' : 'none'
-          }}>
-            {order.orderStatus}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {!isCancelled && !isPending && (
+              <a
+                href={`/api/orders/${order._id}/invoice`}
+                download
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.45rem 1rem',
+                  backgroundColor: '#fff',
+                  color: '#1a1a1a',
+                  border: '1px solid #1a1a1a',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <span>🧾</span> Download Invoice (PDF)
+              </a>
+            )}
+            <div style={{ 
+              padding: '0.45rem 1rem', 
+              backgroundColor: isCancelled ? '#fafafa' : '#000', 
+              color: isCancelled ? '#999' : '#fff', 
+              fontSize: '0.75rem', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              border: isCancelled ? '1px solid #eee' : 'none'
+            }}>
+              {order.orderStatus}
+            </div>
           </div>
         </div>
       </div>

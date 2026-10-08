@@ -21,6 +21,7 @@ import {
   Eye,
   AlertCircle,
   Trash2,
+  FileText,
 } from "lucide-react";
 import styles from "./orders.module.css";
 
@@ -351,6 +352,32 @@ function OrderDrawer({
               )}
             </button>
           </div>
+          <a
+            href={`/api/orders/${order._id}/invoice`}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={`invoice-${order._id}.pdf`}
+            style={{
+              width: "100%",
+              padding: "9px 14px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+              background: "#f9fafb",
+              color: "#111827",
+              fontWeight: 600,
+              fontSize: "0.82rem",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              boxSizing: "border-box",
+              transition: "background 0.15s",
+            }}
+          >
+            <FileText size={14} color="#b8860b" />
+            Download GST Tax Invoice (PDF)
+          </a>
           <button
             onClick={() => onDelete(order._id, `#${order._id.slice(-8).toUpperCase()}`)}
             disabled={saving || deleting}
@@ -424,8 +451,8 @@ export default function AdminOrdersPage() {
   // ── Derived data ──────────────────────────────────────────────────────────
   const stats = useMemo(() => ({
     total: allOrders.length,
-    processing: allOrders.filter(o => o.orderStatus === "processing").length,
-    shipped: allOrders.filter(o => o.orderStatus === "shipped").length,
+    production: allOrders.filter(o => o.orderStatus === "production" || o.orderStatus === "qc" || o.orderStatus === "processing").length,
+    dispatched: allOrders.filter(o => o.orderStatus === "dispatched" || o.orderStatus === "in_transit" || o.orderStatus === "shipped").length,
     delivered: allOrders.filter(o => o.orderStatus === "delivered").length,
     cancelled: allOrders.filter(o => o.orderStatus === "cancelled").length,
     revenue: allOrders.filter(o => o.paymentStatus === "completed").reduce((s, o) => s + o.total, 0),
@@ -541,10 +568,10 @@ export default function AdminOrdersPage() {
       {/* ── Stats Row ── */}
       <div className={styles.statsRow}>
         {[
-          { label: "All Orders",  value: stats.total,      icon: ShoppingBag, color: "#7c3aed", bg: "#ede9fe" },
-          { label: "Processing",  value: stats.processing,  icon: Clock,       color: "#b45309", bg: "#fef3c7" },
-          { label: "Shipped",     value: stats.shipped,     icon: Truck,       color: "#1d4ed8", bg: "#dbeafe" },
-          { label: "Delivered",   value: stats.delivered,   icon: CheckCircle, color: "#15803d", bg: "#dcfce7" },
+          { label: "All Orders",  value: stats.total,      filterKey: "all",        icon: ShoppingBag, color: "#7c3aed", bg: "#ede9fe" },
+          { label: "Production",  value: stats.production, filterKey: "production", icon: Clock,       color: "#d97706", bg: "#fef3c7" },
+          { label: "Dispatched",  value: stats.dispatched, filterKey: "dispatched", icon: Truck,       color: "#2563eb", bg: "#dbeafe" },
+          { label: "Delivered",   value: stats.delivered,  filterKey: "delivered",  icon: CheckCircle, color: "#15803d", bg: "#dcfce7" },
         ].map((s) => {
           const Ic = s.icon;
           return (
@@ -552,7 +579,7 @@ export default function AdminOrdersPage() {
               key={s.label}
               className={styles.statCard}
               style={{ cursor: "pointer" }}
-              onClick={() => setFilter(s.label === "All Orders" ? "all" : s.label.toLowerCase())}
+              onClick={() => setFilter(s.filterKey)}
             >
               <div className={styles.statIcon} style={{ background: s.bg, color: s.color }}>
                 <Ic size={18} />
@@ -704,12 +731,17 @@ export default function AdminOrdersPage() {
                               background:
                                 order.orderStatus === "delivered" ? "#dcfce7"
                                 : order.orderStatus === "cancelled" ? "#fee2e2"
-                                : order.orderStatus === "shipped" ? "#dbeafe"
+                                : order.orderStatus === "dispatched" || order.orderStatus === "in_transit" || order.orderStatus === "shipped" ? "#dbeafe"
+                                : order.orderStatus === "qc" ? "#ede9fe"
+                                : order.orderStatus === "confirmed" ? "#dcfce7"
                                 : "#fef3c7",
                             }}
                           >
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="production">Production</option>
+                            <option value="qc">QC</option>
+                            <option value="dispatched">Dispatched</option>
+                            <option value="in_transit">In Transit</option>
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                           </select>
@@ -724,6 +756,17 @@ export default function AdminOrdersPage() {
                               <Eye size={13} />
                               View
                             </button>
+                            <a
+                              href={`/api/orders/${order._id}/invoice`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={styles.actionBtn}
+                              title="Download GST Invoice"
+                              style={{ textDecoration: "none" }}
+                            >
+                              <FileText size={13} />
+                              Invoice
+                            </a>
                             <button
                               className={styles.deleteBtn}
                               onClick={() => handleDeleteOrder(order._id, `#${order._id.slice(-8).toUpperCase()}`)}

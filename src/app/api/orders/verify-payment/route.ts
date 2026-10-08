@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { requireAuth } from "@/lib/auth";
 import dbConnect from "@/lib/mongoose";
@@ -9,6 +9,7 @@ import { sendMetaEvent } from "@/lib/metaConversions";
 import { validateAddress } from "@/lib/addressValidation";
 import { sendOrderConfirmationEmail, sendNewOrderAdminEmail } from "@/lib/email";
 import { decrementStock } from "@/lib/inventory";
+import { issueAndDeliverInvoice } from "@/lib/invoice/service";
 
 export async function POST(request: Request) {
   try {
@@ -243,6 +244,11 @@ export async function POST(request: Request) {
     sendNewOrderAdminEmail(emailData).catch((e) =>
       console.error('[email] Admin order alert failed:', e?.message)
     );
+
+    // ── GST invoice → email + WhatsApp + account (runs after the response is sent;
+    //    idempotent, so a webhook racing us can never double-send) ──────────────
+    const invoiceOrderId = newOrder._id.toString();
+    after(() => issueAndDeliverInvoice(invoiceOrderId));
     // ─────────────────────────────────────────────────────────────────────────
 
     return NextResponse.json(

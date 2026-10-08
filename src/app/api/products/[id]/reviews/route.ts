@@ -128,7 +128,7 @@ export async function POST(request: Request, props: { params: Promise<{ id: stri
     const validOrder = await Order.findOne({
       user: userId,
       'items.productId': productId,
-      orderStatus: { $in: ['shipped', 'delivered', 'completed'] }
+      orderStatus: { $in: ['shipped', 'delivered', 'completed', 'dispatched', 'in_transit'] }
     });
 
     const verifiedPurchase = !!validOrder;

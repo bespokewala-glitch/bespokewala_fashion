@@ -1,9 +1,10 @@
 export const dynamic = 'force-dynamic';
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import dbConnect from "@/lib/mongoose";
 import Order from "@/models/Order";
 import { decrementStock } from "@/lib/inventory";
+import { issueAndDeliverInvoice } from "@/lib/invoice/service";
 import {
   sendPaymentFailureEmail,
   sendRefundEmail,
@@ -104,6 +105,10 @@ export async function POST(request: Request) {
             sendNewOrderAdminEmail(emailData).catch((e) =>
               console.error("[email] Webhook admin order alert failed:", e?.message)
             );
+
+            // GST invoice (idempotent — skipped if verify-payment already issued/sent it)
+            const invoiceOrderId = updated._id.toString();
+            after(() => issueAndDeliverInvoice(invoiceOrderId));
           }
         }
         break;
@@ -148,6 +153,8 @@ export async function POST(request: Request) {
             if (Array.isArray(updated.items)) {
               await decrementStock(updated.items as any, "Razorpay Webhook");
             }
+            const invoiceOrderId = updated._id.toString();
+            after(() => issueAndDeliverInvoice(invoiceOrderId));
           }
         }
         break;

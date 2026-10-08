@@ -195,7 +195,15 @@ function shippingBlock(s: ShippingDetails): string {
 
 export interface SendResult { success: boolean; error?: string; }
 
-async function send(to: string | string[], subject: string, html: string, text: string): Promise<SendResult> {
+export interface EmailAttachment { filename: string; content: Buffer | Uint8Array; contentType?: string; }
+
+async function send(
+  to: string | string[],
+  subject: string,
+  html: string,
+  text: string,
+  attachments?: EmailAttachment[]
+): Promise<SendResult> {
   try {
     const transporter = getTransporter();
     await transporter.sendMail({
@@ -204,6 +212,9 @@ async function send(to: string | string[], subject: string, html: string, text: 
       subject,
       html,
       text,
+      ...(attachments?.length
+        ? { attachments: attachments.map((a) => ({ filename: a.filename, content: Buffer.from(a.content), contentType: a.contentType })) }
+        : {}),
     });
     return { success: true };
   } catch (err: any) {
@@ -340,6 +351,41 @@ export async function sendOrderConfirmationEmail(to: string, order: OrderEmailDa
 
   return send(to, subject, html,
     `Order Confirmed — #${shortId}\n\nTotal: ${cur}${order.total.toLocaleString('en-IN')}\nShipping to: ${order.shippingDetails.firstName} ${order.shippingDetails.lastName}, ${order.shippingDetails.city}\n\nTrack your order: ${B.siteUrl}/track-order`
+  );
+}
+
+/**
+ * GST invoice email — PDF attached. Sent right after payment is confirmed.
+ */
+export async function sendInvoiceEmail(
+  to: string,
+  customerName: string,
+  info: { orderId: string; invoiceNumber: string; total: number; accountUrl: string },
+  pdf: Uint8Array
+): Promise<SendResult> {
+  const shortId = info.orderId.slice(-8).toUpperCase();
+  const subject = `Your GST invoice ${info.invoiceNumber} — Order #${shortId} | ${B.name}`;
+  const first = customerName.split(' ')[0] || 'there';
+
+  const html = wrap(`
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:34px;margin-bottom:8px;">🧾</div>
+      ${h1('Your Invoice Is Ready')}
+      ${badge(info.invoiceNumber, B.color)}
+    </div>
+    ${divider()}
+    ${para(`Hi ${first},`)}
+    ${para(`Thank you for your order <strong>#${shortId}</strong>. Your GST invoice for <strong>₹${info.total.toLocaleString('en-IN')}</strong> is attached to this email as a PDF.`)}
+    ${para(`You can also download it any time from <em>My Account → Orders</em>.`, 'font-size:13px;color:#888;')}
+    ${ctaButton('View My Orders', info.accountUrl)}
+  `, `This is a transactional email from ${B.name}.`);
+
+  return send(
+    to,
+    subject,
+    html,
+    `Hi ${first},\n\nYour GST invoice ${info.invoiceNumber} for order #${shortId} (₹${info.total.toLocaleString('en-IN')}) is attached.\nDownload it any time: ${info.accountUrl}`,
+    [{ filename: `Invoice-${info.invoiceNumber.replace(/[\/\\]/g, '-')}.pdf`, content: pdf, contentType: 'application/pdf' }]
   );
 }
 

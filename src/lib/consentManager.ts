@@ -31,6 +31,7 @@ export function readConsent(): ConsentState | null {
 export function writeConsent(state: ConsentState): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(CONSENT_KEY, JSON.stringify(state));
+  window.dispatchEvent(new CustomEvent('bw_cookie_consent_changed', { detail: state }));
 }
 
 /**

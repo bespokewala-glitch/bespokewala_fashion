@@ -248,6 +248,21 @@ export default function OrderHistoryClient({ orders }: { orders: OrderData[] }) 
                     <Link href={`/account/orders/${order._id}`} className="action-btn">
                       View Details
                     </Link>
+                    <a
+                      href={`/api/orders/${order._id}/invoice`}
+                      className="action-btn"
+                      download={`invoice-${order._id}.pdf`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      Invoice (PDF)
+                    </a>
                     <a href="mailto:info@bespokewala.com" className="action-btn cancel-btn">
                       Contact Concierge
                     </a>

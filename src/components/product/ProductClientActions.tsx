@@ -267,12 +267,20 @@ export default function ProductClientActions({ product }: ProductClientActionsPr
             target="_blank"
             rel="noopener noreferrer"
             style={secondaryBtnStyle}
-            onClick={() => trackChatWithStylist({
-              slug: product.slug,
-              name: product.name,
-              category: product.category,
-              productType: product.productType,
-            })}
+            onClick={() => {
+              trackChatWithStylist({
+                slug: product.slug,
+                name: product.name,
+                category: product.category,
+                productType: product.productType,
+              });
+              fbEvent('Contact', {
+                content_name: product.name,
+                content_category: product.productType || product.category,
+                value: product.price,
+                currency: 'INR',
+              });
+            }}
           >
             Chat with Stylist
           </a>

@@ -45,10 +45,16 @@ function MetaPixelInner() {
   const [marketingConsented, setMarketingConsented] = useState(false);
 
   useEffect(() => {
-    const saved = readConsent();
-    if (saved && saved.marketing) {
-      setMarketingConsented(true);
-    }
+    const checkConsent = () => {
+      const saved = readConsent();
+      setMarketingConsented(!!(saved && saved.marketing));
+    };
+
+    checkConsent();
+    window.addEventListener("bw_cookie_consent_changed", checkConsent);
+    return () => {
+      window.removeEventListener("bw_cookie_consent_changed", checkConsent);
+    };
   }, []);
 
   useEffect(() => {
@@ -86,6 +92,15 @@ function MetaPixelInner() {
         }}
         onLoad={() => setLoaded(true)}
       />
+      <noscript>
+        <img
+          height="1"
+          width="1"
+          style={{ display: "none" }}
+          src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+          alt=""
+        />
+      </noscript>
     </>
   );
 }

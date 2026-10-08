@@ -26,10 +26,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     await dbConnect();
     const resolvedParams = await params;
     const body = await request.json();
-    const { status } = body;
+    let { status } = body;
 
     if (!status) {
       return NextResponse.json({ success: false, error: 'Status is required' }, { status: 400 });
+    }
+
+    // Support legacy/alias statuses
+    const STATUS_ALIASES: Record<string, string> = {
+      processing: 'production',
+      shipped: 'dispatched',
+    };
+    if (STATUS_ALIASES[status]) {
+      status = STATUS_ALIASES[status];
     }
 
     if (!VALID_STATUSES.includes(status)) {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { event as fbEvent } from '@/components/MetaPixel';
 
 export interface WishlistItem {
   slug: string;
@@ -50,6 +51,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const exists = prev.some(item => item.slug === newItem.slug);
       if (exists) return prev;
       return [...prev, newItem];
+    });
+
+    fbEvent('AddToWishlist', {
+      content_name: newItem.name,
+      content_ids: [newItem.slug],
+      content_type: 'product',
+      value: newItem.price,
+      currency: 'INR',
     });
   };
 
