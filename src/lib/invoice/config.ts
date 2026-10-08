@@ -62,8 +62,8 @@ export function getSellerProfile(): SellerProfile {
     addressLines = [addressOverride];
   } else {
     addressLines = [
-      'House No T86, Juhu Koliwada, Hira Buwa Gawde Road',
-      'Santacruz West, Mumbai City, Maharashtra - 400054',
+      'Unit no 912, arc one by lotus, New Link Road.',
+      'Andheri West, Mumbai 400053, Maharashtra, India',
     ];
   }
 
