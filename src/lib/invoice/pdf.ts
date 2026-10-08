@@ -6,9 +6,10 @@
  * rather than crashing the renderer.
  *
  * Features:
- * - Plain White luxury aesthetic with subtle champagne gold (#B89352) accents
+ * - Plain White pure monochrome aesthetic (no gold tints)
  * - Embeds official BW logo (public/bespoken.png)
  * - Embeds official cursive signature (public/invoice-signature.png)
+ * - Strictly bounded widths and multi-line wrapping for company title & signature
  */
 
 import fs from 'fs';
@@ -16,17 +17,18 @@ import path from 'path';
 import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
 import { inr } from './calc';
 
-const INK = rgb(0.12, 0.12, 0.12);
-const GOLD = rgb(0.72, 0.58, 0.32);
-const GREY = rgb(0.45, 0.45, 0.48);
-const LINE = rgb(0.88, 0.88, 0.88);
+// ── Pure monochrome luxury palette (zero gold) ──────────────────────────────
+const INK = rgb(0.1, 0.1, 0.1);
+const GREY = rgb(0.42, 0.42, 0.45);
+const MUTED = rgb(0.55, 0.55, 0.58);
+const LINE = rgb(0.85, 0.85, 0.85);
 const LIGHT_BG = rgb(0.97, 0.97, 0.97);
 const WHITE = rgb(1, 1, 1);
 
 const PAGE_W = 595.28;
 const PAGE_H = 841.89;
-const M = 40; // page margin
-const CONTENT_W = PAGE_W - M * 2;
+const M = 40; // strict page margin on both left and right (40pt)
+const CONTENT_W = PAGE_W - M * 2; // 515.28 pt
 
 /** Strip / map characters Helvetica (WinAnsi) can't encode. */
 function safe(input: unknown): string {
@@ -146,13 +148,13 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
   const hline = (top: number, x1 = M, x2 = PAGE_W - M, color = LINE, thickness = 0.6) =>
     page.drawLine({ start: { x: x1, y: PAGE_H - top }, end: { x: x2, y: PAGE_H - top }, thickness, color });
 
-  // ── Header (Plain White Design with BW Logo) ──────────────────────────────
+  // ── Header (Plain White, Clean Monochrome) ──────────────────────────────
   const drawHeader = () => {
     rect(0, 0, PAGE_W, PAGE_H, WHITE);
 
     let logoRight = M;
     if (logoImg) {
-      const targetH = 50;
+      const targetH = 46;
       const targetW = (logoImg.width / logoImg.height) * targetH;
       page.drawImage(logoImg, {
         x: M,
@@ -163,19 +165,19 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
       logoRight = M + targetW + 12;
     }
 
-    text('BESPOKEWALA', logoRight, 26, { size: 20, font: bold, color: INK });
-    text('Couture  |  Jewellery  |  Footwear  |  Accessories', logoRight, 49, { size: 8, font: reg, color: GREY });
+    text('BESPOKEWALA', logoRight, 26, { size: 19, font: bold, color: INK });
+    text('Couture  |  Jewellery  |  Footwear  |  Accessories', logoRight, 48, { size: 7.8, font: reg, color: GREY });
 
-    text(docTitle, PAGE_W - M - 220, 24, { size: 20, font: bold, color: INK, align: 'right', w: 220 });
-    text('Original for Recipient', PAGE_W - M - 220, 48, { size: 8.5, font: ital, color: GOLD, align: 'right', w: 220 });
+    text(docTitle, PAGE_W - M - 200, 24, { size: 19, font: bold, color: INK, align: 'right', w: 200 });
+    text('Original for Recipient', PAGE_W - M - 200, 48, { size: 8, font: ital, color: GREY, align: 'right', w: 200 });
 
-    hline(82, M, PAGE_W - M, GOLD, 1.2);
+    hline(78, M, PAGE_W - M, LINE, 0.8);
   };
   drawHeader();
 
   // ── Meta Strip ───────────────────────────────────────────────────────────
-  let y = 94;
-  const metaH = 46;
+  let y = 90;
+  const metaH = 44;
   rect(M, y, CONTENT_W, metaH, LIGHT_BG, LINE, 0.6);
   const metaCols = [
     ['Invoice No.', inv.invoiceNumber],
@@ -186,17 +188,17 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
   const colW = CONTENT_W / metaCols.length;
   metaCols.forEach(([label, value], i) => {
     const cx = M + i * colW + 12;
-    text(label.toUpperCase(), cx, y + 10, { size: 6.8, font: bold, color: GREY });
-    text(value, cx, y + 24, { size: 9.5, font: bold, color: INK });
+    text(label.toUpperCase(), cx, y + 9, { size: 6.5, font: bold, color: MUTED });
+    text(value, cx, y + 23, { size: 9, font: bold, color: INK });
     if (i > 0) page.drawLine({ start: { x: M + i * colW, y: PAGE_H - y - 6 }, end: { x: M + i * colW, y: PAGE_H - y - metaH + 6 }, thickness: 0.5, color: LINE });
   });
-  y += metaH + 16;
+  y += metaH + 14;
 
   // ── Parties (Seller & Buyer Boxes) ─────────────────────────────────────────
-  const partyW = (CONTENT_W - 16) / 2;
+  const partyW = (CONTENT_W - 14) / 2;
   const sellerLines: string[] = [
     safe(inv.seller?.legalName),
-    ...(inv.seller?.addressLines || []).flatMap((l: string) => wrap(l, reg, 8.2, partyW - 24)),
+    ...(inv.seller?.addressLines || []).flatMap((l: string) => wrap(l, reg, 8, partyW - 22)),
     `State: ${safe(inv.seller?.state)}${inv.seller?.stateCode ? ` (${inv.seller.stateCode})` : ''}`,
     ...(hasGstin ? [`GSTIN: ${inv.seller.gstin}`] : []),
     ...(inv.seller?.pan ? [`PAN: ${inv.seller.pan}`] : []),
@@ -204,31 +206,31 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
   ];
   const buyerLines: string[] = [
     safe(inv.buyer?.name),
-    ...(inv.buyer?.addressLines || []).flatMap((l: string) => wrap(l, reg, 8.2, partyW - 24)),
+    ...(inv.buyer?.addressLines || []).flatMap((l: string) => wrap(l, reg, 8, partyW - 22)),
     `State: ${safe(inv.buyer?.state || 'Maharashtra')}${inv.buyer?.stateCode ? ` (${inv.buyer.stateCode})` : ''}`,
     ...(inv.buyer?.phone ? [`Phone: ${safe(inv.buyer.phone)}`] : []),
     ...(inv.buyer?.email ? [safe(inv.buyer.email)] : []),
   ];
-  const partyH = Math.max(sellerLines.length, buyerLines.length) * 12 + 32;
+  const partyH = Math.max(sellerLines.length, buyerLines.length) * 11.5 + 30;
 
   const drawParty = (x: number, title: string, lines: string[]) => {
     rect(x, y, partyW, partyH, WHITE, LINE, 0.6);
-    rect(x, y, 3, partyH, GOLD);
-    text(title.toUpperCase(), x + 14, y + 9, { size: 7.2, font: bold, color: GOLD });
-    lines.forEach((l, i) => text(l, x + 14, y + 23 + i * 12, { size: 8.2, font: i === 0 ? bold : reg, color: i === 0 ? INK : rgb(0.25, 0.25, 0.28) }));
+    rect(x, y, 3, partyH, INK); // Sleek solid black accent edge
+    text(title.toUpperCase(), x + 12, y + 9, { size: 7, font: bold, color: INK });
+    lines.forEach((l, i) => text(l, x + 12, y + 22 + i * 11.5, { size: 8, font: i === 0 ? bold : reg, color: i === 0 ? INK : rgb(0.25, 0.25, 0.28) }));
   };
   drawParty(M, 'Sold By (Seller)', sellerLines);
-  drawParty(M + partyW + 16, 'Billed & Shipped To (Buyer)', buyerLines);
-  y += partyH + 16;
+  drawParty(M + partyW + 14, 'Billed & Shipped To (Buyer)', buyerLines);
+  y += partyH + 14;
 
   // ── Items Table ────────────────────────────────────────────────────────────
   const cols = [
     { k: 'sr', label: '#', w: 22, align: 'center' as const },
-    { k: 'desc', label: 'Item Description', w: 154, align: 'left' as const },
+    { k: 'desc', label: 'Item Description', w: 156, align: 'left' as const },
     { k: 'hsn', label: 'HSN/SAC', w: 42, align: 'center' as const },
     { k: 'qty', label: 'Qty', w: 24, align: 'center' as const },
     { k: 'rate', label: 'Unit Price', w: 58, align: 'right' as const },
-    { k: 'taxable', label: 'Taxable Val', w: 60, align: 'right' as const },
+    { k: 'taxable', label: 'Taxable Val', w: 58, align: 'right' as const },
     { k: 'gst', label: 'GST %', w: 32, align: 'center' as const },
     { k: 'tax', label: 'GST Amt', w: 50, align: 'right' as const },
     { k: 'amt', label: 'Amount', w: 0, align: 'right' as const },
@@ -242,7 +244,7 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
     rect(M, y, CONTENT_W, 22, LIGHT_BG, LINE, 0.6);
     cols.forEach((c, i) =>
       text(c.label, colX[i] + (c.align === 'left' ? 6 : 0), y + 7, {
-        size: 7.2, font: bold, color: INK, align: c.align === 'left' ? 'left' : c.align, w: c.align === 'left' ? undefined : c.w - (c.align === 'right' ? 6 : 0),
+        size: 7, font: bold, color: INK, align: c.align === 'left' ? 'left' : c.align, w: c.align === 'left' ? undefined : c.w - (c.align === 'right' ? 6 : 0),
       })
     );
     y += 22;
@@ -253,7 +255,7 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
     pageNo += 1;
     rect(0, 0, PAGE_W, PAGE_H, WHITE);
     if (logoImg) {
-      const h = 26;
+      const h = 24;
       const w = (logoImg.width / logoImg.height) * h;
       page.drawImage(logoImg, { x: M, y: PAGE_H - 12 - h, width: w, height: h });
       text('BESPOKEWALA', M + w + 8, 17, { size: 12, font: bold, color: INK });
@@ -270,10 +272,10 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
 
   const invoiceLines = inv.lines || (inv as any).lineItems || [];
   invoiceLines.forEach((l: any, idx: number) => {
-    const descLines = wrap(l.description, bold, 8.2, cols[1].w - 10);
+    const descLines = wrap(l.description, bold, 8, cols[1].w - 10);
     const subParts = [l.size ? `Size: ${l.size}` : '', l.sku ? `Style: ${l.sku}` : ''].filter(Boolean).join('   ');
     const subLines = subParts ? wrap(subParts, reg, 7, cols[1].w - 10) : [];
-    const rowH = Math.max(26, descLines.length * 10 + subLines.length * 8.5 + 10);
+    const rowH = Math.max(24, descLines.length * 9.5 + subLines.length * 8.5 + 8);
 
     if (y + rowH > PAGE_H - FOOTER_RESERVE) {
       newPage();
@@ -282,9 +284,9 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
 
     if (idx % 2 === 1) rect(M, y, CONTENT_W, rowH, rgb(0.99, 0.99, 0.99));
     const mid = y + 7;
-    text(String(idx + 1), colX[0], mid, { size: 7.8, align: 'center', w: cols[0].w, color: GREY });
-    descLines.forEach((dl, i) => text(dl, colX[1] + 6, mid + i * 10 - 2, { size: 8, font: bold, color: INK }));
-    subLines.forEach((sl, i) => text(sl, colX[1] + 6, mid + descLines.length * 10 + i * 8.5 - 1, { size: 6.8, color: GREY }));
+    text(String(idx + 1), colX[0], mid, { size: 7.8, align: 'center', w: cols[0].w, color: MUTED });
+    descLines.forEach((dl, i) => text(dl, colX[1] + 6, mid + i * 9.5 - 2, { size: 7.8, font: bold, color: INK }));
+    subLines.forEach((sl, i) => text(sl, colX[1] + 6, mid + descLines.length * 9.5 + i * 8.5 - 1, { size: 6.8, color: GREY }));
 
     const rate = l.cgstRate + l.sgstRate + l.igstRate || l.gstRate;
     const tax = (l.cgst || 0) + (l.sgst || 0) + (l.igst || 0);
@@ -294,14 +296,14 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
     text(inr(l.taxableValue), colX[5], mid, { size: 7.8, align: 'right', w: cols[5].w - 6 });
     text(`${rate}%`, colX[6], mid, { size: 7.8, align: 'center', w: cols[6].w });
     text(inr(tax), colX[7], mid, { size: 7.8, align: 'right', w: cols[7].w - 6 });
-    text(inr(l.grossTotal), colX[8], mid, { size: 8.2, font: bold, align: 'right', w: cols[8].w - 6, color: INK });
+    text(inr(l.grossTotal), colX[8], mid, { size: 8, font: bold, align: 'right', w: cols[8].w - 6, color: INK });
     y += rowH;
     hline(y, M, PAGE_W - M, LINE, 0.5);
   });
 
   y += 5;
   text('Unit Price and Amount are inclusive of GST. Taxable Value = Amount / (1 + GST%).', M, y, { size: 6.8, font: ital, color: GREY });
-  y += 16;
+  y += 14;
 
   // ── Totals & Payment Section ──────────────────────────────────────────────
   const t = inv.totals;
@@ -313,79 +315,95 @@ export async function renderInvoicePdf(inv: PdfInvoice): Promise<Uint8Array> {
   }
   totalRows.push(['Total GST', inr(t.totalTax)]);
 
-  const totalsH = totalRows.length * 17 + 42;
-  if (y + totalsH + 140 > PAGE_H - 30) {
+  const totalsH = totalRows.length * 16 + 40;
+  if (y + totalsH + 130 > PAGE_H - 30) {
     newPage();
   }
 
   // Left: Amount in Words + Payment Details
-  const leftW = CONTENT_W - 200;
-  rect(M, y, leftW - 12, totalsH, LIGHT_BG, LINE, 0.6);
-  text('AMOUNT IN WORDS', M + 12, y + 10, { size: 6.8, font: bold, color: GREY });
-  wrap(inv.amountInWords || '', bold, 8.5, leftW - 36).forEach((ln, i) => text(ln, M + 12, y + 23 + i * 11, { size: 8.5, font: bold, color: INK }));
+  const leftW = CONTENT_W - 196; // 319.28 pt
+  rect(M, y, leftW - 10, totalsH, LIGHT_BG, LINE, 0.6);
+  text('AMOUNT IN WORDS', M + 12, y + 9, { size: 6.8, font: bold, color: MUTED });
+  wrap(inv.amountInWords || '', bold, 8.2, leftW - 34).forEach((ln, i) => text(ln, M + 12, y + 21 + i * 10.5, { size: 8.2, font: bold, color: INK }));
 
-  const payTop = y + totalsH - 34;
-  hline(payTop - 4, M + 12, M + leftW - 24, LINE, 0.5);
-  text('PAYMENT DETAILS', M + 12, payTop + 2, { size: 6.8, font: bold, color: GREY });
-  text(`Paid online via ${safe(inv.paymentMethod || 'Razorpay')}${inv.razorpayPaymentId ? `  |  Ref: ${safe(inv.razorpayPaymentId)}` : ''}`, M + 12, payTop + 14, { size: 7.5, color: INK });
+  const payTop = y + totalsH - 32;
+  hline(payTop - 4, M + 12, M + leftW - 22, LINE, 0.5);
+  text('PAYMENT DETAILS', M + 12, payTop + 2, { size: 6.8, font: bold, color: MUTED });
+  text(`Paid online via ${safe(inv.paymentMethod || 'Razorpay')}${inv.razorpayPaymentId ? `  |  Ref: ${safe(inv.razorpayPaymentId)}` : ''}`, M + 12, payTop + 13, { size: 7.5, color: INK });
 
   // Right: Totals
   const rx = M + leftW + 4;
-  const rw = 196;
+  const rw = 192;
   rect(rx, y, rw, totalsH, WHITE, LINE, 0.6);
   totalRows.forEach(([label, val], i) => {
-    const ry = y + 8 + i * 17;
-    text(label, rx + 12, ry, { size: 8, color: GREY });
-    text(val, rx + 12, ry, { size: 8, align: 'right', w: rw - 24, color: INK });
+    const ry = y + 8 + i * 16;
+    text(label, rx + 12, ry, { size: 7.8, color: GREY });
+    text(val, rx + 12, ry, { size: 7.8, align: 'right', w: rw - 24, color: INK });
   });
 
-  // Grand Total Strip (Clean white with gold borders)
-  const gy = y + totalsH - 32;
-  rect(rx, gy, rw, 32, LIGHT_BG, GOLD, 1);
-  text('GRAND TOTAL', rx + 12, gy + 11, { size: 8, font: bold, color: INK });
-  text(`Rs. ${inr(t.grandTotal)}`, rx + 12, gy + 9, { size: 12, font: bold, color: INK, align: 'right', w: rw - 24 });
-  y += totalsH + 18;
+  // Grand Total Strip (Clean monochrome box with crisp border)
+  const gy = y + totalsH - 30;
+  rect(rx, gy, rw, 30, LIGHT_BG, INK, 0.8);
+  text('GRAND TOTAL', rx + 12, gy + 10, { size: 7.8, font: bold, color: INK });
+  text(`Rs. ${inr(t.grandTotal)}`, rx + 12, gy + 8, { size: 11.5, font: bold, color: INK, align: 'right', w: rw - 24 });
+  y += totalsH + 16;
 
-  // ── Terms & Signature Section ─────────────────────────────────────────────
+  // ── Terms & Signature Section (Strict Margin Adherence) ───────────────────
   const declLines = [
     'Declaration: We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.',
     'Goods once sold are subject to our Shipping & Returns policy published at ' + safe(inv.seller?.website || 'bespokewala.com') + '.',
     'Subject to Mumbai jurisdiction. This is a computer-generated tax invoice.',
   ];
+
+  // Signature Box width & placement (strictly flush with right margin PAGE_W - M = 555.28)
+  const sw = 190;
+  const sx = PAGE_W - M - sw; // 365.28 pt -> [365.28 to 555.28]
+
+  // Terms on Left (width bounded to avoid any collision with signature box)
+  const termsW = sx - M - 16;
   let dy = y;
-  text('TERMS & CONDITIONS', M, dy, { size: 6.8, font: bold, color: GOLD });
+  text('TERMS & CONDITIONS', M, dy, { size: 6.8, font: bold, color: INK });
   dy += 11;
-  declLines.forEach((d) => wrap(d, reg, 7.2, CONTENT_W - 200).forEach((ln) => { text(ln, M, dy, { size: 7.2, color: GREY }); dy += 9.5; }));
+  declLines.forEach((d) => wrap(d, reg, 7, termsW).forEach((ln) => { text(ln, M, dy, { size: 7, color: GREY }); dy += 9.5; }));
 
-  // Signature Box (Right)
-  const sx = PAGE_W - M - 170;
-  const sw = 170;
-  text(`For ${safe(inv.seller?.legalName)}`, sx, y + 2, { size: 7.5, font: bold, align: 'center', w: sw, color: INK });
+  // Signature Block on Right
+  // Wrap company title into multiple lines so it NEVER exceeds sw!
+  const sellerLegal = safe(inv.seller?.legalName || 'BESPOKEWALA ENTERPRISES (OPC) PRIVATE LIMITED');
+  const compLines = wrap(`For ${sellerLegal}`, bold, 7.2, sw - 12);
+  let compY = y;
+  compLines.forEach((cl) => {
+    text(cl, sx, compY, { size: 7.2, font: bold, align: 'center', w: sw, color: INK });
+    compY += 9.5;
+  });
 
-  // Draw signature image
+  // Draw signature image cleanly centered within sw
+  let sigBottomY = compY + 28;
   if (sigImg) {
-    const targetW = 120;
+    const targetW = 100;
     const targetH = (sigImg.height / sigImg.width) * targetW;
     const sigX = sx + (sw - targetW) / 2;
+    const sigY = compY + 2;
     page.drawImage(sigImg, {
       x: sigX,
-      y: PAGE_H - (y + 16) - targetH,
+      y: PAGE_H - sigY - targetH,
       width: targetW,
       height: targetH,
     });
+    sigBottomY = sigY + targetH + 3;
   }
 
-  hline(y + 54, sx + 10, sx + sw - 10, LINE, 0.6);
-  text('Authorised Signatory', sx, y + 59, { size: 7.2, color: GREY, align: 'center', w: sw });
+  // Divider line under signature (strictly inside sw)
+  hline(sigBottomY, sx + 20, sx + sw - 20, LINE, 0.6);
+  text('Authorised Signatory', sx, sigBottomY + 4, { size: 7, font: reg, color: GREY, align: 'center', w: sw });
 
   // ── Page Footers ──────────────────────────────────────────────────────────
   const pages = pdf.getPages();
   pages.forEach((p, i) => {
-    p.drawLine({ start: { x: M, y: 32 }, end: { x: PAGE_W - M, y: 32 }, thickness: 0.6, color: LINE });
+    p.drawLine({ start: { x: M, y: 30 }, end: { x: PAGE_W - M, y: 30 }, thickness: 0.5, color: LINE });
     const foot = safe(`${inv.seller?.tradeName || 'Bespokewala'}  |  ${inv.seller?.website || 'bespokewala.com'}  |  ${inv.seller?.email}  |  ${inv.seller?.phone}`);
-    p.drawText(foot, { x: M, y: 14, size: 7.2, font: reg, color: GREY });
+    p.drawText(foot, { x: M, y: 14, size: 7, font: reg, color: GREY });
     const pg = `Page ${i + 1} of ${pages.length}`;
-    p.drawText(pg, { x: PAGE_W - M - reg.widthOfTextAtSize(pg, 7.2), y: 14, size: 7.2, font: reg, color: GREY });
+    p.drawText(pg, { x: PAGE_W - M - reg.widthOfTextAtSize(pg, 7), y: 14, size: 7, font: reg, color: GREY });
   });
 
   return pdf.save();
