@@ -115,12 +115,95 @@ function sanitizeVtoError(rawError: any): string {
   return str;
 }
 
+/**
+ * Gemini "Nano Banana" try-on. Gemini image generation is synchronous, so the
+ * finished image is returned directly (no job polling needed).
+ * Docs: https://ai.google.dev/gemini-api/docs/image-generation
+ */
+async function generateWithGemini(opts: {
+  geminiKey: string;
+  personBase64: string;
+  garmentBase64: string;
+  category: string;
+}): Promise<{ ok: true; dataUrl: string } | { ok: false; status: number; error: string }> {
+  const model = (process.env.GEMINI_TRYON_MODEL || 'gemini-2.5-flash-image').trim();
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+  const prompt =
+    'You are a professional fashion virtual try-on system. ' +
+    'The FIRST image is the customer. The SECOND image is the garment (' + opts.category + '). ' +
+    'Generate one photorealistic image of the customer from the first image wearing the exact garment from the second image. ' +
+    'Strictly preserve the customer\'s face, identity, skin tone, hair, body shape, pose and the original background. ' +
+    'Strictly preserve the garment\'s exact colour, fabric texture, embroidery, buttons, collar and cut, fitted naturally to the body with realistic folds and shadows. ' +
+    'Do not add text, logos, watermarks or extra people. Output only the final image.';
+
+  const { res, data } = await fetchWithRetry(
+    url,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Header (not ?key=) so the key never appears in URLs or logs
+        'x-goog-api-key': opts.geminiKey,
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType: 'image/jpeg', data: opts.personBase64 } },
+              { inlineData: { mimeType: 'image/jpeg', data: opts.garmentBase64 } },
+            ],
+          },
+        ],
+        generationConfig: { responseModalities: ['IMAGE'] },
+      }),
+    },
+    2,
+  );
+
+  if (!res.ok) {
+    console.error(`[VTO] Gemini Error (status ${res.status}):`, JSON.stringify(data));
+    const raw = data?.error?.message || data?.message || 'The try-on service is temporarily busy.';
+    return { ok: false, status: res.status === 429 ? 429 : 502, error: sanitizeVtoError(raw) };
+  }
+
+  const parts: any[] = data?.candidates?.[0]?.content?.parts || [];
+  const imgPart = parts.find((p) => p?.inlineData?.data || p?.inline_data?.data);
+  const b64: string | undefined = imgPart?.inlineData?.data || imgPart?.inline_data?.data;
+
+  if (!b64) {
+    console.error('[VTO] Gemini returned no image:', JSON.stringify(data?.promptFeedback || data?.candidates?.[0]?.finishReason || data));
+    return {
+      ok: false,
+      status: 422,
+      error: 'We could not generate a try-on from this photo. Please try a clear, front-facing, full-body photo with good lighting.',
+    };
+  }
+
+  // Normalise to JPEG to keep the JSON response small
+  let outB64 = b64;
+  let mime = imgPart?.inlineData?.mimeType || imgPart?.inline_data?.mime_type || 'image/png';
+  try {
+    const sharp = (await import('sharp')).default;
+    const out = await sharp(Buffer.from(b64, 'base64')).jpeg({ quality: 88 }).toBuffer();
+    outB64 = out.toString('base64');
+    mime = 'image/jpeg';
+  } catch {
+    // keep original encoding
+  }
+
+  return { ok: true, dataUrl: `data:${mime};base64,${outB64}` };
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const geminiKey = (process.env.GEMINI_API_KEY || '').trim();
     const apiKey = (process.env.PIXELAPI_KEY || process.env.FASHN_API_KEY || '').trim();
 
-    if (!apiKey) {
+    if (!geminiKey && !apiKey) {
       return NextResponse.json(
         { error: 'Virtual Try-On is currently unavailable (API key missing)' },
         { status: 500 },
@@ -267,6 +350,29 @@ export async function POST(req: Request) {
         { error: 'Failed to process garment image. Please ensure the product image is accessible.' },
         { status: 400 },
       );
+    }
+
+    // ── Gemini (Nano Banana) provider ────────────────────────────────────────
+    if (geminiKey) {
+      const gemResult = await generateWithGemini({
+        geminiKey,
+        personBase64: person_image,
+        garmentBase64: garment_image,
+        category: (body.category || 'garment').toString().slice(0, 40),
+      });
+
+      if (!gemResult.ok) {
+        return NextResponse.json({ error: gemResult.error }, { status: gemResult.status });
+      }
+
+      // Same shape the modal already understands, already completed
+      return NextResponse.json({
+        id: `gemini_${Date.now()}`,
+        status: 'completed',
+        output: gemResult.dataUrl,
+        outputs: [gemResult.dataUrl],
+        output_image_url: gemResult.dataUrl,
+      });
     }
 
     // Map to valid PixelAPI categories: upperbody | lowerbody | dress | saree | lehenga | kurti | sherwani

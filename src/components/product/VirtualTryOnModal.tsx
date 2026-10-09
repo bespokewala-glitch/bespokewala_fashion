@@ -161,6 +161,21 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
         throw new Error(errorMessage);
       }
 
+      // Synchronous providers (Gemini) return the finished image straight away
+      if (data.status === 'completed') {
+        const immediateUrl = findClientImageUrl(data);
+        if (immediateUrl) {
+          setGeneratedImage(immediateUrl);
+          trackVirtualTryOn({
+            productId,
+            productName,
+            productCategory,
+            productPrice,
+          });
+          return;
+        }
+      }
+
       const jobId = data.id;
       if (!jobId) {
         throw new Error('Invalid response from server.');
