@@ -116,22 +116,25 @@ export default function OptimizedImage({
     return <NoImagePlaceholder style={style as React.CSSProperties} />;
   }
 
+  const isPriority = priority === true;
+
   return (
     <>
-      {!isLoaded && <LoadingShimmer fill={fill} />}
+      {!isLoaded && !isPriority && <LoadingShimmer fill={fill} />}
       <Image
         {...rest}
         ref={imgRef}
         src={currentUrl}
         alt={alt || 'Bespokewala Image'}
         priority={priority}
+        fetchPriority={isPriority ? 'high' : undefined}
         fill={fill}
         sizes={sizes || (fill ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw' : undefined)}
         unoptimized={isBypass}
         style={{
           ...style,
-          opacity: isLoaded ? 1 : 0,
-          transition: 'opacity 0.25s ease-in-out',
+          opacity: isPriority || isLoaded ? 1 : 0,
+          transition: isPriority ? undefined : 'opacity 0.25s ease-in-out',
         }}
         onLoad={(e) => {
           setIsLoaded(true);

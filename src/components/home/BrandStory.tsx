@@ -1,5 +1,6 @@
 import React from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import LazyVideo from '@/components/ui/LazyVideo';
 import Link from 'next/link';
 
 export default function BrandStory({ data }: { data?: any }) {
@@ -152,7 +153,7 @@ export default function BrandStory({ data }: { data?: any }) {
 
         <div className="brand-story-image-wrapper">
           {image.match(/\.(mp4|webm|ogg)$/i) ? (
-            <video
+            <LazyVideo
               src={image}
               autoPlay
               loop

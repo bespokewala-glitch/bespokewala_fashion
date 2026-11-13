@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import LazyVideo from '@/components/ui/LazyVideo';
 
 interface Campaign {
   _id?: string;
@@ -74,7 +75,7 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
               `}} />
               
               {camp.mediaType === 'video' ? (
-                <video 
+                <LazyVideo 
                   src={camp.videoUrl}
                   autoPlay
                   muted

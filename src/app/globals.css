@@ -565,10 +565,27 @@ a {
 /* â”€â”€â”€ Hero Section (Global Stable Layout) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .hero-section {
   height: 100vh;
+  min-height: 600px;
+}
+
+@media (max-width: 768px) {
+  .hero-section,
+  .mobile-hero-height,
+  section.mobile-hero-height {
+    height: clamp(340px, 50vh, 460px) !important;
+    min-height: 340px !important;
+  }
 }
 
 .curated-card {
   height: 600px;
+}
+
+@media (max-width: 768px) {
+  .curated-card {
+    height: auto !important;
+    aspect-ratio: 9 / 16 !important;
+  }
 }
 
 /* â”€â”€â”€ Site Footer (Global Critical Layout) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */

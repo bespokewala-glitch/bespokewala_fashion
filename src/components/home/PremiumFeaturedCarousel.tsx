@@ -286,7 +286,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
                 style={{ objectFit: 'cover' }}
                 variant="thumbnail"
                 sizes="(max-width: 768px) 80vw, 300px"
-                priority={index < 2}
+                priority={false}
               />
               <ProductCardWishlistButton 
                 product={{

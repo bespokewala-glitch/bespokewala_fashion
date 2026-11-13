@@ -176,8 +176,8 @@
   }
 
   .mobile-hero-height {
-    height: 65dvh !important;
-    min-height: 480px !important;
+    height: clamp(340px, 50vh, 460px) !important;
+    min-height: 340px !important;
   }
 
   .mobile-p-4 {

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import LazyVideo from '@/components/ui/LazyVideo';
 
 export default function FeatureBanner({ data }: { data?: any }) {
   const image = data?.image || "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?auto=format&fit=crop&q=80";
@@ -41,9 +42,8 @@ export default function FeatureBanner({ data }: { data?: any }) {
         boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
       }}>
         {image.match(/\.(mp4|webm|ogg)$/i) ? (
-          <video
+          <LazyVideo
             src={image}
-            preload="none"
             style={{
               width: '100%',
               height: '100%',
@@ -62,7 +62,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               objectFit: 'cover',
               opacity: 0.7,
             }}
-            variant="large"
+            variant="medium"
             loading="lazy"
           />
         )}

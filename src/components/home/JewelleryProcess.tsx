@@ -1,5 +1,6 @@
 import React from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import LazyVideo from '@/components/ui/LazyVideo';
 
 export default function JewelleryProcess({ data }: { data?: any }) {
   if (!data) return null;
@@ -30,7 +31,7 @@ export default function JewelleryProcess({ data }: { data?: any }) {
 
           <div style={{ flex: description ? '1.5' : '1', position: 'relative', paddingBottom: description ? '60%' : '56.25%', overflow: 'hidden', backgroundColor: '#eee', borderRadius: '4px' }}>
             {image.match(/\.(mp4|webm|ogg)$/i) ? (
-              <video
+              <LazyVideo
                 src={image}
                 autoPlay
                 loop

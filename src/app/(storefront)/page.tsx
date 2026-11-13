@@ -18,6 +18,7 @@ import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';
 import HomepageSection from '@/models/HomepageSection';
 import { getOrFetch } from '@/lib/serverCache';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 import { Metadata } from 'next';
 import { generatePageMetadata, generateOrganizationSchema, generateWebSiteSchema } from '@/lib/seo';
 
@@ -138,8 +139,32 @@ export default async function Home() {
   const organizationSchema = generateOrganizationSchema();
   const websiteSchema = generateWebSiteSchema();
 
+  const firstHeroCampaign = finalHeroCampaigns && finalHeroCampaigns[0];
+  const isHeroImage = Boolean(
+    firstHeroCampaign?.videoUrl &&
+    !firstHeroCampaign.videoUrl.match(/\.(mp4|webm|ogg)$/i)
+  );
+
   return (
     <>
+      {isHeroImage && (
+        <>
+          <link
+            rel="preload"
+            as="image"
+            href={normalizeImageUrl(firstHeroCampaign.videoUrl, 'medium')}
+            media="(max-width: 768px)"
+            fetchPriority="high"
+          />
+          <link
+            rel="preload"
+            as="image"
+            href={normalizeImageUrl(firstHeroCampaign.videoUrl, 'large')}
+            media="(min-width: 769px)"
+            fetchPriority="high"
+          />
+        </>
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 interface Campaign {
   _id?: string;
@@ -143,16 +144,31 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     <section style={heroStyle} className="mobile-hero-height hero-section">
       {isImage ? (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <OptimizedImage
-            src={currentCampaign?.videoUrl || ''}
-            alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
-            fill
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-            priority={true}
-            variant="large"
-            className="hero-image"
-          />
+          <picture>
+            <source
+              media="(max-width: 768px)"
+              srcSet={normalizeImageUrl(currentCampaign?.videoUrl, 'medium')}
+            />
+            <source
+              media="(min-width: 769px)"
+              srcSet={normalizeImageUrl(currentCampaign?.videoUrl, 'large')}
+            />
+            <img
+              src={normalizeImageUrl(currentCampaign?.videoUrl, 'large')}
+              alt={currentCampaign?.title ? `Bespokewala ${currentCampaign.title} collection` : 'Bespokewala luxury collection'}
+              fetchPriority="high"
+              decoding="async"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+              className="hero-image"
+            />
+          </picture>
         </div>
       ) : (
         <video
