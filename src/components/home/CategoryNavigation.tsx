@@ -59,17 +59,18 @@ export default function CategoryNavigation({ data }: { data?: any }) {
           font-weight: 400;
         }
         
-        /* Elegant underline on hover/active */
+        /* Elegant underline on hover/active (composited scaleX instead of layout-triggering width) */
         .category-nav-link::after {
           content: '';
           position: absolute;
-          width: 0;
+          width: 100%;
           height: 1px;
           bottom: 0;
           left: 50%;
           background-color: #111;
-          transition: all 0.3s ease;
-          transform: translateX(-50%);
+          transform: translateX(-50%) scaleX(0);
+          transform-origin: center;
+          transition: transform 0.3s ease;
         }
         
         .category-nav-link:hover {
@@ -77,7 +78,7 @@ export default function CategoryNavigation({ data }: { data?: any }) {
         }
         
         .category-nav-link:hover::after {
-          width: 100%;
+          transform: translateX(-50%) scaleX(1);
         }
 
         /* Mobile Layout */

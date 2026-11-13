@@ -21,9 +21,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const fallbackCampaigns: Campaign[] = [
-    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/clothures_video.mp4', linkUrl: '/products/couture/womens' },
-    { title: 'High Jewellery', subtitle: 'Signature', videoUrl: '/jwellay_video.mp4', linkUrl: '/products/jewellery' },
-    { title: 'Footwear', subtitle: 'Essentials', videoUrl: '/accessary_video.mp4', linkUrl: '/products/footwear' }
+    { title: 'The Bridal Edit', subtitle: 'New Collection', videoUrl: '/bespoken-transparent.webp', linkUrl: '/products/couture' },
   ];
 
   const activeCampaigns = campaigns && campaigns.length > 0 ? campaigns : fallbackCampaigns;
@@ -48,7 +46,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
     // Always attempt to autoplay video when index changes
     if (!isImg && videoRef.current) {
-      videoRef.current.play().catch(e => console.log("Autoplay prevented:", e));
+      videoRef.current.play().catch(() => {});
     }
 
     return () => {
@@ -58,7 +56,6 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
 
   const heroStyle: React.CSSProperties = {
     position: 'relative',
-    height: '100vh',
     width: '100%',
     overflow: 'hidden',
     display: 'flex',
@@ -77,7 +74,12 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     fontSize: '2rem',
     fontWeight: 300,
     cursor: 'pointer',
-    padding: '2rem',
+    padding: '1rem',
+    minWidth: '44px',
+    minHeight: '44px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     opacity: 0.7,
     transition: 'opacity 0.3s ease',
   };
@@ -119,22 +121,6 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     margin: 0,
   };
 
-  const primaryBtnStyle: React.CSSProperties = {
-    backgroundColor: '#fff',
-    color: '#000',
-    border: '1px solid #fff',
-    padding: '0.8rem 1.5rem',
-    textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    fontSize: '0.75rem',
-    textDecoration: 'none',
-    transition: 'all 0.3s ease',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: '160px',
-  };
-
   const secondaryBtnStyle: React.CSSProperties = {
     backgroundColor: 'transparent',
     color: '#fff',
@@ -144,7 +130,7 @@ export default function HeroSection({ campaigns = [] }: HeroSectionProps) {
     letterSpacing: '0.1em',
     fontSize: '0.75rem',
     textDecoration: 'none',
-    transition: 'all 0.3s ease',
+    transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

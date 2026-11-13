@@ -46,3 +46,10 @@ next-env.d.ts
 
 # Local uploads — all files go to GCP, never commit these
 /public/uploads/
+
+# Lighthouse audit reports (generated locally, not for repo)
+/reports/lighthouse/*.report.json
+/reports/lighthouse/*.report.html
+
+# Full Lighthouse reports directory (large generated files)
+/reports/

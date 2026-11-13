@@ -59,7 +59,11 @@
     -webkit-overflow-scrolling: touch;
     white-space: nowrap !important;
     gap: 1.25rem !important;
-    padding: 0.65rem 1rem !important;
+    padding: 0 1rem !important;
+    align-items: center !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    box-sizing: border-box !important;
     justify-content: flex-start !important;
     border-bottom: 1px solid #eeeeee !important;
     background-color: #ffffff !important;
@@ -695,7 +699,8 @@
   /* ── Mobile Main Header Row ─────────────────────────────────────────────── */
   /* Layout: [hamburger flex:0 44px] [logo flex:1 centered] [icons flex:0 auto] */
   .mobile-main-header {
-    height: 64px !important;
+    height: 56px !important;
+    min-height: 56px !important;
     padding: 0 10px !important;
     display: flex !important;
     align-items: center !important;
@@ -703,10 +708,11 @@
     box-sizing: border-box !important;
   }
 
-  /* Logo img — reinforce inline width so it's always sized correctly */
+  /* Logo img — reinforce inline width so it's always sized correctly with reserved aspect ratio */
   .header-logo-img {
     width: 60px !important;
     height: auto !important;
+    aspect-ratio: 522 / 481 !important;
     object-fit: contain !important;
     display: block !important;
     flex-shrink: 0 !important;
@@ -737,11 +743,13 @@
   @media (max-width: 360px) {
     .mobile-main-header {
       padding: 0 6px !important;
-      height: 58px !important;
+      height: 56px !important;
+      min-height: 56px !important;
     }
 
     .header-logo-img {
       width: 50px !important;
+      aspect-ratio: 522 / 481 !important;
     }
 
     .mobile-top-nav {
@@ -785,14 +793,20 @@
 /* ══════════════════════════════════════════════════════════════════════════════
    LOGO — Responsive sizing across all breakpoints
    Logo natural size: 522 × 481 px (near-square, ratio 1.085:1)
-   Always width + height:auto to preserve correct aspect ratio.
+   Always width + height:auto with explicit aspect-ratio to prevent layout shift.
    ══════════════════════════════════════════════════════════════════════════════ */
+
+.header-logo-img {
+  aspect-ratio: 522 / 481 !important;
+  object-fit: contain !important;
+}
 
 /* Desktop: 1440px+ */
 @media (min-width: 1440px) {
   .header-logo-img {
     width: 60px;
     height: auto;
+    aspect-ratio: 522 / 481;
     object-fit: contain;
   }
 }
@@ -802,6 +816,7 @@
   .header-logo-img {
     width: 60px;
     height: auto;
+    aspect-ratio: 522 / 481;
     object-fit: contain;
   }
 }
@@ -811,6 +826,7 @@
   .header-logo-img {
     width: 54px;
     height: auto;
+    aspect-ratio: 522 / 481;
     object-fit: contain;
   }
 }
@@ -1232,11 +1248,14 @@
 
   /* Mobile Header Optimization */
   .mobile-main-header {
-    padding: 0.8rem 1.25rem !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 0 10px !important;
   }
 
   .header-logo-img {
     width: 48px !important;
+    aspect-ratio: 522 / 481 !important;
   }
 
   .mobile-icon-right {
@@ -1515,14 +1534,13 @@ body.body-drawer-open {
 /* ── Top-padding guard for pages without a hero ───────────────────────────── */
 /* Used on pages like /wishlist, /about, /contact where there is NO hero
    section below the fixed header. The header is 64px + optional 36px top-nav = ~100px. */
-@media (max-width: 1023px) {}
 
 /* ── Department collection cards — mobile height fix ─────────────────────── */
 @media (max-width: 767px) {
 
   /* CollectionPageContent top-level department grid cards */
-  .mobile-carousel>a[style],
-  .mobile-carousel>a {
+  .mobile-carousel>a[style]:not(.curated-card),
+  .mobile-carousel>a:not(.curated-card) {
     min-height: 200px !important;
     padding: 1.5rem 1rem !important;
   }

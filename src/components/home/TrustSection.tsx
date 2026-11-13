@@ -1,37 +1,7 @@
-'use client';
-
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import Link from 'next/link';
 
 export default function TrustSection() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
-    const scrollLeft = scrollContainerRef.current.scrollLeft;
-    const container = scrollContainerRef.current;
-    
-    let closestIndex = 0;
-    let minDiff = Infinity;
-    
-    Array.from(container.children).forEach((child, index) => {
-      const childCenter = (child as HTMLElement).offsetLeft + (child as HTMLElement).offsetWidth / 2;
-      const containerCenter = scrollLeft + container.offsetWidth / 2;
-      const diff = Math.abs(childCenter - containerCenter);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestIndex = index;
-      }
-    });
-    
-    if (closestIndex !== activeIndex) {
-      setActiveIndex(closestIndex);
-    }
-  };
-
-  // Keep desktop styles mostly inline or in the generic classes
-  // We'll reset mobile typography entirely in the media query.
   const titleStyle: React.CSSProperties = {
     fontSize: '0.85rem',
     letterSpacing: '0.15em',
@@ -69,13 +39,13 @@ export default function TrustSection() {
         }
         .trust-desc {
           font-size: 0.9rem;
-          color: #777;
+          color: #555;
           font-style: italic;
           margin: 0;
           line-height: 1.4;
         }
         .trust-link {
-          color: #c1a68d;
+          color: #846039;
           text-decoration: none;
           font-size: 0.8rem;
           letter-spacing: 0.1em;
@@ -85,12 +55,13 @@ export default function TrustSection() {
           align-items: center;
           justify-content: center;
           font-weight: 500;
-          transition: opacity 0.2s ease;
+          transition: opacity 0.2s ease, color 0.2s ease;
           min-height: 44px;
           min-width: 44px;
         }
         .trust-link:hover {
-          opacity: 0.8;
+          color: #5c4124;
+          opacity: 0.9;
         }
         .trust-link:hover .arrow-icon {
           transform: translateX(4px);
@@ -105,8 +76,7 @@ export default function TrustSection() {
           display: none; /* Hidden on desktop */
         }
         
-        .mobile-header-wrapper,
-        .mobile-indicator-wrapper {
+        .mobile-header-wrapper {
           display: none;
         }
 
@@ -166,7 +136,7 @@ export default function TrustSection() {
             display: block;
             font-size: 9px;
             letter-spacing: 1.5px;
-            color: #887a6d;
+            color: #705842;
             margin-bottom: 12px;
           }
 
@@ -184,45 +154,17 @@ export default function TrustSection() {
             padding: 0;
             max-width: 100%;
             line-height: 1.5;
-            font-style: normal; /* Editorial feel instead of italic */
+            font-style: normal;
           }
           
           .trust-link {
             font-size: 9.5px;
             letter-spacing: 1.5px;
-            margin-top: 20px; /* Precise gap below description */
-            color: #c1a68d;
+            margin-top: 20px;
+            color: #846039;
             padding: 0;
             min-height: 44px;
             align-items: center;
-          }
-          
-          .mobile-indicator-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            padding: 0 20px;
-          }
-          .indicator-text {
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            color: #666;
-            font-family: monospace;
-          }
-          .indicator-bar-container {
-            flex: 0 0 100px;
-            height: 1px;
-            background-color: #e5e5e5;
-            position: relative;
-          }
-          .indicator-bar-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 1px;
-            background-color: #333;
-            transition: width 0.3s ease, left 0.3s ease;
           }
         }
       `}</style>
@@ -233,13 +175,13 @@ export default function TrustSection() {
         <p className="mobile-section-sub">Thoughtfully crafted services designed around you.</p>
       </div>
 
-      <div className="trust-grid" ref={scrollContainerRef} onScroll={handleScroll}>
+      <div className="trust-grid">
         
         <div className="trust-item">
           <div className="trust-card-num">01</div>
           <h3 style={titleStyle}>Made to Order</h3>
           <p className="trust-desc">Crafted especially for your order.</p>
-          <Link href="#couture-process" aria-label="Discover the Couture Process" className="trust-link">
+          <Link href="#couture-process" aria-label="Discover the Process" className="trust-link">
             Discover the Process <span className="arrow-icon">&rarr;</span>
           </Link>
         </div>
@@ -257,7 +199,7 @@ export default function TrustSection() {
           <div className="trust-card-num">03</div>
           <h3 style={titleStyle}>Personal Styling</h3>
           <p className="trust-desc">Guidance for choosing your look.</p>
-          <Link href="/consultation" aria-label="Book a Design Consultation" className="trust-link">
+          <Link href="/consultation" aria-label="Request a Consultation" className="trust-link">
             Request a Consultation <span className="arrow-icon">&rarr;</span>
           </Link>
         </div>
@@ -266,13 +208,12 @@ export default function TrustSection() {
           <div className="trust-card-num">04</div>
           <h3 style={titleStyle}>Shipping & Returns</h3>
           <p className="trust-desc">Clear information about delivery, exchanges and returns.</p>
-          <Link href="/shipping" aria-label="View Shipping and Return Policy" className="trust-link">
+          <Link href="/shipping" aria-label="View Shipping & Returns" className="trust-link">
             View Shipping & Returns <span className="arrow-icon">&rarr;</span>
           </Link>
         </div>
 
       </div>
-
 
     </section>
   );

@@ -1,16 +1,18 @@
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import HeroSection from '@/components/home/HeroSection';
-import CategoryNavigation from '@/components/home/CategoryNavigation';
-import DynamicCategoryShowcase from '@/components/home/DynamicCategoryShowcase';
-import PremiumFeaturedCarousel from '@/components/home/PremiumFeaturedCarousel';
 import CuratedGrid from '@/components/home/CuratedGrid';
 import FeatureBanner from '@/components/home/FeatureBanner';
-import SplitShowcase from '@/components/home/SplitShowcase';
-import CoutureProcess from '@/components/home/CoutureProcess';
-import LookbookCarousel from '@/components/home/LookbookCarousel';
 import BrandStory from '@/components/home/BrandStory';
 import TrustSection from '@/components/home/TrustSection';
-import TestimonialsSection from '@/components/home/TestimonialsSection';
+
+// Dynamically import below-the-fold interactive components to reduce initial JS bundle size
+// and main-thread execution time. SSR remains enabled for SEO and zero CLS.
+const SplitShowcase = dynamic(() => import('@/components/home/SplitShowcase'));
+const LookbookCarousel = dynamic(() => import('@/components/home/LookbookCarousel'));
+const TestimonialsSection = dynamic(() => import('@/components/home/TestimonialsSection'));
+const PremiumFeaturedCarousel = dynamic(() => import('@/components/home/PremiumFeaturedCarousel'));
+const CoutureProcess = dynamic(() => import('@/components/home/CoutureProcess'));
 import dbConnect from '@/lib/mongoose';
 import Product from '@/models/Product';
 import HeroCampaign from '@/models/HeroCampaign';

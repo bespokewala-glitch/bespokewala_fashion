@@ -66,7 +66,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
         style={{
           position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)',
           zIndex: 10, background: 'rgba(255,255,255,0.7)', border: 'none', borderRadius: '50%',
-          width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem',
+          width: '44px', height: '44px', minWidth: '44px', minHeight: '44px', cursor: 'pointer', fontSize: '1.2rem',
           boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
         }}
         aria-label="Previous"
@@ -79,7 +79,7 @@ export default function LookbookCarousel({ data }: { data?: any }) {
         style={{
           position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)',
           zIndex: 10, background: 'rgba(255,255,255,0.7)', border: 'none', borderRadius: '50%',
-          width: '40px', height: '40px', cursor: 'pointer', fontSize: '1.2rem',
+          width: '44px', height: '44px', minWidth: '44px', minHeight: '44px', cursor: 'pointer', fontSize: '1.2rem',
           boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
         }}
         aria-label="Next"
@@ -94,6 +94,8 @@ export default function LookbookCarousel({ data }: { data?: any }) {
           display: 'flex',
           overflowX: 'auto',
           scrollSnapType: 'x mandatory',
+          touchAction: 'pan-y',
+          WebkitOverflowScrolling: 'touch',
           gap: '2rem',
           paddingBottom: '2rem',
           scrollbarWidth: 'none', // Firefox

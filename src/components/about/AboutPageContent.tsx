@@ -96,11 +96,17 @@ export default function AboutPageContent() {
   /* ── HERO ── */
   const heroSection = (
     <section style={{ position: "relative", height: "85vh", overflow: "hidden" }}>
-      <img
-        src="/about-hero.png"
-        alt="Bespokewala atelier interior"
-        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
-      />
+      <picture>
+        <source srcSet="/about-hero.webp" type="image/webp" />
+        <img
+          src="/about-hero.png"
+          alt="Bespokewala atelier interior"
+          width={1024}
+          height={1024}
+          fetchPriority="high"
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+        />
+      </picture>
       {/* overlay */}
       <div style={{
         position: "absolute", inset: 0,
@@ -228,11 +234,18 @@ export default function AboutPageContent() {
 
         {/* Portrait */}
         <div style={{ position: "relative" }}>
-          <img
-            src="/about-hero.png"
-            alt="Founder of Bespokewala"
-            style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
-          />
+          <picture>
+            <source srcSet="/founder-portrait.webp" type="image/webp" />
+            <img
+              src="/founder-portrait.png"
+              alt="Founder of Bespokewala"
+              width={1024}
+              height={1024}
+              loading="lazy"
+              decoding="async"
+              style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", display: "block" }}
+            />
+          </picture>
           {/* decorative frame */}
           <div style={{
             position: "absolute", top: "1.5rem", left: "1.5rem", right: "-1.5rem", bottom: "-1.5rem",
@@ -406,6 +419,10 @@ export default function AboutPageContent() {
                   <img 
                     src={member.image} 
                     alt={member.name} 
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    decoding="async"
                     style={{ width: "100%", height: "100%", objectFit: "cover" }} 
                   />
                 ) : (

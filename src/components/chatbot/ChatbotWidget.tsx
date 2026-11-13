@@ -1,5 +1,6 @@
 'use client';
 
+import '@/app/chatbot.css';
 import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -225,7 +226,7 @@ export default function ChatbotWidget({ pageContext: propPageContext }: ChatbotW
         <button
           className="chatbot-trigger"
           onClick={handleOpen}
-          aria-label="Open Style Concierge"
+          aria-label="Live Chat"
           id="chatbot-trigger-btn"
         >
           {hasUnread && <span className="chatbot-badge" aria-hidden="true" />}

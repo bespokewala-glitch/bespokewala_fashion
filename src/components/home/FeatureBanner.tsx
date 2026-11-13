@@ -17,10 +17,10 @@ export default function FeatureBanner({ data }: { data?: any }) {
 
       {/* Top Header matching screenshot */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }} className="mobile-mb-2">
-        <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#c1a68d', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }} className="mobile-label-clamp">
+        <p style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#846039', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 600 }} className="mobile-label-clamp">
           Our Craft, Your Forever
         </p>
-        <div style={{ width: '40px', height: '1px', backgroundColor: '#c1a68d', margin: '0 auto 1.5rem auto' }} />
+        <div style={{ width: '40px', height: '1px', backgroundColor: '#846039', margin: '0 auto 1.5rem auto' }} />
         <h2 style={{ fontSize: '2.5rem', fontFamily: 'serif', fontWeight: 400, color: '#222', marginBottom: '1rem', letterSpacing: '0.05em', textTransform: 'uppercase' }} className="mobile-h2-clamp">
           Curated Grid
         </h2>
@@ -43,6 +43,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
         {image.match(/\.(mp4|webm|ogg)$/i) ? (
           <video
             src={image}
+            preload="none"
             style={{
               width: '100%',
               height: '100%',
@@ -61,7 +62,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               objectFit: 'cover',
               opacity: 0.7,
             }}
-            variant="medium"
+            variant="large"
             loading="lazy"
           />
         )}
@@ -114,7 +115,7 @@ export default function FeatureBanner({ data }: { data?: any }) {
               {subtitle}
             </p>
           </div>
-          <Link href={link} prefetch={false} aria-label={`Explore ${title || 'collection'}`} style={{
+          <Link href={link} prefetch={false} style={{
             color: '#fff',
             textDecoration: 'none',
             fontSize: '0.85rem',

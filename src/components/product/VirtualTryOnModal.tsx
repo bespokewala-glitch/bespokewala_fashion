@@ -146,6 +146,7 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
           userImageBase64: userImage,
           productImageUrl: fullProductUrl,
           category: productCategory,
+          productName,
         }),
       });
 
@@ -484,7 +485,7 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
                 <div className="vto-col">
                   <span className="vto-label">Garment</span>
                   <div className="vto-img-wrap">
-                    <img src={productImage} alt="Product" />
+                    <img src={productImage} alt="Product" width={300} height={400} loading="lazy" decoding="async" />
                   </div>
                 </div>
 
@@ -493,7 +494,7 @@ export default function VirtualTryOnModal({ isOpen, onClose, productImage, produ
                   <span className="vto-label">Your Photo</span>
                   <div className="vto-upload" onClick={() => fileInputRef.current?.click()}>
                     {userImage ? (
-                      <img src={userImage} alt="Your photo" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <img src={userImage} alt="Your photo" width={300} height={400} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     ) : (
                       <div className="vto-upload-inner">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

@@ -19,8 +19,6 @@ export default function CurrencySelector() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (isLoading) return <div style={{ width: 60, height: 20 }}></div>;
-
   const currentInfo = SUPPORTED_CURRENCIES[currency] || SUPPORTED_CURRENCIES['INR'];
 
   return (
@@ -38,9 +36,11 @@ export default function CurrencySelector() {
           color: 'inherit',
           padding: '4px 8px',
           textTransform: 'uppercase',
-          letterSpacing: '0.05em'
+          letterSpacing: '0.05em',
+          minWidth: '54px',
+          minHeight: '28px',
         }}
-        aria-label="Select Currency"
+        aria-label={`${currentInfo.code} ${currentInfo.symbol} - Select Currency`}
         title="Select Currency"
       >
         {currentInfo.code} {currentInfo.symbol}

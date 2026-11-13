@@ -1,5 +1,3 @@
-"use client";
-
 import React from 'react';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 import Link from 'next/link';
@@ -49,7 +47,7 @@ export default function BrandStory({ data }: { data?: any }) {
           font-size: 0.85rem;
           text-transform: uppercase;
           letter-spacing: 0.2em;
-          color: #888;
+          color: #846039;
           font-weight: 600;
         }
         .brand-story-title {
@@ -77,7 +75,7 @@ export default function BrandStory({ data }: { data?: any }) {
           letter-spacing: 0.1em;
           font-size: 0.85rem;
           text-decoration: none;
-          transition: all 0.3s ease;
+          transition: background-color 0.3s ease, color 0.3s ease;
           align-self: flex-start;
         }
         .brand-story-cta:hover {
@@ -169,6 +167,7 @@ export default function BrandStory({ data }: { data?: any }) {
               fill
               style={{ objectFit: 'cover' }}
               sizes="(max-width: 1024px) 100vw, 50vw"
+              variant="medium"
               priority={false}
             />
           )}

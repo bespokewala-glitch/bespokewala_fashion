@@ -71,7 +71,7 @@ function LoadingShimmer({ fill, style }: { fill?: boolean; style?: React.CSSProp
 
 export default function OptimizedImage({
   src,
-  variant,
+  variant = 'medium',
   priority = false,
   alt = 'Bespokewala Image',
   style,
@@ -126,7 +126,7 @@ export default function OptimizedImage({
         alt={alt || 'Bespokewala Image'}
         priority={priority}
         fill={fill}
-        sizes={sizes}
+        sizes={sizes || (fill ? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw' : undefined)}
         unoptimized={isBypass}
         style={{
           ...style,

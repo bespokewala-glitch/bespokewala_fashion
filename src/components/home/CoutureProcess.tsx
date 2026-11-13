@@ -62,7 +62,8 @@ export default function CoutureProcess({ data }: { data?: any }) {
           .process-image-wrapper {
             position: relative;
             width: 100%;
-            padding-bottom: 125%; /* 4:5 aspect ratio */
+            aspect-ratio: 4 / 5;
+            padding-bottom: 125%; /* 4:5 aspect ratio fallback */
             overflow: hidden;
             margin-bottom: 1.5rem;
             background-color: #eee;
@@ -82,7 +83,8 @@ export default function CoutureProcess({ data }: { data?: any }) {
           .process-step-number {
             font-size: 0.85rem;
             letter-spacing: 0.15em;
-            color: #888;
+            color: #846039;
+            font-weight: 600;
             margin-bottom: 0.5rem;
             display: block;
           }
@@ -156,7 +158,7 @@ export default function CoutureProcess({ data }: { data?: any }) {
           {steps.map((step: any, index: number) => (
             <div key={index} className="process-step-card">
               <div className="process-image-wrapper">
-                <img src={step.image || step.media || defaultSteps[index]?.image} alt={step.title} loading="lazy" />
+                <img src={step.image || step.media || defaultSteps[index]?.image} alt={step.title} width={600} height={750} decoding="async" loading="lazy" />
               </div>
               <div>
                 <span className="process-step-number">STEP 0{index + 1}</span>

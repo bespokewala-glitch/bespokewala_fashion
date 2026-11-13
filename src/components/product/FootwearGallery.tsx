@@ -37,61 +37,6 @@ export default function FootwearGallery({ images }: ProductGalleryProps) {
 
   return (
     <>
-      <style>{`
-        .footwear-gallery-container {
-          display: flex;
-          gap: 1.5rem;
-          flex-direction: row;
-        }
-        .footwear-gallery-thumbnails {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          width: 100px;
-          flex-shrink: 0;
-          opacity: 0;
-          transition: opacity 0.5s ease-in;
-        }
-        .footwear-gallery-thumbnails.visible {
-          opacity: 1;
-        }
-        .footwear-thumbnail-btn {
-          width: 100px;
-          height: 140px;
-        }
-        @media (max-width: 768px) {
-          .footwear-gallery-container {
-            flex-direction: column-reverse;
-          }
-          .footwear-gallery-thumbnails {
-            flex-direction: row;
-            width: 100%;
-            overflow-x: auto;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-          .footwear-gallery-thumbnails::-webkit-scrollbar {
-            display: none;
-          }
-          .footwear-thumbnail-btn {
-            width: 70px;
-            height: 98px;
-            flex-shrink: 0;
-          }
-        }
-        
-        @keyframes footwear-shimmer {
-          0% { background-position: -1000px 0; }
-          100% { background-position: 1000px 0; }
-        }
-        .footwear-skeleton {
-          background: #f6f7f8;
-          background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-          background-repeat: no-repeat;
-          background-size: 1000px 100%;
-          animation: footwear-shimmer 2s infinite linear forwards;
-        }
-      `}</style>
       <div className="footwear-gallery-container">
         {/* Main Image (Left side) */}
         <div className="footwear-skeleton" style={{ flex: 1, position: 'relative', overflow: 'hidden', borderRadius: '12px', backgroundColor: '#fafafa', aspectRatio: '2/3', maxHeight: '85vh' }}>

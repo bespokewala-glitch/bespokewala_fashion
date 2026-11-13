@@ -45,6 +45,7 @@ export default function CookieBanner() {
             justifyContent: 'space-between',
             gap: '1.5rem',
             flexWrap: 'wrap',
+            contain: 'layout paint',
           }}
           className="cookie-banner"
         >
@@ -139,7 +140,8 @@ export default function CookieBanner() {
               style={{
                 padding: '0.6rem 0.5rem',
                 background: 'transparent',
-                color: '#888',
+                color: '#444',
+                fontWeight: 500,
                 border: 'none',
                 fontSize: '0.75rem',
                 letterSpacing: '0.04em',

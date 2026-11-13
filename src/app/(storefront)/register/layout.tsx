@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import '../../auth.css';
 
 export const metadata: Metadata = {
   title: 'Register',

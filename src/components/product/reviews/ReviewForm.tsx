@@ -205,7 +205,7 @@ export default function ReviewForm({ productId, onSuccess, onCancel }: ReviewFor
           <div className={styles.photoGrid}>
             {images.map((img, idx) => (
               <div key={idx} className={styles.photoPreview}>
-                <img src={img} alt="Upload" className={styles.photoImg} />
+                <img src={img} alt="Upload" width={80} height={80} loading="lazy" decoding="async" className={styles.photoImg} />
                 <button 
                   type="button" 
                   onClick={() => removeImage(idx)}

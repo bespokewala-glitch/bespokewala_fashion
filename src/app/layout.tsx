@@ -13,8 +13,10 @@ import CookieBanner from "@/components/CookieConsent/CookieBanner";
 const josefinSans = Josefin_Sans({
   subsets: ["latin"],
   variable: "--font-josefin-sans",
-  weight: ["300", "400", "600", "700"],
   display: "swap",
+  preload: true,
+  fallback: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+  adjustFontFallback: true,
 });
 
 export const viewport: Viewport = {
@@ -50,7 +52,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-IN" className={josefinSans.variable}>
+    <html lang="en-IN" className={`${josefinSans.variable} ${josefinSans.className}`}>
+      <head>
+        <link rel="preconnect" href="https://storage.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+      </head>
       <body>
         <MetaPixel />
         <GoogleAnalytics />

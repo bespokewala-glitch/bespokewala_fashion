@@ -35,6 +35,16 @@ jest.mock('@/context/WishlistContext', () => ({
   }),
 }));
 
+jest.mock('@/context/CurrencyContext', () => ({
+  useCurrency: () => ({
+    currency: 'INR',
+    setCurrency: jest.fn(),
+    rates: { INR: 1, USD: 0.012 },
+    formatPrice: (price: number) => `₹${price}`,
+    convertPrice: (price: number) => price,
+  }),
+}));
+
 // Mock API calls inside Header
 global.fetch = jest.fn(() =>
   Promise.resolve({

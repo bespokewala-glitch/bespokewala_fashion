@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const testimonials = [
   {
@@ -31,13 +31,32 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
     const timer = setInterval(() => {
       setActiveIndex((current) => (current + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isVisible]);
 
   // Generate SVG stars
   const renderStars = (rating: number) => {
@@ -49,7 +68,7 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="testimonials-section">
+    <section ref={sectionRef} className="testimonials-section">
       <style>{`
         .testimonials-section {
           background-color: #111;
@@ -118,7 +137,7 @@ export default function TestimonialsSection() {
         }
         .testimonial-meta {
           font-size: 0.75rem;
-          color: #888;
+          color: #a8a8a8;
           margin-top: 0.75rem;
           display: flex;
           flex-direction: column;
@@ -135,17 +154,27 @@ export default function TestimonialsSection() {
           margin-top: 2rem;
         }
         .indicator-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background-color: #444;
+          min-width: 44px;
+          min-height: 44px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent;
           cursor: pointer;
-          transition: background-color 0.3s ease;
           border: none;
           padding: 0;
         }
-        .indicator-dot.active {
+        .indicator-dot::after {
+          content: '';
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: #555;
+          transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .indicator-dot.active::after {
           background-color: #d2b48c;
+          transform: scale(1.25);
         }
         
         @media (max-width: 768px) {

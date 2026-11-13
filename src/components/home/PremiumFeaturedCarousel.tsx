@@ -9,28 +9,8 @@ import ProductCardWishlistButton from '@/components/product/ProductCardWishlistB
 export default function PremiumFeaturedCarousel({ products }: { products: any[] }) {
   const { formatPrice } = useCurrency();
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [showArrows, setShowArrows] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    const mql = window.matchMedia('(min-width: 768px)');
-    setShowArrows(mql.matches);
-    const handler = (e: MediaQueryListEvent) => setShowArrows(e.matches);
-    if (mql.addEventListener) {
-      mql.addEventListener('change', handler);
-    } else {
-      mql.addListener(handler);
-    }
-
-    return () => {
-      if (mql.removeEventListener) {
-        mql.removeEventListener('change', handler);
-      } else {
-        mql.removeListener(handler);
-      }
-    };
-  }, []);
 
   // Intersection Observer to detect the currently centered card
   useEffect(() => {
@@ -141,6 +121,7 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           overflow-x: auto;
           scroll-snap-type: x mandatory;
           -webkit-overflow-scrolling: touch;
+          touch-action: pan-y;
           scrollbar-width: none;
           -ms-overflow-style: none;
           gap: 1.5rem;
@@ -161,7 +142,8 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           flex-direction: column;
           text-align: left;
           position: relative;
-          transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+          will-change: transform, opacity;
           opacity: 0.75;
           transform: scale(0.95);
         }
@@ -225,7 +207,8 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
         .unified-product-price {
           font-size: 0.85rem;
           font-weight: 300;
-          color: #777;
+          color: #555;
+          font-weight: 400;
           margin: 0;
           letter-spacing: 0.05em;
         }
@@ -242,11 +225,11 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
           border: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
           z-index: 30;
-          display: flex;
+          display: none;
           align-items: center;
           justify-content: center;
           color: #111;
-          transition: all 0.3s ease;
+          transition: border-color 0.3s ease, background-color 0.3s ease;
           backdrop-filter: blur(4px);
         }
         
@@ -277,9 +260,10 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
 
         @media (min-width: 768px) {
           .mobile-swipe-indicator {
-            display: none;
+            display: none !important;
           }
           .unified-nav-btn {
+            display: flex;
             top: calc(2rem + 375px / 2); /* Desktop height adjustment */
           }
         }
@@ -321,34 +305,28 @@ export default function PremiumFeaturedCarousel({ products }: { products: any[] 
         ))}
       </div>
 
-      {showArrows && (
-        <>
-          <button 
-            onClick={scrollLeft}
-            aria-label="Previous featured product"
-            className="unified-nav-btn nav-left"
-          >
-            <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="10 18 4 12 10 6"></polyline>
-            </svg>
-          </button>
-          <button 
-            onClick={scrollRight}
-            aria-label="Next featured product"
-            className="unified-nav-btn nav-right"
-          >
-            <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="4 18 10 12 4 6"></polyline>
-            </svg>
-          </button>
-        </>
-      )}
+      <button 
+        onClick={scrollLeft}
+        aria-label="Previous featured product"
+        className="unified-nav-btn nav-left"
+      >
+        <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="10 18 4 12 10 6"></polyline>
+        </svg>
+      </button>
+      <button 
+        onClick={scrollRight}
+        aria-label="Next featured product"
+        className="unified-nav-btn nav-right"
+      >
+        <svg width="12" height="20" viewBox="0 0 14 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="4 18 10 12 4 6"></polyline>
+        </svg>
+      </button>
 
-      {!showArrows && (
-        <div className="mobile-swipe-indicator">
-          SWIPE TO EXPLORE <span>&rarr;</span>
-        </div>
-      )}
+      <div className="mobile-swipe-indicator">
+        SWIPE TO EXPLORE <span>&rarr;</span>
+      </div>
     </div>
   );
 }

@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
       },
     ],
 
-    // Allow /api/media/ and /uploads/ as valid <Image> src values.
+    // Allow /api/media/, /uploads/ and root public/ files as valid <Image> src values.
     localPatterns: [
       {
         pathname: '/api/media/**',
@@ -83,6 +83,10 @@ const nextConfig: NextConfig = {
       },
       {
         pathname: '/uploads/**',
+      },
+      {
+        // Allow static assets served from public/ root (e.g. /bespoken-transparent.webp)
+        pathname: '/**',
       },
     ],
 
@@ -128,12 +132,12 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // Cache public static assets (logo, icons, fonts) for 1 week
+        // Cache public static assets (logo, icons, fonts) for 1 year immutable
         source: "/:path*.(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=604800, stale-while-revalidate=86400",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -164,6 +168,14 @@ const nextConfig: NextConfig = {
           {
             key: "X-XSS-Protection",
             value: "1; mode=block",
+          },
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
+          },
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
           },
         ],
       },

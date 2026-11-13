@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
 
@@ -44,34 +44,44 @@ export default function SplitShowcase({ data }: { data?: any }) {
   const products = data?.products || defaultProducts;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % products.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [products.length]);
+  }, [isVisible, products.length]);
 
   const handleNext = () => setCurrentIndex((prev) => (prev + 1) % products.length);
   const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
 
   return (
-    <section style={{ 
+    <section ref={sectionRef} style={{ 
       display: 'flex', 
       width: '100%', 
       minHeight: '80vh',
       backgroundColor: '#fff',
       flexWrap: 'wrap'
     }} className="mobile-flex-col mobile-min-h-auto split-showcase-section">
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes subtleFadeIn {
-          0% { opacity: 0; transform: translateY(10px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        .slide-anim {
-          animation: subtleFadeIn 0.8s ease forwards;
-        }
-      `}} />
       
       {/* Left side - Fixed Model Image */}
       <div className="split-showcase-image" style={{ flex: '1 1 50%', minWidth: '300px', minHeight: '400px', position: 'relative' }}>
@@ -102,14 +112,14 @@ export default function SplitShowcase({ data }: { data?: any }) {
         
         {/* Top Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#666', textTransform: 'uppercase', marginBottom: '0.5rem' }} className="mobile-label-clamp">Our Collection</h2>
+          <h2 style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: '#444', textTransform: 'uppercase', marginBottom: '0.5rem' }} className="mobile-label-clamp">Our Collection</h2>
           <div style={{ width: '30px', height: '1px', backgroundColor: '#ccc', margin: '0 auto' }} />
         </div>
 
         {/* Main Slider Area */}
         <div style={{ position: 'relative', width: '100%', maxWidth: '500px', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           
-          <Link href={products[currentIndex].slug ? `/products/${products[currentIndex].slug}` : '#'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem', textDecoration: 'none', width: '100%' }} aria-label={`View ${products[currentIndex].name}`}>
+          <Link href={products[currentIndex].slug ? `/products/${products[currentIndex].slug}` : '#'} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 3rem', textDecoration: 'none', width: '100%' }}>
             <div style={{ position: 'relative', width: '100%', maxWidth: '300px', height: '300px', marginBottom: '1.5rem' }} className="mobile-slider-img">
               <OptimizedImage 
                 src={products[currentIndex].image || ''} 
@@ -122,7 +132,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
               />
             </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 400, color: '#333', marginBottom: '0.5rem', fontFamily: 'serif' }} className="mobile-h3-clamp">{products[currentIndex].name}</h3>
-            <p style={{ fontSize: '1rem', color: '#888' }} className="mobile-body-clamp">{products[currentIndex].price}</p>
+            <p style={{ fontSize: '1rem', color: '#555' }} className="mobile-body-clamp">{products[currentIndex].price}</p>
           </Link>
           
           {/* Pagination Dots */}
@@ -133,12 +143,29 @@ export default function SplitShowcase({ data }: { data?: any }) {
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
                 style={{ 
-                  width: '6px', height: '6px', borderRadius: '50%', 
-                  backgroundColor: idx === currentIndex ? '#333' : '#e0e0e0',
-                  cursor: 'pointer', transition: 'background-color 0.3s',
-                  border: 'none', padding: 0
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
                 }} 
-              />
+              >
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: idx === currentIndex ? '#333' : '#bbb',
+                    transition: 'background-color 0.3s, transform 0.2s',
+                    transform: idx === currentIndex ? 'scale(1.2)' : 'scale(1)',
+                    display: 'block',
+                  }}
+                />
+              </button>
             ))}
           </div>
         </div>
@@ -157,7 +184,7 @@ export default function SplitShowcase({ data }: { data?: any }) {
               paddingBottom: '2px',
               transition: 'color 0.2s, border-color 0.2s',
             }}
-            aria-label="View all collections"
+            aria-label="View All Collection"
           >
             View All Collection →
           </Link>

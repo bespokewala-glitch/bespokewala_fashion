@@ -85,8 +85,8 @@ export default function Header() {
           sessionStorage.setItem('header_taxonomies', JSON.stringify({ ts: Date.now(), data }));
         }
       } catch (e: any) {
-        if (e?.name !== 'AbortError') {
-          console.error('Failed to fetch taxonomies in header');
+        if (process.env.NODE_ENV === 'development' && e?.name !== 'AbortError') {
+          console.warn('Failed to fetch taxonomies in header');
         }
       }
     };
@@ -178,7 +178,7 @@ export default function Header() {
             setMegaMenuImages(newImages);
             sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), images: newImages }));
           })
-          .catch((e: any) => { if (e?.name !== 'AbortError') console.error(e); });
+          .catch((e: any) => { if (process.env.NODE_ENV === 'development' && e?.name !== 'AbortError') console.warn(e); });
       }, 200);
       return () => { clearTimeout(timer); controller.abort(); };
     }
@@ -240,7 +240,7 @@ export default function Header() {
     top: 0,
     width: '100%',
     zIndex: 100,
-    transition: 'all 0.3s ease',
+    transition: 'background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease',
     backgroundColor: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? 'rgba(255, 255, 255, 0.98)' : 'transparent',
     borderBottom: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? '1px solid #eee' : 'none',
     color: (isScrolled || !isHomePage || hoveredNav || activeMobileTopDropdown) ? '#1c1c1c' : '#ffffff',
@@ -423,7 +423,7 @@ export default function Header() {
       `}</style>
       <header style={headerStyle} className="mobile-header-sticky">
         {/* Mobile Top Category Bar (matches Manish Malhotra reference) */}
-        <div className="mobile-top-bar desktop-hide">
+        <div className="mobile-top-bar desktop-hide" style={{ height: '38px', minHeight: '38px', boxSizing: 'border-box' }}>
           {[
             { id: 'couture', label: 'Couture' },
             { id: 'jewellery', label: 'Jewellery' },
@@ -452,8 +452,10 @@ export default function Header() {
                   gap: '3px',
                   whiteSpace: 'nowrap',
                   borderBottom: isActive ? '2px solid #c8a96e' : '2px solid transparent',
-                  transition: 'all 0.2s ease',
+                  transition: 'color 0.2s ease, border-color 0.2s ease',
                   minHeight: '28px',
+                  height: '28px',
+                  boxSizing: 'border-box',
                 }}
                 aria-expanded={isActive}
                 aria-label={`${cat.label} dropdown`}
@@ -472,7 +474,7 @@ export default function Header() {
           })}
         </div>
 
-        <div style={navContainer} className="mobile-main-header">
+        <div style={{ ...navContainer, minHeight: '56px', height: '56px', boxSizing: 'border-box' }} className="mobile-main-header">
 
           {/* Mobile Hamburger — left */}
           <div className="desktop-hide" style={{ flex: '0 0 44px', display: 'flex', alignItems: 'center' }}>
@@ -519,22 +521,30 @@ export default function Header() {
             </ul>
           </nav>
 
-          {/* Logo — center, always explicitly sized */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img
-                src="/bespoken-transparent.png"
-                alt="Bespokewala"
-                className={`header-logo-img${isLightHeader ? '' : ' header-logo-inverted'}`}
-                style={{
-                  width: '60px',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  display: 'block',
-                  flexShrink: 0,
-                  background: 'transparent',
-                }}
-              />
+          {/* Logo — center, always explicitly sized with reserved aspect-ratio */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '55px' }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '60px', minHeight: '55px' }}>
+              <picture>
+                <source srcSet="/bespoken-transparent.webp" type="image/webp" />
+                <img
+                  src="/bespoken-transparent.png"
+                  alt="Bespokewala"
+                  width={60}
+                  height={55}
+                  fetchPriority="high"
+                  decoding="async"
+                  className={`header-logo-img${isLightHeader ? '' : ' header-logo-inverted'}`}
+                  style={{
+                    width: '60px',
+                    height: 'auto',
+                    aspectRatio: '522 / 481',
+                    objectFit: 'contain',
+                    display: 'block',
+                    flexShrink: 0,
+                    background: 'transparent',
+                  }}
+                />
+              </picture>
             </Link>
           </div>
 
@@ -767,7 +777,7 @@ export default function Header() {
                                   color: isSelected ? '#ffffff' : '#444444',
                                   cursor: 'pointer',
                                   whiteSpace: 'nowrap',
-                                  transition: 'all 0.15s ease',
+                                  transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
                                 }}
                               >
                                 {item.label}

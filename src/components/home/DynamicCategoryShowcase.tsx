@@ -1,5 +1,3 @@
-"use client";
-
 import React from 'react';
 import Link from 'next/link';
 import OptimizedImage from '@/components/ui/OptimizedImage';
@@ -68,6 +66,10 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
                 }
                 .showcase-card:hover .overlay-content {
                   background: rgba(0,0,0,0.6);
+                  }
+                  .mobile-view-all:hover {
+                    background-color: #fff !important;
+                    color: #000 !important;
                 }
               `}} />
               
@@ -122,16 +124,8 @@ export default function DynamicCategoryShowcase({ categoryName, campaigns }: Dyn
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
                     fontSize: '0.8rem',
-                    transition: 'all 0.3s ease',
+                    transition: 'background-color 0.3s ease, color 0.3s ease',
                   }} className="mobile-view-all"
-                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.currentTarget.style.backgroundColor = '#fff';
-                    e.currentTarget.style.color = '#000';
-                  }}
-                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#fff';
-                  }}
                   >
                     View Collection
                   </Link>

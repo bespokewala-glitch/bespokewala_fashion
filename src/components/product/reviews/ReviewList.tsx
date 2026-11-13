@@ -85,7 +85,7 @@ export default function ReviewList({ reviews, setRefreshKey }: ReviewListProps) 
                   style={{ width: '80px', height: '80px', cursor: 'pointer', overflow: 'hidden', border: '1px solid #eaeaea' }}
                   onClick={() => setLightboxImage({ url: img, alt: 'Review Image' })}
                 >
-                  <img src={img} alt="Review" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={img} alt="Review" width={80} height={80} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>

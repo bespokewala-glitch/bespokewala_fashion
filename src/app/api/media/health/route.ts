@@ -56,6 +56,24 @@ export async function GET() {
     checks.gcs_error = msg.substring(0, 200); // truncated — no secrets in error messages
   }
 
+  // 5. Object-level access — what the /api/media proxy actually needs.
+  //    (bucket.exists() above requires storage.buckets.get, which the
+  //    Storage Object Admin role does NOT include, so it can fail even when
+  //    images would work.)
+  try {
+    const [files] = await bucket.getFiles({ prefix: 'uploads/', maxResults: 1, autoPaginate: false });
+    checks.gcs_objects_list_ok = true;
+    if (files[0]) {
+      await files[0].getMetadata();
+      checks.gcs_objects_get_ok = true;
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    const code = (err as { code?: number })?.code;
+    checks.gcs_objects_ok = false;
+    checks.gcs_objects_error = `code=${code ?? 'n/a'} ${msg.substring(0, 300)}`;
+  }
+
   const allGood = checks.env_project_id &&
     checks.env_client_email &&
     checks.env_private_key_present &&

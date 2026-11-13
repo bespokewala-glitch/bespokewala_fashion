@@ -52,6 +52,26 @@ function missingFileResponse(fileParam: string): NextResponse {
   });
 }
 
+// Distinguish a genuinely missing object (GCS 404) from permission / auth /
+// network failures. Previously every error was reported as 410 "missing",
+// which hid IAM problems. Non-404 errors now return 502 and log the real cause.
+function gcsErrorResponse(fileParam: string, err: unknown, startMs: number): NextResponse {
+  const code = (err as { code?: number })?.code;
+  const msg = err instanceof Error ? err.message : String(err);
+  if (code === 404) {
+    console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
+    return missingFileResponse(fileParam);
+  }
+  console.error(`[media] 💥 GCS error (code=${code ?? 'n/a'}) for "${fileParam}": ${msg}`);
+  return new NextResponse(null, {
+    status: 502,
+    headers: {
+      'Cache-Control': 'no-store, max-age=0',
+      'X-Media-Error': `gcs-${code ?? 'unknown'}`,
+    },
+  });
+}
+
 // ─── Route Handler ────────────────────────────────────────────────────────────
 // NOTE: `sharp` is intentionally NOT imported at the top level.
 //
@@ -161,9 +181,8 @@ export async function GET(
       try {
         const [buf] = await gcsFile.download();
         originalBuffer = buf;
-      } catch {
-        console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-        return missingFileResponse(fileParam);
+      } catch (err) {
+        return gcsErrorResponse(fileParam, err, startMs);
       }
 
       // ── Dynamic sharp import ─────────────────────────────────────────────────
@@ -239,10 +258,9 @@ export async function GET(
       const [metadata] = await gcsFile.getMetadata();
       contentType = (metadata.contentType as string) || getMimeType(fileParam);
       contentLength = parseInt(String(metadata.size || '0'), 10);
-    } catch {
-      // File not found or metadata error — return 410 so onError fires in the browser
-      console.warn(`[media] ❌ GCS object not found: "${fileParam}" (${Date.now() - startMs}ms)`);
-      return missingFileResponse(fileParam);
+    } catch (err) {
+      // 404 → 410 (missing); anything else → 502 with the real error logged
+      return gcsErrorResponse(fileParam, err, startMs);
     }
 
     // Download the original from GCS into a buffer and serve it.

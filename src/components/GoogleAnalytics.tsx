@@ -86,13 +86,13 @@ function GoogleAnalyticsInner() {
       {/* Load the Google tag (gtag.js) script */}
       <Script
         id="google-analytics-script"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
       {/* Initialize dataLayer and gtag — consent defaults are already set above */}
       <Script
         id="google-analytics-init"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

@@ -56,66 +56,6 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
 
   return (
     <>
-      <style>{`
-        .gallery-container {
-          display: flex;
-          gap: 1.5rem;
-          flex-direction: row;
-        }
-        @media (min-width: 769px) {
-          .gallery-container {
-            align-items: flex-start;
-          }
-        }
-        .gallery-thumbnails {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          width: 100px;
-          flex-shrink: 0;
-          opacity: 0;
-          transition: opacity 0.5s ease-in;
-        }
-        .gallery-thumbnails.visible {
-          opacity: 1;
-        }
-        .gallery-thumbnail-btn {
-          width: 100px;
-          height: 140px;
-        }
-        @media (max-width: 768px) {
-          .gallery-container {
-            flex-direction: column-reverse;
-          }
-          .gallery-thumbnails {
-            flex-direction: row;
-            width: 100%;
-            overflow-x: auto;
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-          }
-          .gallery-thumbnails::-webkit-scrollbar {
-            display: none; /* Chrome, Safari and Opera */
-          }
-          .gallery-thumbnail-btn {
-            width: 70px;
-            height: 98px;
-            flex-shrink: 0;
-          }
-        }
-        /* NEW: Skeleton Animation */
-        @keyframes gallery-shimmer {
-          0% { background-position: -1000px 0; }
-          100% { background-position: 1000px 0; }
-        }
-        .gallery-skeleton {
-          background: #f6f7f8;
-          background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-          background-repeat: no-repeat;
-          background-size: 1000px 100%;
-          animation: gallery-shimmer 2s infinite linear forwards;
-        }
-      `}</style>
       <div className="gallery-container">
         {/* Main Image (Left side) */}
         {/* ADDED aspect-ratio to prevent layout shift and gallery-skeleton for shimmering effect */}

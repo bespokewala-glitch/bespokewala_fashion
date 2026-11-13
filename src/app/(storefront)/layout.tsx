@@ -1,9 +1,6 @@
 import React from 'react';
 import Header from '@/components/layout/Header';
-import dynamic from 'next/dynamic';
-import '../chatbot.css';
-
-const Footer = dynamic(() => import('@/components/layout/Footer'));
+import Footer from '@/components/layout/Footer';
 import MiniCart from '@/components/cart/MiniCart';
 import ChatbotLoader from '@/components/chatbot/ChatbotLoader';
 
